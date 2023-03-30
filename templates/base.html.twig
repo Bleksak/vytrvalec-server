@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}{{ 'title'|trans }}{% endblock %}</title>
+        <link rel="icon" href="{{ asset('build/images/favicon.png') }}">
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+    </head>
+    <body>
+      <div class="container">
+        {% block navbar %}
+          <nav class="navbar navbar-light navbar-expand-md bg-faded justify-content-center">
+            <a href="{{ path('home') }}" class="navbar-brand d-flex me-auto">{{ 'navbar_title'|trans }}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsingNavbar3">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="navbar-collapse collapse w-100" id="collapsingNavbar3">
+              <ul class="nav navbar-nav ms-auto w-100 justify-content-end">
+                  {% if is_granted('ROLE_STAFF') %}
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ 'navbar_management'|trans }}
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {# <li><a class="dropdown-item" href="{% url 'accounts_management' %}">{% trans 'UserManagementNav' %}</a></li> #}
+                    {# <li><a class="dropdown-item" href="{% url 'season_management' %}">{% trans 'SeasonManagementNav' %}</a></li> #}
+                  </ul>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                  {# <a class="nav-link" href="{% url 'results' %}">{% trans 'ResultsNav' %}</a> #}
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ path('rules') }}">{{ 'navbar_rules'|trans }}</a>
+                </li>
+                {% if app.user %}
+                <li class="nav-item">
+                  {# <a class="nav-item nav-link" href="{% url 'accounts_profile' user.id %}">{% trans 'ProfileNav' %}</a> #}
+                </li>
+                <li class="nav-item">
+                  {# <a class="nav-item nav-link" href="{% url 'submission' %}">{% trans 'SubmitActivityNav' %}</a> #}
+                </li>
+                <li class="nav-item">
+                    {# <a href="{% url 'logout' %}"> #}
+                        {# <button type="button" class="btn btn-outline-dark">{% trans 'LogoutNav' %}</button> #}
+                    {# </a> #}
+                </li>
+                {% else %}
+                <li class="nav-item">
+                  {# <a href="{% url 'login' %}"> #}
+                    {# <button type="button" class="btn btn-outline-dark">{% trans 'LoginNav' %}</button> #}
+                  {# </a> #}
+                </li>
+                <li class="nav-item">
+                  <a href="{{ path('user_register') }}">
+                    <button type="button" class="btn btn-outline-dark">{{ 'sign_up'|trans }}</button>
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
+            </div>
+          </nav>
+        {% endblock %}
+        {% block body %}{% endblock %}
+      </div>
+        {% block footer %}
+          <footer class="text-center">
+            <div class="row">
+              <div class="col">
+                  {{ 'ZCU'|trans }}<br/>
+                  {{ 'KTS'|trans }}<br/>
+                  <br/>
+                  <a href="https://www.facebook.com/KatedraTelesneVychovyASportuZcuVPlzni">
+                      <i class="fa-brands fa-facebook fa-2xl icon"></i>
+                      Facebook
+                  </a>
+                  <a href="https://www.instagram.com/kts.zcu/">
+                    <i class="fa-brands fa-instagram-square fa-2xl icon"></i>
+                    Instagram
+                  </a>
+              </div>
+            </div>
+          </footer>
+        {% endblock %}
+    </body>
+</html>

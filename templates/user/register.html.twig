@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<div class="register">
+    <h2 class="form-header">{{ 'sign_up'|trans }}</h2>
+
+    {# <form class="black-form middle" method="post" action="{% provider_login_url 'google' %}">
+        {% csrf_token %}
+        <button class="google btn"><i class="fa-brands fa-google"></i>{% 'sign_up_gapps'|trans %}</button>
+    </form> #}
+			
+
+    {{ form_start(form, {'attr': {'class': 'black-form'}}) }}
+        <h6>{{ 'sign_up_graduated'|trans }}</h6>
+        {# {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+                <p class="error">{{ error }}</p>
+            {% endfor %}
+        {% endfor %} #}
+
+        {# {% if success %}
+			<span class="success">{% trans 'RegistrationOk' %}</span>
+		{% endif %}  #}
+
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_widget(form.email) }}
+            </div>
+            <div class="col-md-6">
+
+            </div>
+        </div>
+
+        <div>
+            <input type="checkbox" class="form-check-input" id="exampleCheck1" required>
+            <span>{{ 'gdpr'|trans }}</span>
+            <a data-bs-toggle="tooltip" data-bs-placement="top" id="gdpr" title="{{ 'gdpr_tooltip'|trans }}">
+                <u>{{ 'gdpr_link'|trans }}</u>
+            </a>
+            {# <script src="{% static 'js/gdpr.js' %}"></script> #}
+        </div>
+        <input type="submit" class="btn btn-primary" value="{{ 'sign_up'|trans }}">
+    {{ form_end(form) }}
+</div>
+
+{% endblock %}

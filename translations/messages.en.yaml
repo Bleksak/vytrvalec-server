@@ -1,0 +1,74 @@
+title: 'Měsíční vytrvalec'
+
+# navbar
+navbar_title: 'Monthly Endurance'
+navbar_results: 'Results'
+navbar_management: 'Management'
+navbar_user_management: 'User management'
+navbar_season_management: 'Season management'
+navbar_profile: 'Profile'
+navbar_submit: 'Submit activity'
+navbar_login: 'Log in'
+navbar_logout: 'Log out'
+navbar_signup: 'Sign up'
+navbar_rules: 'Rules'
+
+# Home page
+join_us: 'Join the challenge!'
+about_challenge: 'About the challenge'
+challenge_description: |
+  <p>The Monthly Endurance Event was created during the winter semester of 2020. This movement competition was prepared and organized by the Department of Physical Education of the Faculty of Engineering of the University of West Bohemia in Pilsen with the intention to move students during distance learning, which took place at the University of West Bohemia during the coronavirus pandemic.</p>
+  <p>Participants are fighting for 4 weeks for their faculty in the number of kilometers run and cycled. These are tallied within the faculty and at the end of the week to determine the number of points the faculty earns and their overall ranking.</p>
+
+participants: 'Total participants'
+run_and_walk: 'Run and walk'
+bike_and_scooter: 'Bike and scooter'
+winners: Winners of previous years
+charity: Charity
+
+rules: 'Rules'
+rules_description: |
+  <p>Run, walk, bike, scooter, skate! Not only will you do something for your health, but you will contribute to a good cause! Km that contestants offend will be converted into crowns to contribute to charity.</p>
+  <p>We will evaluate the continuous number of kilometers covered and run by faculties and non-faculty departments after a week and each faculty or department has the opportunity to get points for the overall evaluation.</p>
+
+two_disciplines: 'The competition is conducted in two disciplines'
+
+rule2: 'Record the physical activity via some mobile app on your phone and upload it to the Monthly Endurance Portal.'
+
+rating: 'Rating'
+rating_description: 'Each week the number of kilometres covered in the given disciplines is evaluated. The first team gets e.g. 15 points (depending on the number of participating faculties and departments), the second 14 points, the third 13 points, etc. in each discipline. The overall winner of the Challenge will be the team that scores the most points over the 4 weeks in the sum of both disciplines.'
+
+extra_points: In weeks three and four, individuals can earn <strong>EXTRA POINTS</strong> for their faculty
+
+extra_point: 'EXTRA POINT'
+extra_point_plural: 'EXTRA POINTS'
+
+best_in_day: 'for the individual who runs/walks/rides the most miles in one day in that event'
+best_in_week: 'for the individual with the most total miles for the week in that discipline'
+best_elevation: 'for the individual with the most elevation gain in a given discipline. Walking more than 1000m and riding more than 1500m'
+
+third_week: 'Week Three'
+fourth_week: 'Week Four'
+
+ZCU: 'University of West Bohemia'
+KTS: 'Department of Physical Education and Sport'
+
+sign_up: 'Sign up'
+
+sign_up_gapps: 'Sign up with GApps'
+sign_up_graduated: 'Already graduated? Fill the form below!'
+
+gdpr: 'By signing up, you consent to'
+gdpr_link: 'the processing of personal data.'
+gdpr_tooltip: 'The infomration you enter will be used to create a user profile. Personal information will not be published or further processed.'
+
+registration_ok: 'Successfully registered. You can log in now.'
+
+# msgid "season_start_label"
+# msgstr "Season start"
+
+# msgid "season_charity_name_label"
+# msgstr "Charity name"
+
+# msgid "season_charity_description_label"
+# msgstr "Charity description"
