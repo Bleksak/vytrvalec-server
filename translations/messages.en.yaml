@@ -64,6 +64,16 @@ gdpr_tooltip: 'The infomration you enter will be used to create a user profile. 
 
 registration_ok: 'Successfully registered. You can log in now.'
 
+email: 'E-mail'
+first_name: 'First name'
+last_name: 'Last name'
+password: 'Password'
+password_repeat: 'Repeat password'
+faculty: 'Faculty'
+gdpr_label: 'By signing up, you consent to the processing of personal data.'
+empty_field: '---'
+register_form_error: 'There have been some problems with your registration:'
+
 # msgid "season_start_label"
 # msgstr "Season start"
 

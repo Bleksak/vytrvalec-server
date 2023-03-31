@@ -9,9 +9,12 @@
 const $ = require('jquery');
 
 import './styles/global.scss';
-require('bootstrap');
+const bootstrap = require('bootstrap');
 
 import './styles/app.css';
+
+let gdpr = document.getElementById("gdpr");
+let tooltip = new bootstrap.Tooltip(gdpr, {animation: true})
 
 // start the Stimulus application
 import './bootstrap';
