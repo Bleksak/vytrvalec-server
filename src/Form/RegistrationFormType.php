@@ -5,11 +5,12 @@ namespace App\Form;
 use App\Entity\Faculty;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -37,8 +38,9 @@ class RegistrationFormType extends AbstractType
                     'class' => 'form-control'
                 ],
                 'constraints' => [
-                    new Assert\NotBlank(),
-                    new Assert\Email(),
+                    new Assert\NotBlank(null, 'email_empty_error'),
+                    new Assert\Email(null, 'email_format_error'),
+                    new Assert\Type('string', 'email_format_error'),
                 ]
             ])
             ->add('first_name', TextType::class, [
@@ -47,7 +49,7 @@ class RegistrationFormType extends AbstractType
                     'class' => 'form-control d-inline'
                 ],
                 'constraints' => [
-                    new Assert\NotBlank()
+                    new Assert\NotBlank(null, 'first_name_empty_error')
                 ]
             ])
             ->add('last_name', TextType::class, [
@@ -56,25 +58,34 @@ class RegistrationFormType extends AbstractType
                     'class' => 'form-control d-inline'
                 ],
                 'constraints' => [
-                    new Assert\NotBlank()
+                    new Assert\NotBlank(null, 'last_name_empty_error')
                 ]
             ])
-            ->add('password', PasswordType::class, [
-                'label' => 'password',
-                'attr' => [
-                    'class' => 'form-control'
+            // ->add('password', PasswordType::class, [
+            //     'label' => 'password',
+            //     'attr' => [
+            //         'class' => 'form-control'
+            //     ],
+            //     'constraints' => [
+            //         new Assert\NotBlank(null, 'password_short_error'),
+            //         new Assert\Regex('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{3,}.*$/', 'password_format_error'),
+            //         new Assert\Length(null, 8, null, null, null, null, 'password_short_error'),
+            //     ]
+            // ])
+            ->add('password', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'invalid_message' => 'passwords_do_not_match',
+                'first_options'  => ['label' => 'Password'],
+                'second_options' => ['label' => 'Repeat Password'],
+
+                // 'label' => 'password_repeat',
+                'options' => [
+                    'attr' => [
+                        'class' => 'form-control'
+                    ]
                 ],
                 'constraints' => [
-                    new Assert\NotBlank()
-                ]
-            ])
-            ->add('password_repeat', PasswordType::class, [
-                'label' => 'password_repeat',
-                'attr' => [
-                    'class' => 'form-control'
-                ],
-                'constraints' => [
-                    new Assert\NotBlank()
+                    new Assert\NotBlank(),
                 ]
             ])
             ->add('faculty', EntityType::class, [
@@ -84,6 +95,7 @@ class RegistrationFormType extends AbstractType
                 'choice_filter' => 'visible',
                 'choice_label' => 'shortcut',
                 'required' => true,
+                'invalid_message' => 'invalid_faculty_selected',
                 'placeholder' => 'empty_field',
                 'attr' => [
                     'class' => 'form-control'
@@ -103,10 +115,11 @@ class RegistrationFormType extends AbstractType
                     'data-bs-placement' => 'top',
                     'data-bs-title' => $this->translator->trans('gdpr_tooltip'),
                 ],
+
+                'mapped' => false,
                 'constraints' => [
                     new Assert\Required(),
-                    // TODO: what is property path? etc.. make this work
-                    new Assert\EqualTo(true)
+                    new Assert\EqualTo(true, null, 'gdpr_must_be_true')
                 ]
             ])
             ->add('submit', SubmitType::class, [
@@ -123,21 +136,25 @@ class RegistrationFormType extends AbstractType
     {
         $resolver->setDefaults([
             'constraints' => [
-                new Callback([$this, 'validatePasswordMatch'])
-            ]
-            // 'data_class' => User::class,
+                // new Callback([$this, 'validatePasswordMatch'])
+                new UniqueEntity(['message' => 'email_not_unique', 'fields' => 'email']),
+            ],
+            'data_class' => User::class,
         ]);
     }
 
     public function validatePasswordMatch($data, ExecutionContextInterface $context)
     {
-        $password = $data['password'];
-        $password_repeat = $data['password_repeat'];
+        // dd($data);
+        // $data = $context->getRoot();
+        // dd($data);
+        // $password = $data['password']->getData();
+        // $password_repeat = $data['password_repeat']->getData();
 
-        if($password !== $password_repeat) {
-            $context->buildViolation('passwords_do_not_match')
-            ->atPath('password_repeat')
-            ->addViolation();
-        }
+        // if($password !== $password_repeat) {
+        //     $context->buildViolation('passwords_do_not_match')
+        //     ->atPath('password_repeat')
+        //     ->addViolation();
+        // }
     }
 }

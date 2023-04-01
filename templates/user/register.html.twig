@@ -48,16 +48,15 @@
             </div>
         </div>
 
-        {{ form_label(form.password) }}
         {{ form_errors(form.password) }}
         {{ form_widget(form.password) }}
 
-        {{ form_label(form.password_repeat) }}
+        {# {{ form_label(form.password_repeat) }} #}
         {# {{ form_errors(form.password_repeat) }} #}
-        {% for error in form_errors(form.password_repeat) %}
+        {# {% for error in form_errors(form.password_repeat) %}
             <div>{{ error.message }}</div>
         {% endfor %}
-        {{ form_widget(form.password_repeat) }}
+        {{ form_widget(form.password_repeat) }} #}
 
         {{ form_label(form.faculty) }}
         {{ form_errors(form.faculty) }}

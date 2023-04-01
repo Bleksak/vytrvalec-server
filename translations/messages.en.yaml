@@ -10,15 +10,19 @@ navbar_profile: 'Profile'
 navbar_submit: 'Submit activity'
 navbar_login: 'Log in'
 navbar_logout: 'Log out'
-navbar_signup: 'Sign up'
 navbar_rules: 'Rules'
+
+# footer
+
+ZCU: 'University of West Bohemia'
+KTS: 'Department of Physical Education and Sport'
 
 # Home page
 join_us: 'Join the challenge!'
 about_challenge: 'About the challenge'
 challenge_description: |
   <p>The Monthly Endurance Event was created during the winter semester of 2020. This movement competition was prepared and organized by the Department of Physical Education of the Faculty of Engineering of the University of West Bohemia in Pilsen with the intention to move students during distance learning, which took place at the University of West Bohemia during the coronavirus pandemic.</p>
-  <p>Participants are fighting for 4 weeks for their faculty in the number of kilometers run and cycled. These are tallied within the faculty and at the end of the week to determine the number of points the faculty earns and their overall ranking.</p>
+  <p>Participants are competing for four weeks to see who can run and cycle the most kilometers for their faculty. These are tallied within the faculty and at the end of the week to determine the number of points the faculty earns and their overall ranking.</p>
 
 participants: 'Total participants'
 run_and_walk: 'Run and walk'
@@ -26,6 +30,7 @@ bike_and_scooter: 'Bike and scooter'
 winners: Winners of previous years
 charity: Charity
 
+# Rules page
 rules: 'Rules'
 rules_description: |
   <p>Run, walk, bike, scooter, skate! Not only will you do something for your health, but you will contribute to a good cause! Km that contestants offend will be converted into crowns to contribute to charity.</p>
@@ -50,9 +55,7 @@ best_elevation: 'for the individual with the most elevation gain in a given disc
 third_week: 'Week Three'
 fourth_week: 'Week Four'
 
-ZCU: 'University of West Bohemia'
-KTS: 'Department of Physical Education and Sport'
-
+# Registration
 sign_up: 'Sign up'
 
 sign_up_gapps: 'Sign up with GApps'
@@ -60,7 +63,7 @@ sign_up_graduated: 'Already graduated? Fill the form below!'
 
 gdpr: 'By signing up, you consent to'
 gdpr_link: 'the processing of personal data.'
-gdpr_tooltip: 'The infomration you enter will be used to create a user profile. Personal information will not be published or further processed.'
+gdpr_tooltip: 'The information you enter will be used to create a user profile. Personal information will not be published or further processed.'
 
 registration_ok: 'Successfully registered. You can log in now.'
 
@@ -73,6 +76,12 @@ faculty: 'Faculty'
 gdpr_label: 'By signing up, you consent to the processing of personal data.'
 empty_field: '---'
 register_form_error: 'There have been some problems with your registration:'
+
+gdpr_must_be_true: 'You must accept the GDPR field. Please check the box to indicate your acceptance of our data protection and privacy policies'
+
+# Login
+
+login: 'Login'
 
 # msgid "season_start_label"
 # msgstr "Season start"

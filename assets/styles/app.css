@@ -93,8 +93,7 @@ p {
 /* ------------- FORMS ---------------*/
 .black-form {
     font-size: 1em;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
+    border-radius: 15px;
     background: rgba(0, 0, 0, 0.67);
     padding: 2% 10%;
 }
@@ -145,7 +144,7 @@ p {
 /*---------------- LOGIN ----------------------*/
 .login {
     background: url("../images/runner2.png") no-repeat center;
-    padding: 10% 30%;
+    padding: 8% 25%;
     color: white;
     align-content: center;
 }

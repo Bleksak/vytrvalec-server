@@ -33,7 +33,7 @@
                     {# <li><a class="dropdown-item" href="{% url 'season_management' %}">{% trans 'SeasonManagementNav' %}</a></li> #}
                   </ul>
                 </li>
-                {% endif %}
+                  {% endif %}
                 <li class="nav-item">
                   {# <a class="nav-link" href="{% url 'results' %}">{% trans 'ResultsNav' %}</a> #}
                 </li>
@@ -54,9 +54,9 @@
                 </li>
                 {% else %}
                 <li class="nav-item">
-                  {# <a href="{% url 'login' %}"> #}
-                    {# <button type="button" class="btn btn-outline-dark">{% trans 'LoginNav' %}</button> #}
-                  {# </a> #}
+                  <a href="{{ path('user_login') }}">
+                    <button type="button" class="btn btn-outline-dark">{{ 'login'|trans }}</button>
+                  </a>
                 </li>
                 <li class="nav-item">
                   <a href="{{ path('user_register') }}">
