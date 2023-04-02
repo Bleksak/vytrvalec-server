@@ -29,8 +29,8 @@
                     {{ 'navbar_management'|trans }}
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    {# <li><a class="dropdown-item" href="{% url 'accounts_management' %}">{% trans 'UserManagementNav' %}</a></li> #}
-                    {# <li><a class="dropdown-item" href="{% url 'season_management' %}">{% trans 'SeasonManagementNav' %}</a></li> #}
+                    <li><a class="dropdown-item" href="{{ path('management_users') }}">{{ 'management_users_nav'|trans }}</a></li>
+                    <li><a class="dropdown-item" href="{{ path('management_season') }}">{{ 'management_season_nav'|trans }}</a></li>
                   </ul>
                 </li>
                   {% endif %}
@@ -48,9 +48,9 @@
                   {# <a class="nav-item nav-link" href="{% url 'submission' %}">{% trans 'SubmitActivityNav' %}</a> #}
                 </li>
                 <li class="nav-item">
-                    {# <a href="{% url 'logout' %}"> #}
-                        {# <button type="button" class="btn btn-outline-dark">{% trans 'LogoutNav' %}</button> #}
-                    {# </a> #}
+                    <a href="{{ path('user_logout') }}">
+                        <button type="button" class="btn btn-outline-dark">{{ 'logout_nav'|trans }}</button>
+                    </a>
                 </li>
                 {% else %}
                 <li class="nav-item">

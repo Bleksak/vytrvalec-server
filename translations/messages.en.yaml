@@ -83,6 +83,26 @@ gdpr_must_be_true: 'You must accept the GDPR field. Please check the box to indi
 
 login: 'Login'
 
+# user management
+user_management_title: 'User management'
+name: 'Name'
+status: 'Status'
+access_right: 'Access Right'
+action: 'Action'
+admin: 'Administrator'
+user: 'User'
+active: 'Active'
+inactive: 'Inactive'
+user_block: 'Block'
+user_unblock: 'Unblock'
+user_block_confirm: 'Are you sure you want to block this user?'
+user_unblock_confirm: 'Are you sure you want to unblock this user?'
+make_admin: 'Make Administrator'
+unmake_admin: 'Remove Administrator'
+make_admin_confirm: 'Are you sure you want to make this user administrator?'
+unmake_admin_confirm: 'Are you sure you want to demote this user?'
+
+
 # msgid "season_start_label"
 # msgstr "Season start"
 

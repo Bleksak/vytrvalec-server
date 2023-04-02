@@ -28,7 +28,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Faculty $faculty = null;
 
@@ -77,6 +77,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
+    }
+
+    public function hasRole(string $roleName): bool
+    {
+        foreach($this->getRoles() as $role) {
+            if($role === $roleName) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function setRoles(array $roles): self

@@ -21,6 +21,9 @@ security:
                 check_path: user_login
             logout:
                 path: user_logout
+    role_hierarchy:
+        ROLE_STAFF: ROLE_USER
+        ROLE_ADMIN: [ROLE_USER, ROLE_STAFF]
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall

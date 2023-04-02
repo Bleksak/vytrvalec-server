@@ -11,9 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserController extends AbstractController
 {
@@ -61,31 +60,26 @@ class UserController extends AbstractController
         }
 
         $error = $authUtils->getLastAuthenticationError();
-        // $user = new User();
         $form = $this->createForm(LoginFormType::class);
-        // $form->handleRequest($request);
 
         $lastUsername = $authUtils->getLastUsername();
-
-        // if($form->isSubmitted() && $form->isValid()) {
-            // $email = $user->getEmail();
-            // $plainPassword = $user->getPassword();
-            // $user = $this->em->getRepository(User::class)->findOneBy(['email' => $email]);
-
-            // if($user == null || !$this->hasher->isPasswordValid($user, $plainPassword)) {
-            //     $error = $translator->trans('bad_login');
-            // } else {
-            //     $security->login($user);
-            //     return $this->redirectToRoute('home');
-            // }
-
-            // set session
-            // redirect
-        // }
 
         return $this->render('user/login.html.twig', [
             'form' => $form->createView(),
             'error' => $error
+        ]);
+    }
+
+    #[Route('/user/profile/{user}', name: 'user_profile', methods: ['GET'])]
+    #[IsGranted('ROLE_STAFF')]
+    public function profile(User $user = null) : Response
+    {
+        if($user == null) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        return $this->render('user/profile.html.twig', [
+            'user' => $user
         ]);
     }
 }

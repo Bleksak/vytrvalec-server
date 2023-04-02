@@ -14,7 +14,12 @@ const bootstrap = require('bootstrap');
 import './styles/app.css';
 
 let gdpr = document.getElementById("gdpr");
-let tooltip = new bootstrap.Tooltip(gdpr, {animation: true})
+if(gdpr != undefined) {
+    let tooltip = new bootstrap.Tooltip(gdpr, {animation: true})
+}
+
+import { registerReactControllerComponents } from '@symfony/ux-react';
+registerReactControllerComponents(require.context('./react/controllers', true, /\.(j|t)sx?$/));
 
 // start the Stimulus application
 import './bootstrap';
