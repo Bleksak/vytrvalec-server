@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Charity;
+use App\Entity\Season;
 use App\Entity\User;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_STAFF')]
 class ManagementController extends AbstractController
@@ -64,12 +68,6 @@ class ManagementController extends AbstractController
         $user->setBanned($ban);
         $this->em->flush();
 
-        // if($ban) {
-        //     $this->addFlash('notice', 'management_user_banned');
-        // } else {
-        //     $this->addFlash('notice', 'management_user_unbanned');
-        // }
-
         return $this->json('');
     }
 
@@ -84,9 +82,8 @@ class ManagementController extends AbstractController
     }
 
     #[Route('/api/management/users', name: 'api_management_users', methods: ['GET'])]
-    public function users_list(SerializerInterface $serializer): Response
+    public function userList(SerializerInterface $serializer): Response
     {
-            
         $users = $this->em->getRepository(User::class)->findAll();
         $data = $serializer->serialize($users, 'json');
 
@@ -94,6 +91,44 @@ class ManagementController extends AbstractController
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
+    }
+
+    #[Route('/api/management/season/new', name: 'api_management_season_new', methods: ['POST'])]
+    public function seasonCreate(Request $request, ValidatorInterface $validator) {
+
+        $today = new DateTime(date('d-m-Y'));
+        $beginDate = new DateTime($request->get('beginDate'));
+        $charityName = $request->get('charityName');
+        $charityDescription = $request->get('charityDescription');
+
+        if(empty($charityName)) {
+            return $this->json(
+                ['success' => 0]
+            );
+        }
+
+        $charity = new Charity();
+        $charity->setName($charityName);
+        $charity->setDescription($charityDescription);
+
+        $season = new Season();
+        $season->setStart($beginDate);
+        $season->setCharity($charity);
+
+        if($beginDate < $today) {
+            return $this->json(
+                ['success' => 0]
+            );
+        }
+
+        $this->em->persist($charity);
+        $this->em->persist($season);
+
+        $this->em->flush();
+
+        return $this->json(
+            ['success' => 1]
+        );
     }
 
     #[Route('/management/season', name: 'management_season')]

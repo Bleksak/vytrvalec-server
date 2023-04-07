@@ -102,6 +102,10 @@ unmake_admin: 'Remove Administrator'
 make_admin_confirm: 'Are you sure you want to make this user administrator?'
 unmake_admin_confirm: 'Are you sure you want to demote this user?'
 
+charity_name: 'Charity'
+charity_description: 'Charity description'
+begin_date: 'Begin date'
+create_new_season: 'Create new season'
 
 # msgid "season_start_label"
 # msgstr "Season start"

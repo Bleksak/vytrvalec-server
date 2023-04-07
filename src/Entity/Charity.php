@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CharityRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CharityRepository::class)]
@@ -14,6 +15,7 @@ class Charity
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $name = null;
 
     #[ORM\Column(length: 10000)]

@@ -25,6 +25,8 @@ export default function UserTable({user_id, users_route, user_profile_route, use
 
     const filteredUsers = users.filter((user) => (user.firstName + ' ' + user.lastName).toLowerCase().includes(filter));
 
+    console.log(users.length)
+
     return <>
     <input type="text" id="search-bar" onKeyUp={search} placeholder="'search_name'|trans" />
     <table className='table table-striped table-hover table-sm'>
@@ -60,12 +62,12 @@ export default function UserTable({user_id, users_route, user_profile_route, use
 }
 
 function TableRow({user, user_id, user_profile_route, user_admin_route, user_ban_route}) {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation()
 
-    const [userBanned, setUserBanned] = useState(user.banned);
-    const [userAdmin, setUserAdmin] = useState(user.roles.includes('ROLE_STAFF'));
+    const [userBanned, setUserBanned] = useState(user.banned)
+    const [userAdmin, setUserAdmin] = useState(user.roles.includes('ROLE_STAFF'))
 
-    const renderActions = user.id != user_id;
+    const renderActions = user.id != user_id
 
     const toggleBan = () => {
 
@@ -73,11 +75,10 @@ function TableRow({user, user_id, user_profile_route, user_admin_route, user_ban
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'user_id='+user.id
-        };
+        }
 
         fetch(user_ban_route, requestOptions)
-            .then(_ => setUserBanned(!userBanned));
-        // setUserBanned(!userBanned);
+            .then(_ => setUserBanned(!userBanned))
     }
 
     const toggleAdmin = () => {
