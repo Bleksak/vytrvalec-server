@@ -1,88 +1,142 @@
-export default function UserTable({app, users, user_profile_route, user_ban_route, user_admin_route}) {
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from "react-i18next";
+import _ from '../i8n'
 
-    console.log("Pavlovi smrdi koule")
+export default function UserTable({user_id, users_route, user_profile_route, user_ban_route, user_admin_route}) {
+    const [users, setUsers] = useState([]);
+    const [filter, setFilter] = useState('');
+
+    useEffect( () => {
+        const fetchData = async () => {
+            const result = await fetch(users_route);
+            const users = await result.json();
+
+            setUsers(users);
+        }
+
+        fetchData();
+    }, []);
+
+    const search = (input) => {
+        setFilter(input.target.value);
+    }
+
+    const { t, i18n } = useTranslation();
+
+    const filteredUsers = users.filter((user) => (user.firstName + ' ' + user.lastName).toLowerCase().includes(filter));
 
     return <>
-    <input type="text" id="search-bar" onkeyup="search()" placeholder="'search_name'|trans" />
-    <table>
+    <input type="text" id="search-bar" onKeyUp={search} placeholder="'search_name'|trans" />
+    <table className='table table-striped table-hover table-sm'>
         <thead>
-            <th>
-                'name' trans
-            </th>
-            <th>
-                'faculty' trans
-            </th>
-            <th>
-                'email' trans
-            </th>
-            <th>
-                'status' trans
-            </th>
-            <th>
-                'access_right' trans
-            </th>
-            <th>
-                'action' trans
-            </th>
+            <tr>
+                <th scope="col" className='text-center'>
+                    {t('name')}
+                </th>
+                <th scope="col" className='text-center'>
+                    {t('faculty')}
+                </th>
+                <th scope="col" className='text-center'>
+                    {t('email')}
+                </th>
+                <th scope="col" className='text-center'>
+                    {t('status')}
+                </th>
+                <th scope="col" className='text-center'>
+                    {t('access_right')} 
+                </th>
+                <th scope="col" className='text-center'>
+                    {t('action')}
+                </th>
+            </tr>
         </thead>
         <tbody>
-        for(user of users) {
-            <tr>
-                <td><a href="{ user_profile_route }">{ user.firstname} { user.lastname }</a></td>
-                <td>{ user.faculty.shortcut }</td>
-                <td>{ user.email }</td>
-
-                { (user.banned)
-                ?    <td><i className="fa-solid fa-xmark"></i> 'inactive'|trans </td>
-                :    <td><i className="fa-solid fa-check"></i> 'active'|trans </td>
-                }
-
-                <td>
-                    { user.roles.contains("ROLE_STAFF") 
-                    ? 'admin' | trans
-                    : 'user' | trans
-                    }
-                </td>
-                <td>
-                    <div style="min-width: max-content">
-                    <form className="small-form" action="{{ path('management_users_ban') }}" method="POST">
-                    <input type="hidden" name="user_id" value="{{ user.id }}"/>
-                        { user.id != app.user.id 
-                            && (
-                                user.banned 
-                                ?
-                            <button onclick="return confirm('{{ 'user_unblock_confirm'|trans }}');" type="submit" className="btn btn-warning">
-                            'user_unblock'|trans
-                            </button>
-                                : 
-                            <button onclick="return confirm('{{ 'user_block_confirm'|trans }}');" type="submit" className="btn btn-danger">
-                            'user_block'|trans
-                            </button>
-                            )
-                        }
-                    </form>
-
-                    { user.id != app.user.id && !user.banned && (
-                        <form className="small-form" action="{user_admin_route}" method="POST">
-                            <input type="hidden" name="user_id" value="{{ user.id }}"/>
-                            { user.roles.contains('ROLE_STAFF') 
-                            ?
-                            <button onclick="return confirm('{{ 'make_admin_confirm'|trans }}');" type="submit" className="btn btn-dark">
-                            'make_admin'|trans
-                            </button>
-                            :
-                            <button onclick="return confirm('{{ 'unmake_admin_confirm'|trans }}');" type="submit" className="btn btn-secondary">
-                            'unmake_admin'|trans
-                            </button>
-                            }
-                        </form>
-                        )
-                    }
-                    </div>
-                </td>
-            </tr>
-        }
+            { filteredUsers.length > 0 && filteredUsers.map( (user) => 
+                <TableRow key={user.id} user={user} user_id={user_id} user_admin_route={user_admin_route} user_profile_route={user_profile_route} user_ban_route={user_ban_route}></TableRow>
+             )}
         </tbody>
     </table>
+    </>
+}
+
+function TableRow({user, user_id, user_profile_route, user_admin_route, user_ban_route}) {
+    const { t, i18n } = useTranslation();
+
+    const [userBanned, setUserBanned] = useState(user.banned);
+    const [userAdmin, setUserAdmin] = useState(user.roles.includes('ROLE_STAFF'));
+
+    const renderActions = user.id != user_id;
+
+    const toggleBan = () => {
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'user_id='+user.id
+        };
+
+        fetch(user_ban_route, requestOptions)
+            .then(_ => setUserBanned(!userBanned));
+        // setUserBanned(!userBanned);
+    }
+
+    const toggleAdmin = () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'user_id='+user.id
+        };
+
+        fetch(user_admin_route, requestOptions)
+            .then(_ => setUserAdmin(!userAdmin));
+    }
+
+    return <>
+    <tr>
+        <td className='text-center'><a href={user_profile_route}>{ user.firstName} { user.lastName }</a></td>
+        <td className='text-center'>{ user.faculty.shortcut }</td>
+        <td className='text-center'>{ user.email }</td>
+
+        { (user.banned)
+        ?    <td className='text-center'><i className="fa-solid fa-xmark"></i>{t('inactive')}</td>
+        :    <td className='text-center'><i className="fa-solid fa-check"></i>{t('active')}</td>
+        }
+
+        <td className='text-center'>
+            { userAdmin
+            ? t('admin')
+            : t('user')
+            }
+        </td>
+        <td style={ {minWidth: "max-content"} } className='text-center'>
+            { renderActions 
+                && (
+                    userBanned
+                    ?
+                <button onClick={toggleBan} type="submit" className="btn btn-warning">
+                    {t('user_unblock')}
+                </button>
+                    : 
+                <button onClick={toggleBan} type="submit" className="btn btn-danger">
+                    {t('user_block')}
+                </button>
+                )
+            }
+
+            { renderActions && !userBanned && 
+             (
+                !userAdmin
+                ?
+                    <button onClick={toggleAdmin} type="submit" className="btn btn-dark">
+                        {t('make_admin')}
+                    </button>
+                 :
+                    <button onClick={toggleAdmin} type="submit" className="btn btn-secondary">
+                        {t('unmake_admin')}
+                    </button>
+             )
+            }
+        </td>
+    </tr>
     </>
 }

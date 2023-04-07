@@ -30,7 +30,8 @@ Encore
 
     // will require an extra script tag for runtime.js
     // but, you probably want this, unless you're building a single-page app
-    .enableSingleRuntimeChunk()
+    // .enableSingleRuntimeChunk()
+    .disableSingleRuntimeChunk()
 
     /*
      * FEATURE CONFIG
@@ -82,6 +83,12 @@ Encore
         from: './assets/fonts',
         // pattern: /\.(png|jpg|jpeg)$/,
         to: 'fonts/[path][name].[ext]'
+    })
+
+    .copyFiles({
+        from: './assets/translations',
+        // pattern: /\.(png|jpg|jpeg)$/,
+        to: 'translations/[path][name].[ext]'
     })
 ;
 

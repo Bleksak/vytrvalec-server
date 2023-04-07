@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[IsGranted('ROLE_STAFF')]
 class ManagementController extends AbstractController
@@ -39,12 +40,12 @@ class ManagementController extends AbstractController
             $roles[] = "ROLE_STAFF";
         } else {
             unset($roles[$index]);
-            $roles = array_values($roles);
         }
 
         $user->setRoles($roles);
         $this->em->flush();
-        return $this->redirectToRoute('management_users');
+
+        return $this->json('');
     }
 
     #[Route('/management/users/ban', name: 'management_users_ban', methods:['POST'])]
@@ -63,13 +64,13 @@ class ManagementController extends AbstractController
         $user->setBanned($ban);
         $this->em->flush();
 
-        if($ban) {
-            $this->addFlash('notice', 'management_user_banned');
-        } else {
-            $this->addFlash('notice', 'management_user_unbanned');
-        }
+        // if($ban) {
+        //     $this->addFlash('notice', 'management_user_banned');
+        // } else {
+        //     $this->addFlash('notice', 'management_user_unbanned');
+        // }
 
-        return $this->redirectToRoute('management_users');
+        return $this->json('');
     }
 
     #[Route('/management/users', name: 'management_users')]
@@ -80,6 +81,19 @@ class ManagementController extends AbstractController
         return $this->render('management/users.html.twig', [
             'users' => $users
         ]);
+    }
+
+    #[Route('/api/management/users', name: 'api_management_users', methods: ['GET'])]
+    public function users_list(SerializerInterface $serializer): Response
+    {
+            
+        $users = $this->em->getRepository(User::class)->findAll();
+        $data = $serializer->serialize($users, 'json');
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     #[Route('/management/season', name: 'management_season')]

@@ -21,6 +21,8 @@ security:
                 check_path: user_login
             logout:
                 path: user_logout
+            remember_me:
+                samesite: strict
     role_hierarchy:
         ROLE_STAFF: ROLE_USER
         ROLE_ADMIN: [ROLE_USER, ROLE_STAFF]

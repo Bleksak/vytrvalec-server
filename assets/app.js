@@ -5,6 +5,8 @@
  * (and its CSS file) in your base layout (base.html.twig).
  */
 
+import { registerReactControllerComponents } from '@symfony/ux-react';
+
 // any CSS you import will output into a single css file (app.css in this case)
 const $ = require('jquery');
 
@@ -18,8 +20,7 @@ if(gdpr != undefined) {
     let tooltip = new bootstrap.Tooltip(gdpr, {animation: true})
 }
 
-import { registerReactControllerComponents } from '@symfony/ux-react';
-registerReactControllerComponents(require.context('./react/controllers', true, /\.(j|t)sx?$/));
 
 // start the Stimulus application
+registerReactControllerComponents(require.context('./react/controllers', true, /\.(j|t)sx?$/))
 import './bootstrap';

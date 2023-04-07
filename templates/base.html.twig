@@ -29,8 +29,8 @@
                     {{ 'navbar_management'|trans }}
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="{{ path('management_users') }}">{{ 'management_users_nav'|trans }}</a></li>
-                    <li><a class="dropdown-item" href="{{ path('management_season') }}">{{ 'management_season_nav'|trans }}</a></li>
+                    <li><a class="dropdown-item" href="{{ path('management_users') }}">{{ 'navbar_user_management'|trans }}</a></li>
+                    <li><a class="dropdown-item" href="{{ path('management_season') }}">{{ 'navbar_season_management'|trans }}</a></li>
                   </ul>
                 </li>
                   {% endif %}
@@ -49,7 +49,7 @@
                 </li>
                 <li class="nav-item">
                     <a href="{{ path('user_logout') }}">
-                        <button type="button" class="btn btn-outline-dark">{{ 'logout_nav'|trans }}</button>
+                        <button type="button" class="btn btn-outline-dark">{{ 'navbar_logout'|trans }}</button>
                     </a>
                 </li>
                 {% else %}

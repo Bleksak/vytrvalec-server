@@ -391,24 +391,6 @@ h1 {
     }
 }
 
-
-/*----------------- MANAGEMENT ----------------------*/
-.management {
-    padding: 3% 15%;
-}
-
-@media only screen and (max-width: 1500px) {
-    .management {
-        padding: 5% 7%;
-    }
-}
-
-@media only screen and (max-width: 1000px) {
-    .management {
-        padding: 5% 0;
-    }
-}
-
 /*-------------------- PROFILE ---------------*/
 .profile {
     margin: 2%;

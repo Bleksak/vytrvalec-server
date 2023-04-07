@@ -4,90 +4,16 @@
 
 {% block body %}
 
-<div class="management">
+<div class="py-5">
   <h2>{{ 'user_management_title'|trans }}</h2>
-  {# <div {{ react_component('UserTable', {
-    app: app|json_encode,
-    users: users|json_encode,
+
+  <div {{ react_component('UserTable', {
+    user_id: app.user.id,
+    users_route: path('api_management_users'),
     user_profile_route: path('user_profile'),
     user_ban_route: path('management_users_ban'),
     user_admin_route: path('management_users_admin')
-  }) }}></div> #}
-
-  <div {{ react_component('TestController') }}></div>
-
-  {# <input type="text" id="search-bar" onkeyup="search()" placeholder="{{ 'search_name'|trans }}" />
-  <div class="col table-responsive-sm">
-    <table class="table table-striped table-hover table-sm" id="user-management-table">
-      <thead>
-        <tr>
-          <th scope="col">{{ 'name'|trans }}</th>
-          <th scope="col">{{ 'faculty'|trans }}</th>
-          <th scope="col">{{ 'email'|trans }}</th>
-          <th scope="col">{{ 'status'|trans }}</th>
-          <th scope="col">{{ 'access_right'|trans }}</th>
-          <th scope="col">{{ 'action'|trans }}</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for user in users %}
-        <tr>
-          <td><a href="{{ path('user_profile', {user:user.id}) }}">{{ user.firstname}} {{ user.lastname }}</a></td>
-          <td>{{ user.faculty.shortcut }}</td>
-          <td>{{ user.email }}</td>
-
-          {% if not user.banned %}
-            <td><i class="fa-solid fa-check"></i> {{ 'active'|trans }}</td>
-          {% else %}
-            <td><i class="fa-solid fa-xmark"></i> {{ 'inactive'|trans }}</td>
-          {% endif %}
-
-          <td>
-            {% if "ROLE_STAFF" in user.roles %} 
-              {{ 'admin'|trans }} 
-            {% else %}
-              {{ 'user'|trans }}
-            {% endif %}
-          </td>
-          <td>
-            <div style="min-width: max-content">
-              <form class="small-form" action="{{ path('management_users_ban') }}" method="POST">
-              <input type="hidden" name="user_id" value="{{ user.id }}">
-                {% if user.id != app.user.id %}
-                  {% if user.banned %}
-                    <button onclick="return confirm('{{ 'user_unblock_confirm'|trans }}');" type="submit" class="btn btn-warning">
-                      {{ 'user_unblock'|trans }}
-                    </button>
-                  {% else %}
-                    <button onclick="return confirm('{{ 'user_block_confirm'|trans }}');" type="submit" class="btn btn-danger">
-                      {{ 'user_block'|trans }}
-                    </button>
-                  {% endif %}
-                {% endif %}
-              </form>
-
-              {% if user.id != app.user.id and not user.banned %}
-                <form class="small-form" action="{{ path('management_users_admin') }}" method="POST">
-                  <input type="hidden" name="user_id" value="{{ user.id }}">
-                  {% if not user.hasRole('ROLE_STAFF') %}
-                    <button onclick="return confirm('{{ 'make_admin_confirm'|trans }}');" type="submit" class="btn btn-dark">
-                      {{ 'make_admin'|trans }}
-                    </button>
-                  {% else %}
-                    <button onclick="return confirm('{{ 'unmake_admin_confirm'|trans }}');" type="submit" class="btn btn-secondary">
-                      {{ 'unmake_admin'|trans }}
-                    </button>
-                  {% endif %}
-                </form>
-              {% endif %}
-            </div>
-          </td>
-        </tr>
-       {% endfor %}
-      </tbody>
-    </table>
-  </div> #}
+  }) }}></div>
 </div>
 
 {% endblock %}
