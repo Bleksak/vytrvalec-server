@@ -9,7 +9,6 @@ i18next
     .init({
         lng: 'en',
         fallbackLng: 'en',
-        debug: true,
         backend: {
             loadPath: '/build/translations/messages.{{lng}}.yaml',
             parse: function(data) { return yaml.load(data) },

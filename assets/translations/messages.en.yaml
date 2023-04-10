@@ -106,6 +106,8 @@ charity_name: 'Charity'
 charity_description: 'Charity description'
 begin_date: 'Begin date'
 create_new_season: 'Create new season'
+season_running: 'Running'
+season_not_running: 'Not running'
 
 # msgid "season_start_label"
 # msgstr "Season start"

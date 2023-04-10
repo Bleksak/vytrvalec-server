@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Season;
 use App\Repository\SeasonRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,16 @@ class SeasonController extends AbstractController
         $seasons = $serializer->serialize($this->repository->findAll(), 'json');
 
         $response = new Response($seasons);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
+
+    #[Route('/api/season/{season}', name: 'api_season', methods: ['GET'])]
+    public function season(Season $season, SerializerInterface $serializer): Response {
+        $season = $serializer->serialize($season, 'json');
+
+        $response = new Response($season);
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;

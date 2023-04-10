@@ -23,12 +23,12 @@ export default function UserTable({user_id, users_route, user_profile_route, use
 
     const { t, i18n } = useTranslation();
 
-    const filteredUsers = users.filter((user) => (user.firstName + ' ' + user.lastName).toLowerCase().includes(filter));
+    const filteredUsers = users.filter((user) => (user.firstName + ' ' + user.lastName).toLowerCase().includes(filter.toLowerCase()));
 
     console.log(users.length)
 
     return <>
-    <input type="text" id="search-bar" onKeyUp={search} placeholder="'search_name'|trans" />
+    <input type="text" id="search-bar" onKeyUp={search} placeholder={t('search_name')}/>
     <table className='table table-striped table-hover table-sm'>
         <thead>
             <tr>
@@ -92,9 +92,11 @@ function TableRow({user, user_id, user_profile_route, user_admin_route, user_ban
             .then(_ => setUserAdmin(!userAdmin));
     }
 
+    const user_profile_url = user_profile_route + '/' + user.id
+
     return <>
     <tr>
-        <td className='text-center'><a href={user_profile_route}>{ user.firstName} { user.lastName }</a></td>
+        <td className='text-center'><a href={user_profile_url}>{ user.firstName} { user.lastName }</a></td>
         <td className='text-center'>{ user.faculty.shortcut }</td>
         <td className='text-center'>{ user.email }</td>
 

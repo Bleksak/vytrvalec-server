@@ -7,7 +7,7 @@
 <div class="py-5">
   <h2>{{ 'user_management_title'|trans }}</h2>
 
-  <div {{ react_component('UserTable', {
+  <div {{ react_component('App', {
     user_id: app.user.id,
     users_route: path('api_management_users'),
     user_profile_route: path('user_profile'),

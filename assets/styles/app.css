@@ -294,10 +294,6 @@ h1 {
     }
 } */
 
-.home-tag {
-    padding: 2% 5%;
-    height: 200px;
-}
 
 .tag2 {
     padding: 2% 5%;
@@ -344,23 +340,16 @@ h1 {
     font-size: 2em;
 }
 
-.slideshow {
+/* .slideshow {
+    position: relative;
     margin: 1% 5%;
-}
+} */
 
-.tags {
+/* .tags {
     border-radius: 25px;
     padding: 1% 0;
-}
+} */
 
-
-.tags .carousel-control-next {
-    position: absolute;
-}
-
-.tags .carousel-control-prev {
-    position: absolute;
-}
 
 /*---------------- SUBMISSION ----------------------*/
 
@@ -485,15 +474,6 @@ h1 {
     margin: 1%;
 }
 
-.carousel-control-next {
-    position: absolute;
-    right: -10%;
-}
-
-.carousel-control-prev {
-    position: absolute;
-    left: -10%;
-}
 
 .data {
     height: 400px;
@@ -618,4 +598,42 @@ u {
 /* --------- Set password ----------------*/
 .pass{
     background: url("../images/runner.png") no-repeat center;
+}
+
+.seasonManagement {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.seasonForm {
+    width: 100%;
+    max-width: 400px;
+}
+
+@media (min-width: 75em){
+    .seasonManagement {
+        flex-direction: row;
+    }
+}
+
+.carousel-master {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@media (min-width: 70em) {
+    .carousel-master {
+        flex-direction: row;
+    }
+}
+
+.carousel-item * {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    text-align: center;
 }

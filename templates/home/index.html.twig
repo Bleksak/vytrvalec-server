@@ -34,91 +34,73 @@
   </div>
 </div>
 
-<div class="row tags light-blue-bg">
-  <div class="col-md-6">
+<div class="carousel-master light-blue-bg pb-3">
+  <div class="flex-grow-1">
     <h4 class="text-center">{{ 'winners'|trans }}</h4>
-    <div class="slideshow blue-border white-bg home-tag">
-      <div id="controls1" class="carousel slide" data-bs-interval="false">
+    <div class="slideshow blue-border white-bg">
+      <div id="carousel-first" class="carousel slide">
         <div class="carousel-inner">
-          {% for season in seasons %}
-            <div class="carousel-item {% if loop.first %}active{% endif %}">
-              {# <h5><strong>{{ season }}</strong></h5> #}
-              <p>
-                  {# {% for winner in season.sum_results|slice:3 %} #}
-                    {# {% if forloop.counter is 1 %} #}
-                      <i class="fa-solid fa-crown gold"></i>
-                    {# {% elif forloop.counter is 2 %} #}
-                      <i class="fa-solid fa-crown silver"></i>
-                    {# {%else%} #}
-                      <i class="fa-solid fa-crown bronze"></i>
-                    {# {%endif%} #}
-                  {# <strong>{{ forloop.counter|ordinal }}</strong> {% trans winner.0 %} #}
-              </p>
-
-              {# {% endfor %} #}
-            </div>
-            {% endfor %}
-
-            <div class="carousel-item">
-              {# <h5><strong>{% trans 'october'%} 2021</strong></h5> #}
-              {# <p><i class="fa-solid fa-crown gold"></i><strong> {{ 1|ordinal }}</strong> {% trans 'FZS' %}</p> #}
-              {# <p><i class="fa-solid fa-crown silver"></i><strong> {{ 2|ordinal }}</strong> {% trans 'FST' %}</p> #}
-              {# <p><i class="fa-solid fa-crown bronze"></i><strong> {{ 3|ordinal }}</strong> {% trans 'FEK' %}</p> #}
-            </div>
-
-            <div class="carousel-item">
-              {# <h5><strong>{% trans 'october'%} 2020</strong></h5> #}
-              {# <p><i class="fa-solid fa-crown gold"></i><strong> {{ 1|ordinal }}</strong> {% trans 'FZS' %}</p> #}
-              {# <p><i class="fa-solid fa-crown silver"></i><strong> {{ 2|ordinal }}</strong> {% trans 'FST' %}</p> #}
-              {# <p><i class="fa-solid fa-crown bronze"></i><strong> {{ 3|ordinal }}</strong> {% trans 'FPE' %}</p> #}
-            </div>
+          <div class="carousel-item active">
+            <p>
+              JSDFFLSKJDFKJLDSJKL
+            </p>
           </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#controls1" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#controls1" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          </button>
+
+          <div class="carousel-item">
+            <p>
+              JOJOJOO
+            </p>
+          </div>
+
+          <div class="carousel-item">
+            <p>
+              KOKOTKOOOO
+            </p>
+          </div>
         </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-first" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carousel-first" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
       </div>
     </div>
-    <div class="col-md-6">
-      <h4 class="text-center">{{ 'charity'|trans }}</h4>
-      <div class="slideshow blue-border white-bg tag2">
-        <div id="controls2" class="carousel slide" data-bs-interval="false">
-          <div class="carousel-inner">
-            {# {% if seasons %} {% for season in seasons %} {% if forloop.counter is 1 %} #}
-            <div class="carousel-item active">
-              {# {% else %} #}
-              <div class="carousel-item">
-                {# {% endif %} #}
-                {# <h5>{{ season }}: <strong>{{ season.charity_name }}</strong></h5> #}
-                {# <p>{{ season.charity_description }}</p> #}
-              </div>
-              {# {% endfor %} {% else %} {% trans 'NoData'%} {% endif %} #}
+  </div>
 
-              <div class="carousel-item">
-                {# <h5>{% trans 'october' %} 2021: <strong>DAVID a GOLIÁŠ - Kubík</strong></h5> #}
-                <p>
-                  Kubík – kombinované postižení- 11let. Kubík se v bříšku vyvíjel jako úplně zdravé miminko, ale při porodu se
-                  dost přidusil, což se projevilo na jeho mozečku. Diagnóza DMO.
-                </p>
-              </div>
+  <div class="flex-grow-1">
+    <h4 class="text-center">{{ 'winners'|trans }}</h4>
+    <div class="slideshow blue-border white-bg">
+      <div id="carousel-second" class="carousel slide">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <p>
+              JSDFFLSKJDFKJLDSJKL
+            </p>
+          </div>
 
-              <div class="carousel-item">
-                {# <h5>{% trans 'october' %} 2020: <strong>Anička a Jiřík</strong></h5> #}
-                {# {% comment %} <p>Nemůžu najít odkaz</p> {% endcomment %} #}
-                <!-- TODO najít/sehnat něco -->
-              </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#controls2" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#controls2" data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            </button>
+          <div class="carousel-item">
+            <p>
+              JOJOJOO
+            </p>
+          </div>
+
+          <div class="carousel-item">
+            <p>
+              KOKOTKOOOO
+            </p>
           </div>
         </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-second" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carousel-second" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
       </div>
     </div>
   </div>

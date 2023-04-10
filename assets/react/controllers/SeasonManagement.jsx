@@ -13,67 +13,52 @@ export default function SeasonManagement() {
     const charityDescription = useRef(null);
 
     useEffect(() => {
-        const fetchSeasons = async () => {
-            const response = await fetch('/api/seasons')
-            if(response == null) return []
-            return await response.json()
-        }
-
         fetchSeasons().then((seasons) => {
-            setSeasons(seasons)
+            setSeasons(seasons);
         })
-    }, [])
+    }, []);
 
     const newSeasonSubmit = (event) => {
-        event.preventDefault()
+        event.preventDefault();
         
-        const date = beginDate.current.value
-        const name = charityName.current.value
-        const description = charityDescription.current.value
+        const date = beginDate.current.value;
+        const name = charityName.current.value;
+        const description = charityDescription.current.value;
 
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'beginDate='+date+"&charityName="+name+"&charityDescription="+description
-        }
+        };
 
-        const fetchData = async () => {
-            const response = await fetch('/api/management/season/new', requestOptions)
-            if(!response.ok) {
-                return null
-            }
-
-            return await response.json()
-        }
-
-        fetchData().then((data) => {
+        fetchData(requestOptions).then((data) => {
             if(data == null || data.success == 0) {
-                console.log("err")
+                console.log("err");
             } else {
-                seasons.push({
+                const newSeason = {
+                    'id': data.id,
                     'start': new Date(date),
                     'charity': {
                         'name': name,
                         'description': description
                     }
-                })
+                };
 
+                beginDate.current.value = null;
+                charityName.current.value = null;
+                charityDescription.current.value = null;
 
-                beginDate.current.value = null
-                charityName.current.value = null
-                charityDescription.current.value = null
-
-                setSeasons(seasons)
+                setSeasons([...seasons, newSeason]);
             }
         })
     }
 
     return <div className="py-5">
-        <div className="d-flex">
-            <div className="w-50">
+        <div className="seasonManagement">
+            <div className="seasonForm">
                 <CreateNewSeason formSubmit={newSeasonSubmit} beginDate={beginDate} charityName={charityName} charityDescription={charityDescription}></CreateNewSeason>
             </div>
-            <div className="w-50 px-3">
+            <div className="seasonList">
                 <SeasonList seasons={seasons}></SeasonList>
             </div>
         </div>
@@ -82,20 +67,20 @@ export default function SeasonManagement() {
 
 function SeasonList({seasons}) {
 
-    const [t, _] = useTranslation()
-    console.log(seasons.length)
+    const [t, _] = useTranslation();
 
     return <>
     <table className="table">
         <thead>
             <tr>
-                <th>{t('charity_name')}</th>
-                <th>{t('charity_description')}</th>
-                <th>{t('begin_date')}</th>
+                <th className="py-0">{t('charity_name')}</th>
+                <th className="py-0">{t('charity_description')}</th>
+                <th className="py-0 text-nowrap">{t('begin_date')}</th>
+                <th className="py-0">{t('action')}</th>
             </tr>
         </thead>
         <tbody>
-            { seasons.map((season) => 
+            { seasons.reverse().map((season) => 
             <tr key={season.id}>
                 <td>
                     {season.charity.name}
@@ -103,8 +88,14 @@ function SeasonList({seasons}) {
                 <td>
                     {season.charity.description}
                 </td>
+                <td className="text-nowrap">
+                    { moment(season.start, 'YYYY-MM-DD').format('D. M. YYYY') }
+                </td>
                 <td>
-                    { moment(season.charity.start).format('d. M. Y') }
+                    { seasonRunning(season.start) 
+                        ? <a className="text-nowrap" href={`/management/season/${season.id}`}>{t('season_running')}</a>
+                        : <a className="text-nowrap" href={`/management/season/${season.id}`}>{t('season_not_running')}</a>
+                    }
                 </td>
             </tr>
             )}
@@ -113,10 +104,22 @@ function SeasonList({seasons}) {
     </>
 }
 
+const seasonRunning = (startDate) => {
+    const start = moment.utc(startDate).utcOffset(0);
+    const now = moment().utcOffset(0);
+    const end = start.clone().add(4, 'weeks');
+
+    if(now.isBetween(start, end, undefined, '[)')) {
+        return true;
+    }
+
+    return false;
+}
+
 function CreateNewSeason({formSubmit, beginDate, charityName, charityDescription}) {
 
-    const today = new Date().toJSON().split('T')[0]
-    const [t, _] = useTranslation()
+    const today = new Date().toJSON().split('T')[0];
+    const [t, _] = useTranslation();
 
     return <>
         <form className="form-group" onSubmit={formSubmit}>
@@ -134,4 +137,19 @@ function CreateNewSeason({formSubmit, beginDate, charityName, charityDescription
             </div>
         </form>
     </>
+}
+
+const fetchSeasons = async () => {
+    const response = await fetch('/api/seasons').catch(() => null);
+    if(response == null) return [];
+    return await response.json();
+}
+
+const fetchData = async (requestOptions) => {
+    const response = await fetch('/api/management/season/new', requestOptions).catch( () => null );
+    if(response == null) {
+        return null;
+    }
+
+    return await response.json();
 }

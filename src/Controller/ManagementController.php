@@ -127,11 +127,17 @@ class ManagementController extends AbstractController
         $this->em->flush();
 
         return $this->json(
-            ['success' => 1]
+            ['success' => 1, 'id' => $season->getId()]
         );
     }
 
-    #[Route('/management/season', name: 'management_season')]
+    #[Route('/management/seasons', name: 'management_seasons')]
+    public function seasons(): Response 
+    {
+        return $this->render('management/seasons.html.twig', []);
+    }
+
+    #[Route('/management/season/{season}', name: 'management_season')]
     public function season(): Response 
     {
         return $this->render('management/season.html.twig', []);
