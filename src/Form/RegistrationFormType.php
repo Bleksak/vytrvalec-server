@@ -61,24 +61,12 @@ class RegistrationFormType extends AbstractType
                     new Assert\NotBlank(null, 'last_name_empty_error')
                 ]
             ])
-            // ->add('password', PasswordType::class, [
-            //     'label' => 'password',
-            //     'attr' => [
-            //         'class' => 'form-control'
-            //     ],
-            //     'constraints' => [
-            //         new Assert\NotBlank(null, 'password_short_error'),
-            //         new Assert\Regex('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{3,}.*$/', 'password_format_error'),
-            //         new Assert\Length(null, 8, null, null, null, null, 'password_short_error'),
-            //     ]
-            // ])
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'passwords_do_not_match',
                 'first_options'  => ['label' => 'Password'],
                 'second_options' => ['label' => 'Repeat Password'],
 
-                // 'label' => 'password_repeat',
                 'options' => [
                     'attr' => [
                         'class' => 'form-control'
