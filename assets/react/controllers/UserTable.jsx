@@ -2,9 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from "react-i18next";
 import _ from '../i8n'
 
-export default function UserTable({user_id, users_route, user_profile_route, user_ban_route, user_admin_route}) {
+const users_route = '/api/management/users';
+const user_profile_route = '/user/profile/';
+const user_ban_route = '/api/management/ban';
+const user_admin_route = '/api/management/admin';
+
+export default function UserTable(userId) {
     const [users, setUsers] = useState([]);
     const [filter, setFilter] = useState('');
+
 
     useEffect( () => {
         const fetchData = async () => {
@@ -54,20 +60,20 @@ export default function UserTable({user_id, users_route, user_profile_route, use
         </thead>
         <tbody>
             { filteredUsers.length > 0 && filteredUsers.map( (user) => 
-                <TableRow key={user.id} user={user} user_id={user_id} user_admin_route={user_admin_route} user_profile_route={user_profile_route} user_ban_route={user_ban_route}></TableRow>
+                <TableRow key={user.id} user={user} userId={userId} user_admin_route={user_admin_route} user_profile_route={user_profile_route} user_ban_route={user_ban_route}></TableRow>
              )}
         </tbody>
     </table>
     </>
 }
 
-function TableRow({user, user_id, user_profile_route, user_admin_route, user_ban_route}) {
+function TableRow({user, userId, user_profile_route, user_admin_route, user_ban_route}) {
     const { t, i18n } = useTranslation()
 
     const [userBanned, setUserBanned] = useState(user.banned)
     const [userAdmin, setUserAdmin] = useState(user.roles.includes('ROLE_STAFF'))
 
-    const renderActions = user.id != user_id
+    const renderActions = user.id != userId
 
     const toggleBan = () => {
 

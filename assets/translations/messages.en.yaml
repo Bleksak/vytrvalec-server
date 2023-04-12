@@ -109,6 +109,8 @@ create_new_season: 'Create new season'
 season_running: 'Running'
 season_not_running: 'Not running'
 
+edit: 'Edit'
+
 # msgid "season_start_label"
 # msgstr "Season start"
 

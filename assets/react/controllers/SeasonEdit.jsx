@@ -1,25 +1,42 @@
 // import React from 'react';
 import { useTranslation } from 'react-i18next';
 import _ from '../i8n'
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useParams } from 'react-router-dom';
 
-export default function SeasonEdit({seasonId}) {
+export default function SeasonEdit() {
+    const { seasonId } = useParams();
+    console.log(seasonId);
+
+    const charityName = useRef(null);
+    const charityDescription = useRef(null);
+
     const [season, setSeason] = useState(null);
 
-    const [t, _ ] = useTranslation();
+    const [t, _] = useTranslation();
+
+    const editCharitySubmit = () => {
+
+    }
 
     useEffect(() => {
         fetchData(seasonId).then((response) => {
             setSeason(response);
+            charityName.current.value = response.charity.name;
+            charityDescription.current.value = response.charity.description;
         });
     }, []);
 
     return (
     <>
-        <form>
-            <input name="charityName" type="text"/>
-            <textarea name="charityDescription"></textarea>
-            <button type="button"></button>
+        <form className='form-group'>
+            <label htmlFor="charityName">{t('charity_name')}</label>
+            <input className='form-control mb-0' ref={charityName} id="charityName" name="charityName" type="text"/>
+
+            <label htmlFor="charityDescription">{t('charity_description')}</label>
+            <textarea className='form-control mb-0' ref={charityDescription} id="charityDescription" name="charityDescription"></textarea>
+
+            <button type="button">{t('edit')}</button>
         </form>
     </>
     )

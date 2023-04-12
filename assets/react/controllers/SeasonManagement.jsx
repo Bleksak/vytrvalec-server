@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 export default function SeasonManagement() {
 
     const [seasons, setSeasons] = useState([]);
-    const [currentSeason, setCurrentSeason] = useState(null);
 
     const beginDate = useRef(null);
     const charityName = useRef(null);
