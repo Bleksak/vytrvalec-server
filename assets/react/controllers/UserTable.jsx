@@ -11,7 +11,6 @@ export default function UserTable(userId) {
     const [users, setUsers] = useState([]);
     const [filter, setFilter] = useState('');
 
-
     useEffect( () => {
         const fetchData = async () => {
             const result = await fetch(users_route);
@@ -30,8 +29,6 @@ export default function UserTable(userId) {
     const { t, i18n } = useTranslation();
 
     const filteredUsers = users.filter((user) => (user.firstName + ' ' + user.lastName).toLowerCase().includes(filter.toLowerCase()));
-
-    console.log(users.length)
 
     return <>
     <input type="text" id="search-bar" onKeyUp={search} placeholder={t('search_name')}/>

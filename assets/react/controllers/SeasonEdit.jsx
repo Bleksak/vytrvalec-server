@@ -16,7 +16,7 @@ export default function SeasonEdit() {
     const [t, _] = useTranslation();
 
     const editCharitySubmit = () => {
-
+        
     }
 
     useEffect(() => {

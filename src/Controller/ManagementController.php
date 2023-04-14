@@ -142,4 +142,14 @@ class ManagementController extends AbstractController
     {
         return $this->render('management/season.html.twig', []);
     }
+
+
+    #[Route('/api/management/season/edit/{season}', name:'management_edit_season', methods: ['POST'])]
+    public function editSeason(Season $season) {
+        
+
+        return $this->json(
+            ['success' => 1]
+        );
+    }
 }
