@@ -4,6 +4,7 @@ import _ from '../i8n'
 import UserTable from './UserTable'
 import SeasonEdit from './SeasonEdit'
 import SeasonManagement from './SeasonManagement'
+import SubmissionUpload from './SubmissionUpload'
 
 export default function App(props) {
     return (
@@ -14,6 +15,7 @@ export default function App(props) {
                     <Route path='seasons' element={<SeasonManagement/>}/>
                     <Route path='season/:seasonId' element={<SeasonEdit/>}/>
                 </Route>
+                <Route path='submission/upload' element={<SubmissionUpload/>}/>
             </Routes>
         </BrowserRouter>
     )

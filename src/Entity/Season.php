@@ -3,6 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\SeasonRepository;
+use DateInterval;
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Platforms\DateIntervalUnit;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -22,6 +29,14 @@ class Season
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Charity $charity = null;
+
+    #[ORM\OneToMany(mappedBy: 'season', targetEntity: Submission::class)]
+    private Collection $submissions;
+
+    public function __construct()
+    {
+        $this->submissions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -50,5 +65,43 @@ class Season
         $this->charity = $charity;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Submission>
+     */
+    public function getSubmissions(): Collection
+    {
+        return $this->submissions;
+    }
+
+    public function addSubmission(Submission $submission): self
+    {
+        if (!$this->submissions->contains($submission)) {
+            $this->submissions->add($submission);
+            $submission->setSeason($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubmission(Submission $submission): self
+    {
+        if ($this->submissions->removeElement($submission)) {
+            // set the owning side to null (unless already changed)
+            if ($submission->getSeason() === $this) {
+                $submission->setSeason(null);
+            }
+        }
+
+        return $this;
+    }
+    
+    public function isRunning(): bool {
+        $today = new DateTimeImmutable();
+        $start = DateTimeImmutable::createFromInterface($this->getStart());
+        $end = $start->add(new DateInterval('P4W'));
+        
+        return $today >= $start && $today < $end;
     }
 }

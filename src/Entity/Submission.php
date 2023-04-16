@@ -13,8 +13,53 @@ class Submission
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $accepted = null;
+
+    #[ORM\ManyToOne(inversedBy: 'submissions')]
+    private ?Season $season = null;
+
+    #[ORM\ManyToOne(inversedBy: 'submissions')]
+    private ?User $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function isAccepted(): ?bool
+    {
+        return $this->accepted;
+    }
+
+    public function setAccepted(bool $accepted): self
+    {
+        $this->accepted = $accepted;
+
+        return $this;
+    }
+
+    public function getSeason(): ?Season
+    {
+        return $this->season;
+    }
+
+    public function setSeason(?Season $season): self
+    {
+        $this->season = $season;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
     }
 }

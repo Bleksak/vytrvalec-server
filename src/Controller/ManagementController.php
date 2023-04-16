@@ -85,16 +85,11 @@ class ManagementController extends AbstractController
     public function userList(SerializerInterface $serializer): Response
     {
         $users = $this->em->getRepository(User::class)->findAll();
-        $data = $serializer->serialize($users, 'json');
-
-        $response = new Response($data);
-        $response->headers->set('Content-Type', 'application/json');
-
-        return $response;
+        return $this->json($users);
     }
 
     #[Route('/api/management/season/new', name: 'api_management_season_new', methods: ['POST'])]
-    public function seasonCreate(Request $request, ValidatorInterface $validator) {
+    public function seasonCreate(Request $request, ValidatorInterface $validator): Response {
 
         $today = new DateTime(date('d-m-Y'));
         $beginDate = new DateTime($request->get('beginDate'));
@@ -144,12 +139,31 @@ class ManagementController extends AbstractController
     }
 
 
-    #[Route('/api/management/season/edit/{season}', name:'management_edit_season', methods: ['POST'])]
-    public function editSeason(Season $season) {
+    #[Route('/api/management/charity/edit', name:'management_edit_season', methods: ['POST'])]
+    public function editCharity(Request $request): Response {
+
+        $charityId = $request->get('id');
+        $charity = $this->em->getRepository(Charity::class)->find($charityId);
+
+        if(!$charity) {
+            return $this->json(
+                ['success' => false]
+            );
+        }
+        
         
 
+        $charityName = $request->get('charityName');
+        $charityDescription = $request->get('charityDescription');
+
+        $charity->setName($charityName);
+        $charity->setDescription($charityDescription);
+
+        $this->em->persist($charity);
+        $this->em->flush();
+
         return $this->json(
-            ['success' => 1]
+            ['success' => true]
         );
     }
 }

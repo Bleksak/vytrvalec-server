@@ -7,7 +7,7 @@ use App\Repository\SeasonRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class SeasonController extends AbstractController
 {
@@ -18,30 +18,12 @@ class SeasonController extends AbstractController
     }
 
     #[Route('/api/seasons', name: 'api_seasons', methods: ['GET'])]
-    public function seasonList(SerializerInterface $serializer): Response {
-        $seasons = $serializer->serialize($this->repository->findAll(), 'json');
-
-        $response = new Response($seasons);
-        $response->headers->set('Content-Type', 'application/json');
-
-        return $response;
+    public function seasonList(): Response {
+        return $this->json($this->repository->findAll());
     }
 
     #[Route('/api/season/{season}', name: 'api_season', methods: ['GET'])]
-    public function season(Season $season, SerializerInterface $serializer): Response {
-        $season = $serializer->serialize($season, 'json');
-
-        $response = new Response($season);
-        $response->headers->set('Content-Type', 'application/json');
-
-        return $response;
+    public function season(Season $season): Response {
+        return $this->json($season);
     }
-
-    // #[Route('/season', name: 'app_season')]
-    // public function index(): Response
-    // {
-    //     return $this->render('season/index.html.twig', [
-    //         'controller_name' => 'SeasonController',
-    //     ]);
-    // }
 }
