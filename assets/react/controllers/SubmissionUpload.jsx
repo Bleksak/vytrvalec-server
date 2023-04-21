@@ -16,12 +16,12 @@ export default function SubmissionUpload() {
   
   return (
     <>
-      <form action="/api/submission/upload" className="form-group" method="POST">
+      <form action="/api/submission/upload" className="form-group" method="POST" enctype="multipart/form-data">
         
         <label htmlFor="activity">{t('activity')}</label>
         <select id="activity" name="activity" className="form-select mb-1">
           {categories.map((category) => (
-            <option key={category.id} value="{category.id}">{category.name}</option>
+            <option key={category.id} value={category.id}>{category.name}</option>
           ))}
         </select>
         

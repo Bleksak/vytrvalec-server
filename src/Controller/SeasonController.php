@@ -11,11 +11,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class SeasonController extends AbstractController
 {
-    private SeasonRepository $repository;
-
-    public function __construct(SeasonRepository $repository) {
-        $this->repository = $repository;
-    }
+    public function __construct(private SeasonRepository $repository) {}
 
     #[Route('/api/seasons', name: 'api_seasons', methods: ['GET'])]
     public function seasonList(): Response {

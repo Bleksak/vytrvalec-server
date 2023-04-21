@@ -22,7 +22,10 @@ class SubmissionController extends AbstractController
 
     #[Route('/api/submissions/{season}', name: 'api_submissions_season', methods: ['GET'])]
     public function submissionList(Season $season, SubmissionRepository $repository) {
-        return $this->json('asdf');
+        
+        $list = $repository->findBy(['season' => $season]);
+        
+        return $this->json($list);
     }
 
     private function updateSubmissionState($id, $state) {
@@ -56,17 +59,8 @@ class SubmissionController extends AbstractController
         return $this->updateSubmissionState($request->get('id'), false);
     }
     
-    #[Route('/api/submission/upload', name: 'api_submission_upload', methods: ['GET'])]
+    #[Route('/api/submission/upload', name: 'api_submission_upload', methods: ['POST'])]
     public function uploadSubmission(UserInterface $user, SubmissionRequest $request) {
-        // $category = $this->em->getRepository(Category::class)->find($request->category);
-        // if($category == null) {
-        //     return $this->json([
-        //         'success' => false,
-        //         'message' => 'bad_category'
-        //     ]);
-        // }
-        
-        
         
     }
     

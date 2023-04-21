@@ -16,13 +16,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class UserController extends AbstractController
 {
-    private $em;
-    private $hasher;
-
-    public function __construct(EntityManagerInterface $em, UserPasswordHasherInterface $hasher) {
-        $this->em = $em;
-        $this->hasher = $hasher;
-    }
+    public function __construct(private EntityManagerInterface $em, private UserPasswordHasherInterface $hasher) {}
 
     #[Route('/user/register', name: 'user_register', methods:['GET', 'POST'])]
     public function register(Request $request): Response

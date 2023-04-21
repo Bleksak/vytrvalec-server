@@ -3,6 +3,7 @@
 namespace App\Requests;
 
 use App\Entity\Activity;
+use App\Requests\DB;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -10,12 +11,9 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
 
 class SubmissionRequest extends BaseRequest {
-  #[Type('integer')]
-  #[NotBlank()]
   #[NotNull()]
-  protected int $activity;
-  
-  protected ?Activity $activityObject = null;
+  #[DB]
+  protected ?Activity $activity = null;
   
   #[Type('integer')]
   #[NotBlank()]
@@ -31,9 +29,9 @@ class SubmissionRequest extends BaseRequest {
   #[NotNull()]
   protected ?UploadedFile $screenshot;
   
-  public function getCategory(): ?Activity
+  public function getActivity(): ?Activity
   {
-    return $this->activityObject;
+    return $this->activity;
   }
   
   public function getDistance(): int
@@ -51,4 +49,8 @@ class SubmissionRequest extends BaseRequest {
     return $this->screenshot;
   }
   
+  protected function isApi(): bool
+  {
+	return true;
+  }
 }

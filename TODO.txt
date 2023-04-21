@@ -1,0 +1,3 @@
+foreign keys in db
+ref forwarding in management
+translations (search_name)

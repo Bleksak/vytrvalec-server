@@ -3,6 +3,10 @@
     src: url(../fonts/CenturyGothic.ttf);
 }
 
+ul, li {
+    list-style: none;
+}
+
 body {
     font-family: 'centuryGothic', serif;
 }
@@ -229,7 +233,6 @@ footer .row {
 }
 
 .errorlist li {
-    list-style-type: none;
     padding: 0; 
     margin: 0;
 }
@@ -607,10 +610,36 @@ u {
     gap: 20px;
 }
 
-.seasonForm {
+.seasonList {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    
     width: 100%;
-    max-width: 400px;
+    max-width: 300px;
 }
+
+.seasonList ul {
+    width: 100%;
+}
+
+
+.seasonListItem {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    border: 1px solid black;
+    width: 100%;
+}
+
+.seasonListItemBox {
+    background-color: red;
+}
+
 
 @media (min-width: 75em){
     .seasonManagement {

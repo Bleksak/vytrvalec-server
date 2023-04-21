@@ -7,7 +7,7 @@ const user_profile_route = '/user/profile/';
 const user_ban_route = '/api/management/ban';
 const user_admin_route = '/api/management/admin';
 
-export default function UserTable(userId) {
+export default function UserTable({userId}) {
     const [users, setUsers] = useState([]);
     const [filter, setFilter] = useState('');
 
@@ -26,7 +26,7 @@ export default function UserTable(userId) {
         setFilter(input.target.value);
     }
 
-    const { t, i18n } = useTranslation();
+    const { t, _ } = useTranslation();
 
     const filteredUsers = users.filter((user) => (user.firstName + ' ' + user.lastName).toLowerCase().includes(filter.toLowerCase()));
 

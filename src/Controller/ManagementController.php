@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\Entity\Charity;
 use App\Entity\Season;
 use App\Entity\User;
+use App\Repository\CharityRepository;
+use App\Requests\CharityEditRequest;
+use App\Requests\SeasonCreateRequest;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -49,7 +52,7 @@ class ManagementController extends AbstractController
         $user->setRoles($roles);
         $this->em->flush();
 
-        return $this->json('');
+        return $this->json(['success' => true]);
     }
 
     #[Route('/management/users/ban', name: 'management_users_ban', methods:['POST'])]
@@ -61,14 +64,17 @@ class ManagementController extends AbstractController
         $user = $userRepository->find($id);
 
         if($user === null) {
-            throw $this->createNotFoundException("User not found");
+          return $this->json([
+            'success' => false,
+            'message' => 'User not found'
+          ]);
         }
 
         $ban = !$user->isBanned();
         $user->setBanned($ban);
         $this->em->flush();
 
-        return $this->json('');
+        return $this->json(['success' => true]);
     }
 
     #[Route('/management/users', name: 'management_users')]
@@ -82,39 +88,21 @@ class ManagementController extends AbstractController
     }
 
     #[Route('/api/management/users', name: 'api_management_users', methods: ['GET'])]
-    public function userList(SerializerInterface $serializer): Response
+    public function userList(): Response
     {
-        $users = $this->em->getRepository(User::class)->findAll();
-        return $this->json($users);
+        return $this->json($users = $this->em->getRepository(User::class)->findAll());
     }
 
     #[Route('/api/management/season/new', name: 'api_management_season_new', methods: ['POST'])]
-    public function seasonCreate(Request $request, ValidatorInterface $validator): Response {
-
-        $today = new DateTime(date('d-m-Y'));
-        $beginDate = new DateTime($request->get('beginDate'));
-        $charityName = $request->get('charityName');
-        $charityDescription = $request->get('charityDescription');
-
-        if(empty($charityName)) {
-            return $this->json(
-                ['success' => 0]
-            );
-        }
-
+    public function seasonCreate(SeasonCreateRequest $request): Response
+    {
         $charity = new Charity();
-        $charity->setName($charityName);
-        $charity->setDescription($charityDescription);
+        $charity->setName($request->getCharityName());
+        $charity->setDescription($request->getCharityDescription());
 
         $season = new Season();
-        $season->setStart($beginDate);
+        $season->setStart($request->getBeginDate());
         $season->setCharity($charity);
-
-        if($beginDate < $today) {
-            return $this->json(
-                ['success' => 0]
-            );
-        }
 
         $this->em->persist($charity);
         $this->em->persist($season);
@@ -139,31 +127,23 @@ class ManagementController extends AbstractController
     }
 
 
-    #[Route('/api/management/charity/edit', name:'management_edit_season', methods: ['POST'])]
-    public function editCharity(Request $request): Response {
-
-        $charityId = $request->get('id');
-        $charity = $this->em->getRepository(Charity::class)->find($charityId);
-
-        if(!$charity) {
-            return $this->json(
-                ['success' => false]
-            );
-        }
-        
-        
-
-        $charityName = $request->get('charityName');
-        $charityDescription = $request->get('charityDescription');
-
-        $charity->setName($charityName);
-        $charity->setDescription($charityDescription);
-
-        $this->em->persist($charity);
-        $this->em->flush();
-
-        return $this->json(
-            ['success' => true]
-        );
+    #[Route('/api/management/charity/edit/{charity}', name:'management_edit_charity', methods: ['POST'])]
+    public function editCharity(CharityEditRequest $request, CharityRepository $charityRepository): Response
+    {
+      $charity = $request->getCharity();
+      
+      if($request->getCharityName() != null) {
+        $charity->setName($request->getCharityName());
+      }
+      
+      if($request->getCharityDescription() != null) {
+        $charity->setDescription($request->getCharityDescription());
+      }
+      
+      $charityRepository->save($charity, true);
+      
+      return $this->json(
+        ['success' => true]
+      );
     }
 }
