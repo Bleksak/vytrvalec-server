@@ -15,5 +15,5 @@ i18next
         },
         interpolation: {
             escapeValue: false
-        }
+        },
     })

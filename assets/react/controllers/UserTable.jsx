@@ -4,8 +4,8 @@ import _ from '../i8n'
 
 const users_route = '/api/management/users';
 const user_profile_route = '/user/profile/';
-const user_ban_route = '/api/management/ban';
-const user_admin_route = '/api/management/admin';
+const user_ban_route = '/api/management/users/ban';
+const user_admin_route = '/api/management/users/admin';
 
 export default function UserTable({userId}) {
     const [users, setUsers] = useState([]);
@@ -19,14 +19,14 @@ export default function UserTable({userId}) {
             setUsers(users);
         }
 
-        fetchData();
+        fetchData().then(r => {});
     }, []);
 
     const search = (input) => {
         setFilter(input.target.value);
     }
 
-    const { t, _ } = useTranslation();
+    const [ t, _ ] = useTranslation();
 
     const filteredUsers = users.filter((user) => (user.firstName + ' ' + user.lastName).toLowerCase().includes(filter.toLowerCase()));
 
@@ -70,7 +70,7 @@ function TableRow({user, userId, user_profile_route, user_admin_route, user_ban_
     const [userBanned, setUserBanned] = useState(user.banned)
     const [userAdmin, setUserAdmin] = useState(user.roles.includes('ROLE_STAFF'))
 
-    const renderActions = user.id != userId
+    const renderActions = user.id !== userId
 
     const toggleBan = () => {
 

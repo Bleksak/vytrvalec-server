@@ -16,7 +16,7 @@ export default function SubmissionUpload() {
   
   return (
     <>
-      <form action="/api/submission/upload" className="form-group" method="POST" enctype="multipart/form-data">
+      <form action="/api/submission/upload" className="form-group" method="POST" encType="multipart/form-data">
         
         <label htmlFor="activity">{t('activity')}</label>
         <select id="activity" name="activity" className="form-select mb-1">

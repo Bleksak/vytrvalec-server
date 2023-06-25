@@ -16,11 +16,17 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            form_login:
-                login_path: user_login
-                check_path: user_login
+
+#            form_login:
+#                login_path: user_login
+#                check_path: user_login
+
+            json_login:
+                check_path: api_user_login
+
             logout:
-                path: user_logout
+                path: api_user_logout
+
             remember_me:
                 samesite: strict
     role_hierarchy:

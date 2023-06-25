@@ -21,7 +21,8 @@ class HomeController extends AbstractController
     }
 
     #[Route('/rules', name: 'rules')]
-    public function rules() {
-        return $this->render('home/rules.html.twig', []);
+    public function rules(): Response
+    {
+        return $this->render('home/rules.html.twig');
     }
 }

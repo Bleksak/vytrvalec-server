@@ -11,12 +11,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class UserController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $em, private UserPasswordHasherInterface $hasher) {}
+    public function __construct(private readonly EntityManagerInterface $em, private readonly UserPasswordHasherInterface $hasher, private readonly SerializerInterface $serializer) {}
 
     #[Route('/user/register', name: 'user_register', methods:['GET', 'POST'])]
     public function register(Request $request): Response
@@ -48,19 +51,20 @@ class UserController extends AbstractController
     }
 
     #[Route('/user/login', name: 'user_login', methods:['GET', 'POST'])]
-    public function login(Request $request, AuthenticationUtils $authUtils): Response {
-        if($this->isGranted('ROLE_USER')) {
-            return $this->redirectToRoute('home');
-        }
-
-        $error = $authUtils->getLastAuthenticationError();
-        $form = $this->createForm(LoginFormType::class);
-
-        $lastUsername = $authUtils->getLastUsername();
+    public function login(Request $request, AuthenticationUtils $authUtils): Response
+    {
+//        if($this->isGranted('ROLE_USER')) {
+//            return $this->redirectToRoute('home');
+//        }
+//
+//        $error = $authUtils->getLastAuthenticationError();
+//        $form = $this->createForm(LoginFormType::class);
+//
+//        $lastUsername = $authUtils->getLastUsername();
 
         return $this->render('user/login.html.twig', [
-            'form' => $form->createView(),
-            'error' => $error
+//            'form' => $form->createView(),
+//            'error' => $error
         ]);
     }
 
@@ -72,8 +76,13 @@ class UserController extends AbstractController
             throw $this->createNotFoundException('User not found');
         }
 
+        $filtered = $this->serializer->normalize($user, null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['id', 'password', 'submissions'],
+        ]);
+
         return $this->render('user/profile.html.twig', [
-            'user' => $user
+            'user' => $filtered
         ]);
     }
+    
 }

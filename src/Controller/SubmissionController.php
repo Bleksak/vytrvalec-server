@@ -21,14 +21,16 @@ class SubmissionController extends AbstractController
     public function __construct(private EntityManagerInterface $em, private SubmissionRepository $submissionRepository) {}
 
     #[Route('/api/submissions/{season}', name: 'api_submissions_season', methods: ['GET'])]
-    public function submissionList(Season $season, SubmissionRepository $repository) {
+    public function submissionList(Season $season, SubmissionRepository $repository): Response
+    {
         
         $list = $repository->findBy(['season' => $season]);
         
         return $this->json($list);
     }
 
-    private function updateSubmissionState($id, $state) {
+    private function updateSubmissionState($id, $state): Response
+    {
         $submission = $this->submissionRepository->find($id);
 
         if ($submission == null) {
@@ -39,8 +41,8 @@ class SubmissionController extends AbstractController
 
         $submission->setAccepted($state);
 
-        $this->submissionRepository->persist($submission);
-        $this->submissionRepository->flush();
+        $this->em->persist($submission);
+        $this->em->flush();
 
         return $this->json(
             ['success' => true]
@@ -49,19 +51,22 @@ class SubmissionController extends AbstractController
 
     #[IsGranted('ROLE_STAFF')]
     #[Route('/api/submission/accept', name:'api_season_accept', methods: ['POST'])]
-    public function acceptSubmission(Request $request) {
+    public function acceptSubmission(Request $request): Response
+    {
         return $this->updateSubmissionState($request->get('id'), true);
     }
 
     #[IsGranted('ROLE_STAFF')]
     #[Route('/api/submission/reject', name:'api_season_reject', methods: ['POST'])]
-    public function rejectSubmission(Request $request) {
+    public function rejectSubmission(Request $request): Response
+    {
         return $this->updateSubmissionState($request->get('id'), false);
     }
     
     #[Route('/api/submission/upload', name: 'api_submission_upload', methods: ['POST'])]
-    public function uploadSubmission(UserInterface $user, SubmissionRequest $request) {
-        
+    public function uploadSubmission(UserInterface $user, SubmissionRequest $request): Response
+    {
+        return $this->json([]);
     }
     
     #[Route('/submission/upload', name: 'submission_upload', methods: ['GET'])]

@@ -21,14 +21,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[IsGranted('ROLE_STAFF')]
 class ManagementController extends AbstractController
 {
-    private $em;
-
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(private readonly EntityManagerInterface $em)
     {
-        $this->em = $em;
     }
 
-    #[Route('/management/users/admin', name: 'management_users_admin', methods: ['POST'])]
+    #[Route('api/management/users/admin', name: 'management_users_admin', methods: ['POST'])]
     public function user_admin(Request $request): Response 
     {
         $id = $request->get('user_id');
@@ -55,7 +52,7 @@ class ManagementController extends AbstractController
         return $this->json(['success' => true]);
     }
 
-    #[Route('/management/users/ban', name: 'management_users_ban', methods:['POST'])]
+    #[Route('api/management/users/ban', name: 'management_users_ban', methods:['POST'])]
     public function user_ban(Request $request): Response 
     {
         $id = $request->get('user_id');

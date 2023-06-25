@@ -4,6 +4,6 @@ controllers:
         namespace: App\Controller
     type: attribute
 
-user_logout:
-    path: /user/logout
+api_user_logout:
+    path: /api/user/logout
     methods: GET

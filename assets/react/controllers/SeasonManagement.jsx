@@ -32,7 +32,7 @@ export default function SeasonManagement() {
         };
 
         fetchData(requestOptions).then((data) => {
-            if(data == null || data.success == 0) {
+            if(data == null || data.success === 0) {
                 console.log("err");
             } else {
                 const newSeason = {
