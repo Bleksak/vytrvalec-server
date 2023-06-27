@@ -1,16 +1,19 @@
 import useAuth from "./useAuth";
-import React, {useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import {redirect, useLocation, useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
 
 export default function Login() {
     const navigate = useNavigate();
-    const { auth } = useAuth()
+    const { auth } = useAuth();
 
-    if(auth) {
-        return navigate("/");
-    }
+    useEffect(() => {
+            if(auth === true) {
+                return navigate("/");
+            }
+        }, [auth]
+    );
 
     return <>
         <LoginForm/>

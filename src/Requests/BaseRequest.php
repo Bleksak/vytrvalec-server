@@ -7,6 +7,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class BaseRequest {
@@ -79,24 +80,39 @@ abstract class BaseRequest {
           }
       }
 
-      $messages = ['success' => false, 'errors' => []];
+      $messages = [];
       foreach ($errors as $message) {
-          $messages['errors'][] = [
-              'property' => $message->getPropertyPath(),
-              'value' => $message->getInvalidValue(),
-              'message' => $message->getMessage(),
-              ];
+          $messages[] = $message->getMessage();
       }
 
       if($this->isApi()) {
-          if (!empty($messages['errors'])) {
-              $response = new JsonResponse($messages);
-              $response->send();
-
+          if (!empty($messages)) {
+              $this->getResponse(false, $messages)->send();
               exit;
           }
       }
 
       return $messages;
+  }
+
+  public function getResponse(bool $success, mixed $response = null): Response
+  {
+      if(!$success) {
+          return new JsonResponse([
+              'success' => false,
+              'errors' => $response
+          ]);
+      }
+
+      if($response != null) {
+          return new JsonResponse([
+              'success' => true,
+              'result' => $response
+          ]);
+      }
+
+      return new JsonResponse([
+          'success' => true
+      ]);
   }
 }

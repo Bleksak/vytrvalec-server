@@ -22,8 +22,10 @@ export function AuthProvider({children}) {
             const data = response.data;
 
             setUser(data.success ? data.user : null);
+            setAuth(data.success === true);
         }).catch(() => {
             setUser(null);
+            setAuth(false);
         });
     };
 

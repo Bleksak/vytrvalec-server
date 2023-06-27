@@ -10,6 +10,7 @@ import Footer from "./Footer";
 import Login from "./Login";
 import useAuth, {AuthProvider} from "./useAuth";
 import React from "react";
+import Registration from "./Register";
 
 export default function App(props) {
 
@@ -27,6 +28,7 @@ export default function App(props) {
 
                 <Route path='/user'>
                     <Route path='login' element={<Login/>}/>
+                    <Route path='register' element={<Registration/>}/>
                 </Route>
 
                 <Route path='/management'>
