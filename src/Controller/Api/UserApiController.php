@@ -8,6 +8,7 @@ use App\Requests\RegistrationRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -35,12 +36,12 @@ class UserApiController extends AbstractController {
     }
 
     #[Route('/api/user/register', name: 'api_user_register', methods: ['POST'])]
-    public function register(RegistrationRequest $request, EntityManagerInterface $em, ValidatorInterface $validator): Response
+    public function register(RegistrationRequest $request, EntityManagerInterface $em, ValidatorInterface $validator, PasswordHasherInterface $hasher): Response
     {
         $user = new User();
 
         $user->setEmail($request->getUsername());
-        $user->setPassword($request->getPassword());
+        $user->setPassword($hasher->hash($request->getPassword()));
         $user->setFaculty($request->getFaculty());
         $user->setFirstName($request->getFirstName());
         $user->setLastName($request->getLastName());

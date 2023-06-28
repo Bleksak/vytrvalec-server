@@ -12,7 +12,14 @@ export default function Registration() {
     const [faculties, setFaculties] = useState(null);
     const [, setTooltip] = useState(null);
 
-    let gdpr = useRef(null);
+    const  gdpr = useRef(null);
+
+    const emailRef = useRef();
+    const passwordRef = useRef();
+    const password2Ref = useRef();
+    const firstNameRef = useRef();
+    const lastNameRef = useRef();
+    const facultyRef = useRef();
 
     useEffect(() => {
             if(auth) {
@@ -39,6 +46,38 @@ export default function Registration() {
 
     const submit = (ev) => {
 
+        if(!gdpr.current.checked) {
+            // TODO: gdpr unchecked error
+        }
+
+        if(passwordRef.current.value !== password2Ref.current.value) {
+            // TODO: passwords do not match error
+        }
+
+        if(!faculties.map((faculty) => faculty.id).includes(facultyRef.current.value)) {
+            // TODO: Invalid faculty selected
+        }
+
+        sendRegister({
+            first_name: firstNameRef.current.value,
+            last_name: lastNameRef.current.value,
+            username: emailRef.current.value,
+            password: passwordRef.current.value,
+            faculty: facultyRef.current.value,
+        }).then((response) => {
+
+            if(!response.success) {
+                // TODO: Handle errors
+                console.log(response);
+            } else {
+                console.log('success');
+            }
+
+        }).catch((error) => {
+
+        });
+
+        ev.preventDefault();
     }
 
     return <>
@@ -49,32 +88,32 @@ export default function Registration() {
                 {/* TODO: TADY ERRORY*/}
 
                 <label htmlFor="email">{ t('email') }</label>
-                <input type="email" name="email" id="email" className="form-control"/>
+                <input ref={emailRef} type="email" name="email" id="email" className="form-control"/>
                 {/*{{form_errors(form.first_name)}}*/}
 
                 <div className="d-flex gap-3">
                     <div>
                         {/* TODO: Error ke kazdemu fieldu zvlast */}
                         <label htmlFor="first_name">{ t('first_name') }</label>
-                        <input type="text" name="first_name" id="first_name" className="form-control d-inline"/>
+                        <input ref={firstNameRef} type="text" name="first_name" id="first_name" className="form-control d-inline"/>
                         {/*{{form_errors(form.first_name)}}*/}
                     </div>
 
                     <div>
                         <label htmlFor="last_name">{ t('last_name') }</label>
-                        <input type="text" name="last_name" id="last_name" className="form-control d-inline"/>
+                        <input ref={lastNameRef} type="text" name="last_name" id="last_name" className="form-control d-inline"/>
                         {/*{{form_errors(form.last_name)}}*/}
                     </div>
                 </div>
 
                 <label htmlFor="password">{ t('password') }</label>
-                <input type="password" name="password" id="password" className="form-control"/>
+                <input ref={passwordRef} type="password" name="password" id="password" className="form-control"/>
                 {/*{{form_errors(form.last_name)}}*/}
 
                 <label htmlFor="password_repeat">{ t('password_repeat') }</label>
-                <input type="password" name="password_repeat" id="password_repeat" className="form-control"/>
+                <input ref={password2Ref} type="password" name="password_repeat" id="password_repeat" className="form-control"/>
 
-                <select className="form-control">
+                <select ref={facultyRef} className="form-control">
                     { faculties && faculties.map( (faculty) =>
                         <option key={faculty.id} value={faculty.id}>{ faculty.name }</option>
                     )}
@@ -84,7 +123,7 @@ export default function Registration() {
                 <input ref={gdpr} type="checkbox" name="gdpr" id="gdpr" className="form-check-input border border-2 border-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title={ t('gdpr_tooltip') }/>
 
                 <div className="d-flex justify-content-center">
-                    <button type="submit" className="btn btn-primary d-block mx-1 my-1">{ t('sign_up') }</button>
+                    <button type="submit" className="btn btn-primary d-block mx-1 mt-2 mb-1">{ t('sign_up') }</button>
                 </div>
 
             </form>
@@ -94,4 +133,8 @@ export default function Registration() {
 
 async function fetchFaculties() {
     return (await axios.get('/api/faculties/list')).data;
+}
+
+async function sendRegister(data) {
+    return (await axios.post('/api/user/register', data)).data;
 }
