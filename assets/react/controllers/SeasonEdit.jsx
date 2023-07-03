@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import _ from '../i8n'
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from 'react-router-dom';
 
 export default function SeasonEdit() {

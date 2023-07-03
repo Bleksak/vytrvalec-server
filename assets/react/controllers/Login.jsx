@@ -1,6 +1,6 @@
 import useAuth from "./useAuth";
 import React, {useEffect, useRef} from "react";
-import {redirect, useLocation, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
 

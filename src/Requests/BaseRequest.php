@@ -19,6 +19,8 @@ abstract class BaseRequest {
   {
       if($this->isApi()) {
           $this->populate(self::dataFromJson());
+          $this->populate(self::getRequest()->request->all());
+          $this->populate(self::getRequest()->files->all());
       } else {
           $this->populate(self::getRequest()->request->all());
           $this->populate(self::getRequest()->files->all());
@@ -41,7 +43,8 @@ abstract class BaseRequest {
 
   private static function dataFromJson(): array
   {
-      return json_decode(file_get_contents("php://input"), true);
+      $data = json_decode(file_get_contents("php://input"), true);
+      return $data == null ? [] : $data;
   }
   
   private static function getRequest(): Request
@@ -60,9 +63,10 @@ abstract class BaseRequest {
 
               if(!empty($propertyAttribute)) {
                   $this->{$property} = $this->entityManagerInterface->getRepository($reflectionProperty->getType()->getName())->find($value);
-              } else if(!$reflectionProperty->getType()->isBuiltin()) {
-                  $reflectionType = $reflectionProperty->getType()->getName();
-                  $this->{$property} = new $reflectionType($value);
+//              } else if(!$reflectionProperty->getType()->isBuiltin()) {
+//                  $reflectionType = $reflectionProperty->getType()->getName();
+//                  dd($value);
+//                  $this->{$property} = new $reflectionType($value);
               } else {
                   $this->{$property} = $value;
               }

@@ -132,11 +132,9 @@ const seasonRunning = (startDate) => {
     const now = moment().utcOffset(0);
     const end = start.clone().add(4, 'weeks');
 
-    if(now.isBetween(start, end, undefined, '[)')) {
-        return true;
-    }
+    return now.isBetween(start, end, undefined, '[)');
 
-    return false;
+
 }
 
 const SeasonEditor = ({currentSeason}) => {

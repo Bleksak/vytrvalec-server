@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from "react-i18next";
-import _ from '../i8n'
 
 const users_route = '/api/management/users';
 const user_profile_route = '/user/profile/';
