@@ -10,113 +10,118 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-abstract class BaseRequest {
-  
-  public function __construct(
-      protected ValidatorInterface $validatorInterface,
-      protected EntityManagerInterface $entityManagerInterface
-  )
-  {
-      if($this->isApi()) {
-          $this->populate(self::dataFromJson());
-          $this->populate(self::getRequest()->request->all());
-          $this->populate(self::getRequest()->files->all());
-      } else {
-          $this->populate(self::getRequest()->request->all());
-          $this->populate(self::getRequest()->files->all());
-      }
+abstract class BaseRequest
+{
 
-      if($this->autoValidateRequest()) {
-          $this->validate();
-      }
-  }
+    public function __construct(
+        protected ValidatorInterface     $validatorInterface,
+        protected EntityManagerInterface $entityManagerInterface
+    )
+    {
+        if ($this->isApi()) {
+            $this->populate(self::dataFromJson());
+        }
 
-  protected function autoValidateRequest(): bool
-  {
-      return true;
-  }
-  
-  protected function isApi(): bool
-  {
-    return false;
-  }
+        $this->populate(self::getRequest()->request->all());
+        $this->populate(self::getRequest()->files->all());
 
-  private static function dataFromJson(): array
-  {
-      $data = json_decode(file_get_contents("php://input"), true);
-      return $data == null ? [] : $data;
-  }
-  
-  private static function getRequest(): Request
-  {
-      return Request::createFromGlobals();
-  }
-  
-  protected function populate(array $arrayData): void 
-  {
-      $reflectionClass = new ReflectionClass($this::class);
+        if ($this->autoValidateRequest()) {
+            $this->validate();
+        }
+    }
 
-      foreach($arrayData as $property => $value) {
-          if(property_exists($this, $property)) {
-              $reflectionProperty = $reflectionClass->getProperty($property);
-              $propertyAttribute = $reflectionProperty->getAttributes('App\Requests\DB');
+    protected function autoValidateRequest(): bool
+    {
+        return true;
+    }
 
-              if(!empty($propertyAttribute)) {
-                  $this->{$property} = $this->entityManagerInterface->getRepository($reflectionProperty->getType()->getName())->find($value);
+    protected function isApi(): bool
+    {
+        return false;
+    }
+
+    private static function dataFromJson(): array
+    {
+        $data = json_decode(file_get_contents("php://input"), true);
+        return $data == null ? [] : $data;
+    }
+
+    private static function getRequest(): Request
+    {
+        return Request::createFromGlobals();
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    protected function populate(array $arrayData): void
+    {
+        $reflectionClass = new ReflectionClass($this::class);
+
+        foreach ($arrayData as $property => $value) {
+            if (property_exists($this, $property)) {
+                $reflectionProperty = $reflectionClass->getProperty($property);
+                $propertyAttribute = $reflectionProperty->getAttributes('App\Requests\DB');
+
+                if (!empty($propertyAttribute)) {
+                    $this->{$property} = $this->entityManagerInterface->getRepository($reflectionProperty->getType()->getName())->find($value);
 //              } else if(!$reflectionProperty->getType()->isBuiltin()) {
 //                  $reflectionType = $reflectionProperty->getType()->getName();
 //                  dd($value);
 //                  $this->{$property} = new $reflectionType($value);
-              } else {
-                  $this->{$property} = $value;
-              }
-          }
-      }
-  }
-  
-  public function validate(): array
-  {
-      $errors = $this->validatorInterface->validate($this);
-      $reflectionClass = new ReflectionClass($this::class);
-      foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PROTECTED) as $method) {
-          if(str_starts_with($method->getName(), "validate")) {
-              $method->invoke($this);
-          }
-      }
+                } else {
+                    $this->{$property} = $value;
+                }
+            }
+        }
+    }
 
-      $messages = [];
-      foreach ($errors as $message) {
-          $messages[] = $message->getMessage();
-      }
+    /**
+     * @throws \ReflectionException
+     */
+    public function validate(): array
+    {
+        $errors = $this->validatorInterface->validate($this);
+        $reflectionClass = new ReflectionClass($this::class);
+        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PROTECTED) as $method) {
+            if (str_starts_with($method->getName(), "validate")) {
+                $method->invoke($this);
+            }
+        }
 
-      if($this->isApi()) {
-          if (!empty($messages)) {
-              $this->getResponse(false, $messages)->send();
-              exit;
-          }
-      }
+        $messages = [];
+        foreach ($errors as $message) {
+            $messages[] = $message->getMessage();
+        }
 
-      return $messages;
-  }
+        if ($this->isApi()) {
+            if (!empty($messages)) {
+                $this->getResponse(false, $messages)->send();
+                exit;
+            }
+        }
 
-  public function getResponse(bool $success, mixed $response = null): Response
-  {
-      if(!$success) {
-          return new JsonResponse([
-              'success' => false,
-              'errors' => $response
-          ]);
-      }
+        return $messages;
+    }
 
-      if($response != null) {
-          return new JsonResponse([
-              'success' => true,
-              'result' => $response
-          ]);
-      }
+    public function getResponse(bool $success, mixed $response = null): Response
+    {
+        if (!$success) {
+            return new JsonResponse([
+                'success' => false,
+                'errors' => $response
+            ]);
+        }
 
-      return new JsonResponse([
-          'success' => true
-      ]);
-  }
+        if ($response != null) {
+            return new JsonResponse([
+                'success' => true,
+                'result' => $response
+            ]);
+        }
+
+        return new JsonResponse([
+            'success' => true
+        ]);
+    }
 }

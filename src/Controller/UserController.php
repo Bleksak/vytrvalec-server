@@ -69,20 +69,8 @@ class UserController extends AbstractController
     }
 
     #[Route('/user/profile/{user}', name: 'user_profile', methods: ['GET'])]
-    #[IsGranted('ROLE_STAFF')]
     public function profile(User $user = null) : Response
     {
-        if($user == null) {
-            throw $this->createNotFoundException('User not found');
-        }
-
-        $filtered = $this->serializer->normalize($user, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['id', 'password', 'submissions'],
-        ]);
-
-        return $this->render('user/profile.html.twig', [
-            'user' => $filtered
-        ]);
+        return $this->render('base.html.twig');
     }
-    
 }

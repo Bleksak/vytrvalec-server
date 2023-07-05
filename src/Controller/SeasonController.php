@@ -18,8 +18,8 @@ class SeasonController extends AbstractController
         return $this->json($this->repository->findAll());
     }
 
-    #[Route('/api/season/{season}', name: 'api_season', methods: ['GET'])]
-    public function season(Season $season): Response {
-        return $this->json($season);
-    }
+//    #[Route('/api/season/{season}', name: 'api_season', methods: ['GET'])]
+//    public function season(Season $season): Response {
+//        return $this->json($season);
+//    }
 }

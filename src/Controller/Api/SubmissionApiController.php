@@ -2,11 +2,18 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\Activity;
+use App\Entity\FacultySummary;
 use App\Entity\Submission;
 use App\Entity\User;
+use App\Entity\UserSummary;
+use App\Repository\FacultySummaryRepository;
+use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
+use App\Repository\UserSummaryRepository;
 use App\Requests\SubmissionStateRequest;
 use App\Requests\SubmissionRequest;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
 use ImagickException;
@@ -23,15 +30,71 @@ class SubmissionApiController extends AbstractController
     {
     }
 
-    #[Route('/api/submission/create', name: 'api_submission_create', methods: ['POST'])]
+    // TODO: delete this
+    #[Route('/api/submission/createTest', name: 'api_submission_createTest', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function create(#[CurrentUser] User $user, SubmissionRequest $request, Request $httpRequest): Response
+    public function createTest(#[CurrentUser] User $user, Request $httpRequest, SeasonRepository $seasonRepository): Response
     {
         $submission = new Submission();
+        $now = new \DateTimeImmutable();
+
+        $criteria = new Criteria();
+        $criteria->where(Criteria::expr()->lt('start', $now));
+        $criteria->andWhere(Criteria::expr()->gte('end', $now));
+
+        $season = $seasonRepository->matching($criteria)->first();
+        if(!$season) {
+            return $this->json([
+                'NO SEASON KOKOT'
+            ]);
+        }
+
+        $activity = $this->em->getRepository(Activity::class)->find(1);
+
+        $submission->setElevation(1000);
+        $submission->setDistance(1000);
+        $submission->setUser($user);
+        $submission->setReviewed(false);
         $submission->setAccepted(false);
+        $submission->setDate($now);
+        $submission->setSeason($season);
+        $submission->setActivity($activity);
+
+        $uniquePath = uniqid('/uploads/') . '.jpg';
+        $submission->setImage($uniquePath);
+
+        $this->submissionRepository->save($submission, true);
+
+        return $this->json([
+            'success' => true
+        ]);
+    }
+
+    #[Route('/api/submission/create', name: 'api_submission_create', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function create(#[CurrentUser] User $user, SubmissionRequest $request, Request $httpRequest, SeasonRepository $seasonRepository): Response
+    {
+        $submission = new Submission();
+        $now = new \DateTimeImmutable();
+
+        $criteria = new Criteria();
+        $criteria->where(Criteria::expr()->lt('start', $now));
+        $criteria->andWhere(Criteria::expr()->gte('end', $now));
+
+        $season = $seasonRepository->matching($criteria)->first();
+
+        if(!$season) {
+            return $request->getResponse(false, [
+                // TODO: message
+                'NEBEZI SEZONA MOREEEE'
+            ]);
+        }
+
         $submission->setElevation($request->getElevation());
         $submission->setDistance($request->getDistance());
+
         $submission->setUser($user);
+        $submission->setActivity($request->getActivity());
         $submission->setReviewed(false);
         $submission->setAccepted(false);
 
@@ -94,16 +157,58 @@ class SubmissionApiController extends AbstractController
     {
         $submission->setAccepted($state);
         $submission->setReviewed(true);
-
-        $this->em->persist($submission);
-        $this->em->flush();
     }
 
-    #[Route('/api/submission/accept', name: 'api_submission_accept', methods: ['PUT'])]
+    #[Route('/api/submission/accept', name: 'api_submission_accept', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
-    public function accept(SubmissionStateRequest $request): Response
+    public function accept(SubmissionStateRequest $request, FacultySummaryRepository $facultySummaryRepository, UserSummaryRepository $userSummaryRepository): Response
     {
+        if($request->getSubmission()->isReviewed()) {
+            return $request->getResponse(false, [
+                // TODO: message
+                'NEJDE TOOO, UZ JE REVIEWED BROO'
+            ]);
+        }
+
         $this->setState($request->getSubmission(), true);
+        $submission = $request->getSubmission();
+
+        $user = $submission->getUser();
+        $faculty = $user->getFaculty();
+        $season = $submission->getSeason();
+
+        $facultySummary = $facultySummaryRepository->findOneBy(['faculty' => $faculty, 'season' => $season]);
+        $userSummary = $userSummaryRepository->findOneBy(['user' => $user, 'season' => $season]);
+
+        if($facultySummary == null) {
+            $facultySummary = new FacultySummary();
+
+            $facultySummary->setFaculty($faculty);
+            $facultySummary->setSeason($season);
+            $facultySummary->setDistance(0);
+            $facultySummary->setElevation(0);
+        }
+
+        $facultySummary->setDistance( $facultySummary->getDistance() + $submission->getDistance() );
+        $facultySummary->setElevation($facultySummary->getElevation() + $submission->getElevation());
+
+        if($userSummary == null) {
+            $userSummary = new UserSummary();
+
+            $userSummary->setUser($user);
+            $userSummary->setSeason($season);
+            $userSummary->setDistance(0);
+            $userSummary->setElevation(0);
+        }
+
+        $userSummary->setDistance( $userSummary->getDistance() + $submission->getDistance() );
+        $userSummary->setElevation($userSummary->getElevation() + $submission->getElevation());
+
+        $facultySummaryRepository->save($facultySummary);
+        $userSummaryRepository->save($userSummary);
+
+        $this->submissionRepository->save($request->getSubmission(), true);
+
         return $request->getResponse(true);
     }
 
@@ -112,6 +217,7 @@ class SubmissionApiController extends AbstractController
     public function reject(SubmissionStateRequest $request): Response
     {
         $this->setState($request->getSubmission(), false);
+        $this->submissionRepository->save($request->getSubmission(), true);
         return $request->getResponse(true);
     }
 

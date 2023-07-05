@@ -2,8 +2,15 @@
 
 namespace App\Repository;
 
+use App\Entity\Activity;
+use App\Entity\Faculty;
+use App\Entity\FacultySummary;
+use App\Entity\Season;
 use App\Entity\Submission;
+use App\Entity\User;
+use App\Entity\UserSummary;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**

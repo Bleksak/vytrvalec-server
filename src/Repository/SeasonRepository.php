@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Season;
+use App\Entity\Submission;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

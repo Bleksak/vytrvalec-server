@@ -11,6 +11,9 @@ import Login from "./Login";
 import useAuth, {AuthProvider} from "./useAuth";
 import React from "react";
 import Registration from "./Register";
+import Profile from "./Profile";
+
+import _ from '../i8n'
 
 export default function App(props) {
 
@@ -29,6 +32,7 @@ export default function App(props) {
                 <Route path='/user'>
                     <Route path='login' element={<Login/>}/>
                     <Route path='register' element={<Registration/>}/>
+                    <Route path='profile/:userId?' element={<Profile/>}/>
                 </Route>
 
                 <Route path='/management'>
@@ -36,7 +40,7 @@ export default function App(props) {
                     <Route path='seasons' element={<SeasonManagement/>}/>
                     <Route path='season/:seasonId' element={<SeasonEdit/>}/>
                 </Route>
-                <Route path='submission/upload' element={<SubmissionUpload/>}/>
+                <Route path='submission/create' element={<SubmissionUpload/>}/>
             </Routes>
             </div>
             <Footer/>

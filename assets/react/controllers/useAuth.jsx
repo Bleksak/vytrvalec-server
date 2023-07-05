@@ -18,7 +18,7 @@ export function AuthProvider({children}) {
     const [auth, setAuth] = useState(null);
 
     const isAuthenticated = async () => {
-        await axios.get('/api/user/current').then((response) => {
+        await axios.get('/api/user/profile').then((response) => {
             const data = response.data;
 
             setUser(data.success ? data.user : null);

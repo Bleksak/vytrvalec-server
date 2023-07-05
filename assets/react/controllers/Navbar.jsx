@@ -17,10 +17,10 @@ export default function Navbar() {
 
         <div className="navbar-collapse collapse w-100" id="collapsingNavbar3">
             <ul className="nav navbar-nav ms-auto w-100 justify-content-end">
-                <UserStaff user={user}/>
+                <UserStaff/>
                 <Everyone/>
-                <UserNotLoggedIn user={user}/>
-                <UserLoggedIn usr={user}/>
+                <UserNotLoggedIn/>
+                <UserLoggedIn/>
             </ul>
         </div>
     </nav>
@@ -40,10 +40,11 @@ function Everyone() {
     </>
 }
 
-function UserNotLoggedIn({user}) {
+function UserNotLoggedIn() {
     const [t, _] = useTranslation();
+    const {auth} = useAuth();
 
-    if(user !== null) {
+    if(auth !== false) {
         return <></>;
     }
 
@@ -61,7 +62,7 @@ function UserNotLoggedIn({user}) {
     </>
 }
 
-function UserLoggedIn({usr}) {
+function UserLoggedIn({}) {
     const navigate = useNavigate();
     const [t, _] = useTranslation();
     const { auth, setAuth, user } = useAuth();
@@ -73,7 +74,7 @@ function UserLoggedIn({usr}) {
         }
     }, [unlogged]);
 
-    if(usr == null) {
+    if(auth === false) {
         return <></>;
     }
 
@@ -89,7 +90,7 @@ function UserLoggedIn({usr}) {
         </li>
 
         <li className="nav-item">
-            <Link className="nav-link" to="/submission/new">{ t('navbar_submit') }</Link>
+            <Link className="nav-link" to="/submission/create">{ t('navbar_submit') }</Link>
         </li>
 
         <li className="nav-item">
@@ -100,10 +101,11 @@ function UserLoggedIn({usr}) {
     </>
 }
 
-function UserStaff({user}) {
+function UserStaff() {
     const [t, _] = useTranslation();
+    const {user, auth} = useAuth();
 
-    if(user === null) {
+    if(auth === false || user == null) {
         return <></>;
     }
 

@@ -16,4 +16,4 @@ i18next
         interpolation: {
             escapeValue: false
         },
-    })
+    }).then((x) => {})

@@ -62,13 +62,7 @@ class SubmissionController extends AbstractController
     {
         return $this->updateSubmissionState($request->get('id'), false);
     }
-    
-    #[Route('/api/submission/upload', name: 'api_submission_upload', methods: ['POST'])]
-    public function uploadSubmission(UserInterface $user, SubmissionRequest $request): Response
-    {
-        return $this->json([]);
-    }
-    
+
     #[Route('/submission/upload', name: 'submission_upload', methods: ['GET'])]
     public function uploadSubmissionForm(UserInterface $userInterface): Response
     {

@@ -2,6 +2,7 @@
 
 namespace App\Requests;
 
+use App\Entity\Activity;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -13,6 +14,9 @@ class SubmissionRequest extends BaseRequest
     protected ?int $elevation;
     protected ?UploadedFile $image;
 
+    #[DB]
+    protected ?Activity $activity;
+
     public function getDistance(): ?int {
         return $this->distance;
     }
@@ -23,6 +27,10 @@ class SubmissionRequest extends BaseRequest
 
     public function getImage(): ?UploadedFile {
         return $this->image;
+    }
+
+    public function getActivity(): ?Activity {
+        return $this->activity;
     }
 
     protected function validateImage(): ConstraintViolationListInterface

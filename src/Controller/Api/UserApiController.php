@@ -21,22 +21,47 @@ class UserApiController extends AbstractController {
     {
     }
 
-    #[Route('/api/user/current', name: 'api_user_current', methods: ['GET'])]
-    public function currentUser(UserInterface $userInterface = null): Response
+    #[Route('/api/user/login', name: 'api_user_login', methods: ['POST'])]
+    public function login(#[CurrentUser] ?User $user): Response
     {
-        $filtered = $this->serializer->normalize($userInterface, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['id', 'password', 'submissions'],
+        if($user === null) {
+            return $this->json([
+                'success' => false,
+                'message' => 'missing_credentials',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return $this->userData($user);
+    }
+
+    #[Route('/api/user/submissions/{user}', name: 'api_user_submissions', methods: ['GET'])]
+    public function userSubmissions(#[CurrentUser] User $currentUser, User $user = null): Response
+    {
+        if($user === null || ($user !== $currentUser && $currentUser->hasRole('ROLE_STAFF'))) {
+            $user = $currentUser;
+        }
+
+        $filtered = $this->serializer->normalize($user->getSubmissions(), null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
         ]);
 
         return $this->json([
-            'success' => $userInterface !== null,
-            'user' => $filtered,
+            'success' => true,
+            'submissions' => $filtered,
         ]);
     }
 
     #[Route('/api/user/register', name: 'api_user_register', methods: ['POST'])]
-    public function register(RegistrationRequest $request, EntityManagerInterface $em, ValidatorInterface $validator, UserPasswordHasherInterface $hasher): Response
+    public function register(RegistrationRequest $request, EntityManagerInterface $em, ValidatorInterface $validator, UserPasswordHasherInterface $hasher, UserInterface $userInterface = null): Response
     {
+        if($userInterface !== null) {
+            dd($userInterface);
+            return $request->getResponse(false, [
+                // TODO: message
+                'TODO: nelze registrovat protoze uz je prihlasenej'
+            ]);
+        }
+
         $user = new User();
 
         $user->setEmail($request->getUsername());
@@ -61,16 +86,20 @@ class UserApiController extends AbstractController {
         return $request->getResponse(true);
     }
 
-    #[Route('/api/user/login', name: 'api_user_login', methods: ['POST'])]
-    public function login(#[CurrentUser] ?User $user): Response
+    #[Route('/api/user/profile/{user}', name: 'api_user_profile', methods: ['GET'])]
+    public function userData(#[CurrentUser] User $currentUser, User $user = null): Response
     {
-        if($user === null) {
-            return $this->json([
-                'success' => false,
-                'message' => 'missing credentials',
-            ], Response::HTTP_UNAUTHORIZED);
+        if($user === null || ($user !== $currentUser && $currentUser->hasRole('ROLE_STAFF'))) {
+            $user = $currentUser;
         }
 
-        return $this->currentUser($user);
+        $filtered = $this->serializer->normalize($user, null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['id', 'password', 'submissions', 'userSummaries'],
+        ]);
+
+        return $this->json([
+            'success' => true,
+            'user' => $filtered,
+        ]);
     }
 }

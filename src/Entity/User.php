@@ -45,9 +45,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class)]
     private Collection $submissions;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserSummary::class)]
+    private Collection $userSummaries;
+
     public function __construct()
     {
         $this->submissions = new ArrayCollection();
+        $this->userSummaries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -200,6 +204,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($submission->getUser() === $this) {
                 $submission->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserSummary>
+     */
+    public function getUserSummaries(): Collection
+    {
+        return $this->userSummaries;
+    }
+
+    public function addUserSummary(UserSummary $userSummary): self
+    {
+        if (!$this->userSummaries->contains($userSummary)) {
+            $this->userSummaries->add($userSummary);
+            $userSummary->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserSummary(UserSummary $userSummary): self
+    {
+        if ($this->userSummaries->removeElement($userSummary)) {
+            // set the owning side to null (unless already changed)
+            if ($userSummary->getUser() === $this) {
+                $userSummary->setUser(null);
             }
         }
 
