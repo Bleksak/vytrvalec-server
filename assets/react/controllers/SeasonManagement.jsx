@@ -184,7 +184,7 @@ const SeasonEditor = ({currentSeason}) => {
 }
 
 const fetchSeasons = async () => {
-    const response = await fetch('/api/seasons').catch(() => null);
+    const response = await fetch('/api/season/list').catch(() => null);
     if(response == null) return [];
     return await response.json();
 }

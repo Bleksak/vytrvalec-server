@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Api;
+namespace App\ApiResource;
 
 use App\Entity\Activity;
 use App\Entity\FacultySummary;
@@ -11,8 +11,8 @@ use App\Repository\FacultySummaryRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Repository\UserSummaryRepository;
-use App\Requests\SubmissionStateRequest;
 use App\Requests\SubmissionRequest;
+use App\Requests\SubmissionStateRequest;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Imagick;

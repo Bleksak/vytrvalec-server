@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\SeasonRepository;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -13,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]
 #[ORM\Index(columns: ['start'], name: 'date_index')]
+#[ApiResource]
 class Season
 {
     #[ORM\Id]

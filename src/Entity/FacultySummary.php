@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\FacultySummaryRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FacultySummaryRepository::class)]
+#[ApiResource]
 class FacultySummary
 {
     #[ORM\Id]

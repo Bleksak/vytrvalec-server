@@ -7,3 +7,7 @@ controllers:
 api_user_logout:
     path: /api/user/logout
     methods: GET
+
+api_user_login:
+    path: /api/user/login
+    methods: POST

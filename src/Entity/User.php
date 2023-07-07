@@ -2,51 +2,109 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
+use App\State\UserPasswordHasher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['user:create']],
+            validationContext: ['groups' => ['Default', 'user:create']],
+            output: false,
+            read: false,
+            processor: UserPasswordHasher::class
+        ),
+/*        new GetCollection(
+            security: 'is_granted(\'role_staff\')',
+
+        ),*/
+        new Patch(
+            uriTemplate: '/users/update',
+            denormalizationContext: ['groups' => ['user:update']],
+            processor: UserPasswordHasher::class
+        ),
+        new Patch(
+            uriTemplate: '/users/update/{id}',
+            denormalizationContext: ['groups' => ['user:adminUpdate']],
+            processor: UserPasswordHasher::class
+        ),
+        new Delete(),
+    ],
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:create', 'user:update']],
+)]
+#[GetCollection(security: "is_granted('ROLE_ADMIN')")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['user:read', 'user:create', 'user:update'])]
     private ?string $email = null;
 
     /**
      * @var string[]
      */
-    #[ORM\Column]
+    #[ORM\Column(type: 'json')]
+    #[Groups(['user:read', 'user:adminUpdate'])]
     private array $roles = [];
 
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Faculty $faculty = null;
+    #[Assert\NotBlank(groups: ['user:create'])]
+    #[Groups(['user:create', 'user:update'])]
+    private ?string $plainPassword = null;
 
     #[ORM\Column]
+    #[Groups(['user:read', 'user:adminUpdate'])]
     private ?bool $banned = false;
 
-    #[ORM\Column(length: 255)]
-    private ?string $first_name = null;
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['user:read', 'user:create'])]
+    private ?string $firstName = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $last_name = null;
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['user:read', 'user:create'])]
+    private ?string $lastName = null;
+
+    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['user:read', 'user:create'])]
+    private ?Faculty $faculty = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class)]
+    #[Groups(['user:read'])]
     private Collection $submissions;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserSummary::class)]
+    #[Groups(['user:read'])]
     private Collection $userSummaries;
+
+    #[ORM\Column(length: 512)]
+    private ?string $token = null;
 
     public function __construct()
     {
@@ -158,24 +216,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getFirstName(): ?string
     {
-        return $this->first_name;
+        return $this->firstName;
     }
 
-    public function setFirstName(string $first_name): self
+    public function setFirstName(string $firstName): self
     {
-        $this->first_name = $first_name;
+        $this->firstName = $firstName;
 
         return $this;
     }
 
     public function getLastName(): ?string
     {
-        return $this->last_name;
+        return $this->lastName;
     }
 
-    public function setLastName(string $last_name): self
+    public function setLastName(string $lastName): self
     {
-        $this->last_name = $last_name;
+        $this->lastName = $lastName;
 
         return $this;
     }
@@ -236,6 +294,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $userSummary->setUser(null);
             }
         }
+
+        return $this;
+    }
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(string $token): self
+    {
+        $this->token = $token;
 
         return $this;
     }

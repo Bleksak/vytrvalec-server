@@ -15,20 +15,26 @@ security:
             security: false
         main:
             lazy: true
+
+            stateless: true
+
             provider: app_user_provider
 
 #            form_login:
 #                login_path: user_login
 #                check_path: user_login
 
-            json_login:
-                check_path: api_user_login
+#            json_login:
+#                check_path: api_user_login
 
             logout:
                 path: api_user_logout
 
-            remember_me:
-                samesite: strict
+#            remember_me:
+#                samesite: strict
+            custom_authenticator:
+                - App\Security\LoginAuthenticator
+                - App\Security\JWTAuthenticator
     role_hierarchy:
         ROLE_STAFF: ROLE_USER
         ROLE_ADMIN: [ROLE_USER, ROLE_STAFF]

@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\SubmissionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Index(columns: ['date'], name: 'date_index')]
+#[ApiResource]
 class Submission
 {
     #[ORM\Id]
