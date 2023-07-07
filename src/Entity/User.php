@@ -32,10 +32,9 @@ use Symfony\Component\Validator\Constraints as Assert;
             read: false,
             processor: UserPasswordHasher::class
         ),
-/*        new GetCollection(
-            security: 'is_granted(\'role_staff\')',
-
-        ),*/
+        new GetCollection(
+            security: 'is_granted(\'ROLE_STAFF\')',
+        ),
         new Patch(
             uriTemplate: '/users/update',
             denormalizationContext: ['groups' => ['user:update']],
@@ -51,7 +50,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create', 'user:update']],
 )]
-#[GetCollection(security: "is_granted('ROLE_ADMIN')")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -102,9 +100,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserSummary::class)]
     #[Groups(['user:read'])]
     private Collection $userSummaries;
-
-    #[ORM\Column(length: 512)]
-    private ?string $token = null;
 
     public function __construct()
     {

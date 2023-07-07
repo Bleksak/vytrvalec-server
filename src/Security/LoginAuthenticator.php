@@ -69,7 +69,7 @@ class LoginAuthenticator extends AbstractAuthenticator
             'jwt' => $jwt
         ]);
 
-        $response->headers->setCookie(new Cookie('jwt', $jwt, $expirationTime, secure: $request->isSecure()));
+        $response->headers->setCookie(new Cookie('jwt', $jwt, $expirationTime, secure: $request->isSecure(), httpOnly: true));
 
         return $response;
     }

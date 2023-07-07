@@ -28,12 +28,34 @@ class JWTAuthenticator extends AbstractAuthenticator
     public function supports(Request $request): ?bool
     {
         // if using isGranted properly, this is not a vulnerability
-        return $request->cookies->has('jwt') && $request->get('_route') !== 'api_user_login';
+        return ($request->cookies->has('jwt') || $request->headers->has('Authorization')) && $request->get('_route') !== 'api_user_login';
+    }
+
+    private function getHeaderToken(Request $request) : string|null
+    {
+        $authorization = $request->headers->get('Authorization', "");
+        $exploded = explode("Bearer ", $authorization);
+
+        if(count($exploded) != 2) {
+            return null;
+        }
+
+        [, $token] = $exploded;
+
+        if(empty($token)) {
+            return null;
+        }
+
+        return $token;
     }
 
     public function authenticate(Request $request): Passport
     {
-        $jwt = $request->cookies->get('jwt');
+        $jwt = $this->getHeaderToken($request) ?? $request->cookies->get('jwt');
+
+        if($jwt === null) {
+            throw new CustomUserMessageAuthenticationException();
+        }
 
         try {
             $payload = JWT::decode($jwt, new Key($request->server->get('JWT_SECRET'), 'HS256'));
@@ -49,9 +71,9 @@ class JWTAuthenticator extends AbstractAuthenticator
             throw new CustomUserMessageAuthenticationException("session_expired");
         } catch(SignatureInvalidException) {
             // delete the invalid token
-            setcookie('jwt', '', time() - 1, path: '/', secure: $request->isSecure());
+            setcookie('jwt', '', time() - 1, path: '/', secure: $request->isSecure(), httponly: true);
             throw new CustomUserMessageAuthenticationException("bad_token");
-        } catch(Exception $e) {
+        } catch(Exception) {
             throw new CustomUserMessageAuthenticationException();
         }
     }
