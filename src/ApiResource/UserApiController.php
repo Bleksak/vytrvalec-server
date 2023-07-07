@@ -21,18 +21,18 @@ class UserApiController extends AbstractController {
     {
     }
 
-    #[Route('/api/user/login', name: 'api_user_login', methods: ['POST'])]
-    public function login(#[CurrentUser] ?User $user): Response
-    {
-        if($user === null) {
-            return $this->json([
-                'success' => false,
-                'message' => 'missing_credentials',
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        return $this->userData($user);
-    }
+//    #[Route('/api/user/login', name: 'api_user_login', methods: ['POST'])]
+//    public function login(#[CurrentUser] ?User $user): Response
+//    {
+//        if($user === null) {
+//            return $this->json([
+//                'success' => false,
+//                'message' => 'missing_credentials',
+//            ], Response::HTTP_UNAUTHORIZED);
+//        }
+//
+//        return $this->userData($user);
+//    }
 
     #[Route('/api/user/submissions/{user}', name: 'api_user_submissions', methods: ['GET'])]
     public function userSubmissions(#[CurrentUser] User $currentUser, User $user = null): Response

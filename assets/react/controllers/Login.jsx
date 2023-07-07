@@ -36,7 +36,7 @@ function LoginForm() {
 
         sendLogin(username, password).then(data => {
             if(data.success) {
-                setAuth(data.user);
+                setAuth(data.jwt);
                 navigate("/");
             }
         });
@@ -57,8 +57,8 @@ function LoginForm() {
 }
 
 async function sendLogin(username, password) {
-    const result = await axios.post('/api/user/login', {
-        username: username,
+    const result = await axios.postForm('/api/user/login', {
+        email: username,
         password: password,
     });
 

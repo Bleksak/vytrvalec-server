@@ -17,10 +17,12 @@ use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class LoginAuthenticator extends AbstractAuthenticator
 {
-    public function __construct(private readonly UserProviderInterface $userProvider, private readonly UserPasswordHasherInterface $hasher)
+    public function __construct(private readonly UserProviderInterface $userProvider, private readonly UserPasswordHasherInterface $hasher, private readonly SerializerInterface $serializer)
     {
     }
     public function supports(Request $request): ?bool
@@ -66,7 +68,8 @@ class LoginAuthenticator extends AbstractAuthenticator
 
         $response = new JsonResponse([
             'success' => true,
-            'jwt' => $jwt
+            'token' => $jwt,
+            'user' => $this->serializer->normalize($token->getUser(), null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries']]),
         ]);
 
         $response->headers->setCookie(new Cookie('jwt', $jwt, $expirationTime, secure: $request->isSecure(), httpOnly: true));
