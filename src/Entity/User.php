@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -22,10 +21,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
+    uriTemplate: '/user/',
     operations: [
         new Get(
+            uriTemplate: '/user/{id}',
+            security: 'is_granted(\'ROLE_STAFF\') or object == user'
         ),
         new Post(
+            uriTemplate: '/user/register',
             denormalizationContext: ['groups' => ['user:create']],
             security: 'not is_granted(\'ROLE_USER\')',
             validationContext: ['groups' => ['Default', 'user:create']],
@@ -34,19 +37,26 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: UserPasswordHasher::class
         ),
         new GetCollection(
+            uriTemplate: '/user/list',
             security: 'is_granted(\'ROLE_STAFF\')',
         ),
         new Patch(
-            uriTemplate: '/users/update',
+            uriTemplate: '/user/update',
             denormalizationContext: ['groups' => ['user:update']],
             processor: UserPasswordHasher::class
         ),
         new Patch(
-            uriTemplate: '/users/update/{id}',
+            uriTemplate: '/user/update/{id}',
             denormalizationContext: ['groups' => ['user:adminUpdate']],
             processor: UserPasswordHasher::class
         ),
         new Delete(),
+        new Post(
+            routeName: 'api_user_login'
+        ),
+        new Get(
+            routeName: 'api_user_logout'
+        )
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create', 'user:update']],

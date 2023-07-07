@@ -1,0 +1,10 @@
+api_platform:
+    swagger:
+        api_keys:
+            JWT:
+                name: Authorization
+                type: header
+
+#                check_path: /user/login
+#                username_path: email
+#                password_path: password

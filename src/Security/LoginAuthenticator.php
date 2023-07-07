@@ -32,6 +32,7 @@ class LoginAuthenticator extends AbstractAuthenticator
 
     public function authenticate(Request $request): Passport
     {
+//        $request->getPayload();
         $email = $request->request->get('email');
         $password = $request->request->get('password');
 
