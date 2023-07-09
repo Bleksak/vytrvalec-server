@@ -4,12 +4,11 @@ namespace App\Controller\ApiResource;
 
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
-use App\Entity\Faculty;
 use App\Repository\FacultyRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
-#[ApiResource(Faculty::class)]
+#[ApiResource('Faculty')]
 class FacultyController extends AbstractController
 {
     public function __construct(private readonly FacultyRepository $facultyRepository)
