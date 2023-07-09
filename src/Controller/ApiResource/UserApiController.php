@@ -30,11 +30,11 @@ class UserApiController extends AbstractController {
                     'success' => true,
                     'token' => 'string',
                     'user' => [
-                        'id' => 'number',
+                        'id' => 'integer',
                         'email' => 'string',
                         'roles' => ['ROLE_USER', 'ROLE_STAFF'],
                         'faculty' => [
-                            'id' => 'number',
+                            'id' => 'integer',
                             'name' => 'string',
                             'shortcut' => 'string',
                         ]
@@ -107,7 +107,7 @@ class UserApiController extends AbstractController {
         '/api/user/register',
         name: 'api_user_register',
         methods: ['POST'],
-        documentation: 'Creates a new User entity',
+        documentation: 'Creates a new <code>User</code> entity',
         responses: [
             201 => [
                 'message' => 'User successfully created',
@@ -130,7 +130,7 @@ class UserApiController extends AbstractController {
             'password' => 'string',
             'firstName' => 'string',
             'lastName' => 'string',
-            'faculty' => 'number'
+            'faculty' => 'integer'
         ],
     )]
     public function register(RegistrationRequest $request, EntityManagerInterface $em, ValidatorInterface $validator, UserPasswordHasherInterface $hasher, UserInterface $userInterface = null): Response

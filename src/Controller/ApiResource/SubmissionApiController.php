@@ -78,9 +78,35 @@ class SubmissionApiController extends AbstractController
         name: 'api_submission_create',
         methods: ['POST'],
         documentation: 'Creates a new <code>Submission</code> entity',
-        responses: [],
+        responses: [
+            Response::HTTP_CREATED => [
+                'message' => 'Submission created successfully',
+                'response' => [
+                    'success' => true,
+                ]
+            ],
+            Response::HTTP_UNAUTHORIZED => [
+                'message' => 'Unauthorized access',
+                'response' => [
+                    'success' => false,
+                ]
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Bad request ',
+                'response' => [
+                    'success' => false,
+                    'errors' => [
+                        'distance' => 'err_negative_value',
+                        'elevation' => 'err_zero_value'
+                    ]
+                ]
+            ]
+        ],
         requestScheme: [
-            ''
+            'distance' => 'integer',
+            'elevation' => 'integer',
+            'image' => 'file',
+            'activity' => 'integer'
         ]
     )]
     #[IsGranted('ROLE_USER')]
