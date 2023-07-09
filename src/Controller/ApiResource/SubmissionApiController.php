@@ -15,6 +15,7 @@ use App\Repository\SubmissionRepository;
 use App\Repository\UserSummaryRepository;
 use App\Requests\SubmissionRequest;
 use App\Requests\SubmissionStateRequest;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
@@ -39,7 +40,7 @@ class SubmissionApiController extends AbstractController
     public function createTest(#[CurrentUser] User $user, Request $httpRequest, SeasonRepository $seasonRepository): Response
     {
         $submission = new Submission();
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
 
         $criteria = new Criteria();
         $criteria->where(Criteria::expr()->lt('start', $now));
@@ -49,7 +50,7 @@ class SubmissionApiController extends AbstractController
         if(!$season) {
             return $this->json([
                 'NO SEASON KOKOT'
-            ]);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $activity = $this->em->getRepository(Activity::class)->find(1);
@@ -70,7 +71,7 @@ class SubmissionApiController extends AbstractController
 
         return $this->json([
             'success' => true
-        ]);
+        ], Response::HTTP_CREATED);
     }
 
     #[ApiRoute(
@@ -115,7 +116,7 @@ class SubmissionApiController extends AbstractController
         // TODO: check if now > end
 
         $submission = new Submission();
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
 
         $criteria = new Criteria();
         $criteria->where(Criteria::expr()->lt('start', $now));
@@ -124,10 +125,13 @@ class SubmissionApiController extends AbstractController
         $season = $seasonRepository->matching($criteria)->first();
 
         if(!$season) {
-            return $request->getResponse(false, [
-                // TODO: message
-                'NEBEZI SEZONA MOREEEE'
-            ]);
+            return $this->json([
+                'success' => false,
+                'errors' => [
+                    // TODO: message
+                    'NEBEZI SEZONA MOREEEE'
+                ]
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $submission->setElevation($request->getElevation());

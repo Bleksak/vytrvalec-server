@@ -51,21 +51,9 @@ class UserController extends AbstractController
     }
 
     #[Route('/user/login', name: 'user_login', methods:['GET', 'POST'])]
-    public function login(Request $request, AuthenticationUtils $authUtils): Response
+    public function login(): Response
     {
-//        if($this->isGranted('ROLE_USER')) {
-//            return $this->redirectToRoute('home');
-//        }
-//
-//        $error = $authUtils->getLastAuthenticationError();
-//        $form = $this->createForm(LoginFormType::class);
-//
-//        $lastUsername = $authUtils->getLastUsername();
-
-        return $this->render('user/login.html.twig', [
-//            'form' => $form->createView(),
-//            'error' => $error
-        ]);
+        return $this->render('base.html.twig');
     }
 
     #[Route('/user/profile/{user}', name: 'user_profile', methods: ['GET'])]

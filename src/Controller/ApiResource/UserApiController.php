@@ -21,7 +21,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[ApiResource(resourceName: 'User')]
 class UserApiController extends AbstractController {
     #[ApiRoute(
+        '/api/unused/login',
         methods: ['POST'],
+        env: 'dev',
         documentation: 'Creates a JWT cookie, returns a JWT token',
         responses: [
             Response::HTTP_OK => [
@@ -58,10 +60,14 @@ class UserApiController extends AbstractController {
         fakeName: 'api_user_login',
         fakePath: '/api/user/login',
     )]
-    public function login(): void {}
+    public function login(): Response {
+        return $this->json([]);
+    }
 
     #[ApiRoute(
+        '/api/unused/logout',
         methods: ['GET'],
+        env: 'dev',
         documentation: 'Clears the JWT cookie, this endpoint has no effect if using HTTP authentication',
         responses: [
             Response::HTTP_OK => [
@@ -80,7 +86,9 @@ class UserApiController extends AbstractController {
         fakeName: 'api_user_logout',
         fakePath: '/api/user/logout',
     )]
-    public function logout(): void {}
+    public function logout(): Response {
+        return $this->json([]);
+    }
 
     public function __construct(private readonly SerializerInterface $serializer, private readonly UserRepository $userRepository)
     {

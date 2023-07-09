@@ -85,9 +85,10 @@ class JWTAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        return new JsonResponse([
-            'success' => false,
-            'error' => $exception->getMessageKey(),
-        ], Response::HTTP_UNAUTHORIZED);
+        return null;
+//        return new JsonResponse([
+//            'success' => false,
+//            'error' => $exception->getMessageKey(),
+//        ], Response::HTTP_UNAUTHORIZED);
     }
 }
