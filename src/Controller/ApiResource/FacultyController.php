@@ -36,6 +36,6 @@ class FacultyController extends AbstractController
     )]
     public function facultyList(): Response
     {
-        return $this->json([$this->facultyRepository->findAll()]);
+        return $this->json($this->facultyRepository->findAll());
     }
 }
