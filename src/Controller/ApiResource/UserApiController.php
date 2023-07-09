@@ -20,36 +20,25 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[ApiResource(resourceName: 'User')]
 class UserApiController extends AbstractController {
-    public function __construct(private readonly SerializerInterface $serializer, private readonly UserRepository $userRepository)
-    {
-    }
-
-    #[Route('/api/user/submissions/{user}', name: 'api_user_submissions', methods: ['GET'])]
-    public function userSubmissions(#[CurrentUser] User $currentUser, User $user = null): Response
-    {
-        if($user === null || ($user !== $currentUser && $currentUser->hasRole('ROLE_STAFF'))) {
-            $user = $currentUser;
-        }
-
-        $filtered = $this->serializer->normalize($user->getSubmissions(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
-        ]);
-
-        return $this->json([
-            'success' => true,
-            'submissions' => $filtered,
-        ]);
-    }
-
-
     #[ApiRoute(
         methods: ['POST'],
         documentation: 'Creates a JWT cookie, returns a JWT token',
         responses: [
             Response::HTTP_OK => [
-                'message' => 'Cookie successfully created',
+                'message' => 'Token successfully created',
                 'response' => [
                     'success' => true,
+                    'token' => 'string',
+                    'user' => [
+                        'id' => 'number',
+                        'email' => 'string',
+                        'roles' => ['ROLE_USER', 'ROLE_STAFF'],
+                        'faculty' => [
+                            'id' => 'number',
+                            'name' => 'string',
+                            'shortcut' => 'string',
+                        ]
+                    ]
                 ]
             ],
             Response::HTTP_UNAUTHORIZED => [
@@ -69,8 +58,49 @@ class UserApiController extends AbstractController {
         fakeName: 'api_user_login',
         fakePath: '/api/user/login',
     )]
-    public function login(): Response {
-        return $this->json([]);
+    public function login(): void {}
+
+    #[ApiRoute(
+        methods: ['GET'],
+        documentation: 'Clears the JWT cookie, this endpoint has no effect if using HTTP authentication',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Cookie successfully cleared',
+                'response' => [
+                    'success' => true,
+                ]
+            ],
+            Response::HTTP_UNAUTHORIZED => [
+                'message' => 'Unauthorized access',
+                'response' => [
+                    'success' => false,
+                ]
+            ],
+        ],
+        fakeName: 'api_user_logout',
+        fakePath: '/api/user/logout',
+    )]
+    public function logout(): void {}
+
+    public function __construct(private readonly SerializerInterface $serializer, private readonly UserRepository $userRepository)
+    {
+    }
+
+    #[Route('/api/user/submissions/{user}', name: 'api_user_submissions', methods: ['GET'])]
+    public function userSubmissions(#[CurrentUser] User $currentUser, User $user = null): Response
+    {
+        if($user === null || ($user !== $currentUser && $currentUser->hasRole('ROLE_STAFF'))) {
+            $user = $currentUser;
+        }
+
+        $filtered = $this->serializer->normalize($user->getSubmissions(), null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
+        ]);
+
+        return $this->json([
+            'success' => true,
+            'submissions' => $filtered,
+        ]);
     }
 
     #[ApiRoute(
@@ -100,7 +130,7 @@ class UserApiController extends AbstractController {
             'password' => 'string',
             'firstName' => 'string',
             'lastName' => 'string',
-            'faculty' => 'int'
+            'faculty' => 'number'
         ],
     )]
     public function register(RegistrationRequest $request, EntityManagerInterface $em, ValidatorInterface $validator, UserPasswordHasherInterface $hasher, UserInterface $userInterface = null): Response

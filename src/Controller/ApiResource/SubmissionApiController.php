@@ -2,6 +2,8 @@
 
 namespace App\Controller\ApiResource;
 
+use App\Attributes\ApiResource;
+use App\Attributes\ApiRoute;
 use App\Entity\Activity;
 use App\Entity\FacultySummary;
 use App\Entity\Submission;
@@ -24,6 +26,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[ApiResource('Submission')]
 class SubmissionApiController extends AbstractController
 {
     public function __construct(private readonly EntityManagerInterface $em, private readonly SubmissionRepository $submissionRepository)
@@ -70,10 +73,21 @@ class SubmissionApiController extends AbstractController
         ]);
     }
 
-    #[Route('/api/submission/create', name: 'api_submission_create', methods: ['POST'])]
+    #[ApiRoute(
+        '/api/submission/create',
+        name: 'api_submission_create',
+        methods: ['POST'],
+        documentation: 'Creates a new <code>Submission</code> entity',
+        responses: [],
+        requestScheme: [
+            ''
+        ]
+    )]
     #[IsGranted('ROLE_USER')]
     public function create(#[CurrentUser] User $user, SubmissionRequest $request, Request $httpRequest, SeasonRepository $seasonRepository): Response
     {
+        // TODO: check if now > end
+
         $submission = new Submission();
         $now = new \DateTimeImmutable();
 

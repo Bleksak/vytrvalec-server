@@ -16,7 +16,7 @@ class API extends AbstractController
     #[Route('/apidoc/{selection}', name: 'APIDoc', methods: ['GET'], env: 'dev')]
     public function api(RouterInterface $router, string $selection = ''): Response
     {
-        return $this->render('api2.html.twig', [
+        return $this->render('api.html.twig', [
             'routes' => $this->collectApiRoutes($router),
             'selection' => $selection
         ]);
@@ -59,9 +59,17 @@ class API extends AbstractController
                 $routes[$resourceName][$name]['path'] = $apiRouteAttribute->getFakePath();
                 $routes[$resourceName][$name]['name'] = $apiRouteAttribute->getFakeName();
                 $routes[$resourceName][$name]['documentation'] = $apiRouteAttribute->getDocumentation();
-                $routes[$resourceName][$name]['scheme'] = $apiRouteAttribute->getRequestScheme();
-                $routes[$resourceName][$name]['responses'] = $apiRouteAttribute->getResponses();
                 $routes[$resourceName][$name]['method'] = $apiRouteAttribute->getMethod();
+
+                $scheme = $apiRouteAttribute->getRequestScheme();
+                $responses = $apiRouteAttribute->getResponses();
+                if($scheme !== null) {
+                    $routes[$resourceName][$name]['scheme'] = $scheme;
+                }
+
+                if($responses !== null) {
+                    $routes[$resourceName][$name]['responses'] = $responses;
+                }
             }
             catch(ReflectionException) {
             }
