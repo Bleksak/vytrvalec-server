@@ -18,12 +18,10 @@ abstract class BaseRequest
         protected EntityManagerInterface $entityManagerInterface
     )
     {
-        if ($this->isApi()) {
-            $this->populate(self::dataFromJson());
-        }
+        $request = self::getRequest();
 
-        $this->populate(self::getRequest()->request->all());
-        $this->populate(self::getRequest()->files->all());
+        $this->populate($request->getPayload()->all());
+        $this->populate($request->files->all());
 
         if ($this->autoValidateRequest()) {
             $this->validate();
@@ -37,13 +35,7 @@ abstract class BaseRequest
 
     protected function isApi(): bool
     {
-        return false;
-    }
-
-    private static function dataFromJson(): array
-    {
-        $data = json_decode(file_get_contents("php://input"), true);
-        return $data == null ? [] : $data;
+        return true;
     }
 
     private static function getRequest(): Request
@@ -61,7 +53,7 @@ abstract class BaseRequest
         foreach ($arrayData as $property => $value) {
             if (property_exists($this, $property)) {
                 $reflectionProperty = $reflectionClass->getProperty($property);
-                $propertyAttribute = $reflectionProperty->getAttributes('App\Requests\DB');
+                $propertyAttribute = $reflectionProperty->getAttributes('App\Attributes\DB');
 
                 if (!empty($propertyAttribute)) {
                     $this->{$property} = $this->entityManagerInterface->getRepository($reflectionProperty->getType()->getName())->find($value);
@@ -76,20 +68,23 @@ abstract class BaseRequest
         }
     }
 
-    /**
-     * @throws \ReflectionException
-     */
     public function validate(): array
     {
-        $errors = $this->validatorInterface->validate($this);
-        $reflectionClass = new ReflectionClass($this::class);
-        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PROTECTED) as $method) {
-            if (str_starts_with($method->getName(), "validate")) {
-                $method->invoke($this);
-            }
-        }
-
         $messages = [];
+        $errors = $this->validatorInterface->validate($this);
+
+        try {
+            $reflectionClass = new ReflectionClass($this::class);
+
+            foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PROTECTED) as $method) {
+                if (str_starts_with($method->getName(), "validate")) {
+                    foreach($method->invoke($this) as $error) {
+                        $messages[] = $error;
+                    }
+                }
+            }
+        } catch (\ReflectionException) {}
+
         foreach ($errors as $message) {
             $messages[] = $message->getMessage();
         }

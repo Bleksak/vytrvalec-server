@@ -2,6 +2,7 @@
 
 namespace App\Requests;
 
+use App\Attributes\DB;
 use App\Entity\Charity;
 
 class CharityEditRequest extends BaseRequest 
@@ -10,12 +11,7 @@ class CharityEditRequest extends BaseRequest
   protected ?Charity $charity = null;
   protected ?string $charityName = null;
   protected ?string $charityDescription = null;
-  
-  protected function isApi(): bool
-  {
-	return true;
-  }
-  
+
   protected function autoValidateRequest(): bool
   {
 	return true;

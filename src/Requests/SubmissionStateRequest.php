@@ -2,6 +2,7 @@
 
 namespace App\Requests;
 
+use App\Attributes\DB;
 use App\Entity\Submission;
 
 class SubmissionStateRequest extends BaseRequest
@@ -13,12 +14,6 @@ class SubmissionStateRequest extends BaseRequest
     {
         return $this->submission;
     }
-
-    protected function isApi(): bool
-    {
-        return true;
-    }
-
     protected function autoValidateRequest(): bool
     {
         return true;

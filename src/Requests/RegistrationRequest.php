@@ -2,22 +2,23 @@
 
 namespace App\Requests;
 
+use App\Attributes\DB;
 use App\Entity\Faculty;
 
 class RegistrationRequest extends BaseRequest
 {
 
-    protected ?string $username;
+    protected ?string $email;
     protected ?string $password;
-    protected ?string $first_name;
-    protected ?string $last_name;
+    protected ?string $firstName;
+    protected ?string $lastName;
 
     #[DB]
     protected ?Faculty $faculty;
 
-    public function getUsername(): ?string
+    public function getEmail(): ?string
     {
-        return $this->username;
+        return $this->email;
     }
 
     public function getPassword(): ?string
@@ -27,12 +28,12 @@ class RegistrationRequest extends BaseRequest
 
     public function getFirstName(): ?string
     {
-        return $this->first_name;
+        return $this->firstName;
     }
 
     public function getLastName(): ?string
     {
-        return $this->last_name;
+        return $this->lastName;
     }
 
     public function getFaculty(): ?Faculty
@@ -40,13 +41,8 @@ class RegistrationRequest extends BaseRequest
         return $this->faculty;
     }
 
-    protected function isApi(): bool
-    {
-        return true;
-    }
-
     protected function autoValidateRequest(): bool
     {
-        return true;
+        return false;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ApiResource;
+namespace App\Controller\ApiResource;
 
 use App\Entity\Activity;
 use App\Entity\FacultySummary;

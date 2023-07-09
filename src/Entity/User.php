@@ -2,15 +2,7 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
-use App\State\UserPasswordHasher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -20,47 +12,78 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ApiResource(
-    uriTemplate: '/user/',
-    operations: [
-        new Get(
-            uriTemplate: '/user/{id}',
-            security: 'is_granted(\'ROLE_STAFF\') or object == user'
-        ),
-        new Post(
-            uriTemplate: '/user/register',
-            denormalizationContext: ['groups' => ['user:create']],
-            security: 'not is_granted(\'ROLE_USER\')',
-            validationContext: ['groups' => ['Default', 'user:create']],
-            output: false,
-            read: false,
-            processor: UserPasswordHasher::class
-        ),
-        new GetCollection(
-            uriTemplate: '/user/list',
-            security: 'is_granted(\'ROLE_STAFF\')',
-        ),
-        new Patch(
-            uriTemplate: '/user/update',
-            denormalizationContext: ['groups' => ['user:update']],
-            processor: UserPasswordHasher::class
-        ),
-        new Patch(
-            uriTemplate: '/user/update/{id}',
-            denormalizationContext: ['groups' => ['user:adminUpdate']],
-            processor: UserPasswordHasher::class
-        ),
-        new Delete(),
-        new Post(
-            routeName: 'api_user_login'
-        ),
-        new Get(
-            routeName: 'api_user_logout'
-        )
-    ],
-    normalizationContext: ['groups' => ['user:read']],
-    denormalizationContext: ['groups' => ['user:create', 'user:update']],
-)]
+//#[ApiResource(
+//    uriTemplate: '/user/',
+//    operations: [
+//        new Get(
+//            uriTemplate: '/user/{id}',
+//            security: 'is_granted(\'ROLE_STAFF\') or object == user'
+//        ),
+//        new Post(
+//            uriTemplate: '/user/register',
+//            denormalizationContext: ['groups' => ['user:create']],
+//            security: 'not is_granted(\'ROLE_USER\')',
+//            validationContext: ['groups' => ['Default', 'user:create']],
+//            output: false,
+//            read: false,
+//            processor: UserPasswordHasher::class
+//        ),
+//        new GetCollection(
+//            uriTemplate: '/user/list',
+//            security: 'is_granted(\'ROLE_STAFF\')',
+//        ),
+//        new Patch(
+//            uriTemplate: '/user/update',
+//            denormalizationContext: ['groups' => ['user:update']],
+//            processor: UserPasswordHasher::class
+//        ),
+//        new Patch(
+//            uriTemplate: '/user/update/{id}',
+//            denormalizationContext: ['groups' => ['user:adminUpdate']],
+//            processor: UserPasswordHasher::class
+//        ),
+//        new Delete(),
+//        new Post(
+//            routeName: 'api_user_login',
+//            openapi: new Operation(
+//                responses: [
+//                    200 => ['description' => 'Successful login'],
+//                    400 => ['description' => 'Bad credentials'],
+//                ],
+//                summary: 'Logs in a user',
+//                requestBody: new RequestBody(
+//                    content: new \ArrayObject([
+//                        'application/json' => [
+//                            'schema' => [
+//                                'type' => 'object',
+//                                'properties' => [
+//                                    'email' => ['type' => 'string'],
+//                                    'password' => ['type' => 'string']
+//                                ]
+//                            ],
+//                            'example' => [
+//                                'email' => 'admin@example.com',
+//                                'password' => 'planTextPassword'
+//                            ]
+//                        ]
+//                    ])
+//                ),
+//            ),
+//            security: 'not is_granted(\'ROLE_USER\')',
+//        ),
+//        new Get(
+//            routeName: 'api_user_logout',
+//            openapi: new Operation(
+//                summary: 'Logs out the currently logged in user',
+//                description: 'Clears the jwt cookie if exists',
+//            ),
+//            security: 'is_granted(\'ROLE_USER\')',
+//            name: 'Logout',
+//        )
+//    ],
+//    normalizationContext: ['groups' => ['user:read']],
+//    denormalizationContext: ['groups' => ['user:create', 'user:update']],
+//)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -82,10 +105,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?string $password = null;
-
-    #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups(['user:create', 'user:update'])]
-    private ?string $plainPassword = null;
 
     #[ORM\Column]
     #[Groups(['user:read', 'user:adminUpdate'])]
@@ -300,29 +319,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $userSummary->setUser(null);
             }
         }
-
-        return $this;
-    }
-    public function getPlainPassword(): ?string
-    {
-        return $this->plainPassword;
-    }
-
-    public function setPlainPassword(string $plainPassword): self
-    {
-        $this->plainPassword = $plainPassword;
-
-        return $this;
-    }
-
-    public function getToken(): ?string
-    {
-        return $this->token;
-    }
-
-    public function setToken(string $token): self
-    {
-        $this->token = $token;
 
         return $this;
     }

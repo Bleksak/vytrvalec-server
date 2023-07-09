@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{{ 'title'|trans }}{% endblock %}</title>
+    <link rel="icon" href="{{ asset('build/images/favicon.png') }}">
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+
+    {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+    {% endblock %}
+</head>
+<body>
+    {% for route in routes %}
+        <div class="api-block">
+            <h1 class="api-path">{{ route.methods[0] }} {{ route.path }}</h1>
+
+            <h2>Description</h2>
+            <p>{{ route.documentation }}</p>
+
+            <h2>Responses</h2>
+            <ul class="responses">
+                {% for code, response in route.responses %}
+                    <li>{{ code }} => {{ response }}</li>
+                {% endfor %}
+            </ul>
+
+            <h2>Scheme</h2>
+            <ul class="scheme">
+                {% for key, value in route.requestScheme %}
+                    <li>{{ key }} => {{ value }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    {% endfor %}
+</body>
+</html>

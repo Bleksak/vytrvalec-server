@@ -2,6 +2,7 @@
 
 namespace App\Requests;
 
+use App\Attributes\DB;
 use App\Entity\Activity;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -42,11 +43,6 @@ class SubmissionRequest extends BaseRequest
         return new ConstraintViolationList([
             new ConstraintViolation('Bad file type', '', [], null, 'image', $this->image->getMimeType())
         ]);
-    }
-
-    protected function isApi(): bool
-    {
-        return true;
     }
 
     protected function autoValidateRequest(): bool

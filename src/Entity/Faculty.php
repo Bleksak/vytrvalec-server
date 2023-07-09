@@ -2,14 +2,10 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use App\ApiResource\FacultyListController;
 use App\Repository\FacultyRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FacultyRepository::class)]
-#[ApiResource]
 class Faculty
 {
     #[ORM\Id]

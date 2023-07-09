@@ -25,12 +25,7 @@ class SeasonCreateRequest extends BaseRequest
   {
 	return true;
   }
-  
-  protected function isApi(): bool
-  {
-	return true;
-  }
-  
+
   public function getCharityName(): ?string
   {
     return $this->charityName;
