@@ -3,51 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Form\LoginFormType;
-use App\Form\RegistrationFormType;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class UserController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em, private readonly UserPasswordHasherInterface $hasher, private readonly SerializerInterface $serializer) {}
+    public function __construct() {}
 
     #[Route('/user/register', name: 'user_register', methods:['GET', 'POST'])]
-    public function register(Request $request): Response
+    public function register(): Response
     {
-        if($this->isGranted('ROLE_USER')) {
-            return $this->redirectToRoute('home');
-        }
-
-        $user = new User();
-
-        $form = $this->createForm(RegistrationFormType::class, $user);
-        $form->handleRequest($request);
-
-        if($form->isSubmitted() && $form->isValid()) {
-            $user = $form->getData();
-            $plainTextPassword = $user->getPassword();
-
-            $user->setPassword($this->hasher->hashPassword($user, $plainTextPassword));
-
-            $this->em->persist($user);
-            $this->em->flush();
-
-            return $this->redirectToRoute('home');
-        }
-
-        return $this->render('user/register.html.twig', [
-            'form' => $form->createView()
-        ]);
+        return $this->render('user/register.html.twig');
     }
 
     #[Route('/user/login', name: 'user_login', methods:['GET', 'POST'])]

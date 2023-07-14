@@ -5,14 +5,21 @@ namespace App\Requests;
 use App\Attributes\DB;
 use App\Entity\Activity;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Type;
 
 class SubmissionRequest extends BaseRequest
 {
+    #[NotBlank(message: 'blank')]
+    #[Type('integer', message: 'non_integer')]
     protected ?int $distance;
-    protected ?int $elevation;
+
+    #[Type('integer', message: 'non_integer')]
+    protected ?int $elevation = 0;
+
+    #[NotBlank(message: 'blank')]
+    #[Image(mimeTypesMessage: 'bad_image')]
     protected ?UploadedFile $image;
 
     #[DB]
@@ -34,19 +41,7 @@ class SubmissionRequest extends BaseRequest
         return $this->activity;
     }
 
-    protected function validateImage(): ConstraintViolationListInterface
+    protected function validateFile()
     {
-        if(str_starts_with($this->image->getMimeType(), "image/")) {
-            return new ConstraintViolationList();
-        }
-
-        return new ConstraintViolationList([
-            new ConstraintViolation('Bad file type', '', [], null, 'image', $this->image->getMimeType())
-        ]);
-    }
-
-    protected function autoValidateRequest(): bool
-    {
-        return true;
     }
 }

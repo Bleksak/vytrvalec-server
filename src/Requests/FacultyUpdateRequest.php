@@ -8,17 +8,17 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[UniqueValue(fields: ['name'], em: Faculty::class)]
 #[UniqueValue(fields: ['shortcut'], em: Faculty::class)]
-class FacultyCreateRequest extends BaseRequest
+class FacultyUpdateRequest extends BaseRequest
 {
-    #[NotBlank]
+    #[NotBlank(allowNull: true)]
     protected ?string $name = null;
 
-    #[NotBlank]
+    #[NotBlank(allowNull: true)]
     protected ?string $shortcut = null;
 
+    #[NotBlank(allowNull: true)]
     protected ?bool $visible = null;
 
-    #[NotBlank]
     public function getName(): ?string
     {
         return $this->name;
@@ -31,6 +31,6 @@ class FacultyCreateRequest extends BaseRequest
 
     public function getVisible(): ?bool
     {
-       return $this->visible;
+        return $this->visible;
     }
 }

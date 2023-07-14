@@ -2,6 +2,9 @@
 
 namespace App\Test;
 
+use App\Entity\Faculty;
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Input\StringInput;
@@ -9,6 +12,7 @@ use Symfony\Component\Console\Input\StringInput;
 class BaseTest extends WebTestCase
 {
     protected static ?Application $application = null;
+    protected $client;
 
     /**
      * @throws \Exception
@@ -18,6 +22,51 @@ class BaseTest extends WebTestCase
         self::runCommand('doctrine:database:create');
         self::runCommand('doctrine:schema:update --force');
         self::runCommand('doctrine:fixtures:load --no-interaction');
+
+        $this->client = self::createClient();
+    }
+
+    protected function getEntityManager(): EntityManagerInterface
+    {
+        return $this->client->getContainer()->get(EntityManagerInterface::class);
+    }
+
+    protected function createUser($email, $password, $roles = []): void
+    {
+        $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
+
+        $this->client->request('POST', '/api/user/register', [
+            "email" => $email,
+            "password" => $password,
+            "firstName" => "string",
+            "lastName" => "string",
+            "faculty" => $faculty->getId(),
+        ]);
+
+        if(!empty($roles)) {
+            $user = $this->getEntityManager()->getRepository(User::class)->findOneBy(['email' => $email]);
+            $user->setRoles($roles);
+
+            $this->getEntityManager()->persist($user);
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    protected function loginUser($email, $password): void
+    {
+        $this->client->request('POST', '/api/user/login', [
+            'email' => $email,
+            'password' => $password
+        ]);
+    }
+
+    protected function grantRole($role = []): void
+    {
+        $testUser = 'TestUser@TestUser.com';
+        $testPassword = 'TestingPassword45511';
+
+        $this->createUser($testUser, $testPassword, $role);
+        $this->loginUser($testUser, $testPassword);
     }
 
     /**

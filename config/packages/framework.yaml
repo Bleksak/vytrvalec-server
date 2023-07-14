@@ -1,4 +1,7 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
+parameters:
+    jwt_secret: '%env(JWT_SECRET)%'
+
 framework:
     secret: '%env(APP_SECRET)%'
     #csrf_protection: true
@@ -17,6 +20,8 @@ framework:
     #fragments: true
     php_errors:
         log: true
+    validation:
+        email_validation_mode: strict
 
 when@test:
     framework:

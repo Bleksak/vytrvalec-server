@@ -11,9 +11,9 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 class SeasonCreateRequest extends BaseRequest
 {
     #[NotNull(message: 'blank')]
-    protected ?DateTime $beginDate = null;
+    protected ?DateTime $start = null;
     #[NotNull(message: 'blank')]
-    protected ?DateTime $endDate = null;
+    protected ?DateTime $end = null;
 
     #[NotBlank(message: 'blank')]
     protected ?string $charityName = null;
@@ -31,21 +31,21 @@ class SeasonCreateRequest extends BaseRequest
         return $this->charityDescription;
     }
 
-    public function getBeginDate(): ?DateTime
+    public function getStart(): ?DateTime
     {
-        return $this->beginDate;
+        return $this->start;
     }
 
-    public function getEndDate(): ?DateTime
+    public function getEnd(): ?DateTime
     {
-        return $this->endDate;
+        return $this->end;
     }
 
     protected function validateBeginDate(): ?ConstraintViolationInterface
     {
         $today = new DateTime();
-        if ($today > $this->getBeginDate()) {
-            return new ConstraintViolation('invalid_date', 'invalid_date', [], null, 'beginDate', $this->getBeginDate());
+        if ($today > $this->getStart()) {
+            return new ConstraintViolation('invalid_date', 'invalid_date', [], null, 'start', $this->getStart());
         }
 
         return null;
@@ -53,8 +53,8 @@ class SeasonCreateRequest extends BaseRequest
 
     protected function validateEndDate(): ?ConstraintViolationInterface
     {
-        if($this->getBeginDate() > $this->getEndDate()) {
-            return new ConstraintViolation('before_beginDate', 'before_beginDate', [], null, 'endDate', $this->getEndDate());
+        if($this->getStart() > $this->getEnd()) {
+            return new ConstraintViolation('before_start', 'before_start', [], null, 'end', $this->getEnd());
         }
 
         return null;

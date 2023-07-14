@@ -7,8 +7,10 @@ use App\Attributes\ApiRoute;
 use App\Entity\Faculty;
 use App\Repository\FacultyRepository;
 use App\Requests\FacultyCreateRequest;
+use App\Requests\FacultyUpdateRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[ApiResource('Faculty')]
 class FacultyController extends AbstractController
@@ -49,25 +51,16 @@ class FacultyController extends AbstractController
         responses: [
             Response::HTTP_CREATED => [
                 'message' => 'Successfully created',
-                'response' => [
-                    'success' => true,
-                ]
             ],
-            Response::HTTP_UNAUTHORIZED => [
+            Response::HTTP_FORBIDDEN => [
                 'message' => 'Unauthorized access',
-                'response' => [
-                    'success' => false
-                ]
             ],
             Response::HTTP_BAD_REQUEST => [
                 'message' => 'Bad request',
                 'response' => [
-                    'success' => false,
-                    'errors' => [
-                        'name' => 'not_unique',
-                        'shortcut' => 'not_unique',
-                        'visible' => 'invalid_value'
-                    ]
+                    'name' => 'not_unique',
+                    'shortcut' => 'not_unique',
+                    'visible' => 'invalid_value'
                 ]
             ]
         ],
@@ -77,21 +70,13 @@ class FacultyController extends AbstractController
             'visible' => 'boolean'
         ]
     )]
+    #[IsGranted('ROLE_STAFF')]
     public function create(FacultyCreateRequest $request): Response
     {
-        if(!$this->isGranted('ROLE_STAFF')) {
-            return $this->json([
-                'success' => false,
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
         $errors = $request->validate();
 
         if(!empty($errors)) {
-            return $this->json([
-                'success' => false,
-                'errors' => $errors
-            ], Response::HTTP_BAD_REQUEST);
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $faculty = new Faculty();
@@ -101,9 +86,7 @@ class FacultyController extends AbstractController
 
         $this->facultyRepository->save($faculty, true);
 
-        return $this->json([
-            'success' => true
-        ], Response::HTTP_CREATED);
+        return new Response(status: Response::HTTP_CREATED);
     }
 
     #[ApiRoute(
@@ -114,25 +97,16 @@ class FacultyController extends AbstractController
         responses: [
             Response::HTTP_OK => [
                 'message' => 'Successfully updated',
-                'response' => [
-                    'success' => true,
-                ]
             ],
-            Response::HTTP_UNAUTHORIZED => [
+            Response::HTTP_FORBIDDEN => [
                 'message' => 'Unauthorized access',
-                'response' => [
-                    'success' => false
-                ]
             ],
             Response::HTTP_BAD_REQUEST => [
                 'message' => 'Bad request',
                 'response' => [
-                    'success' => false,
-                    'errors' => [
-                        'name' => 'not_unique',
-                        'shortcut' => 'not_unique',
-                        'visible' => 'invalid_value'
-                    ]
+                    'name' => 'not_unique',
+                    'shortcut' => 'not_unique',
+                    'visible' => 'invalid_value'
                 ]
             ]
         ],
@@ -142,26 +116,18 @@ class FacultyController extends AbstractController
             'visible' => 'boolean'
         ]
     )]
-    public function update(Faculty $faculty, FacultyCreateRequest $request): Response
+    #[IsGranted('ROLE_STAFF')]
+    public function update(Faculty $faculty, FacultyUpdateRequest $request): Response
     {
-        if(!$this->isGranted('ROLE_STAFF')) {
-            return $this->json([
-                'success' => false,
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
         $errors = $request->validate();
 
         if(!empty($errors)) {
-            return $this->json([
-                'success' => false,
-                'errors' => $errors
-            ], Response::HTTP_BAD_REQUEST);
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        $faculty->setName($request->getName());
-        $faculty->setShortcut($request->getShortcut());
-        $faculty->setVisible($request->getVisible());
+        $faculty->setName($request->getName() ?? $faculty->getName());
+        $faculty->setShortcut($request->getShortcut() ?? $faculty->getShortcut());
+        $faculty->setVisible($request->getVisible() ?? $faculty->isVisible());
 
         $this->facultyRepository->save($faculty, true);
 

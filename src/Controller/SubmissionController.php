@@ -2,70 +2,20 @@
 
 namespace App\Controller;
 
-use App\Entity\Category;
-use App\Entity\Season;
-use App\Entity\User;
-use App\Repository\SubmissionRepository;
-use App\Repository\UserRepository;
-use App\Requests\SubmissionRequest;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class SubmissionController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $em, private SubmissionRepository $submissionRepository) {}
+    public function __construct() {}
 
-    #[Route('/api/submissions/{season}', name: 'api_submissions_season', methods: ['GET'])]
-    public function submissionList(Season $season, SubmissionRepository $repository): Response
+
+    #[Route('/submission/create', name: 'submission_create', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function uploadSubmissionForm(): Response
     {
-        
-        $list = $repository->findBy(['season' => $season]);
-        
-        return $this->json($list);
-    }
-
-    private function updateSubmissionState($id, $state): Response
-    {
-        $submission = $this->submissionRepository->find($id);
-
-        if ($submission == null) {
-            return $this->json(
-                ['success' => false]
-            );
-        }
-
-        $submission->setAccepted($state);
-
-        $this->em->persist($submission);
-        $this->em->flush();
-
-        return $this->json(
-            ['success' => true]
-        );
-    }
-
-    #[IsGranted('ROLE_STAFF')]
-    #[Route('/api/submission/accept', name:'api_season_accept', methods: ['POST'])]
-    public function acceptSubmission(Request $request): Response
-    {
-        return $this->updateSubmissionState($request->get('id'), true);
-    }
-
-    #[IsGranted('ROLE_STAFF')]
-    #[Route('/api/submission/reject', name:'api_season_reject', methods: ['POST'])]
-    public function rejectSubmission(Request $request): Response
-    {
-        return $this->updateSubmissionState($request->get('id'), false);
-    }
-
-    #[Route('/submission/upload', name: 'submission_upload', methods: ['GET'])]
-    public function uploadSubmissionForm(UserInterface $userInterface): Response
-    {
-        return $this->render('submission/upload.html.twig', []);
+        return $this->render('base.html.twig', []);
     }
 }

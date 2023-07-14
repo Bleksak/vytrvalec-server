@@ -34,46 +34,6 @@ class SubmissionApiController extends AbstractController
     {
     }
 
-    // TODO: delete this
-    #[Route('/api/submission/createTest', name: 'api_submission_createTest', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
-    public function createTest(#[CurrentUser] User $user, Request $httpRequest, SeasonRepository $seasonRepository): Response
-    {
-        $submission = new Submission();
-        $now = new DateTimeImmutable();
-
-        $criteria = new Criteria();
-        $criteria->where(Criteria::expr()->lt('start', $now));
-        $criteria->andWhere(Criteria::expr()->gte('end', $now));
-
-        $season = $seasonRepository->matching($criteria)->first();
-        if(!$season) {
-            return $this->json([
-                'NO SEASON KOKOT'
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        $activity = $this->em->getRepository(Activity::class)->find(1);
-
-        $submission->setElevation(1000);
-        $submission->setDistance(1000);
-        $submission->setUser($user);
-        $submission->setReviewed(false);
-        $submission->setAccepted(false);
-        $submission->setDate($now);
-        $submission->setSeason($season);
-        $submission->setActivity($activity);
-
-        $uniquePath = uniqid('/uploads/') . '.jpg';
-        $submission->setImage($uniquePath);
-
-        $this->submissionRepository->save($submission, true);
-
-        return $this->json([
-            'success' => true
-        ], Response::HTTP_CREATED);
-    }
-
     #[ApiRoute(
         '/api/submission/create',
         name: 'api_submission_create',
@@ -82,25 +42,19 @@ class SubmissionApiController extends AbstractController
         responses: [
             Response::HTTP_CREATED => [
                 'message' => 'Submission created successfully',
-                'response' => [
-                    'success' => true,
-                ]
             ],
-            Response::HTTP_UNAUTHORIZED => [
+            Response::HTTP_FORBIDDEN => [
                 'message' => 'Unauthorized access',
-                'response' => [
-                    'success' => false,
-                ]
             ],
             Response::HTTP_BAD_REQUEST => [
                 'message' => 'Bad request ',
                 'response' => [
-                    'success' => false,
-                    'errors' => [
-                        'distance' => 'err_negative_value',
-                        'elevation' => 'err_zero_value'
-                    ]
+                    'distance' => 'err_negative_value',
+                    'elevation' => 'err_zero_value'
                 ]
+            ],
+            Response::HTTP_INTERNAL_SERVER_ERROR => [
+                'message' => 'Error when processing image'
             ]
         ],
         requestScheme: [
@@ -113,7 +67,10 @@ class SubmissionApiController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function create(#[CurrentUser] User $user, SubmissionRequest $request, Request $httpRequest, SeasonRepository $seasonRepository): Response
     {
-        // TODO: check if now > end
+        $errors = $request->validate();
+        if(!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        }
 
         $submission = new Submission();
         $now = new DateTimeImmutable();
@@ -125,15 +82,10 @@ class SubmissionApiController extends AbstractController
         $season = $seasonRepository->matching($criteria)->first();
 
         if(!$season) {
-            return $this->json([
-                'success' => false,
-                'errors' => [
-                    // TODO: message
-                    'NEBEZI SEZONA MOREEEE'
-                ]
-            ], Response::HTTP_BAD_REQUEST);
+            return $this->json(['no_season'], Response::HTTP_BAD_REQUEST);
         }
 
+        $submission->setSeason($season);
         $submission->setElevation($request->getElevation());
         $submission->setDistance($request->getDistance());
 
@@ -141,6 +93,7 @@ class SubmissionApiController extends AbstractController
         $submission->setActivity($request->getActivity());
         $submission->setReviewed(false);
         $submission->setAccepted(false);
+        $submission->setDate(new DateTimeImmutable());
 
         $uniquePath = uniqid('/uploads/') . '.jpg';
         $absolutePath = $httpRequest->server->get('DOCUMENT_ROOT') . $uniquePath;
@@ -157,8 +110,8 @@ class SubmissionApiController extends AbstractController
             $img->setImageFormat('jpeg');
             $img->setImageCompressionQuality(90);
             $img->writeImage($absolutePath);
-        } catch (ImagickException $e) {
-            return $request->getResponse(false, [$e->getMessage()]);
+        } catch (ImagickException) {
+            return new Response(status: Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $submission->setImage($uniquePath);
@@ -166,35 +119,57 @@ class SubmissionApiController extends AbstractController
         $this->em->persist($submission);
         $this->em->flush();
 
-        return $request->getResponse(true);
+        return new Response(status: Response::HTTP_CREATED);
     }
 
-    #[Route('/api/submissions/list', name: 'api_submissions_list', methods: ['GET'])]
-    public function list(): Response
+    #[ApiRoute(
+        '/api/submission/list/{page}',
+        name: 'api_submission_list',
+        methods: ['GET'],
+        documentation: 'Retrieves all submissions',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieved all submissions'
+            ]
+        ]
+    )]
+    public function list(int $page): Response
     {
-        return $this->json($this->submissionRepository->findAll());
+        return $this->json($this->submissionRepository->findBy([], limit: 50, offset: ($page-1) * 50));
     }
 
-    #[Route('/api/submission/delete', name: 'api_submission_delete', methods: ['DELETE'])]
+    #[ApiRoute(
+        '/api/submission/{submission}/delete',
+        name: 'api_submission_delete',
+        methods: ['DELETE'],
+        documentation: 'Deletes a <code>Submission</code> entity',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully deleted'
+            ],
+            Response::HTTP_FORBIDDEN => [
+                'message' => 'Unauthorized access',
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Cannot delete'
+            ]
+        ]
+    )]
     #[IsGranted('ROLE_USER')]
-    public function delete(#[CurrentUser] User $user, SubmissionStateRequest $request): Response
+    public function delete(#[CurrentUser] User $user, Submission $submission): Response
     {
-        $submission = $request->getSubmission();
-
         if(!$user->hasRole('ROLE_STAFF') && $user !== $submission->getUser()) {
-            throw $this->createAccessDeniedException();
+            return new Response(status: Response::HTTP_FORBIDDEN);
         }
 
         if($submission->isReviewed()) {
-            return $request->getResponse(false, [
-                'cannot_delete'
-            ]);
+            return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
         $this->em->remove($submission);
         $this->em->flush();
 
-        return $request->getResponse(true);
+        return new Response(status: Response::HTTP_OK);
     }
 
     private function setState(Submission $submission, bool $state): void
@@ -203,19 +178,31 @@ class SubmissionApiController extends AbstractController
         $submission->setReviewed(true);
     }
 
-    #[Route('/api/submission/accept', name: 'api_submission_accept', methods: ['POST'])]
+    #[ApiRoute(
+        '/api/submission/{submission}/accept',
+        name: 'api_submission_accept',
+        methods: ['POST'],
+        documentation: 'Accepts a <code>Submission</code> entity',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully accepted'
+            ],
+            Response::HTTP_FORBIDDEN => [
+                'message' => 'Unauthorized access',
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Cannot accept'
+            ]
+        ]
+    )]
     #[IsGranted('ROLE_STAFF')]
-    public function accept(SubmissionStateRequest $request, FacultySummaryRepository $facultySummaryRepository, UserSummaryRepository $userSummaryRepository): Response
+    public function accept(Submission $submission, FacultySummaryRepository $facultySummaryRepository, UserSummaryRepository $userSummaryRepository): Response
     {
-        if($request->getSubmission()->isReviewed()) {
-            return $request->getResponse(false, [
-                // TODO: message
-                'NEJDE TOOO, UZ JE REVIEWED BROO'
-            ]);
+        if($submission->isReviewed()) {
+            return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
-        $this->setState($request->getSubmission(), true);
-        $submission = $request->getSubmission();
+        $this->setState($submission, true);
 
         $user = $submission->getUser();
         $faculty = $user->getFaculty();
@@ -251,18 +238,22 @@ class SubmissionApiController extends AbstractController
         $facultySummaryRepository->save($facultySummary);
         $userSummaryRepository->save($userSummary);
 
-        $this->submissionRepository->save($request->getSubmission(), true);
+        $this->submissionRepository->save($submission, true);
 
-        return $request->getResponse(true);
+        return new Response(status: Response::HTTP_OK);
     }
 
-    #[Route('/api/submission/reject', name: 'api_submission_reject', methods: ['PUT'])]
+    #[Route('/api/submission/{submission}/reject', name: 'api_submission_reject', methods: ['PUT'])]
     #[IsGranted('ROLE_STAFF')]
-    public function reject(SubmissionStateRequest $request): Response
+    public function reject(Submission $submission): Response
     {
-        $this->setState($request->getSubmission(), false);
-        $this->submissionRepository->save($request->getSubmission(), true);
-        return $request->getResponse(true);
-    }
+        if($submission->isReviewed()) {
+            return new Response(status: Response::HTTP_BAD_REQUEST);
+        }
 
+        $this->setState($submission, false);
+        $this->submissionRepository->save($submission, true);
+
+        return new Response(status: Response::HTTP_OK);
+    }
 }

@@ -23,10 +23,16 @@ export default function Login() {
 function LoginForm() {
     const [t, _] = useTranslation();
     const navigate = useNavigate();
-    const { setAuth } = useAuth();
+    const { auth, setAuth } = useAuth();
 
     const usernameRef = useRef();
     const passwordRef = useRef();
+
+    useEffect(() => {
+        if(auth) {
+            navigate('/');
+        }
+    });
 
     const formSubmit = (ev) => {
         ev.preventDefault();
@@ -35,10 +41,9 @@ function LoginForm() {
         const password = passwordRef.current.value;
 
         sendLogin(username, password).then(data => {
-            if(data.success) {
-                setAuth(data.jwt);
-                navigate("/");
-            }
+            setAuth(true);
+        }).catch((err) => {
+            // TODO: errors
         });
     }
 
@@ -57,10 +62,8 @@ function LoginForm() {
 }
 
 async function sendLogin(username, password) {
-    const result = await axios.postForm('/api/user/login', {
+    return await axios.postForm('/api/user/login', {
         email: username,
         password: password,
     });
-
-    return result.data;
 }

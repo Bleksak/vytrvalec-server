@@ -59,22 +59,16 @@ export default function Registration() {
         }
 
         sendRegister({
-            first_name: firstNameRef.current.value,
-            last_name: lastNameRef.current.value,
-            username: emailRef.current.value,
+            firstName: firstNameRef.current.value,
+            lastName: lastNameRef.current.value,
+            email: emailRef.current.value,
             password: passwordRef.current.value,
             faculty: facultyRef.current.value,
         }).then((response) => {
-
-            if(!response.success) {
-                // TODO: Handle errors
-                console.log(response);
-            } else {
-                console.log('success');
-            }
-
+            console.log(response);
         }).catch((error) => {
-
+            // TODO: server side errors
+            console.log('Errooooor');
         });
 
         ev.preventDefault();
@@ -132,9 +126,9 @@ export default function Registration() {
 }
 
 async function fetchFaculties() {
-    return (await axios.get('/api/faculties/list')).data;
+    return (await axios.get('/api/faculty/list')).data;
 }
 
 async function sendRegister(data) {
-    return (await axios.post('/api/user/register', data)).data;
+    return (await axios.post('/api/user/register', data));
 }

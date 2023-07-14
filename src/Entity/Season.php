@@ -121,8 +121,14 @@ class Season
 
         return $this;
     }
+
+    public function canDelete(): bool
+    {
+        return $this->getStart() >= new \DateTimeImmutable('now');
+    }
     
-    public function isRunning(): bool {
+    public function isRunning(): bool
+    {
         $today = new DateTimeImmutable();
         $start = DateTimeImmutable::createFromInterface($this->getStart());
         $end = DateTimeImmutable::createFromInterface($this->getEnd());

@@ -9,11 +9,13 @@ use App\Repository\UserRepository;
 use App\Requests\RegistrationRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -29,7 +31,6 @@ class UserApiController extends AbstractController {
             Response::HTTP_OK => [
                 'message' => 'Token successfully created',
                 'response' => [
-                    'success' => true,
                     'token' => 'string',
                     'user' => [
                         'id' => 'integer',
@@ -45,12 +46,6 @@ class UserApiController extends AbstractController {
             ],
             Response::HTTP_UNAUTHORIZED => [
                 'message' => 'Bad request',
-                'response' => [
-                    'success' => false,
-                    'errors' => [
-                        'bad_request'
-                    ]
-                ]
             ],
         ],
         requestScheme: [
@@ -72,22 +67,16 @@ class UserApiController extends AbstractController {
         responses: [
             Response::HTTP_OK => [
                 'message' => 'Cookie successfully cleared',
-                'response' => [
-                    'success' => true,
-                ]
             ],
             Response::HTTP_UNAUTHORIZED => [
                 'message' => 'Unauthorized access',
-                'response' => [
-                    'success' => false,
-                ]
             ],
         ],
         fakeName: 'api_user_logout',
         fakePath: '/api/user/logout',
     )]
     public function logout(): Response {
-        return $this->json([]);
+        return new Response(status: Response::HTTP_OK);
     }
 
     public function __construct(private readonly SerializerInterface $serializer, private readonly UserRepository $userRepository)
@@ -105,10 +94,7 @@ class UserApiController extends AbstractController {
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
         ]);
 
-        return $this->json([
-            'success' => true,
-            'submissions' => $filtered,
-        ]);
+        return $this->json($filtered);
     }
 
     #[ApiRoute(
@@ -117,20 +103,11 @@ class UserApiController extends AbstractController {
         methods: ['POST'],
         documentation: 'Creates a new <code>User</code> entity',
         responses: [
-            201 => [
+            Response::HTTP_CREATED => [
                 'message' => 'User successfully created',
-                'response' => [
-                    'success' => true,
-                ]
             ],
-            400 => [
+            Response::HTTP_BAD_REQUEST => [
                 'message' => 'Bad request',
-                'response' => [
-                    'success' => false,
-                    'errors' => [
-                        'bad_request'
-                    ]
-                ]
             ],
         ],
         requestScheme: [
@@ -143,21 +120,17 @@ class UserApiController extends AbstractController {
     )]
     public function register(RegistrationRequest $request, EntityManagerInterface $em, ValidatorInterface $validator, UserPasswordHasherInterface $hasher, UserInterface $userInterface = null): Response
     {
-        $messages = $request->validate();
-
-        if(count($messages) != 0) {
+        if($this->isGranted('ROLE_USER')) {
             return $this->json([
-                'success' => false,
-                'errors' => $messages
+                // TODO: message
+                ['TODO: nelze registrovat protoze uz je prihlasenej']
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        if($userInterface !== null) {
-            return $this->json([
-                'success' => false,
-                // TODO: message
-                'errors' => ['TODO: nelze registrovat protoze uz je prihlasenej']
-            ], Response::HTTP_BAD_REQUEST);
+        $messages = $request->validate();
+
+        if(count($messages) != 0) {
+            return $this->json($messages, Response::HTTP_BAD_REQUEST);
         }
 
         $user = new User();
@@ -175,34 +148,79 @@ class UserApiController extends AbstractController {
                 $messages[] = $constraint->getMessage();
             }
 
-            return $this->json([
-                'success' => false,
-                'errors' => $messages
-            ], Response::HTTP_BAD_REQUEST);
+            return $this->json($messages, Response::HTTP_BAD_REQUEST);
         }
 
         $em->persist($user);
         $em->flush();
 
-        return $this->json([
-            'success' => true
-        ], Response::HTTP_CREATED);
+        return new Response(status: Response::HTTP_CREATED);
     }
 
-    #[Route('/api/user/profile/{user}', name: 'api_user_profile', methods: ['GET'])]
+    #[ApiRoute(
+        '/api/user/profile',
+        name: 'api_user_current_profile',
+        methods: ['GET'],
+        documentation: 'Retrieve a currently logged <code>User</code> entity',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieves a User entity',
+                'response' => [
+                    'id' => 'integer',
+                    'email' => 'string',
+                    'roles' => ['ROLE_USER', 'ROLE_STAFF'],
+                    'faculty' => [
+                        'id' => 'integer',
+                        'name' => 'string',
+                        'shortcut' => 'string',
+                    ]
+                ]
+            ],
+            Response::HTTP_FORBIDDEN => [
+                'message' => 'Unauthorized access',
+            ],
+        ],
+    )]
+    #[IsGranted('ROLE_USER')]
+    public function currentUserData(#[CurrentUser] User $user): Response
+    {
+        return $this->json($this->serializer->normalize($user, null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
+        ]));
+    }
+
+    #[ApiRoute(
+        '/api/user/{user}/profile',
+        name: 'api_user_profile',
+        methods: ['GET'],
+        documentation: 'Retrieve a <code>User</code> entity',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieves a User entity',
+                'response' => [
+                    'id' => 'integer',
+                    'email' => 'string',
+                    'roles' => ['ROLE_USER', 'ROLE_STAFF'],
+                    'faculty' => [
+                        'id' => 'integer',
+                        'name' => 'string',
+                        'shortcut' => 'string',
+                    ]
+                ]
+            ],
+            Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
+        ],
+    )]
     public function userData(#[CurrentUser] User $currentUser, User $user = null): Response
     {
-        if($user === null || ($user !== $currentUser && $currentUser->hasRole('ROLE_STAFF'))) {
+        if(!$this->isGranted('ROLE_STAFF')) {
             $user = $currentUser;
         }
 
         $filtered = $this->serializer->normalize($user, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['id', 'password', 'submissions', 'userSummaries'],
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
         ]);
 
-        return $this->json([
-            'success' => true,
-            'user' => $filtered,
-        ]);
+        return $this->json($filtered);
     }
 }

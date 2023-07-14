@@ -3,6 +3,8 @@
 namespace App\Security;
 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +24,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class LoginAuthenticator extends AbstractAuthenticator
 {
-    public function __construct(private readonly UserProviderInterface $userProvider, private readonly UserPasswordHasherInterface $hasher, private readonly SerializerInterface $serializer)
+    public function __construct(private readonly ParameterBagInterface $parameters, private readonly UserProviderInterface $userProvider, private readonly UserPasswordHasherInterface $hasher, private readonly SerializerInterface $serializer)
     {
     }
     public function supports(Request $request): ?bool
@@ -62,12 +64,11 @@ class LoginAuthenticator extends AbstractAuthenticator
             'exp' => $expirationTime,
         ];
 
-        $key = $request->server->get('JWT_SECRET');
+        $key = $this->parameters->get('jwt_secret');
 
         $jwt = JWT::encode($payload, $key, 'HS256');
 
         $response = new JsonResponse([
-            'success' => true,
             'token' => $jwt,
             'user' => $this->serializer->normalize($token->getUser(), null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries']]),
         ]);
@@ -80,8 +81,7 @@ class LoginAuthenticator extends AbstractAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         return new JsonResponse([
-            'success' => false,
-            'error' => $exception->getMessageKey(),
+            $exception->getMessageKey(),
         ], Response::HTTP_BAD_REQUEST);
     }
 }

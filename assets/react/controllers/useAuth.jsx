@@ -19,10 +19,13 @@ export function AuthProvider({children}) {
 
     const isAuthenticated = async () => {
         await axios.get('/api/user/profile').then((response) => {
-            const data = response.data;
-
-            setUser(data.success ? data.user : null);
-            setAuth(data.success === true);
+            if(response.status === 200) {
+                setUser(response.data);
+                setAuth(true);
+            } else {
+                setUser(null);
+                setAuth(false);
+            }
         }).catch(() => {
             setUser(null);
             setAuth(false);

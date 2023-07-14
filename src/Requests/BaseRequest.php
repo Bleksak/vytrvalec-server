@@ -3,40 +3,34 @@
 namespace App\Requests;
 
 use App\Attributes\DB;
+use App\Validation\TypeSystem;
 use Doctrine\ORM\EntityManagerInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class BaseRequest
 {
+    private array $populationErrors = [];
+
     public function __construct(
         protected ValidatorInterface     $validatorInterface,
-        protected EntityManagerInterface $entityManagerInterface
+        protected EntityManagerInterface $entityManagerInterface,
+        protected RequestStack           $requestStack
     )
     {
-        $request = self::getRequest();
+        $request = $this->requestStack->getCurrentRequest();
+        $data = $request->getPayload()->all();
 
-        $this->populate($request->getPayload()->all());
+        $this->populate($data);
         $this->populate($request->files->all());
-
-        if ($this->autoValidateRequest()) {
-            $this->validate();
-        }
-    }
-
-    protected function autoValidateRequest(): bool
-    {
-        return true;
-    }
-
-    protected function isApi(): bool
-    {
-        return true;
     }
 
     private static function getRequest(): Request
@@ -55,15 +49,17 @@ abstract class BaseRequest
             if (property_exists($this, $property)) {
                 $reflectionProperty = $reflectionClass->getProperty($property);
                 $propertyAttribute = $reflectionProperty->getAttributes(DB::class);
+                $type = $reflectionProperty->getType();
 
                 if (!empty($propertyAttribute)) {
                     $this->{$property} = $this->entityManagerInterface->getRepository($reflectionProperty->getType()->getName())->find($value);
-              } else if(!$reflectionProperty->getType()->isBuiltin()) {
-                  $reflectionType = $reflectionProperty->getType()->getName();
-//                  dd($value);
-                  $this->{$property} = new $reflectionType($value);
-                } else {
+                } else if(TypeSystem::canAssign($value, TypeSystem::reflectionTypeToBuiltinType($type->getName()))) {
                     $this->{$property} = $value;
+                } else if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
+                    $reflectionType = $reflectionProperty->getType()->getName();
+                    $this->{$property} = new $reflectionType($value);
+                } else {
+                    $this->populationErrors[] = new ConstraintViolation('bad_type', 'bad_type', [], null, $property, $value);
                 }
             }
         }
@@ -81,7 +77,7 @@ abstract class BaseRequest
                 if (str_starts_with($method->getName(), "validate")) {
                     $error = $method->invoke($this);
 
-                    if($error !== null) {
+                    if ($error !== null) {
                         $messages[$error->getPropertyPath()] = $error->getMessageTemplate();
                     }
                 }
@@ -90,15 +86,12 @@ abstract class BaseRequest
             $messages[] = 'unrecognized_exception';
         }
 
-        foreach ($errors as $message) {
-            $messages[$message->getPropertyPath()] = $message->getMessageTemplate();
+        foreach ($this->populationErrors as $error) {
+            $messages[$error->getPropertyPath()] = $error->getMessageTemplate();
         }
 
-        if ($this->isApi()) {
-            if (!empty($messages)) {
-                $this->getResponse(false, $messages)->send();
-                exit;
-            }
+        foreach ($errors as $message) {
+            $messages[$message->getPropertyPath()] = $message->getMessageTemplate();
         }
 
         return $messages;

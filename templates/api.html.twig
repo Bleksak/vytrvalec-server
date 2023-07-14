@@ -113,7 +113,9 @@
                             {% for http, response in route.responses %}
                             <h4>Response</h4>
                                 <p>{{ http }} - {{ response.message }}</p>
-                                <pre><code>{{ response.response | json_encode(constant('JSON_PRETTY_PRINT')) }}</code></pre>
+                                {% if response.response is defined %}
+                                    <pre><code>{{ response.response | json_encode(constant('JSON_PRETTY_PRINT')) }}</code></pre>
+                                {% endif %}
                             {% endfor %}
                         {% endif %}
                     {% endfor %}

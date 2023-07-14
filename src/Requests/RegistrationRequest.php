@@ -4,15 +4,31 @@ namespace App\Requests;
 
 use App\Attributes\DB;
 use App\Entity\Faculty;
+use App\Entity\User;
+use App\Validation\Constraint\UniqueValue;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\PasswordStrength;
 
+#[UniqueValue(fields: ['email'], em: User::class, message: 'not_unique_email')]
 class RegistrationRequest extends BaseRequest
 {
-
+    #[Email(message: 'invalid_format')]
+    #[NotBlank(message: 'blank')]
     protected ?string $email;
+
+//    #[PasswordStrength(minScore: 2, message: 'weak_password')]
+    #[NotBlank(message: 'blank')]
     protected ?string $password;
+
+    #[NotBlank(message: 'blank')]
     protected ?string $firstName;
+
+    #[NotBlank(message: 'blank')]
     protected ?string $lastName;
 
+    #[NotNull(message: 'invalid')]
     #[DB]
     protected ?Faculty $faculty;
 
@@ -39,10 +55,5 @@ class RegistrationRequest extends BaseRequest
     public function getFaculty(): ?Faculty
     {
         return $this->faculty;
-    }
-
-    protected function autoValidateRequest(): bool
-    {
-        return false;
     }
 }
