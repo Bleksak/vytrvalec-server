@@ -2,7 +2,7 @@
 
 namespace App\Requests;
 
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -11,9 +11,10 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 class SeasonCreateRequest extends BaseRequest
 {
     #[NotNull(message: 'blank')]
-    protected ?DateTime $start = null;
-    #[NotNull(message: 'blank')]
-    protected ?DateTime $end = null;
+    protected ?DateTimeImmutable $start = null;
+
+    #[NotBlank(message: 'blank', allowNull: true)]
+    protected ?DateTimeImmutable $end = null;
 
     #[NotBlank(message: 'blank')]
     protected ?string $charityName = null;
@@ -31,19 +32,26 @@ class SeasonCreateRequest extends BaseRequest
         return $this->charityDescription;
     }
 
-    public function getStart(): ?DateTime
+    public function getStart(): ?DateTimeImmutable
     {
         return $this->start;
     }
 
-    public function getEnd(): ?DateTime
+    public function getEnd(): ?DateTimeImmutable
     {
         return $this->end;
     }
 
+    protected function populateEndDate(): void
+    {
+        if($this->end === null) {
+            $this->end = $this->start->add(new \DateInterval('P4W'));
+        }
+    }
+
     protected function validateBeginDate(): ?ConstraintViolationInterface
     {
-        $today = new DateTime();
+        $today = new DateTimeImmutable();
         if ($today > $this->getStart()) {
             return new ConstraintViolation('invalid_date', 'invalid_date', [], null, 'start', $this->getStart());
         }

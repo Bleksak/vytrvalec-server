@@ -63,6 +63,13 @@ abstract class BaseRequest
                 }
             }
         }
+
+        foreach($reflectionClass->getMethods(ReflectionMethod::IS_PROTECTED) as $method) {
+            if(str_starts_with($method->getName(), 'populate')) {
+                $method->invoke($this);
+            }
+        }
+
     }
 
     public function validate(): array
