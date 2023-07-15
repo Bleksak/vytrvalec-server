@@ -22,6 +22,12 @@ class SeasonTest extends BaseTest
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+
+        $this->client->jsonRequest('POST', '/api/season/create', [
+            'start' => $beginDate->format('Y-m-d'),
+            'charityName' => 'Sbirka na nohu Kasparovy',
+            'charityDescription' => 'Mila divenka, jela na vylet do bradavic na koštěti. Koště jí ujelo z mezinoží a napálila do orka. Ork jí zlomil pravou nohu na více způsobů.'
+        ]);
     }
 
     public function testCreateNotLoggedIn(): void
