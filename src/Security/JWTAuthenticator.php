@@ -38,7 +38,7 @@ class JWTAuthenticator extends AbstractAuthenticator
         $exploded = explode("Bearer ", $authorization);
 
         if(count($exploded) != 2) {
-            return null;
+            throw new CustomUserMessageAuthenticationException();
         }
 
         [, $token] = $exploded;
