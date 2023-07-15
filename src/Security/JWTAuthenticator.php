@@ -34,7 +34,12 @@ class JWTAuthenticator extends AbstractAuthenticator
 
     private function getHeaderToken(Request $request) : string|null
     {
-        $authorization = $request->headers->get('Authorization', "");
+        $authorization = $request->headers->get('Authorization', null);
+
+        if($authorization === null) {
+            return null;
+        }
+
         $exploded = explode("Bearer ", $authorization);
 
         if(count($exploded) != 2) {
