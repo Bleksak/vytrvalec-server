@@ -53,6 +53,10 @@ abstract class BaseRequest
 
                 if (!empty($propertyAttribute)) {
                     $this->{$property} = $this->entityManagerInterface->getRepository($reflectionProperty->getType()->getName())->find($value);
+
+                    if($this->{$property} === null) {
+                        $this->populationErrors[] = new ConstraintViolation('invalid_value', 'invalid_value', [], null, $property, $value);
+                    }
                 } else if(TypeSystem::canAssign($value, TypeSystem::reflectionTypeToBuiltinType($type->getName()))) {
                     $this->{$property} = $value;
                 } else if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
@@ -69,7 +73,6 @@ abstract class BaseRequest
                 $method->invoke($this);
             }
         }
-
     }
 
     public function validate(): array
