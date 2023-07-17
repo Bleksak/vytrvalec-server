@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a2a880199ad1f60fd230679f07d4bad",
+    "content-hash": "db29c188ba631a20cfb5bf09ba6e83d4",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1524,6 +1524,59 @@
                 "source": "https://github.com/firebase/php-jwt/tree/v6.8.0"
             },
             "time": "2023-06-20T16:45:35+00:00"
+        },
+        {
+            "name": "funcai/funcai-php",
+            "version": "v0.5.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/funcai/funcai-php.git",
+                "reference": "c5e13f93c324d94ad2fc8d30e314f5f51a41347e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/funcai/funcai-php/zipball/c5e13f93c324d94ad2fc8d30e314f5f51a41347e",
+                "reference": "c5e13f93c324d94ad2fc8d30e314f5f51a41347e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-ffi": "*",
+                "ext-gd": "*",
+                "ext-json": "*",
+                "ext-phar": "*",
+                "php": "^7.4.0|^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.1",
+                "phpstan/phpstan": "^0.12.98",
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Tests\\": "tests/",
+                    "FuncAI\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "High performance, state of the art machine learning in php",
+            "keywords": [
+                "ai",
+                "ffi",
+                "image recognition",
+                "machine learning",
+                "prediction",
+                "tensorflow"
+            ],
+            "support": {
+                "issues": "https://github.com/funcai/funcai-php/issues",
+                "source": "https://github.com/funcai/funcai-php/tree/v0.5.4"
+            },
+            "time": "2021-11-25T21:05:33+00:00"
         },
         {
             "name": "monolog/monolog",

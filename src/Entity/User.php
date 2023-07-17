@@ -17,7 +17,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user:read'])]
+    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
@@ -28,35 +28,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string[]
      */
     #[ORM\Column(type: 'json')]
-    #[Groups(['user:read', 'user:adminUpdate'])]
+    #[Groups(['fetchSubmission'])]
     private array $roles = [];
 
     #[ORM\Column]
     private ?string $password = null;
 
     #[ORM\Column]
-    #[Groups(['user:read', 'user:adminUpdate'])]
+    #[Groups(['fetchSubmission'])]
     private ?bool $banned = false;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['user:read', 'user:create'])]
+    #[Groups(['fetchSubmission'])]
     private ?string $firstName = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['user:read', 'user:create'])]
+    #[Groups(['fetchSubmission'])]
     private ?string $lastName = null;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['user:read', 'user:create'])]
+    #[Groups(['fetchSubmission'])]
     private ?Faculty $faculty = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class)]
-    #[Groups(['user:read'])]
     private Collection $submissions;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserSummary::class)]
-    #[Groups(['user:read'])]
     private Collection $userSummaries;
 
     public function __construct()

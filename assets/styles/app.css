@@ -7,8 +7,17 @@ ul, li {
     list-style: none;
 }
 
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
 body {
     font-family: 'centuryGothic', serif;
+    overflow-y: scroll;
+
+    display: flex;
+    flex-direction: column;
 }
 
 a, a:hover, a:visited {
@@ -97,7 +106,8 @@ p {
 /* ------------- FORMS ---------------*/
 .black-form {
     font-size: 1em;
-    border-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
     background: rgba(0, 0, 0, 0.67);
     padding: 2% 10%;
 }
@@ -114,6 +124,7 @@ p {
     margin: 0;
     padding: 2%;
     color: white;
+    text-align: center;
 }
 
 .form-control {
@@ -170,6 +181,7 @@ footer {
     background-color: #404040ff;
     color: white;
     padding: 1%;
+    /*flex-shrink: 0;*/
 }
 
 footer a {
@@ -183,7 +195,7 @@ footer a:hover {
 footer span {
     color: #4d4d4d;
     position: relative;
-    bottom: 15;
+    bottom: 15px;
 }
 
 footer .row {
@@ -666,3 +678,19 @@ u {
     height: 200px;
     text-align: center;
 }
+
+
+.container {
+    flex-grow: 1;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+

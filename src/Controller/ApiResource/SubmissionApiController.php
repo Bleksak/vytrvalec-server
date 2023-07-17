@@ -26,11 +26,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[ApiResource('Submission')]
 class SubmissionApiController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em, private readonly SubmissionRepository $submissionRepository)
+    public function __construct(private readonly EntityManagerInterface $em, private readonly SubmissionRepository $submissionRepository, private readonly SerializerInterface $serializer)
     {
     }
 
@@ -73,13 +75,8 @@ class SubmissionApiController extends AbstractController
         }
 
         $submission = new Submission();
-        $now = new DateTimeImmutable();
 
-        $criteria = new Criteria();
-        $criteria->where(Criteria::expr()->lt('start', $now));
-        $criteria->andWhere(Criteria::expr()->gte('end', $now));
-
-        $season = $seasonRepository->matching($criteria)->first();
+        $season = $seasonRepository->getRunning();
 
         if(!$season) {
             return $this->json(['no_season'], Response::HTTP_BAD_REQUEST);
@@ -133,9 +130,15 @@ class SubmissionApiController extends AbstractController
             ]
         ]
     )]
-    public function list(int $page): Response
+    public function list(#[CurrentUser] User $user, int $page): Response
     {
-        return $this->json($this->submissionRepository->findBy([], limit: 50, offset: ($page-1) * 50));
+        return $this->json($this->serializer->normalize($this->submissionRepository->findAllByUser($user, $page, 50), null, [
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
+                return $object->getId();
+            },
+            AbstractNormalizer::GROUPS => ['fetchSubmission'],
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
+        ]));
     }
 
     #[ApiRoute(

@@ -4,7 +4,10 @@ namespace App\Repository;
 
 use App\Entity\Season;
 use App\Entity\Submission;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -38,6 +41,16 @@ class SeasonRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getRunning(): Season|false {
+        $now = new DateTimeImmutable();
+
+        $criteria = new Criteria();
+        $criteria->where(Criteria::expr()->lt('start', $now));
+        $criteria->andWhere(Criteria::expr()->gte('end', $now));
+
+        return $this->matching($criteria)->first();
     }
 
 //    /**

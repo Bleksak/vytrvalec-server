@@ -11,11 +11,11 @@ export default function Footer() {
                 {t('KTS')}<br/>
                 <br/>
                 <a href="https://www.facebook.com/KatedraTelesneVychovyASportuZcuVPlzni">
-                    <i className="fa-brands fa-facebook fa-2xl icon"></i>
+                    <i className="fa-brands fa-facebook fa-2xl icon px-2"></i>
                     Facebook
                 </a>
                 <a href="https://www.instagram.com/kts.zcu/">
-                    <i className="fa-brands fa-instagram-square fa-2xl icon"></i>
+                    <i className="fa-brands fa-instagram-square fa-2xl icon px-2"></i>
                     Instagram
                 </a>
             </div>

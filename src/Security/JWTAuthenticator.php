@@ -40,6 +40,8 @@ class JWTAuthenticator extends AbstractAuthenticator
             return null;
         }
 
+        // When auth token == "Bearer Bearer "
+        // then "Bearer " is an invalid jwt token
         $exploded = explode("Bearer ", $authorization);
 
         if(count($exploded) != 2) {

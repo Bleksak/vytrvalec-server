@@ -46,6 +46,42 @@ class SubmissionRepository extends ServiceEntityRepository
         }
     }
 
+    public function findAllByUser(User $user, int $page, int $limit)
+    {
+
+        return $this->findBy(['user' => $user], limit: $limit, offset: ($page - 1) * $limit);
+
+//        $query = $this->getEntityManager()->createQueryBuilder()
+//            ->select('partial s.{id, accepted, elevation, distance, reviewed, image, date}, season_fk')
+//            ->from('App:Submission', 's')
+//            ->innerJoin('s.season', 'season_fk')
+//            ->innerJoin('s.activity', 'activity_fk')
+//            ->where('s.user = :userId')
+//            ->setFirstResult(($page-1) * $limit)
+//            ->setMaxResults($limit)
+//            ->setParameter('userId', $user->getId())
+//            ->getQuery();
+        // $qb->innerJoin('u.Group', 'g', 'WITH', 'u.status = ?1', 'g.id')
+
+//        return $query->execute();
+    }
+
+    public function getAll(int $page, int $limit)
+    {
+        $query = $this->getEntityManager()->createQueryBuilder()
+            ->select('s.id', 'season_fk.id as season', 'user_fk.id as user', 'activity_fk.id as activity', 's.accepted', 's.elevation', 's.distance', 's.reviewed', 's.image', 's.date')
+            ->from('App:Submission', 's')
+            ->innerJoin('s.season', 'season_fk')
+            ->innerJoin('s.user', 'user_fk')
+            ->innerJoin('s.activity', 'activity_fk')
+            ->setFirstResult(($page-1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery();
+        // $qb->innerJoin('u.Group', 'g', 'WITH', 'u.status = ?1', 'g.id')
+
+        return $query->execute();
+    }
+
 //    /**
 //     * @return Submission[] Returns an array of Submission objects
 //     */

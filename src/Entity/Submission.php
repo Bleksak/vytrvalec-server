@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\SubmissionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Index(columns: ['date'], name: 'date_index')]
@@ -13,36 +14,46 @@ class Submission
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['fetchSubmission'])]
     private ?bool $accepted = null;
 
     #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['fetchSubmission'])]
     private ?Season $season = null;
 
     #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['fetchSubmission'])]
     private ?User $user = null;
 
     #[ORM\Column]
+    #[Groups(['fetchSubmission'])]
     private ?int $elevation = null;
 
     #[ORM\Column]
+    #[Groups(['fetchSubmission'])]
     private ?int $distance = null;
 
     #[ORM\Column]
+    #[Groups(['fetchSubmission'])]
     private ?bool $reviewed = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['fetchSubmission'])]
     private ?string $image = null;
 
     #[ORM\ManyToOne(inversedBy: 'season')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['fetchSubmission'])]
     private ?Activity $activity = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Groups(['fetchSubmission'])]
     private ?\DateTimeInterface $date = null;
 
     public function getId(): ?int

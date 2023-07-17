@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\FacultyRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacultyRepository::class)]
 class Faculty
@@ -11,15 +12,19 @@ class Faculty
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['fetchSubmission'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 10)]
+    #[Groups(['fetchSubmission'])]
     private ?string $shortcut = null;
 
     #[ORM\Column]
+    #[Groups(['fetchSubmission'])]
     private ?bool $visible = null;
 
     public function getId(): ?int

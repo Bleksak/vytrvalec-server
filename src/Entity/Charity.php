@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CharityRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -12,13 +13,16 @@ class Charity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(['fetchSubmission'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 10000)]
+    #[Groups(['fetchSubmission'])]
     private ?string $description = null;
 
     public function getId(): ?int

@@ -106,6 +106,41 @@ class SeasonController extends AbstractController
     }
 
     #[ApiRoute(
+        '/api/season/running',
+        name: 'api_season_running',
+        methods: ['GET'],
+        documentation: 'Get the currently running <code>Season</code>',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieved the currently running season',
+                'response' => [
+                    'id' => 'integer',
+                    'start' => 'date',
+                    'end' => 'date',
+                    'charity' => [
+                        'name' => 'string',
+                        'description' => 'string'
+                    ],
+                ]
+            ],
+            Response::HTTP_NOT_FOUND => [
+                'message' => 'Currently season has not been found'
+            ]
+        ],
+    )]
+    public function running(): Response
+    {
+        $season = $this->seasonRepository->getRunning();
+        if($season === false) {
+            return new Response(status: Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->json($this->serializer->normalize($season, null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions']
+        ]));
+    }
+
+    #[ApiRoute(
         '/api/season/{season}/delete',
         name: 'api_season_delete',
         methods: ['DELETE'],
