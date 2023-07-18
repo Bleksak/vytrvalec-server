@@ -3,6 +3,12 @@
     src: url(../fonts/CenturyGothic.ttf);
 }
 
+* {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 ul, li {
     list-style: none;
 }
@@ -630,13 +636,12 @@ u {
     gap: 2px;
     
     width: 100%;
-    max-width: 300px;
+    max-width: 200px;
 }
 
 .seasonList ul {
     width: 100%;
 }
-
 
 .seasonListItem {
     display: flex;
@@ -644,14 +649,13 @@ u {
     justify-content: center;
     align-items: center;
     height: 50px;
-    border: 1px solid black;
     width: 100%;
 }
 
-.seasonListItemBox {
-    background-color: red;
+.seasonForm {
+    width: 100%;
+    max-width: 300px;
 }
-
 
 @media (min-width: 75em){
     .seasonManagement {

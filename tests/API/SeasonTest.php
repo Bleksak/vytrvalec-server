@@ -17,16 +17,16 @@ class SeasonTest extends BaseTest
         $this->client->jsonRequest('POST', '/api/season/create', [
             'start' => $beginDate->format('Y-m-d'),
             'end' => $endDate->format('Y-m-d'),
-            'charityName' => 'Sbirka na nohu Kasparovy',
-            'charityDescription' => 'Mila divenka, jela na vylet do bradavic na koštěti. Koště jí ujelo z mezinoží a napálila do orka. Ork jí zlomil pravou nohu na více způsobů.'
+            'charityName' => 'Test',
+            'charityDescription' => 'test'
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $this->client->jsonRequest('POST', '/api/season/create', [
             'start' => $beginDate->format('Y-m-d'),
-            'charityName' => 'Sbirka na nohu Kasparovy',
-            'charityDescription' => 'Mila divenka, jela na vylet do bradavic na koštěti. Koště jí ujelo z mezinoží a napálila do orka. Ork jí zlomil pravou nohu na více způsobů.'
+            'charityName' => 'test',
+            'charityDescription' => 'test'
         ]);
     }
 
@@ -35,8 +35,8 @@ class SeasonTest extends BaseTest
         $this->client->jsonRequest('POST', '/api/season/create', [
             'start' => '2023-07-12',
             'end' => '2023-08-12',
-            'charityName' => 'Sbirka na nohu Kasparovy',
-            'charityDescription' => 'Mila divenka, jela na vylet do bradavic na koštěti. Koště jí ujelo z mezinoží a napálila do orka. Ork jí zlomil pravou nohu na více způsobů.'
+            'charityName' => 'test',
+            'charityDescription' => 'test'
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
@@ -48,8 +48,8 @@ class SeasonTest extends BaseTest
         $this->client->jsonRequest('POST', '/api/season/create', [
             'start' => '2023-05-12',
             'end' => '2023-08-12',
-            'charityName' => 'Sbirka na nohu Kasparovy',
-            'charityDescription' => 'Mila divenka, jela na vylet do bradavic na koštěti. Koště jí ujelo z mezinoží a napálila do orka. Ork jí zlomil pravou nohu na více způsobů.'
+            'charityName' => 'test',
+            'charityDescription' => 'test'
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
@@ -64,8 +64,8 @@ class SeasonTest extends BaseTest
         $this->client->jsonRequest('POST', '/api/season/create', [
             'start' => $beginDate->format('Y-m-d'),
             'end' => '2023-06-12',
-            'charityName' => 'Sbirka na nohu Kasparovy',
-            'charityDescription' => 'Mila divenka, jela na vylet do bradavic na koštěti. Koště jí ujelo z mezinoží a napálila do orka. Ork jí zlomil pravou nohu na více způsobů.'
+            'charityName' => 'test',
+            'charityDescription' => 'test'
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
@@ -82,8 +82,8 @@ class SeasonTest extends BaseTest
         $this->client->jsonRequest('POST', '/api/season/create', [
             'start' => $beginDate->format('Y-m-d'),
             'end' => $endDate->format('Y-m-d'),
-            'charityName' => 'Sbirka na nohu Kasparovy',
-            'charityDescription' => 'Mila divenka, jela na vylet do bradavic na koštěti. Koště jí ujelo z mezinoží a napálila do orka. Ork jí zlomil pravou nohu na více způsobů.'
+            'charityName' => 'test',
+            'charityDescription' => 'test'
         ]);
 
         $this->client->jsonRequest('GET', '/api/season/list');

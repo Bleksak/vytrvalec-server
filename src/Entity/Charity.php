@@ -13,16 +13,16 @@ class Charity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 10000)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
     private ?string $description = null;
 
     public function getId(): ?int

@@ -19,22 +19,22 @@ class Season
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
     private ?DateTimeInterface $start = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
     private ?DateTimeInterface $end = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
     private ?Charity $charity = null;
 
     /**

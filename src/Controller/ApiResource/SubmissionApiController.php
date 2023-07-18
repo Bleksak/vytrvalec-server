@@ -210,17 +210,17 @@ class SubmissionApiController extends AbstractController
         $user = $submission->getUser();
         $faculty = $user->getFaculty();
         $season = $submission->getSeason();
+        $week = intdiv($submission->getDate()->diff($season->getStart())->days, 7);
 
-        $facultySummary = $facultySummaryRepository->findOneBy(['faculty' => $faculty, 'season' => $season]);
-        $userSummary = $userSummaryRepository->findOneBy(['user' => $user, 'season' => $season]);
+        $facultySummary = $facultySummaryRepository->findOneBy(['faculty' => $faculty, 'season' => $season, 'week' => $week]);
+        $userSummary = $userSummaryRepository->findOneBy(['user' => $user, 'season' => $season, 'week' => $week]);
 
         if($facultySummary == null) {
             $facultySummary = new FacultySummary();
 
             $facultySummary->setFaculty($faculty);
             $facultySummary->setSeason($season);
-            $facultySummary->setDistance(0);
-            $facultySummary->setElevation(0);
+            $facultySummary->setWeek($week);
         }
 
         $facultySummary->setDistance( $facultySummary->getDistance() + $submission->getDistance() );
@@ -231,8 +231,7 @@ class SubmissionApiController extends AbstractController
 
             $userSummary->setUser($user);
             $userSummary->setSeason($season);
-            $userSummary->setDistance(0);
-            $userSummary->setElevation(0);
+            $userSummary->setWeek($week);
         }
 
         $userSummary->setDistance( $userSummary->getDistance() + $submission->getDistance() );

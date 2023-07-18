@@ -7,7 +7,7 @@ use App\Entity\Season;
 use App\Entity\User;
 use App\Repository\CharityRepository;
 use App\Requests\CharityEditRequest;
-use App\Requests\SeasonCreateRequest;
+use App\Requests\SeasonRequest;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -91,7 +91,7 @@ class ManagementController extends AbstractController
     }
 
     #[Route('/api/management/season/new', name: 'api_management_season_new', methods: ['POST'])]
-    public function seasonCreate(SeasonCreateRequest $request): Response
+    public function seasonCreate(SeasonRequest $request): Response
     {
         $charity = new Charity();
         $charity->setName($request->getCharityName());
@@ -122,7 +122,6 @@ class ManagementController extends AbstractController
     {
         return $this->render('management/season.html.twig', []);
     }
-
 
     #[Route('/api/management/charity/edit/{charity}', name:'management_edit_charity', methods: ['POST'])]
     public function editCharity(CharityEditRequest $request, CharityRepository $charityRepository): Response

@@ -10,15 +10,15 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[UniqueValue(fields: ['shortcut'], em: Faculty::class)]
 class FacultyCreateRequest extends BaseRequest
 {
-    #[NotBlank]
+    #[NotBlank(message: 'blank')]
     protected ?string $name = null;
 
-    #[NotBlank]
+    #[NotBlank(message: 'blank')]
     protected ?string $shortcut = null;
 
+    #[NotBlank(message: 'blank')]
     protected ?bool $visible = null;
 
-    #[NotBlank]
     public function getName(): ?string
     {
         return $this->name;
