@@ -28,8 +28,7 @@ challenge_description_right: |
 participants: 'Total participants'
 run_and_walk: 'Run and walk'
 bike_and_scooter: 'Bike and scooter'
-winners: 'Winners of previous years'
-charity: 'Charity'
+previous_years: 'Results of previous years'
 
 # Rules page
 rules: 'Rules'

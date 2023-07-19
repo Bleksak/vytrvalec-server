@@ -1,12 +1,48 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
+import {Carousel} from "react-bootstrap";
 
 export default function Home() {
+
+    const [t] = useTranslation();
+
     return <>
         <Logo/>
         <EventSummary/>
-        <Carousel/>
+        <Carousel indicators={false} interval={null}>
+            <Carousel.Item>
+                <h2><strong>April 2023: 5 letý Nicolas</strong></h2>
+                <div className='carousel-inside-item'>
+                    <div className='carousel-row'>
+                        <p><i className="fa-solid fa-crown gold mx-2"></i><strong>1. </strong>Fakulta A</p>
+                        <p><i className="fa-solid fa-crown silver mx-2"></i><strong>2. </strong>Fakulta B</p>
+                        <p><i className="fa-solid fa-crown bronze mx-2"></i><strong>3. </strong>Fakulta C</p>
+                    </div>
+                    <div className='carousel-row'>
+                        <p>
+                            V sedmi měsících mu byl diagnostikován nádor na mozku, který nešťastně postihnul křížení zrakových nervů. Po první operaci, kdy byl nádor částečně odstraněn, přišel bohužel Nicolas o zrak. Navíc byla tehdy zasažena hormonální část mozku, takže hormony jsou mu uměle několikrát denně podávány společně s léky na epilepsii, růst a momentálně i na ředění krve. Jeho léčba je finančně velice náročná. Pojďme mu aktivním sportováním pomoci!
+                        </p>
+                    </div>
+                </div>
+            </Carousel.Item>
+
+            <Carousel.Item>
+                <h2><strong>April 2023: 5 letý Nicolas</strong></h2>
+                <div className='carousel-inside-item'>
+                    <div className='carousel-row'>
+                        <p><i className="fa-solid fa-crown gold mx-2"></i><strong>1. </strong>Fakulta A</p>
+                        <p><i className="fa-solid fa-crown silver mx-2"></i><strong>2. </strong>Fakulta B</p>
+                        <p><i className="fa-solid fa-crown bronze mx-2"></i><strong>3. </strong>Fakulta C</p>
+                    </div>
+                    <div className='carousel-row'>
+                        <p>
+                            V sedmi měsících mu byl diagnostikován nádor na mozku, který nešťastně postihnul křížení zrakových nervů. Po první operaci, kdy byl nádor částečně odstraněn, přišel bohužel Nicolas o zrak. Navíc byla tehdy zasažena hormonální část mozku, takže hormony jsou mu uměle několikrát denně podávány společně s léky na epilepsii, růst a momentálně i na ředění krve. Jeho léčba je finančně velice náročná. Pojďme mu aktivním sportováním pomoci!
+                        </p>
+                    </div>
+                </div>
+            </Carousel.Item>
+        </Carousel>
     </>
 }
 
@@ -42,92 +78,34 @@ function EventSummary() {
                 <p>{t('challenge_description_right')}</p>
             </div>
 
+            <div className='summary-item'>
+                <h3><b>{ participants }</b></h3>
+                {t('participants')}
+            </div>
+
         </div>
 
-        <div className="summary">
-            <div className="row py-4 px-5 text-center">
-                <div className="col-md-4">
-                    <h3><b>{ participants }</b></h3>
-                    {t('participants')}
+        <div className='summary'>
+
+            { Object.keys(summary).map((activity) =>
+                <div className='summary-item' key={activity}>
+                    <h3><b>{ Math.ceil(summary[activity] / 1000)} km</b></h3>
+                    {t(activity)}
                 </div>
-
-                { Object.keys(summary).map((activity) =>
-                    <div key={activity} className='col-md-4'>
-                        <h3><b>{summary[activity] / 1000} km</b></h3>
-                        {t(activity)}
-                    </div>
-                ) }
-            </div>
-        </div>
-    </>
-}
-
-function Carousel() {
-    const [t, _] = useTranslation();
-
-    return <>
-        <div className="carousel-master light-blue-bg pb-3">
-            <div className="flex-grow-1">
-                <h4 className="text-center">{t('winners')}</h4>
-                <div className="slideshow blue-border white-bg">
-                    <div id="carousel-first" className="carousel slide">
-                        <div className="carousel-inner">
-                            <CarouselItem content="JSDFFLSKJDFKJLDSJKL" active={true}/>
-                            <CarouselItem content="JOJOJJOOOOO"/>
-                            <CarouselItem content="TEEEEST"/>
-                        </div>
-
-                        <button className="carousel-control-prev" type="button" data-bs-target="#carousel-first"
-                                data-bs-slide="prev">
-                            <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span className="visually-hidden">Previous</span>
-                        </button>
-
-                        <button className="carousel-control-next" type="button" data-bs-target="#carousel-first"
-                                data-bs-slide="next">
-                            <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span className="visually-hidden">Next</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex-grow-1">
-                <h4 className="text-center">{t('winners')}</h4>
-                <div className="slideshow blue-border white-bg">
-                    <div id="carousel-second" className="carousel slide">
-                        <div className="carousel-inner">
-                            <CarouselItem content="JSDFFLSKJDFKJLDSJKL" active={true}/>
-                            <CarouselItem content="JOJOJJOOOOO"/>
-                            <CarouselItem content="TEEEEST"/>
-                        </div>
-
-                        <button className="carousel-control-prev" type="button" data-bs-target="#carousel-second"
-                                data-bs-slide="prev">
-                            <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span className="visually-hidden">Previous</span>
-                        </button>
-                        <button className="carousel-control-next" type="button" data-bs-target="#carousel-second"
-                                data-bs-slide="next">
-                            <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span className="visually-hidden">Next</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            ) }
         </div>
     </>
 }
 
-function CarouselItem({content, active = false}) {
-    let clsName = `carousel-item${active ? " active" : ""}`;
-
-    return <div className={clsName}>
-        <p>
-            {content}
-        </p>
-    </div>
-}
+// function CarouselItem({content, active = false}) {
+//     let clsName = `carousel-item${active ? " active" : ""}`;
+//
+//     return <div className={clsName}>
+//         <p>
+//             {content}
+//         </p>
+//     </div>
+// }
 
 const getUserCount = async() => {
     return await axios.get('/api/user/count');
