@@ -66,7 +66,7 @@ function Carousel() {
             <div className="carousel-inner">
               <CarouselItem content="JSDFFLSKJDFKJLDSJKL" active={true}/>
               <CarouselItem content="JOJOJJOOOOO"/>
-              <CarouselItem content="KOKOTKOOOO"/>
+              <CarouselItem content="TEEEEST"/>
             </div>
 
             <button className="carousel-control-prev" type="button" data-bs-target="#carousel-first" data-bs-slide="prev">
@@ -89,7 +89,7 @@ function Carousel() {
             <div className="carousel-inner">
               <CarouselItem content="JSDFFLSKJDFKJLDSJKL" active={true}/>
               <CarouselItem content="JOJOJJOOOOO"/>
-              <CarouselItem content="KOKOTKOOOO"/>
+              <CarouselItem content="TEEEEST"/>
             </div>
 
             <button className="carousel-control-prev" type="button" data-bs-target="#carousel-second" data-bs-slide="prev">

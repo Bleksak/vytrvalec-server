@@ -12,7 +12,7 @@ export default function Registration() {
     const [faculties, setFaculties] = useState(null);
     const [, setTooltip] = useState(null);
 
-    const  gdpr = useRef(null);
+    const gdpr = useRef(null);
 
     const emailRef = useRef();
     const passwordRef = useRef();
