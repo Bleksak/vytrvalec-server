@@ -4,8 +4,8 @@ namespace App\Controller\ApiResource;
 
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
-use App\Entity\Activity;
 use App\Entity\FacultySummary;
+use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use App\Entity\UserSummary;
@@ -14,9 +14,7 @@ use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Repository\UserSummaryRepository;
 use App\Requests\SubmissionRequest;
-use App\Requests\SubmissionStateRequest;
 use DateTimeImmutable;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
 use ImagickException;
@@ -138,6 +136,50 @@ class SubmissionApiController extends AbstractController
             },
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
+        ]));
+    }
+
+    #[ApiRoute(
+        '/api/submission/list/{season}/{page}',
+        name: 'api_submission_list_season',
+        methods: ['GET'],
+        documentation: 'Retrieves all submissions in given Season',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieved all submissions'
+            ]
+        ]
+    )]
+    public function listSeason(#[CurrentUser] User $user, Season $season, int $page): Response
+    {
+        return $this->json($this->serializer->normalize($this->submissionRepository->findBy(['season' => $season], limit: 50, offset: ($page-1)*50), null, [
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
+                return $object->getId();
+            },
+            AbstractNormalizer::GROUPS => ['fetchSubmission'],
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
+        ]));
+    }
+
+    #[ApiRoute(
+        '/api/submission/unresolved/{season}',
+        name: 'api_submission_list',
+        methods: ['GET'],
+        documentation: 'Retrieves all unresolved submissions in the given season',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieved all unresolved submissions'
+            ]
+        ]
+    )]
+    #[IsGranted('ROLE_STAFF')]
+    public function unresolvedList(#[CurrentUser] User $user, Season $season): Response
+    {
+        return $this->json($this->serializer->normalize($this->submissionRepository->findBy(['season' => $season, 'reviewed' => false]), null, [
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
+                return $object->getId();
+            },
+            AbstractNormalizer::GROUPS => ['fetchSubmission'],
         ]));
     }
 
