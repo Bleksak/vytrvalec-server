@@ -30,6 +30,10 @@ class FacultySummary
     #[ORM\Column]
     private ?int $week = null;
 
+    #[ORM\ManyToOne(inversedBy: 'facultySummaries')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Activity $activity = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -91,6 +95,18 @@ class FacultySummary
     public function setWeek(int $week): static
     {
         $this->week = $week;
+
+        return $this;
+    }
+
+    public function getActivity(): ?Activity
+    {
+        return $this->activity;
+    }
+
+    public function setActivity(?Activity $activity): static
+    {
+        $this->activity = $activity;
 
         return $this;
     }

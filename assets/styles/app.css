@@ -343,12 +343,46 @@ h1 {
     }
 }
 
+.about-challenge {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+
+.about-challenge-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 40px;
+
+    font-size: 1.1em;
+    text-align: justify;
+}
+
+.about-challenge h2 {
+    max-width: 500px;
+}
+
+.about-challenge-container p {
+    width: 50%;
+}
+
+.summary {
+
+}
+
 .about {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    width: 100%;
     padding-top: 2%;
     padding-bottom: 2%;
     /* padding: 3%; */
-    font-size: 1em;
-    text-align: justify;
 }
 
 .about .col {

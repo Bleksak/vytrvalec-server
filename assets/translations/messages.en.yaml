@@ -1,4 +1,4 @@
-title: 'Měsíční vytrvalec'
+title: 'Monthly Runner'
 
 # navbar
 navbar_title: 'Monthly Runner'
@@ -20,9 +20,10 @@ KTS: 'Department of Physical Education and Sport'
 # Home page
 join_us: 'Join the challenge!'
 about_challenge: 'About the challenge'
-challenge_description: |
-  <p>The Monthly Endurance Event was created during the winter semester of 2020. This movement competition was prepared and organized by the Department of Physical Education of the Faculty of Engineering of the University of West Bohemia in Pilsen with the intention to move students during distance learning, which took place at the University of West Bohemia during the coronavirus pandemic.</p>
-  <p>Participants are competing for four weeks to see who can run and cycle the most kilometers for their faculty. These are tallied within the faculty and at the end of the week to determine the number of points the faculty earns and their overall ranking.</p>
+challenge_description_left: |
+  The Monthly Runner Event was created during the winter semester of 2020. This movement competition was prepared and organized by the Department of Physical Education of the Faculty of Engineering of the University of West Bohemia in Pilsen with the intention to move students during distance learning, which took place at the University of West Bohemia during the coronavirus pandemic.
+challenge_description_right: |
+  Participants are competing for four weeks to see who can run and cycle the most kilometers for their faculty. These are tallied within the faculty and at the end of the week to determine the number of points the faculty earns and their overall ranking.
 
 participants: 'Total participants'
 run_and_walk: 'Run and walk'

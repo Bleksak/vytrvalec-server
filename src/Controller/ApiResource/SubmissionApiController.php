@@ -68,7 +68,7 @@ class SubmissionApiController extends AbstractController
     public function create(#[CurrentUser] User $user, SubmissionRequest $request, Request $httpRequest, SeasonRepository $seasonRepository): Response
     {
         $errors = $request->validate();
-        if(!empty($errors)) {
+        if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -76,7 +76,7 @@ class SubmissionApiController extends AbstractController
 
         $season = $seasonRepository->getRunning();
 
-        if(!$season) {
+        if (!$season) {
             return $this->json(['no_season'], Response::HTTP_BAD_REQUEST);
         }
 
@@ -98,7 +98,7 @@ class SubmissionApiController extends AbstractController
             $profiles = $img->getImageProfiles("icc");
 
             $img->stripImage();
-            if(!empty($profiles)) {
+            if (!empty($profiles)) {
                 $img->profileImage("icc", $profiles['icc']);
             }
 
@@ -130,7 +130,7 @@ class SubmissionApiController extends AbstractController
     )]
     public function listSeason(#[CurrentUser] User $user, Season $season, int $page): Response
     {
-        return $this->json($this->serializer->normalize($this->submissionRepository->findBy(['season' => $season], limit: 50, offset: ($page-1)*50), null, [
+        return $this->json($this->serializer->normalize($this->submissionRepository->findBy(['season' => $season], limit: 50, offset: ($page - 1) * 50), null, [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
                 return $object->getId();
             },
@@ -204,11 +204,11 @@ class SubmissionApiController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function delete(#[CurrentUser] User $user, Submission $submission): Response
     {
-        if(!$user->hasRole('ROLE_STAFF') && $user !== $submission->getUser()) {
+        if (!$user->hasRole('ROLE_STAFF') && $user !== $submission->getUser()) {
             return new Response(status: Response::HTTP_FORBIDDEN);
         }
 
-        if($submission->isReviewed()) {
+        if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
@@ -244,7 +244,7 @@ class SubmissionApiController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function accept(Submission $submission, FacultySummaryRepository $facultySummaryRepository, UserSummaryRepository $userSummaryRepository): Response
     {
-        if($submission->isReviewed()) {
+        if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
@@ -255,29 +255,31 @@ class SubmissionApiController extends AbstractController
         $season = $submission->getSeason();
         $week = intdiv($submission->getDate()->diff($season->getStart())->days, 7);
 
-        $facultySummary = $facultySummaryRepository->findOneBy(['faculty' => $faculty, 'season' => $season, 'week' => $week]);
-        $userSummary = $userSummaryRepository->findOneBy(['user' => $user, 'season' => $season, 'week' => $week]);
+        $facultySummary = $facultySummaryRepository->findOneBy(['faculty' => $faculty, 'season' => $season, 'week' => $week, 'activity' => $submission->getActivity()]);
+        $userSummary = $userSummaryRepository->findOneBy(['user' => $user, 'season' => $season, 'week' => $week, 'activity' => $submission->getActivity()]);
 
-        if($facultySummary == null) {
+        if ($facultySummary == null) {
             $facultySummary = new FacultySummary();
 
             $facultySummary->setFaculty($faculty);
             $facultySummary->setSeason($season);
             $facultySummary->setWeek($week);
+            $facultySummary->setActivity($submission->getActivity());
         }
 
-        $facultySummary->setDistance( $facultySummary->getDistance() + $submission->getDistance() );
+        $facultySummary->setDistance($facultySummary->getDistance() + $submission->getDistance());
         $facultySummary->setElevation($facultySummary->getElevation() + $submission->getElevation());
 
-        if($userSummary == null) {
+        if ($userSummary == null) {
             $userSummary = new UserSummary();
 
             $userSummary->setUser($user);
             $userSummary->setSeason($season);
             $userSummary->setWeek($week);
+            $userSummary->setActivity($submission->getActivity());
         }
 
-        $userSummary->setDistance( $userSummary->getDistance() + $submission->getDistance() );
+        $userSummary->setDistance($userSummary->getDistance() + $submission->getDistance());
         $userSummary->setElevation($userSummary->getElevation() + $submission->getElevation());
 
         $facultySummaryRepository->save($facultySummary);
@@ -292,7 +294,7 @@ class SubmissionApiController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function reject(Submission $submission): Response
     {
-        if($submission->isReviewed()) {
+        if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 

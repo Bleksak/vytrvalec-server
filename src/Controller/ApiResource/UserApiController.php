@@ -23,6 +23,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[ApiResource(resourceName: 'User')]
 class UserApiController extends AbstractController
 {
+    public function __construct(private readonly SerializerInterface $serializer, private readonly UserRepository $userRepository)
+    {
+    }
+
     #[ApiRoute(
         '/api/unused/login',
         methods: ['POST'],
@@ -80,10 +84,6 @@ class UserApiController extends AbstractController
     public function logout(): Response
     {
         return new Response(status: Response::HTTP_OK);
-    }
-
-    public function __construct(private readonly SerializerInterface $serializer, private readonly UserRepository $userRepository)
-    {
     }
 
     #[ApiRoute(
@@ -146,6 +146,22 @@ class UserApiController extends AbstractController
         return new Response(status: Response::HTTP_CREATED);
     }
 
+    #[ApiRoute(
+        '/api/user/count',
+        name: 'api_user_count',
+        methods: ['GET'],
+        documentation: 'Retrieve count of <code>User</code> entities',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Retrieved count of User entities',
+                'response' => ['integer']
+            ],
+        ]
+    )]
+    public function userCount(): Response
+    {
+        return $this->json($this->userRepository->count(['banned'=>false]));
+    }
 
     #[ApiRoute(
         '/api/user/list',

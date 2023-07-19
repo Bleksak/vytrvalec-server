@@ -1,118 +1,138 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
+import React, {useEffect, useState} from "react";
+import {useTranslation} from "react-i18next";
+import axios from "axios";
 
 export default function Home() {
-  return <>
-    <Logo/>
-    <EventSummary/>
-    <Carousel/>
+    return <>
+        <Logo/>
+        <EventSummary/>
+        <Carousel/>
     </>
 }
 
 function Logo() {
-  const [t, _ ] = useTranslation();
+    const [t, _] = useTranslation();
 
-  return <>
-    <div className="main">
-      <div className="col title">
-        <h1>{ t('title').toUpperCase() }</h1>
-        <h2>{ t('join_us') }</h2>
-      </div>
-    </div>
-  </>
+    return <>
+        <div className="main">
+            <div className="col title">
+                <h1>{t('title').toUpperCase()}</h1>
+                <h2>{t('join_us')}</h2>
+            </div>
+        </div>
+    </>
 }
 
 function EventSummary() {
-  const [t, _ ] = useTranslation();
+    const [t, _] = useTranslation();
 
-  return <>
-  <div className="about">
-    <h2><strong>{t('about_challenge')}</strong></h2>
-      <div dangerouslySetInnerHTML={
-        {__html: t('challenge_description')}
-      } />
+    const [participants, setParticipants] = useState(0);
+    const [summary, setSummary] = useState({});
 
-    <div className="row py-4 px-5 text-center">
-      <div className="col-md-4">
-        <h3><b>10 </b></h3>
-        {/*{# <h3><b>{{ users_count }}</b></h3> #}*/}
-        { t('participants') }
-      </div>
-      <div className="col-md-4">
-        <h3><b>20 km</b></h3>
-        {/*{# <h3><b>{{ bike_km|floatformat:0 }}</b> km</h3> #}*/}
-        { t('bike_and_scooter') }
-      </div>
+    useEffect(() => {
+        getUserCount().then((res) => setParticipants(res.data));
+        getSummaryDistance().then((res) => setSummary(res.data));
+    }, []);
 
-      <div className="col-md-4">
-        <h3><b>200 km</b></h3>
-        {/*{# <h3><b>{{ run_km|floatformat:0 }}</b> km</h3> #}*/}
-        { t('run_and_walk') }
-      </div>
-    </div>
-  </div>
-  </>
+    return <>
+        <div className="about-challenge">
+            <h2><strong>{t('about_challenge')}</strong></h2>
+            <div className="about-challenge-container">
+                <p>{t('challenge_description_left')}</p>
+                <p>{t('challenge_description_right')}</p>
+            </div>
+
+        </div>
+
+        <div className="summary">
+            <div className="row py-4 px-5 text-center">
+                <div className="col-md-4">
+                    <h3><b>{ participants }</b></h3>
+                    {t('participants')}
+                </div>
+
+                { Object.keys(summary).map((activity) =>
+                    <div key={activity} className='col-md-4'>
+                        <h3><b>{summary[activity] / 1000} km</b></h3>
+                        {t(activity)}
+                    </div>
+                ) }
+            </div>
+        </div>
+    </>
 }
 
 function Carousel() {
-  const [t, _ ] = useTranslation();
+    const [t, _] = useTranslation();
 
-  return <>
-    <div className="carousel-master light-blue-bg pb-3">
-      <div className="flex-grow-1">
-        <h4 className="text-center">{ t('winners') }</h4>
-        <div className="slideshow blue-border white-bg">
-          <div id="carousel-first" className="carousel slide">
-            <div className="carousel-inner">
-              <CarouselItem content="JSDFFLSKJDFKJLDSJKL" active={true}/>
-              <CarouselItem content="JOJOJJOOOOO"/>
-              <CarouselItem content="TEEEEST"/>
+    return <>
+        <div className="carousel-master light-blue-bg pb-3">
+            <div className="flex-grow-1">
+                <h4 className="text-center">{t('winners')}</h4>
+                <div className="slideshow blue-border white-bg">
+                    <div id="carousel-first" className="carousel slide">
+                        <div className="carousel-inner">
+                            <CarouselItem content="JSDFFLSKJDFKJLDSJKL" active={true}/>
+                            <CarouselItem content="JOJOJJOOOOO"/>
+                            <CarouselItem content="TEEEEST"/>
+                        </div>
+
+                        <button className="carousel-control-prev" type="button" data-bs-target="#carousel-first"
+                                data-bs-slide="prev">
+                            <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span className="visually-hidden">Previous</span>
+                        </button>
+
+                        <button className="carousel-control-next" type="button" data-bs-target="#carousel-first"
+                                data-bs-slide="next">
+                            <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span className="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <button className="carousel-control-prev" type="button" data-bs-target="#carousel-first" data-bs-slide="prev">
-              <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span className="visually-hidden">Previous</span>
-            </button>
+            <div className="flex-grow-1">
+                <h4 className="text-center">{t('winners')}</h4>
+                <div className="slideshow blue-border white-bg">
+                    <div id="carousel-second" className="carousel slide">
+                        <div className="carousel-inner">
+                            <CarouselItem content="JSDFFLSKJDFKJLDSJKL" active={true}/>
+                            <CarouselItem content="JOJOJJOOOOO"/>
+                            <CarouselItem content="TEEEEST"/>
+                        </div>
 
-            <button className="carousel-control-next" type="button" data-bs-target="#carousel-first" data-bs-slide="next">
-              <span className="carousel-control-next-icon" aria-hidden="true"></span>
-              <span className="visually-hidden">Next</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-grow-1">
-        <h4 className="text-center">{ t('winners') }</h4>
-        <div className="slideshow blue-border white-bg">
-          <div id="carousel-second" className="carousel slide">
-            <div className="carousel-inner">
-              <CarouselItem content="JSDFFLSKJDFKJLDSJKL" active={true}/>
-              <CarouselItem content="JOJOJJOOOOO"/>
-              <CarouselItem content="TEEEEST"/>
+                        <button className="carousel-control-prev" type="button" data-bs-target="#carousel-second"
+                                data-bs-slide="prev">
+                            <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span className="visually-hidden">Previous</span>
+                        </button>
+                        <button className="carousel-control-next" type="button" data-bs-target="#carousel-second"
+                                data-bs-slide="next">
+                            <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span className="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
             </div>
-
-            <button className="carousel-control-prev" type="button" data-bs-target="#carousel-second" data-bs-slide="prev">
-              <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span className="visually-hidden">Previous</span>
-            </button>
-            <button className="carousel-control-next" type="button" data-bs-target="#carousel-second" data-bs-slide="next">
-              <span className="carousel-control-next-icon" aria-hidden="true"></span>
-              <span className="visually-hidden">Next</span>
-            </button>
-          </div>
         </div>
-      </div>
-    </div>
-  </>
+    </>
 }
 
 function CarouselItem({content, active = false}) {
-  let clsName = `carousel-item${active ? " active" : ""}`;
+    let clsName = `carousel-item${active ? " active" : ""}`;
 
-  return <div className={clsName}>
-    <p>
-      {content}
-    </p>
-  </div>
+    return <div className={clsName}>
+        <p>
+            {content}
+        </p>
+    </div>
+}
+
+const getUserCount = async() => {
+    return await axios.get('/api/user/count');
+}
+
+const getSummaryDistance = async() => {
+    return await axios.get('/api/summary/distances');
 }

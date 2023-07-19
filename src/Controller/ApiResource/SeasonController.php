@@ -72,7 +72,7 @@ class SeasonController extends AbstractController
 
         $this->seasonRepository->save($season, true);
 
-        return $this->json([], Response::HTTP_CREATED);
+        return new Response(status: Response::HTTP_CREATED);
     }
 
     #[ApiRoute(
