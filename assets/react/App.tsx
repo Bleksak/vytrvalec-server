@@ -1,0 +1,24 @@
+import { BrowserRouter, } from 'react-router-dom'
+import Navbar from './components/navbar/Navbar'
+import React from "react";
+//@ts-ignore
+import _ from './i8n'
+import Navigation from './Navigation'
+import { AuthProvider } from './useAuth';
+import Footer from './components/Footer';
+
+const App = (props: any) => {
+    return (
+        <BrowserRouter>
+            <AuthProvider>
+                <div className="container">
+                    <Navbar />
+                    <Navigation {...props} />
+                </div>
+                <Footer />
+            </AuthProvider>
+        </BrowserRouter>
+    );
+}
+
+export default App;

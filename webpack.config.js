@@ -67,6 +67,8 @@ Encore
     // uncomment if you use React
     .enableReactPreset()
 
+    .enableTypeScriptLoader()
+
     // uncomment to get integrity="..." attributes on your script & link tags
     // requires WebpackEncoreBundle 1.4 or higher
     //.enableIntegrityHashes(Encore.isProduction())
@@ -91,6 +93,6 @@ Encore
         // pattern: /\.(png|jpg|jpeg)$/,
         to: 'translations/[path][name].[ext]'
     })
-;
+    ;
 
 module.exports = Encore.getWebpackConfig();

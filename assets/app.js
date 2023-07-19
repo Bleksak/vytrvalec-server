@@ -16,11 +16,11 @@ const bootstrap = require('bootstrap');
 import './styles/app.css';
 
 let gdpr = document.getElementById("gdpr");
-if(gdpr != undefined) {
-    let tooltip = new bootstrap.Tooltip(gdpr, {animation: true})
+if (gdpr != undefined) {
+    let tooltip = new bootstrap.Tooltip(gdpr, { animation: true })
 }
 
 
 // start the Stimulus application
-registerReactControllerComponents(require.context('./react/controllers', true, /\.(j|t)sx?$/))
+registerReactControllerComponents(require.context('./react', true, /\.(j|t)sx?$/))
 import './bootstrap';
