@@ -118,28 +118,6 @@ class SubmissionApiController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/submission/list/{page}',
-        name: 'api_submission_list',
-        methods: ['GET'],
-        documentation: 'Retrieves all submissions',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully retrieved all submissions'
-            ]
-        ]
-    )]
-    public function list(#[CurrentUser] User $user, int $page): Response
-    {
-        return $this->json($this->serializer->normalize($this->submissionRepository->findAllByUser($user, $page, 50), null, [
-            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
-                return $object->getId();
-            },
-            AbstractNormalizer::GROUPS => ['fetchSubmission'],
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
-        ]));
-    }
-
-    #[ApiRoute(
         '/api/submission/list/{season}/{page}',
         name: 'api_submission_list_season',
         methods: ['GET'],
@@ -162,8 +140,31 @@ class SubmissionApiController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/submission/unresolved/{season}',
+        '/api/submission/list/{page}',
         name: 'api_submission_list',
+        methods: ['GET'],
+        documentation: 'Retrieves all submissions',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieved all submissions'
+            ]
+        ]
+    )]
+    public function list(#[CurrentUser] User $user, int $page): Response
+    {
+        return $this->json($this->serializer->normalize($this->submissionRepository->findAllByUser($user, $page, 50), null, [
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
+                return $object->getId();
+            },
+            AbstractNormalizer::GROUPS => ['fetchSubmission'],
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
+        ]));
+    }
+
+
+    #[ApiRoute(
+        '/api/submission/unresolved/{season}',
+        name: 'api_submission_list_unresolved',
         methods: ['GET'],
         documentation: 'Retrieves all unresolved submissions in the given season',
         responses: [
