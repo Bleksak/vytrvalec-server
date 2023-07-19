@@ -8,19 +8,14 @@
 import { registerReactControllerComponents } from '@symfony/ux-react';
 
 // any CSS you import will output into a single css file (app.css in this case)
-const $ = require('jquery');
+// const $ = require('jquery');
 
-import './styles/global.scss';
-const bootstrap = require('bootstrap');
-
-import './styles/app.css';
-
-let gdpr = document.getElementById("gdpr");
-if (gdpr != undefined) {
-    let tooltip = new bootstrap.Tooltip(gdpr, { animation: true })
-}
+// const bootstrap = require('bootstrap');
 
 
 // start the Stimulus application
-registerReactControllerComponents(require.context('./react', true, /\.(j|t)sx?$/))
+registerReactControllerComponents(require.context('./react', true, /\.tsx?$/))
 import './bootstrap';
+
+import './styles/global.scss';
+import './styles/app.css';
