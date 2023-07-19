@@ -2,7 +2,7 @@ import axios from "axios";
 
 //TODO error handling 
 //TODO response types
-export const getUserData = async (id: number | null) => {
+export const getUserData = async (id: string) => {
     if (!id) return null;
 
     return axios.get(`/api/user/profile/${id}`).then(

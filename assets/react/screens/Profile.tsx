@@ -5,19 +5,22 @@ import { Button, Modal, Image, Col, Row, Stack } from 'react-bootstrap';
 import { MdCheck, MdClose, MdQuestionMark, MdSettings } from "react-icons/md";
 import { User } from "../types";
 import Submission from "../types/Submission";
+import useAuth from "../useAuth";
 
 const Profile = () => {
     const { userId } = useParams();
-    const [user, setUser] = useState<User | null>(null);
+    // const [user, setUser] = useState<User | null>(null);
     const [submissions, setSubmissions] = useState<Submission[][] | null>(null);
     const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
     const [stats, setStats] = useState<{ bikeKm: number, walkKm: number } | null>(null);
+    const { user } = useAuth();
 
-    const id = userId === undefined ? null : Number.parseInt(userId);
+
+    const id = userId === undefined ? "" : userId;
 
 
     useEffect(() => {
-        getUserData(id).then(setUser);
+        // getUserData(id).then(setUser); //userId je null
         getUserSubmissions(1).then((subs) => {
             let splitted: Submission[][] = [];
             let tree: Submission[] = [] // yes strom
@@ -25,11 +28,13 @@ const Profile = () => {
             let bikeKm = 0;
             let walkKm = 0;
 
-            subs.forEach((sub: Submission) => {
+            subs.forEach((sub: Submission, index: number) => {
                 tree.push(sub);
                 if (tree.length == 3) {
                     splitted.push(tree);
                     tree = []
+                } else if (index == subs.length - 1) {
+                    splitted.push(tree);
                 }
 
                 if (sub.activity.name === 'Běh/Chůze') {
@@ -47,11 +52,12 @@ const Profile = () => {
 
     const handleSelectSubmission = (id: number | null) => {
         if (!id) setSelectedSubmission(null);
-        const selected = submissions?.forEach((subs: Submission[]) => {
-            const found = subs.find(sub => sub.id === id);
-            if (found) return found;
+        let found = null;
+        submissions?.forEach((subs: Submission[]) => {
+            const f = subs.find(sub => sub.id === id);
+            if (f) { found = f; return };
         });
-        if (selected) setSelectedSubmission(selected);
+        if (found) setSelectedSubmission(found);
     }
 
     const renderIcon = () => {
@@ -61,17 +67,20 @@ const Profile = () => {
         return selectedSubmission!.accepted ? <MdCheck /> : <MdClose />;
     }
 
+
     return (
         <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}>
             <div style={{ width: '70%' }}>
                 {user &&
                     <>
                         <Row style={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}>
+                            {/* @ts-ignore */}
                             <span>{user.firstName} {user.lastName} <MdSettings style={{ marginLeft: '2%' }} /></span>
                         </Row >
                         <Row>
+                            {/* @ts-ignore */}
                             <Col> <span>{user.faculty.name}</span></Col>
-
+                            {/* @ts-ignore */}
                             <Col><span>{user.email} </span></Col>
                             {stats && <>
                                 <Col><span>{stats.bikeKm} km</span></Col>
@@ -84,28 +93,18 @@ const Profile = () => {
 
                 }
 
+                {submissions?.map((subs: Submission[], index: number) => {
+                    return (
+                        <Stack key={index} direction='horizontal' gap={0} style={{ width: 'max-content' }}>
+                            {subs.map(sub => (
+                                <Button key={sub.id} variant="primary" onClick={() => handleSelectSubmission(sub.id)}>
+                                    {new Date(sub.date).toDateString()}
+                                </Button>
+                            ))}
+                        </Stack>
 
-                {/* {submissions.map((sub, index) => {
-                        // <Stack direction='horizontal' gap={0} style={{ width: 'max-content' }}>
-                        // </Stack>
-
-                        // <Col sm={4}>
-                        // <Image src={sub.image} rounded className="img-fluid" width={200} />
-                        // </Col>
-                        const renderStack = ((index + 1) % 3) == 0;
-                        console.log('renderStack', renderStack);
-                        return (
-                            <>
-                                {renderStack && <Stack direction='horizontal' gap={0} style={{ width: 'max-content' }}>}
-                                    <Button key={sub.id} variant="primary" onClick={() => handleSelectSubmission(sub.id)}>
-                                        {new Date(sub.date).toDateString('cs-CZ')}
-                                    </Button>
-                                    {renderStack && </Stack>}
-                            </>
-                        )
-
-                    }
-                    )} */}
+                    )
+                })}
 
                 {selectedSubmission &&
                     <Modal

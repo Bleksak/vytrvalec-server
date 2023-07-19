@@ -25,7 +25,7 @@ const Login = () => {
         }
     });
 
-    const formSubmit = (ev: any) => {
+    const formSubmit = (ev: { preventDefault: () => void; }) => {
         ev.preventDefault();
 
         const username = usernameRef.current.value;
