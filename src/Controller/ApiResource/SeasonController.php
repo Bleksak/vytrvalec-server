@@ -8,7 +8,7 @@ use App\Entity\Charity;
 use App\Entity\Season;
 use App\Repository\CharityRepository;
 use App\Repository\SeasonRepository;
-use App\Requests\SeasonCreateRequest;
+use App\Requests\SeasonRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -50,7 +50,7 @@ class SeasonController extends AbstractController
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function create(SeasonCreateRequest $request, CharityRepository $charityRepository): Response
+    public function create(SeasonRequest $request, CharityRepository $charityRepository): Response
     {
         $errors = $request->validate();
 
@@ -72,7 +72,7 @@ class SeasonController extends AbstractController
 
         $this->seasonRepository->save($season, true);
 
-        return $this->json([], Response::HTTP_CREATED);
+        return new Response(status: Response::HTTP_CREATED);
     }
 
     #[ApiRoute(

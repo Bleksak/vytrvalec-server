@@ -32,9 +32,17 @@ class Activity
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: Submission::class, orphanRemoval: true)]
     private Collection $submissions;
 
+    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: UserSummary::class)]
+    private Collection $userSummaries;
+
+    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: FacultySummary::class)]
+    private Collection $facultySummaries;
+
     public function __construct()
     {
         $this->submissions = new ArrayCollection();
+        $this->userSummaries = new ArrayCollection();
+        $this->facultySummaries = new ArrayCollection();
     }
     
     public function getId(): ?int
@@ -102,6 +110,66 @@ class Activity
             // set the owning side to null (unless already changed)
             if ($submission->getActivity() === $this) {
                 $submission->setActivity(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserSummary>
+     */
+    public function getUserSummaries(): Collection
+    {
+        return $this->userSummaries;
+    }
+
+    public function addUserSummary(UserSummary $userSummary): static
+    {
+        if (!$this->userSummaries->contains($userSummary)) {
+            $this->userSummaries->add($userSummary);
+            $userSummary->setActivity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserSummary(UserSummary $userSummary): static
+    {
+        if ($this->userSummaries->removeElement($userSummary)) {
+            // set the owning side to null (unless already changed)
+            if ($userSummary->getActivity() === $this) {
+                $userSummary->setActivity(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FacultySummary>
+     */
+    public function getFacultySummaries(): Collection
+    {
+        return $this->facultySummaries;
+    }
+
+    public function addFacultySummary(FacultySummary $facultySummary): static
+    {
+        if (!$this->facultySummaries->contains($facultySummary)) {
+            $this->facultySummaries->add($facultySummary);
+            $facultySummary->setActivity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFacultySummary(FacultySummary $facultySummary): static
+    {
+        if ($this->facultySummaries->removeElement($facultySummary)) {
+            // set the owning side to null (unless already changed)
+            if ($facultySummary->getActivity() === $this) {
+                $facultySummary->setActivity(null);
             }
         }
 

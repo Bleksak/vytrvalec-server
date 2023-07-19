@@ -15,7 +15,6 @@ const Registration = () => {
     const [, setTooltip] = useState<any>(null);
 
     const gdpr: any = useRef(null);
-
     const emailRef: any = useRef();
     const passwordRef: any = useRef();
     const password2Ref: any = useRef();
@@ -44,7 +43,7 @@ const Registration = () => {
         }
     }, [gdpr]);
 
-    const submit = (ev: any) => {
+    const submit = (ev: { preventDefault: () => void; }) => {
 
         if (!gdpr.current.checked) {
             // TODO: gdpr unchecked error

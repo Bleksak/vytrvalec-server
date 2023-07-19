@@ -52,7 +52,7 @@ export const registerUser = (data: any) => { //TODO
             return res.data;
         }, err => console.log('err', err)
 
-    )
+    );
 }
 
 export const toggleBan = async (id: number) => {
@@ -67,7 +67,7 @@ export const toggleBan = async (id: number) => {
             return res.data;
         },
         err => console.log('err', err)
-    )
+    );
 
 }
 
@@ -82,7 +82,7 @@ export const toggleAdmin = async (id: number) => {
             console.log('res', res);
             return res.data;
         }, err => console.log('err', err)
-    )
+    );
 }
 
 export const getAllUsers = () => {
@@ -92,7 +92,7 @@ export const getAllUsers = () => {
             return res.data;
         },
         err => console.log('err', err)
-    )
+    );
 }
 
 export const isAuthenticated = () => {
@@ -102,5 +102,15 @@ export const isAuthenticated = () => {
             return res.data;
         },
         err => console.log('err', err)
-    )
+    );
+}
+
+export const getUserCount = async () => {
+    return axios.get('/api/user/count').then(
+        res => {
+            console.log('res', res);
+            return res.data;
+        },
+        err => console.log('err', err)
+    );
 }

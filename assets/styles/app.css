@@ -3,6 +3,12 @@
     src: url(../fonts/CenturyGothic.ttf);
 }
 
+* {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 ul, li {
     list-style: none;
 }
@@ -337,12 +343,46 @@ h1 {
     }
 }
 
+.about-challenge {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+
+.about-challenge-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 40px;
+
+    font-size: 1.1em;
+    text-align: justify;
+}
+
+.about-challenge h2 {
+    max-width: 500px;
+}
+
+.about-challenge-container p {
+    width: 50%;
+}
+
+.summary {
+
+}
+
 .about {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    width: 100%;
     padding-top: 2%;
     padding-bottom: 2%;
     /* padding: 3%; */
-    font-size: 1em;
-    text-align: justify;
 }
 
 .about .col {
@@ -616,42 +656,153 @@ u {
 }
 
 .seasonManagement {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    /*align-items: center;*/
+    /*align-items: start;*/
+    gap: 20px;
+}
+
+.seasonManagementLeft {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    /*align-items: center;*/
+    align-items: start;
     gap: 20px;
 }
 
 .seasonList {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    /*align-items: center;*/
     justify-content: center;
     gap: 2px;
     
     width: 100%;
-    max-width: 300px;
+    max-width: 200px;
+    height: 100%;
 }
 
 .seasonList ul {
     width: 100%;
 }
 
-
 .seasonListItem {
     display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
     height: 50px;
-    border: 1px solid black;
     width: 100%;
 }
 
-.seasonListItemBox {
-    background-color: red;
+.seasonForm {
+    width: 100%;
+    max-width: 300px;
 }
 
+.container-season-management {
+    display: flex;
+    justify-content: space-between;
+}
+
+.column {
+    flex: 1;
+    margin: 10px;
+}
+
+.menu-column {
+    display: flex;
+    align-items: center;
+}
+
+.menu-list {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+}
+
+.menu-list li {
+    margin-bottom: 10px;
+}
+
+.form-column form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-column label {
+    margin-top: 10px;
+}
+
+.form-column input[type="text"],
+.form-column textarea {
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.form-column button[type="submit"] {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background-color: #3cb371;
+    color: #fff;
+}
+
+.tinder-column {
+    display: flex;
+    justify-content: center;
+}
+
+.profile-card {
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.profile-fields {
+    margin-top: 10px;
+}
+
+.field {
+    margin-bottom: 5px;
+}
+
+.field label {
+    font-weight: bold;
+}
+
+.profile-buttons {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.reject-button,
+.approve-button {
+    padding: 8px 16px;
+    margin: 5px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.reject-button {
+    background-color: #ff4f4f;
+    color: #fff;
+}
 
 @media (min-width: 75em){
     .seasonManagement {

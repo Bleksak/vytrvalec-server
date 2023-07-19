@@ -62,32 +62,30 @@ const Profile = () => {
     }
 
     return (
-        <>
+        <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '70%' }}>
+                {user &&
+                    <>
+                        <Row style={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}>
+                            <span>{user.firstName} {user.lastName} <MdSettings style={{ marginLeft: '2%' }} /></span>
+                        </Row >
+                        <Row>
+                            <Col> <span>{user.faculty.name}</span></Col>
 
-            <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}>
-                <div style={{ width: '70%' }}>
-                    {user &&
-                        <>
-                            <Row style={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}>
-                                <span>{user.firstName} {user.lastName} <MdSettings style={{ marginLeft: '2%' }} /></span>
-                            </Row >
-                            <Row>
-                                <Col> <span>{user.faculty.name}</span></Col>
+                            <Col><span>{user.email} </span></Col>
+                            {stats && <>
+                                <Col><span>{stats.bikeKm} km</span></Col>
+                                <Col><span>{stats.walkKm} km</span></Col>
+                            </>}
 
-                                <Col><span>{user.email} </span></Col>
-                                {stats && <>
-                                    <Col><span>{stats.bikeKm} km</span></Col>
-                                    <Col><span>{stats.walkKm} km</span></Col>
-                                </>}
+                        </Row>
+                        <hr className="hr-text" style={{ height: '1px' }} />
+                    </>
 
-                            </Row>
-                            <hr className="hr-text" style={{ height: '1px' }} />
-                        </>
-
-                    }
+                }
 
 
-                    {/* {submissions.map((sub, index) => {
+                {/* {submissions.map((sub, index) => {
                         // <Stack direction='horizontal' gap={0} style={{ width: 'max-content' }}>
                         // </Stack>
 
@@ -109,43 +107,42 @@ const Profile = () => {
                     }
                     )} */}
 
-                    {selectedSubmission &&
-                        <Modal
-                            show={selectedSubmission != null}
-                            onHide={() => setSelectedSubmission(null)}
-                            backdrop="static"
-                            keyboard={false}
-                        >
+                {selectedSubmission &&
+                    <Modal
+                        show={selectedSubmission != null}
+                        onHide={() => setSelectedSubmission(null)}
+                        backdrop="static"
+                        keyboard={false}
+                    >
 
-                            <Modal.Body style={{ padding: 0 }}>
-                                <div className="container" style={{ padding: 0 }}>
-                                    <Row>
-                                        <Col sm style={{ padding: 0 }}>
-                                            <Image src={selectedSubmission.image} rounded />
-                                        </Col>
-                                        <Col sm> {/* FIXME */}
-                                            <Row>
-                                                <Col sm>
-                                                    <h5>{selectedSubmission.activity.name}</h5>
-                                                </Col>
-                                                <Col sm>
-                                                    <MdClose onClick={() => handleSelectSubmission(null)} />
-                                                </Col>
-                                            </Row>
-                                            <p>Date: {new Date(selectedSubmission.date).toDateString()}</p>
-                                            <p>Status: {renderIcon()}</p> {/* TODO trans */}
-                                            <p>Distance: {selectedSubmission.distance} km</p>
-                                            <p>Elevation: {selectedSubmission.elevation} m</p>
-                                            {selectedSubmission.comment && <p>Comment: {selectedSubmission.comment}</p>}
-                                        </Col>
-                                    </Row>
-                                </div>
-                            </Modal.Body>
-                        </Modal>
-                    }
-                </div >
-            </div>
-        </>
+                        <Modal.Body style={{ padding: 0 }}>
+                            <div className="container" style={{ padding: 0 }}>
+                                <Row>
+                                    <Col sm style={{ padding: 0 }}>
+                                        <Image src={selectedSubmission.image} rounded />
+                                    </Col>
+                                    <Col sm> {/* FIXME */}
+                                        <Row>
+                                            <Col sm>
+                                                <h5>{selectedSubmission.activity.name}</h5>
+                                            </Col>
+                                            <Col sm>
+                                                <MdClose onClick={() => handleSelectSubmission(null)} />
+                                            </Col>
+                                        </Row>
+                                        <p>Date: {new Date(selectedSubmission.date).toDateString()}</p>
+                                        <p>Status: {renderIcon()}</p> {/* TODO trans */}
+                                        <p>Distance: {selectedSubmission.distance} km</p>
+                                        <p>Elevation: {selectedSubmission.elevation} m</p>
+                                        {selectedSubmission.comment && <p>Comment: {selectedSubmission.comment}</p>}
+                                    </Col>
+                                </Row>
+                            </div>
+                        </Modal.Body>
+                    </Modal>
+                }
+            </div >
+        </div>
     )
 }
 

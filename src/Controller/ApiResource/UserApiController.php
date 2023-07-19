@@ -21,7 +21,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[ApiResource(resourceName: 'User')]
-class UserApiController extends AbstractController {
+class UserApiController extends AbstractController
+{
+    public function __construct(private readonly SerializerInterface $serializer, private readonly UserRepository $userRepository)
+    {
+    }
+
     #[ApiRoute(
         '/api/unused/login',
         methods: ['POST'],
@@ -55,7 +60,8 @@ class UserApiController extends AbstractController {
         fakeName: 'api_user_login',
         fakePath: '/api/user/login',
     )]
-    public function login(): Response {
+    public function login(): Response
+    {
         return $this->json([]);
     }
 
@@ -75,26 +81,9 @@ class UserApiController extends AbstractController {
         fakeName: 'api_user_logout',
         fakePath: '/api/user/logout',
     )]
-    public function logout(): Response {
+    public function logout(): Response
+    {
         return new Response(status: Response::HTTP_OK);
-    }
-
-    public function __construct(private readonly SerializerInterface $serializer, private readonly UserRepository $userRepository)
-    {
-    }
-
-    #[Route('/api/user/submissions/{user}', name: 'api_user_submissions', methods: ['GET'])]
-    public function userSubmissions(#[CurrentUser] User $currentUser, User $user = null): Response
-    {
-        if($user === null || ($user !== $currentUser && $currentUser->hasRole('ROLE_STAFF'))) {
-            $user = $currentUser;
-        }
-
-        $filtered = $this->serializer->normalize($user->getSubmissions(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
-        ]);
-
-        return $this->json($filtered);
     }
 
     #[ApiRoute(
@@ -120,7 +109,7 @@ class UserApiController extends AbstractController {
     )]
     public function register(RegistrationRequest $request, EntityManagerInterface $em, ValidatorInterface $validator, UserPasswordHasherInterface $hasher, UserInterface $userInterface = null): Response
     {
-        if($this->isGranted('ROLE_USER')) {
+        if ($this->isGranted('ROLE_USER')) {
             return $this->json([
                 // TODO: message
                 ['TODO: nelze registrovat protoze uz je prihlasenej']
@@ -129,7 +118,7 @@ class UserApiController extends AbstractController {
 
         $messages = $request->validate();
 
-        if(count($messages) != 0) {
+        if (count($messages) != 0) {
             return $this->json($messages, Response::HTTP_BAD_REQUEST);
         }
 
@@ -142,9 +131,9 @@ class UserApiController extends AbstractController {
         $user->setLastName($request->getLastName());
 
         $constraints = $validator->validate($user);
-        if(count($constraints) != 0) {
+        if (count($constraints) != 0) {
             $messages = [];
-            foreach($constraints as $constraint) {
+            foreach ($constraints as $constraint) {
                 $messages[] = $constraint->getMessage();
             }
 
@@ -155,6 +144,55 @@ class UserApiController extends AbstractController {
         $em->flush();
 
         return new Response(status: Response::HTTP_CREATED);
+    }
+
+    #[ApiRoute(
+        '/api/user/count',
+        name: 'api_user_count',
+        methods: ['GET'],
+        documentation: 'Retrieve count of <code>User</code> entities',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Retrieved count of User entities',
+                'response' => ['integer']
+            ],
+        ]
+    )]
+    public function userCount(): Response
+    {
+        return $this->json($this->userRepository->count(['banned'=>false]));
+    }
+
+    #[ApiRoute(
+        '/api/user/list',
+        name: 'api_user_list',
+        methods: ['GET'],
+        documentation: 'Retrieve all <code>User</code> entities',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieved all User entities',
+                'response' => [
+                    [
+                        'id' => 'integer',
+                        'email' => 'string',
+                        'roles' => ['ROLE_USER', 'ROLE_STAFF'],
+                        'faculty' => [
+                            'id' => 'integer',
+                            'name' => 'string',
+                            'shortcut' => 'string',
+                        ]
+                    ]
+                ]
+            ],
+            Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
+        ],
+    )]
+    #[IsGranted('ROLE_STAFF')]
+    public function userList(): Response
+    {
+        return $this->json($this->serializer->normalize($this->userRepository->findAll(), null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
+        ]));
     }
 
     #[ApiRoute(
@@ -213,7 +251,7 @@ class UserApiController extends AbstractController {
     )]
     public function userData(#[CurrentUser] User $currentUser, User $user = null): Response
     {
-        if(!$this->isGranted('ROLE_STAFF')) {
+        if (!$this->isGranted('ROLE_STAFF')) {
             $user = $currentUser;
         }
 

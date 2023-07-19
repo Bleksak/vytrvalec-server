@@ -22,10 +22,17 @@ class UserSummary
     private ?Season $season = null;
 
     #[ORM\Column]
-    private ?int $distance = null;
+    private ?int $distance = 0;
 
     #[ORM\Column]
-    private ?int $elevation = null;
+    private ?int $elevation = 0;
+
+    #[ORM\Column]
+    private ?int $week = null;
+
+    #[ORM\ManyToOne(inversedBy: 'userSummaries')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Activity $activity = null;
 
     public function getId(): ?int
     {
@@ -76,6 +83,30 @@ class UserSummary
     public function setElevation(int $elevation): self
     {
         $this->elevation = $elevation;
+
+        return $this;
+    }
+
+    public function getWeek(): ?int
+    {
+        return $this->week;
+    }
+
+    public function setWeek(int $week): static
+    {
+        $this->week = $week;
+
+        return $this;
+    }
+
+    public function getActivity(): ?Activity
+    {
+        return $this->activity;
+    }
+
+    public function setActivity(?Activity $activity): static
+    {
+        $this->activity = $activity;
 
         return $this;
     }

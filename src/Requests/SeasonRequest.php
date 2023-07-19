@@ -4,22 +4,21 @@ namespace App\Requests;
 
 use DateTimeImmutable;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
-class SeasonCreateRequest extends BaseRequest
+class SeasonRequest extends BaseRequest
 {
-    #[NotNull(message: 'blank')]
+    #[NotBlank(message: 'blank', allowNull: true)]
     protected ?DateTimeImmutable $start = null;
 
     #[NotBlank(message: 'blank', allowNull: true)]
     protected ?DateTimeImmutable $end = null;
 
-    #[NotBlank(message: 'blank')]
+    #[NotBlank(message: 'blank', allowNull: true)]
     protected ?string $charityName = null;
 
-    #[NotBlank(message: 'blank')]
+    #[NotBlank(message: 'blank', allowNull: true)]
     protected ?string $charityDescription = null;
 
     public function getCharityName(): ?string
