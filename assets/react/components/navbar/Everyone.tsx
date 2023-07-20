@@ -1,18 +1,23 @@
 import { useTranslation } from "react-i18next";
 import React from "react";
 import { Link } from "react-router-dom";
+import {Nav} from "react-bootstrap";
 
 const Everyone = () => {
     const [t, _] = useTranslation();
 
     return <>
-        <li className="nav-item">
-            <Link className="nav-link" to='/rules'>{t('rules')}</Link>
-        </li>
+        <Nav.Item>
+            <Nav.Link as={Link} to='/rules'>
+                {t('rules')}
+            </Nav.Link>
+        </Nav.Item>
 
-        <li className="nav-item">
-            <Link className="nav-link" to='/results'>{t('navbar_results')}</Link>
-        </li>
+        <Nav.Item>
+            <Nav.Link as={Link} to='/results'>
+                {t('navbar_results')}
+            </Nav.Link>
+        </Nav.Item>
     </>
 }
 export default Everyone;

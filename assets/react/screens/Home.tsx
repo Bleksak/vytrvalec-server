@@ -9,6 +9,7 @@ export default function Home() {
 
     return <>
         <Logo/>
+        <div className='gradient'>
         <EventSummary/>
         <Carousel indicators={false} interval={null}>
             <Carousel.Item>
@@ -43,6 +44,7 @@ export default function Home() {
                 </div>
             </Carousel.Item>
         </Carousel>
+        </div>
     </>
 }
 
@@ -79,14 +81,15 @@ function EventSummary() {
                 <p>{t('challenge_description_right')}</p>
             </div>
 
+
+        </div>
+
+
+        <div className='summary'>
             <div className='summary-item'>
                 <h3><b>{ participants }</b></h3>
                 {t('participants')}
             </div>
-
-        </div>
-
-        <div className='summary'>
 
             { Object.keys(summary).map((activity) =>
                 <div className='summary-item' key={activity}>

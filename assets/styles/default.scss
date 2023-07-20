@@ -1,0 +1,61 @@
+@use "sass:math";
+
+$base-color: #f1f8ff;
+
+@function lerp($a, $b, $t) {
+  @return $a + ($b - $a) * $t;
+}
+
+@font-face {
+  font-family: centuryGothic;
+  src: url('../fonts/CenturyGothic.ttf');
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+ul, li {
+  list-style: none;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'centuryGothic', serif;
+  overflow-y: scroll;
+
+  display: flex;
+  flex-direction: column;
+  background-color: $base-color;
+}
+
+a, a:hover, a:visited {
+  text-decoration: none;
+}
+
+p {
+  text-align: justify;
+}
+
+u {
+  color: #78c1ff;
+  font-weight: bold;
+}
+
+// h1-h6:
+$h1-font-size: 2.2;
+$h6-font-size: 1.2;
+@for $i from 1 through 6 {
+  h#{$i} {
+    font-size: lerp($h1-font-size, $h6-font-size, math.div($i - 1, 5)) + em;
+  }
+}
+
+h3 {
+  color: #1650a3ff;
+}

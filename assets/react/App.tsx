@@ -6,13 +6,14 @@ import _ from './i8n'
 import Navigation from './Navigation'
 import { AuthProvider } from './useAuth';
 import Footer from './components/Footer';
+import CustomNavbar from "./components/navbar/Navbar";
 
 const App = (props: any) => {
     return (
         <BrowserRouter>
             <AuthProvider>
                 <div className="container">
-                    <Navbar />
+                    <CustomNavbar />
                     <Navigation {...props} />
                 </div>
                 <Footer />
