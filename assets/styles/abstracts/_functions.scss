@@ -1,6 +1,2 @@
 @charset "utf-8";
 
-/// Linear interpolation
-@function lerp($a, $b, $t) {
-  @return $a + ($b - $a) * $t;
-}

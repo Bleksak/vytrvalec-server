@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import React from "react";
+import {BsFacebook, BsInstagram} from "react-icons/bs";
 
 const Footer = () => {
     const [t, _] = useTranslation();
@@ -10,11 +11,11 @@ const Footer = () => {
 
         <div>
             <a href="https://www.facebook.com/KatedraTelesneVychovyASportuZcuVPlzni">
-                <i className="fa-brands fa-facebook fa-2xl icon px-2"></i>
+                <BsFacebook size={40} className='px-2'/>
                 Facebook
             </a>
             <a href="https://www.instagram.com/kts.zcu/">
-                <i className="fa-brands fa-instagram-square fa-2xl icon px-2"></i>
+                <BsInstagram size={40} className='px-2'/>
                 Instagram
             </a>
         </div>

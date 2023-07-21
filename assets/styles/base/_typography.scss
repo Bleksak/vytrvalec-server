@@ -9,17 +9,17 @@
   src: url('../../fonts/CenturyGothic.ttf');
 }
 
-@for $i from 1 through length(variables.$h-font-sizes) {
-  h#{$i} {
-    font-size: nth(variables.$h-font-sizes, $i);
-    color: nth(variables.$h-font-colors, $i);
-  }
-}
-
 body {
   font-family: 'centuryGothic', serif;
 }
 
 p {
   text-align: justify;
+}
+
+@for $i from 1 through length(variables.$h-font-sizes) {
+  h#{$i} {
+    font-size: nth(variables.$h-font-sizes, $i);
+    color: nth(variables.$h-font-colors, $i);
+  }
 }
