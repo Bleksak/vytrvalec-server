@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { Carousel } from "react-bootstrap";
+import { FaCrown } from "react-icons/fa6";
 
 export default function Home() {
 
@@ -16,9 +17,16 @@ export default function Home() {
 					<h2><strong>April 2023: 5 letý Nicolas</strong></h2>
 					<div className='carousel-inside-item'>
 						<div className='carousel-row'>
-							<p><i className="fa-solid fa-crown gold mx-2"></i><strong>1. </strong>Fakulta A</p>
-							<p><i className="fa-solid fa-crown silver mx-2"></i><strong>2. </strong>Fakulta B</p>
-							<p><i className="fa-solid fa-crown bronze mx-2"></i><strong>3. </strong>Fakulta C</p>
+							<p>
+								<FaCrown size={25} color='gold' className='mx-2' />
+								<strong>1. </strong>Fakulta A</p>
+							<p>
+								<FaCrown size={25} color='silver' className='mx-2' />
+								<strong>2. </strong>Fakulta B</p>
+							<p>
+								<FaCrown size={25} color='brown' className='mx-2' />
+								<strong>3. </strong>Fakulta C
+							</p>
 						</div>
 						<div className='carousel-row'>
 							<p>
@@ -32,9 +40,16 @@ export default function Home() {
 					<h2><strong>April 2023: 5 letý Nicolas</strong></h2>
 					<div className='carousel-inside-item'>
 						<div className='carousel-row'>
-							<p><i className="fa-solid fa-crown gold mx-2"></i><strong>1. </strong>Fakulta A</p>
-							<p><i className="fa-solid fa-crown silver mx-2"></i><strong>2. </strong>Fakulta B</p>
-							<p><i className="fa-solid fa-crown bronze mx-2"></i><strong>3. </strong>Fakulta C</p>
+							<p>
+								<FaCrown size={25} color='gold' className='mx-2' />
+								<strong>1. </strong>Fakulta A</p>
+							<p>
+								<FaCrown size={25} color='silver' className='mx-2' />
+								<strong>2. </strong>Fakulta B</p>
+							<p>
+								<FaCrown size={25} color='brown' className='mx-2' />
+								<strong>3. </strong>Fakulta C
+							</p>
 						</div>
 						<div className='carousel-row'>
 							<p>
@@ -52,12 +67,12 @@ function Logo() {
 	const [t, _] = useTranslation();
 
 	return <>
-		<div className="main">
-			<div className="col title">
+		<header>
+			<div>
 				<h1>{t('title').toUpperCase()}</h1>
 				<h2>{t('join_us')}</h2>
 			</div>
-		</div>
+		</header>
 	</>
 }
 

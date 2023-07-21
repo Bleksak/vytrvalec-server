@@ -19,7 +19,6 @@
         "js-yaml": "^4.1.0",
         "regenerator-runtime": "^0.13.9",
         "ts-loader": "^9.4.4",
-        "ts-yaml": "^1.0.0",
         "typescript": "^5.1.6",
         "webpack": "^5.74.0",
         "webpack-cli": "^4.10.0",

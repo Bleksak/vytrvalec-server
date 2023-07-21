@@ -1,1 +1,47 @@
 @charset "utf-8";
+
+header {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  padding: 15% 0;
+  background: linear-gradient( rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4) ), url('../../images/cyclist2.png') no-repeat center;
+
+  & h1 {
+    font-size: 6rem;
+  }
+
+  & h1,
+  & h2 {
+    color: white;
+    animation: 1.5s lineUp ease-out;
+  }
+
+  & div {
+    text-align: right;
+  }
+}
+
+@keyframes lineUp {
+  0% {
+    opacity: 0;
+    transform: translateY(80%);
+  }
+
+  20% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
