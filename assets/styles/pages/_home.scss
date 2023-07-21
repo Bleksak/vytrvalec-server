@@ -37,15 +37,6 @@ p {
   color: brown;
 }
 
-.fa-check {
-  color: green;
-}
-
-.fa-xmark,
-.fa-exclamation {
-  color: red;
-}
-
 .white {
   color: white;
 }
@@ -113,122 +104,7 @@ p {
   }
 }
 
-/* ------------ FOOTER ----------------*/
-footer {
-  background-color: #404040ff;
-  color: white;
-  padding: 1%;
-  /*flex-shrink: 0;*/
-}
-
-footer a {
-  color: white;
-}
-
-footer a:hover {
-  color: #78c1ffff;
-}
-
-footer span {
-  color: #4d4d4d;
-  position: relative;
-  bottom: 15px;
-}
-
-footer .row {
-  margin-bottom: 1%;
-}
-
-.icon {
-  margin-left: 1%;
-}
-
-/*-----------------REGISTER----------------------*/
-
-.google {
-  background-color: #e13f2aff;
-  color: white;
-  font-weight: bold;
-  margin: 2%;
-}
-
-.google svg {
-  margin-right: 0.5em;
-}
-
-.middle {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  padding: 0;
-}
-
-
-.register {
-  background: linear-gradient( rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4) ), url(../../images/cyclist.png) no-repeat center;
-  /* background: url("../images/cyclist.png") no-repeat center; */
-  padding: 8% 25%;
-  color: white;
-}
-
-@media only screen and (max-width: 1400px) {
-  .register {
-    padding: 8% 15%;
-  }
-}
-
-.errorlist {
-  color:red;
-  font-weight: bold;
-}
-
-.errorlist li {
-  padding: 0;
-  margin: 0;
-}
-
-
 /*---------------- HOME ----------------------*/
-.main {
-  background: linear-gradient( rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4) ), url(../../images/cyclist2.png) no-repeat center;
-  text-align: center;
-}
-
-.title {
-  margin: 15% 0;
-  display: inline-block;
-  text-align: right;
-}
-
-.main h1 {
-  font-size: 6rem;
-}
-
-.main h1,
-.main h2 {
-  color: white;
-  animation: 1.5s lineUp ease-out;
-}
-
-@keyframes lineUp {
-  0% {
-    opacity: 0;
-    transform: translateY(80%);
-  }
-
-  20% {
-    opacity: 0;
-  }
-
-  50% {
-    opacity: 1;
-    transform: translateY(0%);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0%);
-  }
-}
 
 .gradient {
   background: linear-gradient(to bottom, #e4f2ff, #f1f8ff);
@@ -390,56 +266,4 @@ table .btn {
   }
 }
 
-.carousel {
-  padding-top: 50px;
-  margin-bottom: 50px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-  height: 600px;
-}
-
-.carousel-item {
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  text-align: center;
-  height: 100%;
-}
-
-.carousel-inside-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  width: 100%;
-  margin-top: 20px;
-}
-
-.carousel-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: justify;
-  max-width: 50%;
-  min-width: 15%;
-}
-
-.carousel-row:first-child {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-@media (min-width: 70em) {
-  .carousel {
-    height: 260px;
-  }
-
-  .carousel-inside-item {
-    flex-direction: row;
-    //align-items: baseline;
-  }
-}
 
