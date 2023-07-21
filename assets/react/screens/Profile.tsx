@@ -1,26 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getUserData, getUserSubmissions } from "../api/UserApi";
-import { Button, Modal, Image, Col, Row, Stack } from 'react-bootstrap';
+import { Button, Modal, Image, Col, Row, Stack, Dropdown } from 'react-bootstrap';
 import { MdCheck, MdClose, MdQuestionMark, MdSettings } from "react-icons/md";
 import { User } from "../types";
 import Submission from "../types/Submission";
 import useAuth from "../useAuth";
+import SubmissionModal from "../components/user/SubmissionModal";
 
 const Profile = () => {
-    const { userId } = useParams();
-    // const [user, setUser] = useState<User | null>(null);
     const [submissions, setSubmissions] = useState<Submission[][] | null>(null);
     const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
     const [stats, setStats] = useState<{ bikeKm: number, walkKm: number } | null>(null);
     const { user } = useAuth();
 
 
-    const id = userId === undefined ? "" : userId;
-
-
     useEffect(() => {
-        // getUserData(id).then(setUser); //userId je null
         getUserSubmissions(1).then((subs) => {
             let splitted: Submission[][] = [];
             let tree: Submission[] = [] // yes strom
@@ -30,7 +25,7 @@ const Profile = () => {
 
             subs.forEach((sub: Submission, index: number) => {
                 tree.push(sub);
-                if (tree.length == 3) {
+                if (tree.length == 4) {
                     splitted.push(tree);
                     tree = []
                 } else if (index == subs.length - 1) {
@@ -60,88 +55,60 @@ const Profile = () => {
         if (found) setSelectedSubmission(found);
     }
 
-    const renderIcon = () => {
-        if (!selectedSubmission!.reviewed) {
-            return <MdQuestionMark />;
-        }
-        return selectedSubmission!.accepted ? <MdCheck /> : <MdClose />;
-    }
+
 
 
     return (
-        <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}>
-            <div style={{ width: '70%' }}>
+        <Row>
+            <Col className="col-lg-3">
                 {user &&
                     <>
                         <Row style={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}>
+                            <strong>Under construction</strong>
                             {/* @ts-ignore */}
                             <span>{user.firstName} {user.lastName} <MdSettings style={{ marginLeft: '2%' }} /></span>
                         </Row >
                         <Row>
+                            <strong>Faculty:</strong>
                             {/* @ts-ignore */}
-                            <Col> <span>{user.faculty.name}</span></Col>
-                            {/* @ts-ignore */}
-                            <Col><span>{user.email} </span></Col>
-                            {stats && <>
-                                <Col><span>{stats.bikeKm} km</span></Col>
-                                <Col><span>{stats.walkKm} km</span></Col>
-                            </>}
-
+                            <span>{user.faculty.name}</span>
                         </Row>
+                        <Row>
+                            <strong>Email:</strong>
+                            {/* @ts-ignore */}
+                            <span>{user.email} </span>
+                        </Row>
+
                         <hr className="hr-text" style={{ height: '1px' }} />
+
+                        {stats && <>
+                            <span>{stats.bikeKm} km</span>
+                            <span>{stats.walkKm} km</span>
+                        </>}
+
                     </>
 
                 }
+            </Col>
 
+            <Col >
                 {submissions?.map((subs: Submission[], index: number) => {
                     return (
-                        <Stack key={index} direction='horizontal' gap={0} style={{ width: 'max-content' }}>
+                        <Row key={index} style={{ margin: '1%', justifyContent: 'center' }}>
                             {subs.map(sub => (
-                                <Button key={sub.id} variant="primary" onClick={() => handleSelectSubmission(sub.id)}>
-                                    {new Date(sub.date).toDateString()}
-                                </Button>
+                                <Image key={sub.id} src={sub.image} className="img" rounded onClick={() => handleSelectSubmission(sub.id)} />
                             ))}
-                        </Stack>
+                        </Row>
 
                     )
                 })}
+            </Col>
 
-                {selectedSubmission &&
-                    <Modal
-                        show={selectedSubmission != null}
-                        onHide={() => setSelectedSubmission(null)}
-                        backdrop="static"
-                        keyboard={false}
-                    >
+            {selectedSubmission &&
+                <SubmissionModal submission={selectedSubmission} onClose={() => setSelectedSubmission(null)} />
+            }
 
-                        <Modal.Body style={{ padding: 0 }}>
-                            <div className="container" style={{ padding: 0 }}>
-                                <Row>
-                                    <Col sm style={{ padding: 0 }}>
-                                        <Image src={selectedSubmission.image} rounded />
-                                    </Col>
-                                    <Col sm> {/* FIXME */}
-                                        <Row>
-                                            <Col sm>
-                                                <h5>{selectedSubmission.activity.name}</h5>
-                                            </Col>
-                                            <Col sm>
-                                                <MdClose onClick={() => handleSelectSubmission(null)} />
-                                            </Col>
-                                        </Row>
-                                        <p>Date: {new Date(selectedSubmission.date).toDateString()}</p>
-                                        <p>Status: {renderIcon()}</p> {/* TODO trans */}
-                                        <p>Distance: {selectedSubmission.distance} km</p>
-                                        <p>Elevation: {selectedSubmission.elevation} m</p>
-                                        {selectedSubmission.comment && <p>Comment: {selectedSubmission.comment}</p>}
-                                    </Col>
-                                </Row>
-                            </div>
-                        </Modal.Body>
-                    </Modal>
-                }
-            </div >
-        </div>
+        </Row >
     )
 }
 

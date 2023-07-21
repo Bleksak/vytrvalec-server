@@ -11,3 +11,14 @@ export const uploadSubmission = async (data: UploadSubmissionData) => {
     );
 }
 
+//TODO
+export const deleteSubmission = async (id: number) => {
+    return axios.post('/api/submission/delete', id).then(
+        res => {
+            console.log('res', res);
+            return res.data;
+        },
+        err => console.log('err', err)
+    )
+}
+
