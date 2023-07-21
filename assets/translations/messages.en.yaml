@@ -33,7 +33,7 @@ previous_years: 'Results of previous years'
 # Rules page
 rules: 'Rules'
 rules_description: |
-  <p>Run, walk, bike, scooter, skate! Not only will you do something for your health, but you will contribute to a good cause! Km that contestants offend will be converted into crowns to contribute to charity.</p>
+  <p>Run, walk, bike, scooter, skate! Not only will you do something for your health, but you will contribute to a good cause! We will turn every 1 km into 1 crown, which we will donate to charity.</p>
   <p>We will evaluate the continuous number of kilometers covered and run by faculties and non-faculty departments after a week and each faculty or department has the opportunity to get points for the overall evaluation.</p>
 
 two_disciplines: 'The competition is conducted in two disciplines'
@@ -42,7 +42,6 @@ rule2: 'Record the physical activity via some mobile app on your phone and uploa
 
 rating: 'Rating'
 rating_description: 'Each week the number of kilometres covered in the given disciplines is evaluated. The first team gets e.g. 15 points (depending on the number of participating faculties and departments), the second 14 points, the third 13 points, etc. in each discipline. The overall winner of the Challenge will be the team that scores the most points over the 4 weeks in the sum of both disciplines.'
-
 extra_points: In weeks three and four, individuals can earn <strong>EXTRA POINTS</strong> for their faculty
 
 extra_point: 'EXTRA POINT'
@@ -110,6 +109,15 @@ season_running: 'Running'
 season_not_running: 'Not running'
 
 edit: 'Edit'
+
+# user management
+submission_create_title: 'Upload submission'
+activity: 'Activity'
+distance: 'Distance'
+elevation: 'Elevation'
+screenshot: 'Screenshot'
+upload: 'Upload'
+
 
 # msgid "season_start_label"
 # msgstr "Season start"

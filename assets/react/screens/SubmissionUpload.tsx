@@ -103,7 +103,7 @@ const SubmissionUpload = () => {
                     <input ref={imageRef} name="image" id="image" type="file" accept="image/*"
                         className="form-control mb-1" />
                     <div className="d-flex justify-content-center">
-                        <button className="btn btn-primary mt-2" type="submit">{t('submit')}</button>
+                        <button className="btn btn-primary mt-2" type="submit">{t('upload')}</button>
                     </div>
                 </form>
             </div>
