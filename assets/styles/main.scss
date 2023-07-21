@@ -1,33 +1,24 @@
-//@import "default";
-//@import "navbar";
-//@import "form";
-//@import "homepage";
-//@import "register";
-//@import "login";
-//@import "rules";
-//@import "profile";
-@import 'abstracts/variables';
-@import 'abstracts/functions';
-@import 'abstracts/mixins';
-@import 'abstracts/placeholders';
+@use 'abstracts/variables';
+@use 'abstracts/functions';
+@use 'abstracts/mixins';
+@use 'abstracts/placeholders';
 
-@import 'base/reset';
-@import 'base/typography';
+@use 'base/reset';
+@use 'base/typography';
 
-@import 'layout/navigation';
-@import 'layout/header';
-@import 'layout/footer';
-@import 'layout/forms';
+@use 'layout/navigation';
+@use 'layout/header';
+@use 'layout/footer';
+@use 'layout/forms';
 
-//@import 'components/buttons';
-@import 'components/carousel';
-//@import 'components/cover';
-//@import 'components/dropdown';
+//@use 'components/buttons';
+@use 'components/carousel';
+//@use 'components/cover';
+//@use 'components/dropdown';
 
-//@import 'pages/home';
-//@import 'pages/contact';
 
-@import 'themes/blue';
-@import 'themes/orange';
+@use 'pages/home';
+@use 'pages/profile';
 
-// TODO: remove imports, use @use
+@use 'themes/blue';
+@use 'themes/orange';
