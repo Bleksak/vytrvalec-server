@@ -8,4 +8,4 @@ registerReactControllerComponents(require.context('./react', true, /\.tsx?$/))
 import './bootstrap';
 
 import './styles/global.scss';
-import './styles/app.scss';
+import './styles/main.scss';
