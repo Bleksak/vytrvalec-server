@@ -22,7 +22,7 @@ const Alert = (props: AProps) => (
             </p>
             <hr />
             <div className="d-flex justify-content-end spa">
-                <Button onClick={props.onAccept} variant="outline-dark">
+                <Button onClick={props.onAccept} style={{ marginRight: '2%' }} variant="outline-dark">
                     Yes
                 </Button>
                 <Button onClick={props.onClose} variant="dark">

@@ -17,6 +17,7 @@ const AboutKTS = () => (
             </div>
         </div>
 
+        {/* TODO translation */}
         <p>Sledujte nás na sociálních sítích!</p>
 
         <div>
