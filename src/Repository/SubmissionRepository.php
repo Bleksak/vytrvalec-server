@@ -82,6 +82,11 @@ class SubmissionRepository extends ServiceEntityRepository
         return $query->execute();
     }
 
+    public function findAcceptedInSeason(Season $season): array
+    {
+        return $this->findBy(['season' => $season, 'accepted' => true], orderBy: ['date' => 'ASC']);
+    }
+
 //    /**
 //     * @return Submission[] Returns an array of Submission objects
 //     */

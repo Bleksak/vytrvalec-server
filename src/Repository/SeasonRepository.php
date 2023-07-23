@@ -2,8 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Activity;
+use App\Entity\Faculty;
 use App\Entity\Season;
 use App\Entity\Submission;
+use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Collection;

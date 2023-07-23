@@ -17,16 +17,18 @@ export default function Home() {
                 <h2><strong>April 2023: 5 letý Nicolas</strong></h2>
                 <div className='carousel-inside-item'>
                     <div className='carousel-row'>
-                        <p>
+                        <div>
                             <FaCrown size={25} color='gold' className='mx-2'/>
-                            <strong>1. </strong>Fakulta A</p>
-                        <p>
+                            <span><strong>1. </strong>Fakulta A</span>
+                        </div>
+                        <div>
                             <FaCrown size={25} color='silver' className='mx-2'/>
-                            <strong>2. </strong>Fakulta B</p>
-                        <p>
+                            <span><strong>2. </strong>Fakulta B</span>
+                        </div>
+                        <div>
                             <FaCrown size={25} color='brown' className='mx-2'/>
-                            <strong>3. </strong>Fakulta C
-                        </p>
+                            <span><strong>3. </strong>Fakulta C</span>
+                        </div>
                     </div>
                     <div className='carousel-row'>
                         <p>
@@ -40,16 +42,19 @@ export default function Home() {
                 <h2><strong>April 2023: 5 letý Nicolas</strong></h2>
                 <div className='carousel-inside-item'>
                     <div className='carousel-row'>
-                        <p>
+                        <div>
                             <FaCrown size={25} color='gold' className='mx-2'/>
-                            <strong>1. </strong>Fakulta A</p>
-                        <p>
+                            <span><strong>1. </strong>Fakulta A</span>
+                        </div>
+
+                        <div>
                             <FaCrown size={25} color='silver' className='mx-2'/>
-                            <strong>2. </strong>Fakulta B</p>
-                        <p>
+                            <span><strong>2. </strong>Fakulta B</span>
+                        </div>
+                        <div>
                             <FaCrown size={25} color='brown' className='mx-2'/>
-                            <strong>3. </strong>Fakulta C
-                        </p>
+                            <span><strong>3. </strong>Fakulta C</span>
+                        </div>
                     </div>
                     <div className='carousel-row'>
                         <p>
@@ -95,10 +100,7 @@ function EventSummary() {
                 <p>{t('challenge_description_left')}</p>
                 <p>{t('challenge_description_right')}</p>
             </div>
-
-
         </div>
-
 
         <div className='summary'>
             <div className='summary-item'>
@@ -116,20 +118,14 @@ function EventSummary() {
     </>
 }
 
-// function CarouselItem({content, active = false}) {
-//     let clsName = `carousel-item${active ? " active" : ""}`;
-//
-//     return <div className={clsName}>
-//         <p>
-//             {content}
-//         </p>
-//     </div>
-// }
-
 const getUserCount = async() => {
     return await axios.get('/api/user/count');
 }
 
 const getSummaryDistance = async() => {
     return await axios.get('/api/summary/distances');
+}
+
+const getSeasonAndWinners = async() => {
+
 }

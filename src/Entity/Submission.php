@@ -168,4 +168,10 @@ class Submission
 
         return $this;
     }
+
+    public function getWeek(): int
+    {
+        $sub = $this->getDate()->diff($this->getSeason()->getStart());
+        return intdiv($sub->days, 7);
+    }
 }

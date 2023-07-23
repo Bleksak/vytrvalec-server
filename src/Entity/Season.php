@@ -19,22 +19,22 @@ class Season
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
-    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary'])]
     private ?DateTimeInterface $start = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
-    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary'])]
     private ?DateTimeInterface $end = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary'])]
     private ?Charity $charity = null;
 
     /**
@@ -43,17 +43,9 @@ class Season
     #[ORM\OneToMany(mappedBy: 'season', targetEntity: Submission::class)]
     private Collection $submissions;
 
-    #[ORM\OneToMany(mappedBy: 'season', targetEntity: FacultySummary::class)]
-    private Collection $facultySummaries;
-
-    #[ORM\OneToMany(mappedBy: 'season', targetEntity: UserSummary::class)]
-    private Collection $userSummaries;
-
     public function __construct()
     {
         $this->submissions = new ArrayCollection();
-        $this->facultySummaries = new ArrayCollection();
-        $this->userSummaries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -139,65 +131,5 @@ class Season
         $end = DateTimeImmutable::createFromInterface($this->getEnd());
 
         return $today >= $start && $today < $end;
-    }
-
-    /**
-     * @return Collection<int, FacultySummary>
-     */
-    public function getFacultySummaries(): Collection
-    {
-        return $this->facultySummaries;
-    }
-
-    public function addFacultySummary(FacultySummary $facultySummary): self
-    {
-        if (!$this->facultySummaries->contains($facultySummary)) {
-            $this->facultySummaries->add($facultySummary);
-            $facultySummary->setSeason($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFacultySummary(FacultySummary $facultySummary): self
-    {
-        if ($this->facultySummaries->removeElement($facultySummary)) {
-            // set the owning side to null (unless already changed)
-            if ($facultySummary->getSeason() === $this) {
-                $facultySummary->setSeason(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, UserSummary>
-     */
-    public function getUserSummaries(): Collection
-    {
-        return $this->userSummaries;
-    }
-
-    public function addUserSummary(UserSummary $userSummary): self
-    {
-        if (!$this->userSummaries->contains($userSummary)) {
-            $this->userSummaries->add($userSummary);
-            $userSummary->setSeason($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserSummary(UserSummary $userSummary): self
-    {
-        if ($this->userSummaries->removeElement($userSummary)) {
-            // set the owning side to null (unless already changed)
-            if ($userSummary->getSeason() === $this) {
-                $userSummary->setSeason(null);
-            }
-        }
-
-        return $this;
     }
 }
