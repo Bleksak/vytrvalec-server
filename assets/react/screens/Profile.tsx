@@ -55,13 +55,13 @@ const Profile = (): JSX.Element => {
 
     return (
         <Row>
-            <Col className="col-lg-3">
+            <Col className="col-lg-4">
                 {user &&
-                    <>
+                    <div>
                         <Row style={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}>
                             <strong>Under construction</strong>
                             {/* @ts-ignore */}
-                            <span>{user.firstName} {user.lastName} <MdSettings style={{ marginLeft: '2%' }} /></span>
+                            <span>{user.firstName} {user.lastName}</span>
                         </Row >
                         <Row>
                             <strong>Faculty:</strong>
@@ -74,14 +74,12 @@ const Profile = (): JSX.Element => {
                             <span>{user.email} </span>
                         </Row>
 
-                        <hr className="hr-text" style={{ height: '1px' }} />
-
                         {stats && <>
                             <span>{stats.bikeKm} km</span>
                             <span>{stats.walkKm} km</span>
                         </>}
 
-                    </>
+                    </div>
 
                 }
             </Col>
