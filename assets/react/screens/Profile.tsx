@@ -1,27 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { getUserData, getUserSubmissions } from "../api/UserApi";
-import { Button, Modal, Image, Col, Row, Stack, Dropdown } from 'react-bootstrap';
-import { MdCheck, MdClose, MdQuestionMark, MdSettings } from "react-icons/md";
-import { User } from "../types";
+import { getUserSubmissions } from "../api/UserApi";
+import { Image, Col, Row, } from 'react-bootstrap';
+import { MdSettings } from "react-icons/md";
 import Submission from "../types/Submission";
 import useAuth from "../useAuth";
 import SubmissionModal from "../components/user/SubmissionModal";
 
-const Profile = () => {
+const Profile = (): JSX.Element => {
     const [submissions, setSubmissions] = useState<Submission[][] | null>(null);
     const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
     const [stats, setStats] = useState<{ bikeKm: number, walkKm: number } | null>(null);
     const { user } = useAuth();
 
-
     useEffect(() => {
-        getUserSubmissions(1).then((subs) => {
+        getUserSubmissions(1).then((subs: Submission[]) => {
             let splitted: Submission[][] = [];
             let tree: Submission[] = [] // yes strom
 
-            let bikeKm = 0;
-            let walkKm = 0;
+            let bikeKm: number = 0;
+            let walkKm: number = 0;
 
             subs.forEach((sub: Submission, index: number) => {
                 tree.push(sub);
@@ -45,17 +42,15 @@ const Profile = () => {
     }, []);
 
 
-    const handleSelectSubmission = (id: number | null) => {
-        if (!id) setSelectedSubmission(null);
+    const handleSelectSubmission = (id: number) => {
         let found = null;
         submissions?.forEach((subs: Submission[]) => {
             const f = subs.find(sub => sub.id === id);
             if (f) { found = f; return };
         });
+
         if (found) setSelectedSubmission(found);
     }
-
-
 
 
     return (
