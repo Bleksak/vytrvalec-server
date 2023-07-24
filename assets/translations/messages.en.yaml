@@ -29,6 +29,9 @@ participants: 'Total participants'
 run_and_walk: 'Run and walk'
 bike_and_scooter: 'Bike and scooter'
 previous_years: 'Results of previous years'
+follow_soc: 'Follow us on social media!'
+Běh/Chůze: 'Run and walk'
+Kolo/Koloběžka: 'Bike and scooter'
 
 # Rules page
 rules: 'Rules'
@@ -118,6 +121,11 @@ elevation: 'Elevation'
 screenshot: 'Screenshot'
 upload: 'Upload'
 
+# profile
+pwd_change_label: 'Changing your password will allow you to access the portal even after losing access to your GApps account. If you wish to participate in the challenge as an graduate, you will need to change your password. Changing your password will allow you to log in using the form. You will not lose the ability to log in through GApps.'
+delete_sub_info: 'An uploaded record can be deleted while it is in the approval process.'
+elev_total: 'Total elevation'
+pwd_change_btn: 'Change password'
 
 # msgid "season_start_label"
 # msgstr "Season start"

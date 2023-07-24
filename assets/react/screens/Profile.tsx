@@ -9,15 +9,13 @@ import { useTranslation } from "react-i18next";
 const Profile = (): JSX.Element => {
     const [submissions, setSubmissions] = useState<Submission[] | null>(null);
     const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
-    const [stats, setStats] = useState<{ bikeKm: number, walkKm: number, elevation: number } | null>({ bikeKm: 26, walkKm: 17, elevation: 34 });
+    const [stats, setStats] = useState<{ bikeKm: number, walkKm: number, elevation: number } | null>({ bikeKm: 26, walkKm: 17, elevation: 34 }); //TODO
     const { user } = useAuth();
     const [t, _] = useTranslation();
 
     useEffect(() => {
         getUserSubmissions(1).then(setSubmissions);
     }, []);
-
-
 
     return (
         <Row>
@@ -35,53 +33,46 @@ const Profile = (): JSX.Element => {
 
                                 {stats && <>
                                     <p className="margin-sm centered">
-                                        <strong>Kolo a koloběžka</strong>
+                                        <strong>{t('bike_and_scooter')}</strong>
                                         <span>{stats.bikeKm} km</span>
                                     </p>
 
                                     <p className="margin-sm centered">
-                                        <strong>Běh a chůze</strong>
+                                        <strong>{t('run_and_walk')}</strong>
                                         <span>{stats.walkKm} km</span>
                                     </p>
 
                                     <p className="margin-sm centered">
-                                        <strong>Nastoupáno celkem</strong>
+                                        <strong>{t('elev_total')}</strong>
                                         <span>{stats.elevation} m</span>
                                     </p>
                                 </>}
-
                             </div>
-                            <Button className="pwd-change-btn">Změnit heslo</Button>
+                            <Button className="pwd-change-btn">{t('pwd_change_btn')}</Button>
                         </>
                     }
 
                     <div className="box-shadow centered user-info-box">
-                        <p>Změna hesla vám umožní přístup k portálu i po ztrátě přístupu k účtu GApps. Pokud se chcete výzvy zúčastnit jako absolvent, musíte si heslo změnit. Změna hesla vám umožní přihlásit se pomocí formuláře. O možnost přihlásit se prostřednictvím aplikace GApps nepřijdete.</p>
+                        <p>{t('pwd_change_label')}</p>
                     </div>
                 </div>
-
             </Col>
-
 
             <Col className="col-lg bg-blue" >
                 <div className="container-new centered">
-                    <u><strong>Nahraný záznam může být smazán dokud je v procesu schvalování.</strong></u>
+                    <u><strong>{t('delete_sub_info')}</strong></u>
                 </div>
-
 
                 <Row style={{ justifyContent: 'center' }}>
                     {submissions?.map((sub: Submission) => (
                         <Image key={sub.id} src={sub.image} className="img" rounded onClick={() => setSelectedSubmission(sub)} />
                     ))}
                 </Row>
-
-
             </Col >
 
             {selectedSubmission &&
                 <SubmissionModal submission={selectedSubmission} onClose={() => setSelectedSubmission(null)} />
             }
-
         </Row >
     )
 }
