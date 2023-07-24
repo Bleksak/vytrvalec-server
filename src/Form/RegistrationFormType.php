@@ -15,14 +15,12 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class RegistrationFormType extends AbstractType
 {
-    private $translator;
+    private TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {
@@ -129,20 +127,5 @@ class RegistrationFormType extends AbstractType
             ],
             'data_class' => User::class,
         ]);
-    }
-
-    public function validatePasswordMatch($data, ExecutionContextInterface $context)
-    {
-        // dd($data);
-        // $data = $context->getRoot();
-        // dd($data);
-        // $password = $data['password']->getData();
-        // $password_repeat = $data['password_repeat']->getData();
-
-        // if($password !== $password_repeat) {
-        //     $context->buildViolation('passwords_do_not_match')
-        //     ->atPath('password_repeat')
-        //     ->addViolation();
-        // }
     }
 }

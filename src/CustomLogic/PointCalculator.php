@@ -15,24 +15,68 @@ class PointCalculator
     }
     public function processSeason(Season $season): array
     {
-        $submissions = $this->submissionRepository->findAcceptedInSeason($season);
-        return [];
+        $weeks = [];
+
+        for($week = 0; $week < 4; ++$week) {
+            $weeks[] = $this->processWeek($season, $week);
+        }
+
+        return $weeks;
     }
 
-    public function processWeek($activities): array
+    public function processWeek(Season $season, int $week): array
     {
-        foreach($activities as &$faculties) {
-            usort($faculties, function($a, $b) {
-                $cmp = $a['distance'] - $b['distance'];
-                if($cmp !== 0) {
-                    return $cmp;
+        $submissions = $this->submissionRepository->findAcceptedInSeasonAndWeek($season, $week);
+
+        $extraPointClasses = [WeeklyDistanceExtraPoints::class, DailyDistanceExtraPoints::class, WeeklyElevationExtraPoints::class];
+        $extraPoints = [];
+
+//        $activities = ['extras' => []];
+        $activities = [];
+
+        foreach($submissions as $submission) {
+            $activity = $submission->getActivity()->getId();
+            $faculty = $submission->getFaculty()->getId();
+
+            if(!array_key_exists($activity, $activities)) {
+                $activities[$activity] = ['faculties' => []];
+            }
+
+            if(!array_key_exists($activity, $extraPoints)) {
+                $extraPoints[$activity] = [];
+                $activities[$activity]['extras'] = [];
+
+                foreach($extraPointClasses as $extra) {
+                    // TODO: check if week is accepted here
+                    if($extra::acceptsWeek($week)) {
+                        $cls = new $extra();
+                        $extraPoints[$activity][] = $cls;
+                        if($cls->requiresActivity()) {
+                            $cls->setActivity($submission->getActivity());
+                        }
+                    }
                 }
+            }
 
-                return $a['elevation'] - $b['elevation'];
-            });
+            if(!array_key_exists($faculty, $activities[$activity])) {
+                $activities[$activity]['faculties'][$faculty] = 0;
+            }
 
-            foreach($faculties as $key => &$faculty) {
-                $faculty['points'] = $key + 1;
+            $activities[$activity]['faculties'][$faculty] += $submission->getDistance();
+
+            foreach($extraPoints[$activity] as $extra) {
+                $extra->accumulate($submission);
+            }
+        }
+
+        foreach($extraPoints as $activityId => $activity) {
+            foreach($activity as $extraPointHandler) {
+                $extraPointHandler->finalize();
+                $result = $extraPointHandler->getWinners();
+
+                if(!empty($result)) {
+                    $activities[$activityId]['extras'][] = $result;
+                }
             }
         }
 

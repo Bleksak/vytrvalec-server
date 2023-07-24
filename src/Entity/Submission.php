@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\SubmissionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -55,6 +57,14 @@ class Submission
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Groups(['fetchSubmission'])]
     private ?\DateTimeInterface $date = null;
+
+    #[ORM\Column]
+    #[Groups(['fetchSubmission'])]
+    private ?int $week = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Faculty $faculty = null;
 
     public function getId(): ?int
     {
@@ -169,9 +179,34 @@ class Submission
         return $this;
     }
 
-    public function getWeek(): int
+    public function calculateWeek(): int
     {
         $sub = $this->getDate()->diff($this->getSeason()->getStart());
-        return intdiv($sub->days, 7);
+        $this->week = intdiv($sub->days, 7);
+        return $this->week;
+    }
+
+    public function getWeek(): ?int
+    {
+        return $this->week;
+    }
+
+    public function setWeek(int $week): static
+    {
+        $this->week = $week;
+
+        return $this;
+    }
+
+    public function getFaculty(): ?Faculty
+    {
+        return $this->faculty;
+    }
+
+    public function setFaculty(?Faculty $faculty): static
+    {
+        $this->faculty = $faculty;
+
+        return $this;
     }
 }

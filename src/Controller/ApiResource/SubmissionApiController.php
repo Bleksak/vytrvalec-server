@@ -4,15 +4,11 @@ namespace App\Controller\ApiResource;
 
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
-use App\Entity\FacultySummary;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
-use App\Entity\UserSummary;
-use App\Repository\FacultySummaryRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
-use App\Repository\UserSummaryRepository;
 use App\Requests\SubmissionRequest;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -89,6 +85,7 @@ class SubmissionApiController extends AbstractController
         $submission->setReviewed(false);
         $submission->setAccepted(false);
         $submission->setDate(new DateTimeImmutable());
+        $submission->calculateWeek();
 
         $uniquePath = uniqid('/uploads/') . '.jpg';
         $absolutePath = $httpRequest->server->get('DOCUMENT_ROOT') . $uniquePath;
@@ -128,7 +125,8 @@ class SubmissionApiController extends AbstractController
             ]
         ]
     )]
-    public function listSeason(#[CurrentUser] User $user, Season $season, int $page): Response
+    #[IsGranted('ROLE_STAFF')]
+    public function listSeason(Season $season, int $page): Response
     {
         return $this->json($this->serializer->normalize($this->submissionRepository->findBy(['season' => $season], limit: 50, offset: ($page - 1) * 50), null, [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
@@ -174,7 +172,7 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function unresolvedList(#[CurrentUser] User $user, Season $season): Response
+    public function unresolvedList(Season $season): Response
     {
         return $this->json($this->serializer->normalize($this->submissionRepository->findBy(['season' => $season, 'reviewed' => false]), null, [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
@@ -242,7 +240,7 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function accept(Submission $submission, FacultySummaryRepository $facultySummaryRepository, UserSummaryRepository $userSummaryRepository): Response
+    public function accept(Submission $submission): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
