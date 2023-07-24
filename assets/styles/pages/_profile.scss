@@ -21,3 +21,34 @@
     cursor: pointer;
     margin: 0.5em;
 }
+
+.centered {
+    display: grid;
+    justify-items: center;
+}
+
+.padding-user-panel {
+    padding: 2%;
+}
+
+.box-shadow {
+    box-shadow: 1px 2px 9px gray;
+}
+
+.user-info-box {
+    width: 70%;
+    padding: 5%;
+}
+
+.margin-sm {
+    margin: 2%;
+}
+
+.bg-blue {
+    background-color: #b6dfedff;
+}
+
+.pwd-change-btn {
+    background-color: #00aaffff;
+    margin: 4%;
+}

@@ -15,7 +15,7 @@ const Rules = () => {
             <Col className="col-lg-4">
                 <AboutKTS />
             </Col>
-            <Col className="col-lg" style={{ backgroundColor: '#b6dfedff' }}>
+            <Col className="col-lg bg-blue" >
                 <Row className="container-new">
                     <h3><strong style={{ color: 'black' }}>{t('rules')}</strong></h3>
                     <p dangerouslySetInnerHTML={

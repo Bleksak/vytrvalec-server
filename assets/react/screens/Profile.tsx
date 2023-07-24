@@ -22,10 +22,10 @@ const Profile = (): JSX.Element => {
     return (
         <Row>
             <Col className="col-lg-4">
-                <div style={{ display: 'grid', justifyItems: 'center', padding: '2%' }}>
+                <div className="centered padding-user-panel">
                     {user &&
                         <>
-                            <div style={{ width: '70%', boxShadow: '1px 2px 9px gray', justifyItems: 'center', display: 'grid', padding: '5%' }}>
+                            <div className="box-shadow centered user-info-box">
                                 {/* @ts-ignore */}
                                 <p>{user.firstName} {user.lastName}</p>
                                 {/* @ts-ignore */}
@@ -34,28 +34,28 @@ const Profile = (): JSX.Element => {
                                 <p>{user.email} </p>
 
                                 {stats && <>
-                                    <p style={{ margin: '2%', display: 'grid', justifyItems: 'center' }}>
+                                    <p className="margin-sm centered">
                                         <strong>Kolo a koloběžka</strong>
                                         <span>{stats.bikeKm} km</span>
                                     </p>
 
-                                    <p style={{ margin: '2%', display: 'grid', justifyItems: 'center' }}>
+                                    <p className="margin-sm centered">
                                         <strong>Běh a chůze</strong>
                                         <span>{stats.walkKm} km</span>
                                     </p>
 
-                                    <p style={{ margin: '2%', display: 'grid', justifyItems: 'center' }}>
+                                    <p className="margin-sm centered">
                                         <strong>Nastoupáno celkem</strong>
                                         <span>{stats.elevation} m</span>
                                     </p>
                                 </>}
 
                             </div>
-                            <Button style={{ backgroundColor: '#00aaffff', margin: '4%' }}>Změnit heslo</Button>
+                            <Button className="pwd-chagnge-btn">Změnit heslo</Button>
                         </>
                     }
 
-                    <div style={{ width: '70%', boxShadow: '1px 2px 9px gray', justifyItems: 'center', display: 'grid', padding: '5%' }}>
+                    <div className="box-shadow centered user-info-box">
                         <p>Změna hesla vám umožní přístup k portálu i po ztrátě přístupu k účtu GApps. Pokud se chcete výzvy zúčastnit jako absolvent, musíte si heslo změnit. Změna hesla vám umožní přihlásit se pomocí formuláře. O možnost přihlásit se prostřednictvím aplikace GApps nepřijdete.</p>
                     </div>
                 </div>
@@ -63,8 +63,8 @@ const Profile = (): JSX.Element => {
             </Col>
 
 
-            <Col className="col-lg" style={{ backgroundColor: '#b6dfedff' }}>
-                <div className="container-new" style={{ display: 'grid', justifyItems: 'center', }}>
+            <Col className="col-lg bg-blue" >
+                <div className="container-new centered">
                     <u><strong>Nahraný záznam může být smazán dokud je v procesu schvalování.</strong></u>
                 </div>
 
