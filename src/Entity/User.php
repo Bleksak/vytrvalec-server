@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -51,16 +50,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['fetchSubmission'])]
     private ?Faculty $faculty = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class)]
-    private Collection $submissions;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserSummary::class)]
-    private Collection $userSummaries;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class, orphanRemoval: true)]
+    private ?Collection $submissions;
 
     public function __construct()
     {
         $this->submissions = new ArrayCollection();
-        $this->userSummaries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -213,36 +208,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($submission->getUser() === $this) {
                 $submission->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, UserSummary>
-     */
-    public function getUserSummaries(): Collection
-    {
-        return $this->userSummaries;
-    }
-
-    public function addUserSummary(UserSummary $userSummary): self
-    {
-        if (!$this->userSummaries->contains($userSummary)) {
-            $this->userSummaries->add($userSummary);
-            $userSummary->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserSummary(UserSummary $userSummary): self
-    {
-        if ($this->userSummaries->removeElement($userSummary)) {
-            // set the owning side to null (unless already changed)
-            if ($userSummary->getUser() === $this) {
-                $userSummary->setUser(null);
             }
         }
 

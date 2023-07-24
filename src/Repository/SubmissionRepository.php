@@ -4,11 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Activity;
 use App\Entity\Faculty;
-use App\Entity\FacultySummary;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
-use App\Entity\UserSummary;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
@@ -80,6 +78,17 @@ class SubmissionRepository extends ServiceEntityRepository
         // $qb->innerJoin('u.Group', 'g', 'WITH', 'u.status = ?1', 'g.id')
 
         return $query->execute();
+    }
+
+    public function findAcceptedInSeasonAndWeek(Season $season, int $week): array
+    {
+        // TODO: re-enable this
+//        $maxWeek = intdiv((new \DateTimeImmutable())->diff($season->getStart())->days, 7);
+//        if($week > $maxWeek) {
+//            return [];
+//        }
+
+        return $this->findBy(['season' => $season, 'accepted' => true, 'week' => $week], orderBy: ['date' => 'ASC']);
     }
 
 //    /**

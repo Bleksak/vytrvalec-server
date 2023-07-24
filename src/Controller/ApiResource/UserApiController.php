@@ -9,11 +9,8 @@ use App\Repository\UserRepository;
 use App\Requests\RegistrationRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -107,12 +104,12 @@ class UserApiController extends AbstractController
             'faculty' => 'integer'
         ],
     )]
-    public function register(RegistrationRequest $request, EntityManagerInterface $em, ValidatorInterface $validator, UserPasswordHasherInterface $hasher, UserInterface $userInterface = null): Response
+    public function register(RegistrationRequest $request, EntityManagerInterface $em, ValidatorInterface $validator, UserPasswordHasherInterface $hasher): Response
     {
         if ($this->isGranted('ROLE_USER')) {
             return $this->json([
                 // TODO: message
-                ['TODO: nelze registrovat protoze uz je prihlasenej']
+                'TODO: nelze registrovat protoze uz je prihlasenej'
             ], Response::HTTP_BAD_REQUEST);
         }
 
