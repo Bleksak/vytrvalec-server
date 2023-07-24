@@ -4,15 +4,11 @@ namespace App\Controller\ApiResource;
 
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
-use App\Entity\FacultySummary;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
-use App\Entity\UserSummary;
-use App\Repository\FacultySummaryRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
-use App\Repository\UserSummaryRepository;
 use App\Requests\SubmissionRequest;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -89,6 +85,7 @@ class SubmissionApiController extends AbstractController
         $submission->setReviewed(false);
         $submission->setAccepted(false);
         $submission->setDate(new DateTimeImmutable());
+        $submission->calculateWeek();
 
         $uniquePath = uniqid('/uploads/') . '.jpg';
         $absolutePath = $httpRequest->server->get('DOCUMENT_ROOT') . $uniquePath;
@@ -128,7 +125,8 @@ class SubmissionApiController extends AbstractController
             ]
         ]
     )]
-    public function listSeason(#[CurrentUser] User $user, Season $season, int $page): Response
+    #[IsGranted('ROLE_STAFF')]
+    public function listSeason(Season $season, int $page): Response
     {
         return $this->json($this->serializer->normalize($this->submissionRepository->findBy(['season' => $season], limit: 50, offset: ($page - 1) * 50), null, [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
@@ -174,7 +172,7 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function unresolvedList(#[CurrentUser] User $user, Season $season): Response
+    public function unresolvedList(Season $season): Response
     {
         return $this->json($this->serializer->normalize($this->submissionRepository->findBy(['season' => $season, 'reviewed' => false]), null, [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
@@ -242,49 +240,13 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function accept(Submission $submission, FacultySummaryRepository $facultySummaryRepository, UserSummaryRepository $userSummaryRepository): Response
+    public function accept(Submission $submission): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
         $this->setState($submission, true);
-
-        $user = $submission->getUser();
-        $faculty = $user->getFaculty();
-        $season = $submission->getSeason();
-        $week = intdiv($submission->getDate()->diff($season->getStart())->days, 7);
-
-        $facultySummary = $facultySummaryRepository->findOneBy(['faculty' => $faculty, 'season' => $season, 'week' => $week, 'activity' => $submission->getActivity()]);
-        $userSummary = $userSummaryRepository->findOneBy(['user' => $user, 'season' => $season, 'week' => $week, 'activity' => $submission->getActivity()]);
-
-        if ($facultySummary == null) {
-            $facultySummary = new FacultySummary();
-
-            $facultySummary->setFaculty($faculty);
-            $facultySummary->setSeason($season);
-            $facultySummary->setWeek($week);
-            $facultySummary->setActivity($submission->getActivity());
-        }
-
-        $facultySummary->setDistance($facultySummary->getDistance() + $submission->getDistance());
-        $facultySummary->setElevation($facultySummary->getElevation() + $submission->getElevation());
-
-        if ($userSummary == null) {
-            $userSummary = new UserSummary();
-
-            $userSummary->setUser($user);
-            $userSummary->setSeason($season);
-            $userSummary->setWeek($week);
-            $userSummary->setActivity($submission->getActivity());
-        }
-
-        $userSummary->setDistance($userSummary->getDistance() + $submission->getDistance());
-        $userSummary->setElevation($userSummary->getElevation() + $submission->getElevation());
-
-        $facultySummaryRepository->save($facultySummary);
-        $userSummaryRepository->save($userSummary);
-
         $this->submissionRepository->save($submission, true);
 
         return new Response(status: Response::HTTP_OK);

@@ -4,10 +4,18 @@ namespace App\Controller\ApiResource;
 
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
+use App\CustomLogic\PointCalculator;
+use App\Entity\Activity;
 use App\Entity\Charity;
+use App\Entity\Faculty;
 use App\Entity\Season;
+use App\Entity\User;
+use App\Repository\ActivityRepository;
 use App\Repository\CharityRepository;
+use App\Repository\FacultyRepository;
 use App\Repository\SeasonRepository;
+use App\Repository\SubmissionRepository;
+use App\Repository\UserRepository;
 use App\Requests\SeasonRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -166,6 +174,34 @@ class SeasonController extends AbstractController
 
         $this->seasonRepository->remove($season);
         return new Response(status: Response::HTTP_OK);
+    }
+
+    #[ApiRoute(
+        '/api/season/{season}/results',
+        name: 'api_season_results',
+        methods: ['GET'],
+        documentation: 'Retrieves a <code>Season</code> entity',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully calculated results',
+//                'response' => [
+//                    'id' => 'integer',
+//                    'start' => 'date',
+//                    'end' => 'date',
+//                    'charity' => [
+//                        'name' => 'string',
+//                        'description' => 'string'
+//                    ],
+//                ]
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Bad request',
+            ]
+        ],
+    )]
+    public function result(PointCalculator $calculator, Season $season): Response
+    {
+        return $this->json($calculator->processSeason($season));
     }
 
     #[ApiRoute(
