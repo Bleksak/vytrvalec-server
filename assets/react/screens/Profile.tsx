@@ -51,7 +51,7 @@ const Profile = (): JSX.Element => {
                                 </>}
 
                             </div>
-                            <Button className="pwd-chagnge-btn">Změnit heslo</Button>
+                            <Button className="pwd-change-btn">Změnit heslo</Button>
                         </>
                     }
 
