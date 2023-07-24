@@ -3,14 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\SubmissionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
-#[ORM\Index(columns: ['date'], name: 'date_index')]
+#[ORM\Index(columns: ['week'], name: 'week_index')]
 class Submission
 {
     #[ORM\Id]
@@ -49,6 +48,10 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private ?string $image = null;
 
+    #[ORM\Column]
+    #[Groups(['fetchSubmission'])]
+    private ?int $week = null;
+
     #[ORM\ManyToOne(inversedBy: 'season')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission'])]
@@ -56,11 +59,7 @@ class Submission
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Groups(['fetchSubmission'])]
-    private ?\DateTimeInterface $date = null;
-
-    #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
-    private ?int $week = null;
+    private ?DateTimeInterface $date = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -167,12 +166,12 @@ class Submission
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate(DateTimeInterface $date): self
     {
         $this->date = $date;
 

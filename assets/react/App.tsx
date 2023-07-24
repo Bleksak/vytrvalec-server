@@ -1,5 +1,4 @@
 import { BrowserRouter, } from 'react-router-dom'
-import Navbar from './components/navbar/Navbar'
 import React from "react";
 //@ts-ignore
 import _ from './i8n'
@@ -12,7 +11,7 @@ const App = (props: any) => {
     return (
         <BrowserRouter>
             <AuthProvider>
-                <div > {/*className="container" */}
+                <div className="container">
                     <CustomNavbar />
                     <Navigation {...props} />
                 </div>

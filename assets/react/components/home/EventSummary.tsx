@@ -11,7 +11,7 @@ const EventSummary = () => {
 
     useEffect(() => {
         getUserCount().then(setParticipants);
-        getSummaryDistance().then(setSummary);
+        // getSummaryDistance().then(setSummary);
     }, []);
 
     // @ts-ignore

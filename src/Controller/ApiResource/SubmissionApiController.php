@@ -69,7 +69,6 @@ class SubmissionApiController extends AbstractController
         }
 
         $submission = new Submission();
-
         $season = $seasonRepository->getRunning();
 
         if (!$season) {
@@ -128,12 +127,18 @@ class SubmissionApiController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function listSeason(Season $season, int $page): Response
     {
-        return $this->json($this->serializer->normalize($this->submissionRepository->findBy(['season' => $season], limit: 50, offset: ($page - 1) * 50), null, [
-            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
-                return $object->getId();
-            },
+        $limit = 50;
+        $users = $this->submissionRepository->findUsersBySeason($season, $page, $limit);
+        $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
+        $pageCount = 1 + intdiv($submissions->count(), $limit);
+
+        return $this->json($this->serializer->normalize(['pages' => $pageCount, 'submissions' => $submissions, 'users' => $users], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
+            AbstractNormalizer::CALLBACKS => [
+                'season' => fn($object) => $object->getId(),
+                'activity' => fn($object) => $object->getId(),
+                'user' => fn($object) => $object->getId(),
+            ],
         ]));
     }
 
@@ -150,12 +155,18 @@ class SubmissionApiController extends AbstractController
     )]
     public function list(#[CurrentUser] User $user, int $page): Response
     {
-        return $this->json($this->serializer->normalize($this->submissionRepository->findAllByUser($user, $page, 50), null, [
-            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
-                return $object->getId();
-            },
+        $limit = 50;
+        $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
+        $pageCount = 1 + intdiv($submissions->count(), $limit);
+
+
+        return $this->json($this->serializer->normalize(['pages' => $pageCount, 'submissions' => $submissions], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['faculty', 'user'],
+            AbstractNormalizer::CALLBACKS => [
+                'season' => fn($object) => $object->getId(),
+                'activity' => fn($object) => $object->getId(),
+            ]
         ]));
     }
 

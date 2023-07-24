@@ -2,13 +2,11 @@
 
 namespace App\Repository;
 
-use App\Entity\Activity;
-use App\Entity\Faculty;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -44,40 +42,59 @@ class SubmissionRepository extends ServiceEntityRepository
         }
     }
 
-    public function findAllByUser(User $user, int $page, int $limit)
+    public function findAllByUser(User $user, int $page, int $limit): Paginator
     {
+        $query = $this->createQueryBuilder('s')
+            ->select('s')
+            ->where('s.user = :userId')
+            ->setParameter('userId', $user->getId())
+        ;
 
-        return $this->findBy(['user' => $user], limit: $limit, offset: ($page - 1) * $limit);
-
-//        $query = $this->getEntityManager()->createQueryBuilder()
-//            ->select('partial s.{id, accepted, elevation, distance, reviewed, image, date}, season_fk')
-//            ->from('App:Submission', 's')
-//            ->innerJoin('s.season', 'season_fk')
-//            ->innerJoin('s.activity', 'activity_fk')
-//            ->where('s.user = :userId')
-//            ->setFirstResult(($page-1) * $limit)
-//            ->setMaxResults($limit)
-//            ->setParameter('userId', $user->getId())
-//            ->getQuery();
-        // $qb->innerJoin('u.Group', 'g', 'WITH', 'u.status = ?1', 'g.id')
-
-//        return $query->execute();
-    }
-
-    public function getAll(int $page, int $limit)
-    {
-        $query = $this->getEntityManager()->createQueryBuilder()
-            ->select('s.id', 'season_fk.id as season', 'user_fk.id as user', 'activity_fk.id as activity', 's.accepted', 's.elevation', 's.distance', 's.reviewed', 's.image', 's.date')
-            ->from('App:Submission', 's')
-            ->innerJoin('s.season', 'season_fk')
-            ->innerJoin('s.user', 'user_fk')
-            ->innerJoin('s.activity', 'activity_fk')
+        $paginator = new Paginator($query);
+        $paginator->getQuery()
             ->setFirstResult(($page-1) * $limit)
             ->setMaxResults($limit)
-            ->getQuery();
-        // $qb->innerJoin('u.Group', 'g', 'WITH', 'u.status = ?1', 'g.id')
+        ;
 
-        return $query->execute();
+        return $paginator;
+    }
+
+    public function findBySeason(Season $season, int $page, int $limit): Paginator
+    {
+        $query = $this->createQueryBuilder('s')
+            ->select('s')
+            ->where('s.season = :seasonId')
+            ->setParameter('seasonId', $season->getId())
+        ;
+
+        $paginator = new Paginator($query);
+        $paginator->getQuery()
+            ->setFirstResult(($page-1) * $limit)
+            ->setMaxResults($limit)
+        ;
+
+        return $paginator;
+    }
+
+    public function findUsersBySeason(Season $season, int $page, int $limit): Paginator
+    {
+        $query = $this->getEntityManager()->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u')
+            ->join('u.submissions', 's')
+            ->where('s.season = :seasonId')
+
+            ->setParameter('seasonId', $season->getId())
+            ->distinct()
+        ;
+
+        $paginator = new Paginator($query);
+        $paginator->getQuery()
+            ->setFirstResult(($page-1) * $limit)
+            ->setMaxResults($limit)
+        ;
+
+        return $paginator;
     }
 
     public function findAcceptedInSeasonAndWeek(Season $season, int $week): array
