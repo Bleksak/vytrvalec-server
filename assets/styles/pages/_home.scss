@@ -1,4 +1,3 @@
-
 .error {
   font-weight: bold;
   color: red;
@@ -126,7 +125,7 @@ p {
   margin-top: 10px;
 }
 
-.about-challenge-container > * {
+.about-challenge-container>* {
   width: 50%;
 }
 
@@ -247,7 +246,7 @@ table .btn {
 }
 
 /* --------- Set password ----------------*/
-.pass{
+.pass {
   background: url("../../images/runner.png") no-repeat center;
 }
 
@@ -256,10 +255,8 @@ table .btn {
   margin: 10px;
 }
 
-@media (min-width: 75em){
+@media (min-width: 75em) {
   .seasonManagement {
     flex-direction: row;
   }
 }
-
-

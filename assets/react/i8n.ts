@@ -11,9 +11,9 @@ i18next
         fallbackLng: 'en',
         backend: {
             loadPath: '/build/translations/messages.{{lng}}.yaml',
-            parse: function(data: string) { return yaml.load(data) },
+            parse: function (data: string) { return yaml.load(data) },
         },
         interpolation: {
             escapeValue: false
         },
-    }).then((x) => {})
+    }).then((x) => { })

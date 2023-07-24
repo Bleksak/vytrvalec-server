@@ -1,131 +1,26 @@
-import React, {useEffect, useState} from "react";
-import {useTranslation} from "react-i18next";
-import axios from "axios";
-import {Carousel} from "react-bootstrap";
-import {FaCrown} from "react-icons/fa6";
+import React from "react";
+import { Col, Row } from "react-bootstrap";
+import { Carousel, EventSummary, Logo } from "../components/home";
+import AboutKTS from "../components/AboutKTS";
 
-export default function Home() {
+const Home = () => (
+	<>
+		<Logo />
+		<Row>
+			<Col className="col-lg-4">
+				<AboutKTS />
+			</Col>
+			<Col className="bg-blue">
+				<div className="container-new" >
+					<EventSummary />
+				</div>
+				<div className="container-new" >
+					<Carousel />
+				</div>
 
-    const [t] = useTranslation();
+			</Col>
+		</Row>
+	</>
+);
 
-    return <>
-        <Logo/>
-        <div className='gradient'>
-        <EventSummary/>
-        <Carousel indicators={false} interval={null}>
-            <Carousel.Item>
-                <h2><strong>April 2023: 5 letý Nicolas</strong></h2>
-                <div className='carousel-inside-item'>
-                    <div className='carousel-row'>
-                        <div>
-                            <FaCrown size={25} color='gold' className='mx-2'/>
-                            <span><strong>1. </strong>Fakulta A</span>
-                        </div>
-                        <div>
-                            <FaCrown size={25} color='silver' className='mx-2'/>
-                            <span><strong>2. </strong>Fakulta B</span>
-                        </div>
-                        <div>
-                            <FaCrown size={25} color='brown' className='mx-2'/>
-                            <span><strong>3. </strong>Fakulta C</span>
-                        </div>
-                    </div>
-                    <div className='carousel-row'>
-                        <p>
-                            V sedmi měsících mu byl diagnostikován nádor na mozku, který nešťastně postihnul křížení zrakových nervů. Po první operaci, kdy byl nádor částečně odstraněn, přišel bohužel Nicolas o zrak. Navíc byla tehdy zasažena hormonální část mozku, takže hormony jsou mu uměle několikrát denně podávány společně s léky na epilepsii, růst a momentálně i na ředění krve. Jeho léčba je finančně velice náročná. Pojďme mu aktivním sportováním pomoci!
-                        </p>
-                    </div>
-                </div>
-            </Carousel.Item>
-
-            <Carousel.Item>
-                <h2><strong>April 2023: 5 letý Nicolas</strong></h2>
-                <div className='carousel-inside-item'>
-                    <div className='carousel-row'>
-                        <div>
-                            <FaCrown size={25} color='gold' className='mx-2'/>
-                            <span><strong>1. </strong>Fakulta A</span>
-                        </div>
-
-                        <div>
-                            <FaCrown size={25} color='silver' className='mx-2'/>
-                            <span><strong>2. </strong>Fakulta B</span>
-                        </div>
-                        <div>
-                            <FaCrown size={25} color='brown' className='mx-2'/>
-                            <span><strong>3. </strong>Fakulta C</span>
-                        </div>
-                    </div>
-                    <div className='carousel-row'>
-                        <p>
-                            V sedmi měsících mu byl diagnostikován nádor na mozku, který nešťastně postihnul křížení zrakových nervů. Po první operaci, kdy byl nádor částečně odstraněn, přišel bohužel Nicolas o zrak. Navíc byla tehdy zasažena hormonální část mozku, takže hormony jsou mu uměle několikrát denně podávány společně s léky na epilepsii, růst a momentálně i na ředění krve. Jeho léčba je finančně velice náročná. Pojďme mu aktivním sportováním pomoci!
-                        </p>
-                    </div>
-                </div>
-            </Carousel.Item>
-        </Carousel>
-        </div>
-    </>
-}
-
-function Logo() {
-    const [t, _] = useTranslation();
-
-    return <>
-        <header>
-            <div>
-                <h1>{t('title').toUpperCase()}</h1>
-                <h2>{t('join_us')}</h2>
-            </div>
-        </header>
-    </>
-}
-
-function EventSummary() {
-    const [t, _] = useTranslation();
-
-    const [participants, setParticipants] = useState(0);
-    const [summary, setSummary] = useState({});
-
-    useEffect(() => {
-        getUserCount().then((res) => setParticipants(res.data));
-        getSummaryDistance().then((res) => setSummary(res.data));
-    }, []);
-
-    // @ts-ignore
-    return <>
-        <div className="about-challenge">
-            <h2><strong>{t('about_challenge')}</strong></h2>
-            <div className="about-challenge-container">
-                <p>{t('challenge_description_left')}</p>
-                <p>{t('challenge_description_right')}</p>
-            </div>
-        </div>
-
-        <div className='summary'>
-            <div className='summary-item'>
-                <h3><b>{ participants }</b></h3>
-                {t('participants')}
-            </div>
-
-            { Object.keys(summary).map((activity) =>
-                <div className='summary-item' key={activity}>
-                    <h3><b>{ Math.ceil(summary[activity] / 1000)} km</b></h3>
-                    {t(activity)}
-                </div>
-            ) }
-        </div>
-    </>
-}
-
-const getUserCount = async() => {
-    return await axios.get('/api/user/count');
-}
-
-const getSummaryDistance = async() => {
-    return await axios.get('/api/summary/distances');
-}
-
-const getSeasonAndWinners = async() => {
-
-}
+export default Home;

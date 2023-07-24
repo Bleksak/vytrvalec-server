@@ -12,13 +12,13 @@ const App = (props: any) => {
     return (
         <BrowserRouter>
             <AuthProvider>
-                <div className="container">
+                <div > {/*className="container" */}
                     <CustomNavbar />
                     <Navigation {...props} />
                 </div>
                 <Footer />
             </AuthProvider>
-        </BrowserRouter>
+        </BrowserRouter >
     );
 }
 
