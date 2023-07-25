@@ -11,7 +11,6 @@ class SubmissionController extends AbstractController
 {
     public function __construct() {}
 
-
     #[Route('/submission/create', name: 'submission_create', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function uploadSubmissionForm(): Response

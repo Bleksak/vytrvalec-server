@@ -84,6 +84,7 @@ class SubmissionApiController extends AbstractController
         $submission->setReviewed(false);
         $submission->setAccepted(false);
         $submission->setDate(new DateTimeImmutable());
+        $submission->setFaculty($user->getFaculty());
         $submission->calculateWeek();
 
         $uniquePath = uniqid('/uploads/') . '.jpg';
