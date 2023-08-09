@@ -2,6 +2,8 @@
 
 namespace App\Security;
 
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -24,9 +26,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class LoginAuthenticator extends AbstractAuthenticator
 {
-    public function __construct(private readonly ParameterBagInterface $parameters, private readonly UserProviderInterface $userProvider, private readonly UserPasswordHasherInterface $hasher, private readonly SerializerInterface $serializer)
-    {
-    }
+    public function __construct(
+        private readonly ParameterBagInterface $parameters,
+        private readonly UserProviderInterface $userProvider,
+        private readonly UserPasswordHasherInterface $hasher,
+        private readonly SerializerInterface $serializer,
+        private readonly UserRepository $userRepository
+    )
+    {}
     public function supports(Request $request): ?bool
     {
         return $request->get('_route') === 'api_user_login' && $request->isMethod('POST');
@@ -74,6 +81,14 @@ class LoginAuthenticator extends AbstractAuthenticator
         ]);
 
         $response->headers->setCookie(new Cookie('jwt', $jwt, $expirationTime, secure: $request->isSecure(), httpOnly: true));
+
+        $expoToken = $request->getPayload()->get('expo_token');
+        $user = $token->getUser();
+
+        if($expoToken !== null && $user instanceof User) {
+            $user->setExpoToken($expoToken);
+            $this->userRepository->save($user, true);
+        }
 
         return $response;
     }

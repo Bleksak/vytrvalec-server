@@ -18,6 +18,9 @@ use ImagickException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\NotifierInterface;
+use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -246,7 +249,7 @@ class SubmissionApiController extends AbstractController
     #[ApiRoute(
         '/api/submission/{submission}/accept',
         name: 'api_submission_accept',
-        methods: ['POST'],
+        methods: ['PUT'],
         documentation: 'Accepts a <code>Submission</code> entity',
         responses: [
             Response::HTTP_OK => [
@@ -273,9 +276,28 @@ class SubmissionApiController extends AbstractController
         return new Response(status: Response::HTTP_OK);
     }
 
-    #[Route('/api/submission/{submission}/reject', name: 'api_submission_reject', methods: ['PUT'])]
+    #[ApiRoute(
+        '/api/submission/{submission}/reject',
+        name: 'api_submission_reject',
+        methods: ['PUT'],
+        documentation: 'Rejects a <code>Submission</code> entity',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully rejected'
+            ],
+            Response::HTTP_FORBIDDEN => [
+                'message' => 'Unauthorized access',
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Cannot reject'
+            ]
+        ],
+        requestScheme: [
+            'message' => 'string'
+        ]
+    )]
     #[IsGranted('ROLE_STAFF')]
-    public function reject(Submission $submission): Response
+    public function reject(Request $request, Submission $submission, NotifierInterface $notifier): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
@@ -283,6 +305,12 @@ class SubmissionApiController extends AbstractController
 
         $this->setState($submission, false);
         $this->submissionRepository->save($submission, true);
+
+        $message = $request->getPayload()->get('message');
+
+        $notification = (new Notification('Měsíční vytrvalec', ['email', 'expo']))->content($message);
+        $recipient = new Recipient($submission->getUser()->getEmail(), $submission->getUser()->getExpoToken());
+        $notifier->send($notification, $recipient);
 
         return new Response(status: Response::HTTP_OK);
     }

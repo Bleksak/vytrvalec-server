@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "db29c188ba631a20cfb5bf09ba6e83d4",
+    "content-hash": "ba56eaf5bb2eebafde4efd5138b2992a",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -3400,6 +3400,73 @@
                 }
             ],
             "time": "2023-05-23T14:45:45+00:00"
+        },
+        {
+            "name": "symfony/expo-notifier",
+            "version": "v6.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/expo-notifier.git",
+                "reference": "a1727bec3f5be0a5448cc0a29aa733ad34926d2b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/expo-notifier/zipball/a1727bec3f5be0a5448cc0a29aa733ad34926d2b",
+                "reference": "a1727bec3f5be0a5448cc0a29aa733ad34926d2b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/http-client": "^5.4|^6.0",
+                "symfony/notifier": "^6.2.7"
+            },
+            "type": "symfony-notifier-bridge",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Notifier\\Bridge\\Expo\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Zairig Imad",
+                    "homepage": "https://github.com/zairigimad"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Expo Notifier Bridge",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "expo",
+                "notifier"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/expo-notifier/tree/v6.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-05-12T17:22:58+00:00"
         },
         {
             "name": "symfony/expression-language",

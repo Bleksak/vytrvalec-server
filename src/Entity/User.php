@@ -53,6 +53,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class, orphanRemoval: true)]
     private ?Collection $submissions;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $expoToken = null;
+
     public function __construct()
     {
         $this->submissions = new ArrayCollection();
@@ -210,6 +213,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $submission->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getExpoToken(): ?string
+    {
+        return $this->expoToken;
+    }
+
+    public function setExpoToken(?string $expoToken): static
+    {
+        $this->expoToken = $expoToken;
 
         return $this;
     }
