@@ -4,10 +4,13 @@ namespace App\Controller\ApiResource;
 
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
+use App\Entity\RejectedSubmissionMessage;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
+use App\Recipient\ExpoRecipient;
 use App\Repository\ActivityRepository;
+use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Requests\SubmissionRequest;
@@ -18,10 +21,11 @@ use ImagickException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Notifier\Channel\PushChannel;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Notifier\Texter;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -297,20 +301,30 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function reject(Request $request, Submission $submission, NotifierInterface $notifier): Response
+    public function reject(Request $request, Submission $submission, NotifierInterface $notifier, RejectedSubmissionMessageRepository $repository): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
         $this->setState($submission, false);
-        $this->submissionRepository->save($submission, true);
+        $this->submissionRepository->save($submission);
 
         $message = $request->getPayload()->get('message');
+        if(empty($message)) {
+            $message = 'Vaše aktivita ze dne ' . $submission->getDate()->format('d. m. Y') . ' byla zamítnuta.\nZkontrolujte prosím zadané údaje a případně je upravte.\n\nDěkujeme za pochopení,\nKatedra tělesné výchovy a sportu ZČU v Plzni';
+        }
+
+        $rejectedMessage = (new RejectedSubmissionMessage())->setSubmission($submission)->setMessage($message);
+        $repository->save($rejectedMessage, true);
 
         $notification = (new Notification('Měsíční vytrvalec', ['email', 'expo']))->content($message);
-        $recipient = new Recipient($submission->getUser()->getEmail(), $submission->getUser()->getExpoToken());
+        $recipient = new Recipient($submission->getUser()->getEmail());
+
         $notifier->send($notification, $recipient);
+//        $notifier->send($notification, new ExpoRecipient($submission->getUser()->getExpoToken()));
+        $pushChannel = new PushChannel();
+        $pushChannel->notify($notification, new ExpoRecipient($submission->getUser()->getExpoToken()), null);
 
         return new Response(status: Response::HTTP_OK);
     }

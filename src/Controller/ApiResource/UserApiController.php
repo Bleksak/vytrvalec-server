@@ -59,7 +59,7 @@ class UserApiController extends AbstractController
     )]
     public function login(): Response
     {
-        return $this->json([]);
+        return new Response(status: Response::HTTP_NOT_FOUND);
     }
 
     #[ApiRoute(
@@ -80,7 +80,7 @@ class UserApiController extends AbstractController
     )]
     public function logout(): Response
     {
-        return new Response(status: Response::HTTP_OK);
+        return new Response(status: Response::HTTP_NOT_FOUND);
     }
 
     #[ApiRoute(

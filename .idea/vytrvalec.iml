@@ -142,7 +142,11 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php83" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/stimulus-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/funcai/funcai-php" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/lorenzo/pinky" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/expo-notifier" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/tijsverkoyen/css-to-inline-styles" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/twig/cssinliner-extra" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/twig/inky-extra" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
