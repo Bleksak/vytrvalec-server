@@ -156,7 +156,7 @@ class SubmissionApiController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/submission/list/{limit}/{page}',
+        '/api/submission/list/{page}/{limit}',
         name: 'api_submission_list',
         methods: ['GET'],
         documentation: 'Retrieves all submissions',
@@ -166,7 +166,7 @@ class SubmissionApiController extends AbstractController
             ]
         ]
     )]
-    public function list(#[CurrentUser] User $user, int $limit, int $page): Response
+    public function list(#[CurrentUser] User $user, int $page, int $limit = 50): Response
     {
         $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
