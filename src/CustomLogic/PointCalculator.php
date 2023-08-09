@@ -31,7 +31,6 @@ class PointCalculator
         $extraPointClasses = [WeeklyDistanceExtraPoints::class, DailyDistanceExtraPoints::class, WeeklyElevationExtraPoints::class];
         $extraPoints = [];
 
-//        $activities = ['extras' => []];
         $activities = [];
 
         foreach($submissions as $submission) {

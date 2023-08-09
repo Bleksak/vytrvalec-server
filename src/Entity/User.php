@@ -20,7 +20,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Groups(['fetchSubmission'])]
     private ?string $email = null;
 
     /**

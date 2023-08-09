@@ -6,6 +6,7 @@ use App\Entity\Submission;
 
 interface ExtraPoints
 {
+    public static function getUniqueName(): string;
     public static function acceptsWeek(int $week): bool;
     public static function reward(): int;
     public function requiresActivity(): bool;

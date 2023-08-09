@@ -8,6 +8,11 @@ class WeeklyDistanceExtraPoints implements ExtraPoints
 {
     private array $users = [];
 
+    public static function getUniqueName(): string
+    {
+        return 'weekly_distance';
+    }
+
     public static function acceptsWeek(int $week): bool
     {
         return $week === 2;
@@ -60,7 +65,7 @@ class WeeklyDistanceExtraPoints implements ExtraPoints
         }
 
         return [
-            'name' => 'weekly_distance',
+            'name' => self::getUniqueName(),
             'user_id' => $maxUser,
             'distance' => $maxDistance,
             'faculty' => $maxFaculty,

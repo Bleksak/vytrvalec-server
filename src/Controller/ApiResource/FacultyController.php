@@ -49,12 +49,8 @@ class FacultyController extends AbstractController
         methods: ['POST'],
         documentation: 'Create a new <code>Faculty</code> entity.',
         responses: [
-            Response::HTTP_CREATED => [
-                'message' => 'Successfully created',
-            ],
-            Response::HTTP_FORBIDDEN => [
-                'message' => 'Unauthorized access',
-            ],
+            Response::HTTP_CREATED => ['message' => 'Successfully created',],
+            Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access',],
             Response::HTTP_BAD_REQUEST => [
                 'message' => 'Bad request',
                 'response' => [

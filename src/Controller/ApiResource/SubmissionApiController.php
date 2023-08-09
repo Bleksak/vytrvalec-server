@@ -7,6 +7,7 @@ use App\Attributes\ApiRoute;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
+use App\Repository\ActivityRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Requests\SubmissionRequest;
@@ -26,7 +27,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[ApiResource('Submission')]
 class SubmissionApiController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em, private readonly SubmissionRepository $submissionRepository, private readonly SerializerInterface $serializer)
+    public function __construct(private readonly EntityManagerInterface $em, private readonly SubmissionRepository $submissionRepository, private readonly ActivityRepository $activityRepository, private readonly SerializerInterface $serializer)
     {
     }
 
@@ -69,7 +70,7 @@ class SubmissionApiController extends AbstractController
         }
 
         $submission = new Submission();
-        $season = $seasonRepository->getRunning();
+        $season = $seasonRepository->getCurrent();
 
         if (!$season) {
             return $this->json(['no_season'], Response::HTTP_BAD_REQUEST);
@@ -121,7 +122,12 @@ class SubmissionApiController extends AbstractController
         documentation: 'Retrieves all submissions in given Season',
         responses: [
             Response::HTTP_OK => [
-                'message' => 'Successfully retrieved all submissions'
+                'message' => 'Successfully retrieved all submissions',
+                'response' => [
+                    'pages' => 'integer',
+                    'submissions' => 'array',
+                    'users' => 'array'
+                ]
             ]
         ]
     )]
@@ -133,18 +139,24 @@ class SubmissionApiController extends AbstractController
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
 
-        return $this->json($this->serializer->normalize(['pages' => $pageCount, 'submissions' => $submissions, 'users' => $users], null, [
+        return $this->json($this->serializer->normalize(
+            [
+                'pages' => $pageCount,
+                'submissions' => $submissions,
+                'users' => $users,
+            ], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
             AbstractNormalizer::CALLBACKS => [
                 'season' => fn($object) => $object->getId(),
                 'activity' => fn($object) => $object->getId(),
                 'user' => fn($object) => $object->getId(),
+                'faculty' => fn($object) => $object->getId(),
             ],
         ]));
     }
 
     #[ApiRoute(
-        '/api/submission/list/{page}',
+        '/api/submission/list/{limit}/{page}',
         name: 'api_submission_list',
         methods: ['GET'],
         documentation: 'Retrieves all submissions',
@@ -154,12 +166,10 @@ class SubmissionApiController extends AbstractController
             ]
         ]
     )]
-    public function list(#[CurrentUser] User $user, int $page): Response
+    public function list(#[CurrentUser] User $user, int $limit, int $page): Response
     {
-        $limit = 50;
         $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
-
 
         return $this->json($this->serializer->normalize(['pages' => $pageCount, 'submissions' => $submissions], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
@@ -170,7 +180,6 @@ class SubmissionApiController extends AbstractController
             ]
         ]));
     }
-
 
     #[ApiRoute(
         '/api/submission/unresolved/{season}',

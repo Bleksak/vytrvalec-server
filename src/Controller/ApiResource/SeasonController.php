@@ -5,17 +5,10 @@ namespace App\Controller\ApiResource;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
 use App\CustomLogic\PointCalculator;
-use App\Entity\Activity;
 use App\Entity\Charity;
-use App\Entity\Faculty;
 use App\Entity\Season;
-use App\Entity\User;
-use App\Repository\ActivityRepository;
 use App\Repository\CharityRepository;
-use App\Repository\FacultyRepository;
 use App\Repository\SeasonRepository;
-use App\Repository\SubmissionRepository;
-use App\Repository\UserRepository;
 use App\Requests\SeasonRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,7 +55,7 @@ class SeasonController extends AbstractController
     {
         $errors = $request->validate();
 
-        if(!empty($errors)) {
+        if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -105,17 +98,18 @@ class SeasonController extends AbstractController
             ]
         ],
     )]
-    public function seasonList(): Response {
+    public function seasonList(): Response
+    {
         $seasons = $this->serializer->normalize($this->seasonRepository->findAll(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions'],
         ]);
 
         return $this->json($seasons);
     }
 
     #[ApiRoute(
-        '/api/season/running',
-        name: 'api_season_running',
+        '/api/season/current',
+        name: 'api_season_current',
         methods: ['GET'],
         documentation: 'Get the currently running <code>Season</code>',
         responses: [
@@ -131,15 +125,13 @@ class SeasonController extends AbstractController
                     ],
                 ]
             ],
-            Response::HTTP_NOT_FOUND => [
-                'message' => 'Currently season has not been found'
-            ]
+            Response::HTTP_NOT_FOUND => ['message' => 'Currently season has not been found']
         ],
     )]
-    public function running(): Response
+    public function current(): Response
     {
-        $season = $this->seasonRepository->getRunning();
-        if($season === false) {
+        $season = $this->seasonRepository->getCurrent();
+        if ($season === false) {
             return new Response(status: Response::HTTP_NOT_FOUND);
         }
 
@@ -168,7 +160,7 @@ class SeasonController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function delete(Season $season): Response
     {
-        if(!$season->canDelete()) {
+        if (!$season->canDelete()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
@@ -180,23 +172,33 @@ class SeasonController extends AbstractController
         '/api/season/{season}/results',
         name: 'api_season_results',
         methods: ['GET'],
-        documentation: 'Retrieves a <code>Season</code> entity',
+        documentation: 'Retrieves a <code>Season</code>\'s results',
         responses: [
             Response::HTTP_OK => [
                 'message' => 'Successfully calculated results',
-//                'response' => [
-//                    'id' => 'integer',
-//                    'start' => 'date',
-//                    'end' => 'date',
-//                    'charity' => [
-//                        'name' => 'string',
-//                        'description' => 'string'
-//                    ],
-//                ]
+                'response' => [
+                    [
+                        'weekId' => [
+                            'activityId' => [
+                                'facultyId' => [
+                                    'distance' => 'int',
+                                    'elevation' => 'int',
+                                ],
+                                'extras' => [
+                                    'weekId' => [
+                                        'name' => 'weekly_distance|daily_distance|weekly_elevation',
+                                        'user_id' => 'int',
+                                        'distance|elevation' => 'int',
+                                        'faculty' => 'int',
+                                        'reward' => 'int',
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ],
-            Response::HTTP_BAD_REQUEST => [
-                'message' => 'Bad request',
-            ]
+            Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
         ],
     )]
     public function result(PointCalculator $calculator, Season $season): Response
@@ -222,12 +224,11 @@ class SeasonController extends AbstractController
                     ],
                 ]
             ],
-            Response::HTTP_BAD_REQUEST => [
-                'message' => 'Bad request',
-            ]
+            Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
         ],
     )]
-    public function season(Season $season): Response {
+    public function season(Season $season): Response
+    {
         $season = $this->serializer->normalize($season, null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
         ]);

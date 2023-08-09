@@ -11,6 +11,11 @@ class WeeklyElevationExtraPoints implements ExtraPoints
     private array $users = [];
     private bool $eligible = false;
 
+    public static function getUniqueName(): string
+    {
+        return 'weekly_elevation';
+    }
+
     public static function acceptsWeek(int $week): bool
     {
         return $week === 3;
@@ -72,7 +77,7 @@ class WeeklyElevationExtraPoints implements ExtraPoints
         }
 
         return [
-            'name' => 'weekly_elevation',
+            'name' => self::getUniqueName(),
             'user_id' => $maxUser,
             'elevation' => $maxElevation,
             'faculty' => $maxFaculty,

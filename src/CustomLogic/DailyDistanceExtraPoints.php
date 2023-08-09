@@ -11,6 +11,11 @@ class DailyDistanceExtraPoints implements ExtraPoints
     private int $maxUser = -1;
     private ?\DateTimeInterface $lastDate = null;
 
+    public static function getUniqueName(): string
+    {
+        return 'daily_distance';
+    }
+
     public static function acceptsWeek(int $week): bool
     {
         return $week === 2;
@@ -86,11 +91,12 @@ class DailyDistanceExtraPoints implements ExtraPoints
         }
 
         return [
-            'name' => 'daily_distance',
+            'name' => self::getUniqueName(),
             'user_id' => $maxUser,
             'distance' => $maxDistance,
             'faculty' => $maxFaculty,
             'reward' => self::reward(),
         ];
     }
+
 }

@@ -46,7 +46,7 @@ class SeasonRepository extends ServiceEntityRepository
         }
     }
 
-    public function getRunning(): Season|false {
+    public function getCurrent(): Season|false {
         $now = new DateTimeImmutable();
 
         $criteria = new Criteria();
