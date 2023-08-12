@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ActivityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -27,12 +29,16 @@ class Activity
     #[Groups(['fetchSubmission'])]
     private ?int $min_elevation = null;
 
+    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: ProfileCache::class)]
+    private Collection $profileCaches;
+
 //    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: Submission::class, orphanRemoval: true)]
 //    private Collection $submissions;
 
     public function __construct()
     {
 //        $this->submissions = new ArrayCollection();
+$this->profileCaches = new ArrayCollection();
     }
     
     public function getId(): ?int
@@ -72,6 +78,36 @@ class Activity
     public function setMinElevation(int $min_elevation): self
     {
         $this->min_elevation = $min_elevation;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProfileCache>
+     */
+    public function getProfileCaches(): Collection
+    {
+        return $this->profileCaches;
+    }
+
+    public function addProfileCache(ProfileCache $profileCache): static
+    {
+        if (!$this->profileCaches->contains($profileCache)) {
+            $this->profileCaches->add($profileCache);
+            $profileCache->setActivity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProfileCache(ProfileCache $profileCache): static
+    {
+        if ($this->profileCaches->removeElement($profileCache)) {
+            // set the owning side to null (unless already changed)
+            if ($profileCache->getActivity() === $this) {
+                $profileCache->setActivity(null);
+            }
+        }
 
         return $this;
     }

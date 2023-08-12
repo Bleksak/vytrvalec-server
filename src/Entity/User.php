@@ -56,9 +56,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $expoToken = null;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
+    private Collection $profileCaches;
+
     public function __construct()
     {
         $this->submissions = new ArrayCollection();
+        $this->profileCaches = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -225,6 +229,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setExpoToken(?string $expoToken): static
     {
         $this->expoToken = $expoToken;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProfileCache>
+     */
+    public function getProfileCaches(): Collection
+    {
+        return $this->profileCaches;
+    }
+
+    public function addProfileCache(ProfileCache $profileCache): static
+    {
+        if (!$this->profileCaches->contains($profileCache)) {
+            $this->profileCaches->add($profileCache);
+            $profileCache->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProfileCache(ProfileCache $profileCache): static
+    {
+        if ($this->profileCaches->removeElement($profileCache)) {
+            // set the owning side to null (unless already changed)
+            if ($profileCache->getUser() === $this) {
+                $profileCache->setUser(null);
+            }
+        }
 
         return $this;
     }
