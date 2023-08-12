@@ -9,27 +9,25 @@ use Doctrine\ORM\Mapping as ORM;
 class ProfileCache
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\ManyToOne(inversedBy: 'profileCaches')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private ?User $user;
 
+    #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'profileCaches')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Activity $activity = null;
+    private ?Activity $activity;
 
     #[ORM\Column]
-    private ?int $distance = null;
+    private ?int $distance = 0;
 
     #[ORM\Column]
-    private ?int $elevation = null;
+    private ?int $elevation = 0;
 
-    public function getId(): ?int
+    public function __construct(User $user, Activity $activity)
     {
-        return $this->id;
+        $this->user = $user;
+        $this->activity = $activity;
     }
 
     public function getUser(): ?User
@@ -37,22 +35,20 @@ class ProfileCache
         return $this->user;
     }
 
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     public function getActivity(): ?Activity
     {
         return $this->activity;
     }
 
-    public function setActivity(?Activity $activity): static
+    public function updateDistance(callable $updateFn): static
     {
-        $this->activity = $activity;
+        $this->setDistance(call_user_func($updateFn, $this->getDistance()));
+        return $this;
+    }
 
+    public function updateElevation(callable $updateFn): static
+    {
+        $this->setElevation(call_user_func($updateFn, $this->getElevation()));
         return $this;
     }
 

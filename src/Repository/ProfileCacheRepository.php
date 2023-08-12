@@ -2,7 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Activity;
 use App\Entity\ProfileCache;
+use App\Entity\Season;
+use App\Entity\Submission;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,28 +25,23 @@ class ProfileCacheRepository extends ServiceEntityRepository
         parent::__construct($registry, ProfileCache::class);
     }
 
-//    /**
-//     * @return ProfileCache[] Returns an array of ProfileCache objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function save(ProfileCache $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
 
-//    public function findOneBySomeField($value): ?ProfileCache
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function addCache(Submission $submission, bool $flush = false)
+    {
+        $profileCache = $this->findOneBy(['user' => $submission->getUser(), 'activity' => $submission->getActivity()]) ?? new ProfileCache($submission->getUser(), $submission->getActivity());
+        $profileCache
+            ->updateDistance(fn($oldDistance) => $oldDistance + $submission->getDistance())
+            ->updateElevation(fn($oldElevation) => $oldElevation + $submission->getElevation())
+        ;
+
+        $this->save($profileCache, $flush);
+    }
 }

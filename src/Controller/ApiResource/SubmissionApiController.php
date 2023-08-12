@@ -8,6 +8,7 @@ use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use App\Repository\ActivityRepository;
+use App\Repository\ProfileCacheRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Requests\SubmissionRequest;
@@ -264,14 +265,15 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function accept(Submission $submission): Response
+    public function accept(Submission $submission, ProfileCacheRepository $profileCacheRepository): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
         $this->setState($submission, true);
-        $this->submissionRepository->save($submission, true);
+        $this->submissionRepository->save($submission);
+        $profileCacheRepository->addCache($submission, true);
 
         return new Response(status: Response::HTTP_OK);
     }
