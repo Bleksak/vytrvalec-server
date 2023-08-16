@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\CharityRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: CharityRepository::class)]
+class Charity
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 10000)]
+    #[Groups(['fetchSubmission', 'fetchSeasonList'])]
+    private ?string $description = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+}

@@ -1,0 +1,9 @@
+@use "../abstracts/variables";
+
+body {
+  overflow-y: scroll;
+
+  display: flex;
+  flex-direction: column;
+  background-color: variables.$base-color;
+}

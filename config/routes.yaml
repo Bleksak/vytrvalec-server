@@ -1,0 +1,14 @@
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+
+api_user_logout:
+    path: /api/user/logout
+    methods: GET
+
+api_user_login:
+    path: /api/user/login
+    methods: POST
+
