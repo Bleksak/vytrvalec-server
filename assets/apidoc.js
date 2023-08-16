@@ -1,7 +1,7 @@
 import hljs from "highlight.js";
 
-import './styles/hightlightjs-dark.css';
 import './styles/style.css';
+import './styles/hightlightjs-dark.css';
 
 function toggleMenu(e) {
     e.preventDefault();
