@@ -62,11 +62,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: FacultyExtraPoints::class)]
     private Collection $extraPoints;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserCache::class)]
+    private Collection $userCache;
+
     public function __construct()
     {
         $this->submissions = new ArrayCollection();
         $this->profileCaches = new ArrayCollection();
         $this->extraPoints = new ArrayCollection();
+        $this->userCache = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -245,28 +249,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->profileCaches;
     }
 
-    public function addProfileCache(ProfileCache $profileCache): static
-    {
-        if (!$this->profileCaches->contains($profileCache)) {
-            $this->profileCaches->add($profileCache);
-            $profileCache->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProfileCache(ProfileCache $profileCache): static
-    {
-        if ($this->profileCaches->removeElement($profileCache)) {
-            // set the owning side to null (unless already changed)
-            if ($profileCache->getUser() === $this) {
-                $profileCache->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, FacultyExtraPoints>
      */
@@ -291,6 +273,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($extraPoint->getUser() === $this) {
                 $extraPoint->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserCache>
+     */
+    public function getUserCaches(): Collection
+    {
+        return $this->userCaches;
+    }
+
+    public function addUserCache(UserCache $userCache): static
+    {
+        if (!$this->userCache->contains($userCache)) {
+            $this->userCache->add($userCache);
+            $userCache->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserCache(UserCache $userCache): static
+    {
+        if ($this->userCache->removeElement($userCache)) {
+            // set the owning side to null (unless already changed)
+            if ($userCache->getUser() === $this) {
+                $userCache->setUser(null);
             }
         }
 
