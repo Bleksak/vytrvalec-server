@@ -1,12 +1,28 @@
-.idea
-vendor
-var
-public
-node_modules
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
 
-.env.local
+###> phpunit/phpunit ###
+/phpunit.xml
 .phpunit.result.cache
+###< phpunit/phpunit ###
 
-composer.lock
-package-lock.json
-symfony.lock
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> symfony/webpack-encore-bundle ###
+/node_modules/
+/public/build/
+npm-debug.log
+yarn-error.log
+###< symfony/webpack-encore-bundle ###
+
+.idea
