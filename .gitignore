@@ -1,3 +1,12 @@
 .idea
 vendor
 var
+public
+node_modules
+
+.env.local
+.phpunit.result.cache
+
+composer.lock
+package-lock.json
+symfony.lock
