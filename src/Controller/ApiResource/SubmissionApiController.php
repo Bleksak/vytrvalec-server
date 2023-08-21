@@ -8,6 +8,8 @@ use App\Entity\RejectedSubmissionMessage;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
+use App\Notifications\Firebase\Firebase;
+use App\Notifications\Firebase\FirebaseNotification;
 use App\Recipient\ExpoRecipient;
 use App\Repository\ActivityRepository;
 use App\Repository\RejectedSubmissionMessageRepository;
@@ -19,17 +21,31 @@ use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
 use ImagickException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransport;
+use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
+use Symfony\Component\Notifier\Bridge\Firebase\Notification\AndroidNotification;
+use Symfony\Component\Notifier\Bridge\Firebase\Notification\IOSNotification;
+use Symfony\Component\Notifier\Bridge\Firebase\Notification\WebNotification;
 use Symfony\Component\Notifier\Channel\PushChannel;
+use Symfony\Component\Notifier\Chatter;
+use Symfony\Component\Notifier\ChatterInterface;
+use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\Texter;
+use Symfony\Component\Notifier\TexterInterface;
+use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 
 #[ApiResource('Submission')]
 class SubmissionApiController extends AbstractController
@@ -301,7 +317,7 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function reject(Request $request, Submission $submission, NotifierInterface $notifier, RejectedSubmissionMessageRepository $repository): Response
+    public function reject(Request $request, Submission $submission, RejectedSubmissionMessageRepository $repository, Firebase $firebase): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
@@ -318,14 +334,20 @@ class SubmissionApiController extends AbstractController
         $rejectedMessage = (new RejectedSubmissionMessage())->setSubmission($submission)->setMessage($message);
         $repository->save($rejectedMessage, true);
 
-        $notification = (new Notification('Měsíční vytrvalec', ['email', 'expo']))->content($message);
-        $recipient = new Recipient($submission->getUser()->getEmail());
+//        $notification = (new Notification('Měsíční vytrvalec', ['email', 'expo']))->content($message);
+//        $recipient = new Recipient($submission->getUser()->getEmail());
 
-        $notifier->send($notification, $recipient);
-//        $notifier->send($notification, new ExpoRecipient($submission->getUser()->getExpoToken()));
-        $pushChannel = new PushChannel();
-        $pushChannel->notify($notification, new ExpoRecipient($submission->getUser()->getExpoToken()), null);
+//        $notifier->send($notification, $recipient);
+        $firebase->send(new FirebaseNotification($submission->getUser()->getFirebaseToken(), 'Send nudes plz', 'plííííz', 'ASPON_BOOBIEZ?'));
 
         return new Response(status: Response::HTTP_OK);
+    }
+
+    #[Route('/notifyTest', name: 'notification_test', env: 'dev')]
+    public function notificationTest(Firebase $firebase): Response
+    {
+        $firebase->send(new FirebaseNotification('/topics/new_season', 'Send nudes plz', 'plííííz', 'ASPON_BOOBIEZ?'));
+
+        return new Response('OK', 200);
     }
 }

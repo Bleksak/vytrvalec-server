@@ -53,6 +53,7 @@ class UserApiController extends AbstractController
         requestScheme: [
             'email' => 'string',
             'password' => 'string',
+            'firebase_token' => 'string',
         ],
         fakeName: 'api_user_login',
         fakePath: '/api/user/login',

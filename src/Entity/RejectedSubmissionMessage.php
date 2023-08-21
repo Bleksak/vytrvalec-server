@@ -31,6 +31,7 @@ class RejectedSubmissionMessage
 
         return $this;
     }
+
     public function getSubmission(): ?Submission
     {
         return $this->submission;
@@ -50,12 +51,12 @@ class RejectedSubmissionMessage
 
     public function getTimeCreated(): ?\DateTimeInterface
     {
-        return $this->time_created;
+        return $this->createdAt;
     }
 
-    public function setTimeCreated(\DateTimeInterface $time_created): static
+    public function setTimeCreated(\DateTimeInterface $createdAt): static
     {
-        $this->time_created = $time_created;
+        $this->createdAt = $createdAt;
 
         return $this;
     }

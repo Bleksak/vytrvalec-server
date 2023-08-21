@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -50,11 +51,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['fetchSubmission'])]
     private ?Faculty $faculty = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $firebaseToken = null;
+
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class, orphanRemoval: true)]
     private ?Collection $submissions;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $expoToken = null;
 
     public function __construct()
     {
@@ -217,14 +218,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getExpoToken(): ?string
+    public function getFirebaseToken(): ?string
     {
-        return $this->expoToken;
+        return $this->firebaseToken;
     }
 
-    public function setExpoToken(?string $expoToken): static
+    public function setFirebaseToken(string $firebaseToken): static
     {
-        $this->expoToken = $expoToken;
+        $this->firebaseToken = $firebaseToken;
 
         return $this;
     }

@@ -82,11 +82,12 @@ class LoginAuthenticator extends AbstractAuthenticator
 
         $response->headers->setCookie(new Cookie('jwt', $jwt, $expirationTime, secure: $request->isSecure(), httpOnly: true));
 
-        $expoToken = $request->getPayload()->get('expo_token');
+        $firebaseToken = $request->getPayload()->get('firebase_token');
         $user = $token->getUser();
 
-        if($expoToken !== null && $user instanceof User) {
-            $user->setExpoToken($expoToken);
+        if($firebaseToken !== null && $user instanceof User) {
+            // TODO: set token
+//            $user->setExpoToken($expoToken);
             $this->userRepository->save($user, true);
         }
 
