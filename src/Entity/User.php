@@ -17,38 +17,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile'])]
     private ?string $email = null;
 
-    /**
-     * @var string[]
-     */
     #[ORM\Column(type: 'json')]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile'])]
     private array $roles = [];
 
     #[ORM\Column]
     private ?string $password = null;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile'])]
     private ?bool $banned = false;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile'])]
     private ?string $firstName = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile'])]
     private ?string $lastName = null;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile'])]
     private ?Faculty $faculty = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
@@ -57,9 +54,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class, orphanRemoval: true)]
     private ?Collection $submissions;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
+    private Collection $profileCaches;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: FacultyExtraPoints::class)]
+    private Collection $extraPoints;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserCache::class)]
+    private Collection $userCache;
+
     public function __construct()
     {
         $this->submissions = new ArrayCollection();
+        $this->profileCaches = new ArrayCollection();
+        $this->extraPoints = new ArrayCollection();
+        $this->userCache = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -226,6 +235,74 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFirebaseToken(string $firebaseToken): static
     {
         $this->firebaseToken = $firebaseToken;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProfileCache>
+     */
+    public function getProfileCaches(): Collection
+    {
+        return $this->profileCaches;
+    }
+
+    /**
+     * @return Collection<int, FacultyExtraPoints>
+     */
+    public function getExtraPoints(): Collection
+    {
+        return $this->extraPoints;
+    }
+
+    public function addExtraPoint(FacultyExtraPoints $extraPoint): static
+    {
+        if (!$this->extraPoints->contains($extraPoint)) {
+            $this->extraPoints->add($extraPoint);
+            $extraPoint->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExtraPoint(FacultyExtraPoints $extraPoint): static
+    {
+        if ($this->extraPoints->removeElement($extraPoint)) {
+            // set the owning side to null (unless already changed)
+            if ($extraPoint->getUser() === $this) {
+                $extraPoint->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserCache>
+     */
+    public function getUserCaches(): Collection
+    {
+        return $this->userCache;
+    }
+
+    public function addUserCache(UserCache $userCache): static
+    {
+        if (!$this->userCache->contains($userCache)) {
+            $this->userCache->add($userCache);
+            $userCache->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserCache(UserCache $userCache): static
+    {
+        if ($this->userCache->removeElement($userCache)) {
+            // set the owning side to null (unless already changed)
+            if ($userCache->getUser() === $this) {
+                $userCache->setUser(null);
+            }
+        }
 
         return $this;
     }

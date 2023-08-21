@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ActivityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -12,27 +14,27 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile'])]
     private ?string $name = null;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile'])]
     private ?bool $active = null;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
-    private ?int $min_elevation = null;
+    #[Groups(['fetchSubmission', 'userProfile'])]
+    private ?int $minElevation = null;
 
-//    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: Submission::class, orphanRemoval: true)]
-//    private Collection $submissions;
+    #[ORM\OneToMany(mappedBy: 'faculty', targetEntity: FacultyCache::class)]
+    private Collection $facultyCaches;
 
     public function __construct()
     {
-//        $this->submissions = new ArrayCollection();
+        $this->facultyCaches = new ArrayCollection();
     }
     
     public function getId(): ?int
@@ -66,13 +68,18 @@ class Activity
 
     public function getMinElevation(): ?int
     {
-        return $this->min_elevation;
+        return $this->minElevation;
     }
 
-    public function setMinElevation(int $min_elevation): self
+    public function setMinElevation(int $minElevation): self
     {
-        $this->min_elevation = $min_elevation;
+        $this->minElevation = $minElevation;
 
         return $this;
+    }
+
+    public function getFacultyCaches(): ?Collection
+    {
+        return $this->facultyCaches;
     }
 }
