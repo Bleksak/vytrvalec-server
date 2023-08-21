@@ -43,13 +43,9 @@ class Season
     #[ORM\OneToMany(mappedBy: 'season', targetEntity: Submission::class)]
     private Collection $submissions;
 
-//    #[ORM\OneToMany(mappedBy: 'season', targetEntity: FacultyCache::class)]
-//    private Collection $activityCaches;
-
     public function __construct()
     {
         $this->submissions = new ArrayCollection();
-//        $this->activityCaches = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -136,34 +132,4 @@ class Season
 
         return $today >= $start && $today < $end;
     }
-
-    /**
-     * @return Collection<int, FacultyCache>
-     */
-//    public function getActivityCaches(): Collection
-//    {
-//        return $this->activityCaches;
-//    }
-//
-//    public function addActivityCache(FacultyCache $activityCache): static
-//    {
-//        if (!$this->activityCaches->contains($activityCache)) {
-//            $this->activityCaches->add($activityCache);
-//            $activityCache->setSeason($this);
-//        }
-//
-//        return $this;
-//    }
-//
-//    public function removeActivityCache(FacultyCache $activityCache): static
-//    {
-//        if ($this->activityCaches->removeElement($activityCache)) {
-//            // set the owning side to null (unless already changed)
-//            if ($activityCache->getSeason() === $this) {
-//                $activityCache->setSeason(null);
-//            }
-//        }
-//
-//        return $this;
-//    }
 }

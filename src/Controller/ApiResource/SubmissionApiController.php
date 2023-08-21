@@ -4,25 +4,24 @@ namespace App\Controller\ApiResource;
 
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
+use App\Entity\RejectedSubmissionMessage;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
-use App\Entity\UserCache;
-use App\Repository\FacultyCacheRepository;
-use App\Repository\ProfileCacheRepository;
+use App\Notifications\Firebase\Firebase;
+use App\Notifications\Firebase\FirebaseNotification;
+use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
-use App\Repository\UserCacheRepository;
 use App\Requests\SubmissionRequest;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
 use ImagickException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\NotifierInterface;
-use Symfony\Component\Notifier\Recipient\Recipient;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -31,10 +30,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[ApiResource('Submission')]
 class SubmissionApiController extends AbstractController
 {
-    public function __construct(
-        private readonly SubmissionRepository $submissionRepository,
-        private readonly SerializerInterface $serializer
-    )
+    public function __construct(private readonly EntityManagerInterface $em, private readonly SubmissionRepository $submissionRepository, private readonly SerializerInterface $serializer)
     {
     }
 
@@ -115,7 +111,9 @@ class SubmissionApiController extends AbstractController
         }
 
         $submission->setImage($uniquePath);
-        $this->submissionRepository->save($submission, true);
+
+        $this->em->persist($submission);
+        $this->em->flush();
 
         return new Response(status: Response::HTTP_CREATED);
     }
@@ -236,7 +234,8 @@ class SubmissionApiController extends AbstractController
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
-        $this->submissionRepository->remove($submission, true);
+        $this->em->remove($submission);
+        $this->em->flush();
 
         return new Response(status: Response::HTTP_OK);
     }
@@ -265,24 +264,14 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function accept(
-        Submission $submission,
-        ProfileCacheRepository $profileCacheRepository,
-        UserCacheRepository $userCacheRepository,
-        FacultyCacheRepository $facultyCacheRepository
-    ): Response
+    public function accept(Submission $submission): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
         $this->setState($submission, true);
-        $this->submissionRepository->save($submission);
-
-        $profileCacheRepository->addCache($submission);
-        $userCacheRepository->addCache($submission);
-        $facultyCacheRepository->addCache($submission, true);
-
+        $this->submissionRepository->save($submission, true);
 
         return new Response(status: Response::HTTP_OK);
     }
@@ -308,21 +297,37 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function reject(Request $request, Submission $submission, NotifierInterface $notifier): Response
+    public function reject(Request $request, Submission $submission, RejectedSubmissionMessageRepository $repository, Firebase $firebase): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
         $this->setState($submission, false);
-        $this->submissionRepository->save($submission, true);
+        $this->submissionRepository->save($submission);
 
         $message = $request->getPayload()->get('message');
+        if(empty($message)) {
+            $message = 'Vaše aktivita ze dne ' . $submission->getDate()->format('d. m. Y') . ' byla zamítnuta.\nZkontrolujte prosím zadané údaje a případně je upravte.\n\nDěkujeme za pochopení,\nKatedra tělesné výchovy a sportu ZČU v Plzni';
+        }
 
-        $notification = (new Notification('Měsíční vytrvalec', ['email', 'expo']))->content($message);
-        $recipient = new Recipient($submission->getUser()->getEmail(), $submission->getUser()->getExpoToken());
-        $notifier->send($notification, $recipient);
+        $rejectedMessage = (new RejectedSubmissionMessage())->setSubmission($submission)->setMessage($message);
+        $repository->save($rejectedMessage, true);
+
+//        $notification = (new Notification('Měsíční vytrvalec', ['email', 'expo']))->content($message);
+//        $recipient = new Recipient($submission->getUser()->getEmail());
+
+//        $notifier->send($notification, $recipient);
+        $firebase->send(new FirebaseNotification($submission->getUser()->getFirebaseToken(), 'Send nudes plz', 'plííííz', 'ASPON_BOOBIEZ?'));
 
         return new Response(status: Response::HTTP_OK);
+    }
+
+    #[Route('/notifyTest', name: 'notification_test', env: 'dev')]
+    public function notificationTest(Firebase $firebase): Response
+    {
+        $firebase->send(new FirebaseNotification('/topics/new_season', 'Send nudes plz', 'plííííz', 'ASPON_BOOBIEZ?'));
+
+        return new Response('OK', 200);
     }
 }

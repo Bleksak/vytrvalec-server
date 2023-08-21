@@ -1,6 +1,7 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 parameters:
     jwt_secret: '%env(JWT_SECRET)%'
+    firebase_dsn: '%env(FIREBASE_DSN)%'
 
 framework:
     secret: '%env(APP_SECRET)%'
