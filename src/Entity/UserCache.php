@@ -2,30 +2,20 @@
 
 namespace App\Entity;
 
-use App\Repository\FacultyCacheRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\UserCacheRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: FacultyCacheRepository::class)]
-class FacultyCache
+#[ORM\Entity(repositoryClass: UserCacheRepository::class)]
+class UserCache
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'userCache')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Faculty $faculty = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Activity $activity = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Season $season = null;
+    private ?User $user = null;
 
     #[ORM\Column]
     private ?int $week = null;
@@ -36,13 +26,13 @@ class FacultyCache
     #[ORM\Column]
     private ?int $elevation = null;
 
-    #[ORM\OneToMany(mappedBy: 'cache', targetEntity: FacultyExtraPoints::class)]
-    private Collection $extraPoints;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Activity $activity = null;
 
-    public function __construct(Faculty $faculty, Activity $activity, int $week)
+    public function __construct(User $user, Activity $activity, int $week)
     {
-        $this->extraPoints = new ArrayCollection();
-        $this->faculty = $faculty;
+        $this->user = $user;
         $this->activity = $activity;
         $this->week = $week;
     }
@@ -52,14 +42,14 @@ class FacultyCache
         return $this->id;
     }
 
-    public function getSeason(): ?Season
+    public function getUser(): ?User
     {
-        return $this->season;
+        return $this->user;
     }
 
-    public function setSeason(?Season $season): static
+    public function setUser(?User $user): static
     {
-        $this->season = $season;
+        $this->user = $user;
 
         return $this;
     }
@@ -67,18 +57,6 @@ class FacultyCache
     public function getWeek(): ?int
     {
         return $this->week;
-    }
-
-    public function getActivity(): ?Activity
-    {
-        return $this->activity;
-    }
-
-    public function setActivity(?Activity $activity): static
-    {
-        $this->activity = $activity;
-
-        return $this;
     }
 
     public function setWeek(int $week): static
@@ -112,24 +90,16 @@ class FacultyCache
         return $this;
     }
 
-    public function getFaculty(): ?Faculty
+    public function getActivity(): ?Activity
     {
-        return $this->faculty;
+        return $this->activity;
     }
 
-    public function setFaculty(?Faculty $faculty): static
+    public function setActivity(?Activity $activity): static
     {
-        $this->faculty = $faculty;
+        $this->activity = $activity;
 
         return $this;
-    }
-
-    /**
-     * @return Collection<int, FacultyExtraPoints>
-     */
-    public function getExtraPoints(): Collection
-    {
-        return $this->extraPoints;
     }
 
     public function updateDistance(callable $updateFn): static

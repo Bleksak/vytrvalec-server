@@ -174,6 +174,7 @@ class Submission
     public function setDate(DateTimeInterface $date): self
     {
         $this->date = $date;
+        $this->calculateWeek();
 
         return $this;
     }
