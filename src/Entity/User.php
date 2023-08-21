@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -23,9 +24,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['fetchSubmission', 'userProfile'])]
     private ?string $email = null;
 
-    /**
-     * @var string[]
-     */
     #[ORM\Column(type: 'json')]
     #[Groups(['fetchSubmission', 'userProfile'])]
     private array $roles = [];
@@ -50,11 +48,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['fetchSubmission', 'userProfile'])]
     private ?Faculty $faculty = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $firebaseToken = null;
+
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class, orphanRemoval: true)]
     private ?Collection $submissions;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $expoToken = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
     private Collection $profileCaches;
@@ -229,14 +227,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getExpoToken(): ?string
+    public function getFirebaseToken(): ?string
     {
-        return $this->expoToken;
+        return $this->firebaseToken;
     }
 
-    public function setExpoToken(?string $expoToken): static
+    public function setFirebaseToken(string $firebaseToken): static
     {
-        $this->expoToken = $expoToken;
+        $this->firebaseToken = $firebaseToken;
 
         return $this;
     }

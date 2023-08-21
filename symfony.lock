@@ -130,6 +130,15 @@
             "ref": "9e3bbbadbc1d3089cacc5ff2eccc19d03c973436"
         }
     },
+    "symfony/firebase-notifier": {
+        "version": "6.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.1",
+            "ref": "653cce5c9e02ab91f9c0cf67ebff02c4a297f493"
+        }
+    },
     "symfony/flex": {
         "version": "2.2",
         "recipe": {

@@ -1,0 +1,39 @@
+label, input {
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.form-black {
+  font-size: 1em;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  background: rgba(0, 0, 0, 0.67);
+  padding: 2% 10%;
+}
+
+.form-small {
+  padding: 0;
+  display: inline-block;
+}
+
+.form-header {
+  background: rgba(0, 0, 0, 0.82);
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  margin: 0;
+  padding: 2%;
+  color: white;
+  text-align: center;
+}
+

@@ -6,80 +6,91 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
 }
 
-if(!Encore.isProduction()) {
+Encore
+    // directory where compiled assets will be stored
+    .setOutputPath('public/build/')
+    // public path used by the web server to access the output path
+    .setPublicPath('/build')
+    // only needed for CDN's or subdirectory deploy
+    //.setManifestKeyPrefix('build/')
 
-    Encore
-        // directory where compiled assets will be stored
-        .setOutputPath('public/build/')
-        // public path used by the web server to access the output path
-        .setPublicPath('/build')
-        // only needed for CDN's or subdirectory deploy
-        //.setManifestKeyPrefix('build/')
+    /*
+     * ENTRY CONFIG
+     *
+     * Each entry will result in one JavaScript file (e.g. app.js)
+     * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
+     */
+    .addEntry('app', './assets/app.js')
+    .addEntry('apidoc', './assets/apidoc.js')
 
-        /*
-         * ENTRY CONFIG
-         *
-         * Each entry will result in one JavaScript file (e.g. app.js)
-         * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
-         */
-        .addEntry('apidoc', './assets/apidoc.js')
+    // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
+    .enableStimulusBridge('./assets/controllers.json')
 
-        // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
-        .splitEntryChunks()
+    // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
+    .splitEntryChunks()
 
-        // will require an extra script tag for runtime.js
-        // but, you probably want this, unless you're building a single-page app
-        // .enableSingleRuntimeChunk()
-        .disableSingleRuntimeChunk()
+    // will require an extra script tag for runtime.js
+    // but, you probably want this, unless you're building a single-page app
+    // .enableSingleRuntimeChunk()
+    .disableSingleRuntimeChunk()
 
-        /*
-         * FEATURE CONFIG
-         *
-         * Enable & configure other features below. For a full
-         * list of features, see:
-         * https://symfony.com/doc/current/frontend.html#adding-more-features
-         */
-        .cleanupOutputBeforeBuild()
-        // .enableBuildNotifications()
-        .enableSourceMaps(!Encore.isProduction())
-        // enables hashed filenames (e.g. app.abc123.css)
-        .enableVersioning(Encore.isProduction())
+    /*
+     * FEATURE CONFIG
+     *
+     * Enable & configure other features below. For a full
+     * list of features, see:
+     * https://symfony.com/doc/current/frontend.html#adding-more-features
+     */
+    .cleanupOutputBeforeBuild()
+    // .enableBuildNotifications()
+    .enableSourceMaps(!Encore.isProduction())
+    // enables hashed filenames (e.g. app.abc123.css)
+    .enableVersioning(Encore.isProduction())
 
-        // configure Babel
-        // .configureBabel((config) => {
-        //     config.plugins.push('@babel/a-babel-plugin');
-        // })
+    // configure Babel
+    // .configureBabel((config) => {
+    //     config.plugins.push('@babel/a-babel-plugin');
+    // })
 
-        // enables and configure @babel/preset-env polyfills
-        .configureBabelPresetEnv((config) => {
-            config.useBuiltIns = 'usage';
-            config.corejs = '3.23';
-        })
+    // enables and configure @babel/preset-env polyfills
+    .configureBabelPresetEnv((config) => {
+        config.useBuiltIns = 'usage';
+        config.corejs = '3.23';
+    })
 
-        // uncomment to get integrity="..." attributes on your script & link tags
-        // requires WebpackEncoreBundle 1.4 or higher
-        //.enableIntegrityHashes(Encore.isProduction())
+    // enables Sass/SCSS support
+    .enableSassLoader()
 
-        .copyFiles({
-            from: './assets/translations',
-            // pattern: /\.(png|jpg|jpeg)$/,
-            to: 'translations/[path][name].[ext]'
-        })
+    // uncomment if you use React
+    .enableReactPreset()
+
+    // uncomment if you use TypeScript
+    .enableTypeScriptLoader()
+
+    // uncomment to get integrity="..." attributes on your script & link tags
+    // requires WebpackEncoreBundle 1.4 or higher
+    //.enableIntegrityHashes(Encore.isProduction())
+
+    // uncomment if you're having problems with a jQuery plugin
+    .autoProvidejQuery()
+
+    .copyFiles({
+        from: './assets/images',
+        pattern: /\.(png|jpg|jpeg)$/,
+        to: 'images/[path][name].[ext]'
+    })
+
+    .copyFiles({
+        from: './assets/fonts',
+        // pattern: /\.(png|jpg|jpeg)$/,
+        to: 'fonts/[path][name].[ext]'
+    })
+
+    .copyFiles({
+        from: './assets/translations',
+        // pattern: /\.(png|jpg|jpeg)$/,
+        to: 'translations/[path][name].[ext]'
+    })
     ;
-} else {
-    Encore
-        .setOutputPath('public/build/')
-        // public path used by the web server to access the output path
-        .setPublicPath('/build')
-
-        .enableSingleRuntimeChunk()
-        .cleanupOutputBeforeBuild()
-
-        .copyFiles({
-            from: 'public/build',
-            to: ''
-        })
-    ;
-}
 
 module.exports = Encore.getWebpackConfig();

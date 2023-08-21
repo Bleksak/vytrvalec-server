@@ -1,0 +1,13 @@
+@charset "utf-8";
+
+$base-color: #f1f8ff;
+$blue-font-color: #1650a3;
+
+$breakpoints: (
+        'medium': (min-width: 800px),
+        'large': (min-width: 1000px),
+        'huge': (min-width: 1200px),
+);
+
+$h-font-sizes: (2.2, 2.0, 1.8, 1.6, 1.4, 1.2);
+$h-font-colors: (inherit, inherit, $blue-font-color, $blue-font-color, $blue-font-color, $blue-font-color);

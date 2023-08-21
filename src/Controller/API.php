@@ -13,7 +13,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class API extends AbstractController
 {
-    #[Route('/{selection}', name: 'APIDoc', methods: ['GET'], env: 'dev')]
+    #[Route('/apidoc/{selection}', name: 'APIDoc', methods: ['GET'], env: 'dev')]
     public function api(RouterInterface $router, string $selection = ''): Response
     {
         return $this->render('api.html.twig', [
