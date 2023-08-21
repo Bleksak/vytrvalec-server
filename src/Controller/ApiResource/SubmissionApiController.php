@@ -10,8 +10,6 @@ use App\Entity\Submission;
 use App\Entity\User;
 use App\Notifications\Firebase\Firebase;
 use App\Notifications\Firebase\FirebaseNotification;
-use App\Recipient\ExpoRecipient;
-use App\Repository\ActivityRepository;
 use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
@@ -21,36 +19,18 @@ use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
 use ImagickException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransport;
-use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
-use Symfony\Component\Notifier\Bridge\Firebase\Notification\AndroidNotification;
-use Symfony\Component\Notifier\Bridge\Firebase\Notification\IOSNotification;
-use Symfony\Component\Notifier\Bridge\Firebase\Notification\WebNotification;
-use Symfony\Component\Notifier\Channel\PushChannel;
-use Symfony\Component\Notifier\Chatter;
-use Symfony\Component\Notifier\ChatterInterface;
-use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
-use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\NotifierInterface;
-use Symfony\Component\Notifier\Recipient\Recipient;
-use Symfony\Component\Notifier\Texter;
-use Symfony\Component\Notifier\TexterInterface;
-use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 
 #[ApiResource('Submission')]
 class SubmissionApiController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em, private readonly SubmissionRepository $submissionRepository, private readonly ActivityRepository $activityRepository, private readonly SerializerInterface $serializer)
+    public function __construct(private readonly EntityManagerInterface $em, private readonly SubmissionRepository $submissionRepository, private readonly SerializerInterface $serializer)
     {
     }
 
