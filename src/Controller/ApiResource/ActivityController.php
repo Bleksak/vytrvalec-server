@@ -31,7 +31,6 @@ class ActivityController extends AbstractController
             Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access']
         ],
     )]
-    #[IsGranted('ROLE_USER')]
     public function activityList(SerializerInterface $serializer): Response
     {
         return $this->json($serializer->normalize($this->activityRepository->findAll(), null, [
