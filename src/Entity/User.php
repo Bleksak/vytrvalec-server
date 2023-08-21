@@ -284,7 +284,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserCaches(): Collection
     {
-        return $this->userCaches;
+        return $this->userCache;
     }
 
     public function addUserCache(UserCache $userCache): static

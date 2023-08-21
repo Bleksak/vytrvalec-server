@@ -13,7 +13,7 @@ class UserCache
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'week')]
+    #[ORM\ManyToOne(inversedBy: 'userCache')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
@@ -25,6 +25,17 @@ class UserCache
 
     #[ORM\Column]
     private ?int $elevation = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Activity $activity = null;
+
+    public function __construct(User $user, Activity $activity, int $week)
+    {
+        $this->user = $user;
+        $this->activity = $activity;
+        $this->week = $week;
+    }
 
     public function getId(): ?int
     {
@@ -76,6 +87,30 @@ class UserCache
     {
         $this->elevation = $elevation;
 
+        return $this;
+    }
+
+    public function getActivity(): ?Activity
+    {
+        return $this->activity;
+    }
+
+    public function setActivity(?Activity $activity): static
+    {
+        $this->activity = $activity;
+
+        return $this;
+    }
+
+    public function updateDistance(callable $updateFn): static
+    {
+        $this->setDistance(call_user_func($updateFn, $this->getDistance()));
+        return $this;
+    }
+
+    public function updateElevation(callable $updateFn): static
+    {
+        $this->setElevation(call_user_func($updateFn, $this->getElevation()));
         return $this;
     }
 }

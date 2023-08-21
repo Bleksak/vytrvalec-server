@@ -34,9 +34,13 @@ class ProfileCacheRepository extends ServiceEntityRepository
         }
     }
 
-    public function addCache(Submission $submission, bool $flush = false)
+    public function addCache(Submission $submission, bool $flush = false): void
     {
-        $profileCache = $this->findOneBy(['user' => $submission->getUser(), 'activity' => $submission->getActivity()]) ?? new ProfileCache($submission->getUser(), $submission->getActivity());
+        $profileCache = $this->findOneBy([
+            'user' => $submission->getUser(),
+            'activity' => $submission->getActivity()
+        ]) ?? new ProfileCache($submission->getUser(), $submission->getActivity());
+
         $profileCache
             ->updateDistance(fn($oldDistance) => $oldDistance + $submission->getDistance())
             ->updateElevation(fn($oldElevation) => $oldElevation + $submission->getElevation())

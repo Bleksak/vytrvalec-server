@@ -39,9 +39,12 @@ class FacultyCache
     #[ORM\OneToMany(mappedBy: 'cache', targetEntity: FacultyExtraPoints::class)]
     private Collection $extraPoints;
 
-    public function __construct()
+    public function __construct(Faculty $faculty, Activity $activity, int $week)
     {
         $this->extraPoints = new ArrayCollection();
+        $this->faculty = $faculty;
+        $this->activity = $activity;
+        $this->week = $week;
     }
 
     public function getId(): ?int
@@ -127,5 +130,17 @@ class FacultyCache
     public function getExtraPoints(): Collection
     {
         return $this->extraPoints;
+    }
+
+    public function updateDistance(callable $updateFn): static
+    {
+        $this->setDistance(call_user_func($updateFn, $this->getDistance()));
+        return $this;
+    }
+
+    public function updateElevation(callable $updateFn): static
+    {
+        $this->setElevation(call_user_func($updateFn, $this->getElevation()));
+        return $this;
     }
 }

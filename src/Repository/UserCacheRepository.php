@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Entity\ProfileCache;
+use App\Entity\Submission;
 use App\Entity\UserCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,6 +21,31 @@ class UserCacheRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, UserCache::class);
+    }
+
+    public function save(UserCache $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function addCache(Submission $submission, bool $flush = false): void
+    {
+        $userCache = $this->findOneBy([
+            'user' => $submission->getUser(),
+            'activity' => $submission->getActivity(),
+            'week' => $submission->getWeek(),
+        ]) ?? new UserCache($submission->getUser(), $submission->getActivity(), $submission->getWeek());
+
+        $userCache
+            ->updateDistance(fn($oldDistance) => $oldDistance + $submission->getDistance())
+            ->updateElevation(fn($oldElevation) => $oldElevation + $submission->getElevation())
+        ;
+
+        $this->save($userCache, $flush);
     }
 
 //    /**

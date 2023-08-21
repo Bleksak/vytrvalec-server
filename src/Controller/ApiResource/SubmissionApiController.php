@@ -7,9 +7,12 @@ use App\Attributes\ApiRoute;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
+use App\Entity\UserCache;
+use App\Repository\FacultyCacheRepository;
 use App\Repository\ProfileCacheRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
+use App\Repository\UserCacheRepository;
 use App\Requests\SubmissionRequest;
 use DateTimeImmutable;
 use Imagick;
@@ -262,7 +265,12 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function accept(Submission $submission, ProfileCacheRepository $profileCacheRepository): Response
+    public function accept(
+        Submission $submission,
+        ProfileCacheRepository $profileCacheRepository,
+        UserCacheRepository $userCacheRepository,
+        FacultyCacheRepository $facultyCacheRepository
+    ): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
@@ -270,7 +278,11 @@ class SubmissionApiController extends AbstractController
 
         $this->setState($submission, true);
         $this->submissionRepository->save($submission);
-        $profileCacheRepository->addCache($submission, true);
+
+        $profileCacheRepository->addCache($submission);
+        $userCacheRepository->addCache($submission);
+        $facultyCacheRepository->addCache($submission, true);
+
 
         return new Response(status: Response::HTTP_OK);
     }
