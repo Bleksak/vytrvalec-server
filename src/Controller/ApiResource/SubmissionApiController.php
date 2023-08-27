@@ -178,7 +178,7 @@ class SubmissionApiController extends AbstractController
     {
         $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
-        $nextPage = $page + 1 >= $pageCount ? $page + 1 : null;
+        $nextPage = ($page + 1) > $pageCount ? null : $page + 1;
 
         return $this->json($this->serializer->normalize(['nextPage' => $nextPage, 'submissions' => $submissions], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
