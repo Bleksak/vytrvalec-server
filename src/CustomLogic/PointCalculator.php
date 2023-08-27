@@ -57,7 +57,7 @@ class PointCalculator
                 }
             }
 
-            if(!array_key_exists($faculty, $activities[$activity]['faculties'])) {
+            if(!array_key_exists($faculty, $activities[$activity])) {
                 $activities[$activity]['faculties'][$faculty] = 0;
             }
 

@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<div class="register">
+    <h2 class="form-header text-center">{{ 'sign_up'|trans }}</h2>
+
+    {# <form class="black-form middle" method="post" action="{% provider_login_url 'google' %}">
+        {% csrf_token %}
+        <button class="google btn"><i class="fa-brands fa-google"></i>{% 'sign_up_gapps'|trans %}</button>
+    </form> #}
+			
+
+    {{ form_start(form, {'attr': {'class': 'black-form'}}) }}
+        <h6 class="text-center">{{ 'sign_up_graduated'|trans }}</h6>
+        {# {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+                <p class="error">{{ error }}</p>
+            {% endfor %}
+        {% endfor %} #}
+
+        {# {% if success %}
+			<span class="success">{% trans 'RegistrationOk' %}</span>
+		{% endif %}  #}
+
+        {% if form_errors(form)|length != 0%}
+        <div class="text-center">{{ 'register_form_error'|trans }}</div>
+        <div class="d-flex justify-content-center">
+            {{ form_errors(form) }}
+        </div>
+        {% endif %}
+
+        {{ form_label(form.email) }}
+        {{ form_errors(form.email) }}
+        {{ form_widget(form.email) }}
+
+        <div class="d-flex gap-3">
+            <div>
+                {{ form_label(form.first_name) }}
+                {{ form_errors(form.first_name) }}
+                {{ form_widget(form.first_name) }}
+            </div>
+
+            <div>
+                {{ form_label(form.last_name) }}
+                {{ form_errors(form.first_name) }}
+                {{ form_widget(form.last_name) }}
+            </div>
+        </div>
+
+        {{ form_errors(form.password) }}
+        {{ form_widget(form.password) }}
+
+        {# {{ form_label(form.password_repeat) }} #}
+        {# {{ form_errors(form.password_repeat) }} #}
+        {# {% for error in form_errors(form.password_repeat) %}
+            <div>{{ error.message }}</div>
+        {% endfor %}
+        {{ form_widget(form.password_repeat) }} #}
+
+        {{ form_label(form.faculty) }}
+        {{ form_errors(form.faculty) }}
+        {{ form_widget(form.faculty) }}
+
+        {{ form_label(form.gdpr) }}
+        {{ form_errors(form.gdpr) }}
+        {{ form_widget(form.gdpr) }}
+
+        <div class="d-flex justify-content-center">
+            {{ form_widget(form.submit) }}
+        </div>
+
+    {{ form_end(form) }}
+</div>
+
+{% endblock %}

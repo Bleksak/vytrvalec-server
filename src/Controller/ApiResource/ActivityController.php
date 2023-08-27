@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[ApiResource('Activity')]
 class ActivityController extends AbstractController
 {
-    public function __construct(private ActivityRepository $activityRepository)
+    public function __construct(private readonly ActivityRepository $activityRepository)
     {
 
     }

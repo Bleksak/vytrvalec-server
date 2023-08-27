@@ -238,5 +238,4 @@ class SeasonController extends AbstractController
 
         return $this->json($season);
     }
-
 }

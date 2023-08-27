@@ -53,13 +53,14 @@ class UserApiController extends AbstractController
         requestScheme: [
             'email' => 'string',
             'password' => 'string',
+            'firebase_token' => 'string',
         ],
         fakeName: 'api_user_login',
         fakePath: '/api/user/login',
     )]
     public function login(): Response
     {
-        return $this->json([]);
+        return new Response(status: Response::HTTP_NOT_FOUND);
     }
 
     #[ApiRoute(
@@ -80,7 +81,7 @@ class UserApiController extends AbstractController
     )]
     public function logout(): Response
     {
-        return new Response(status: Response::HTTP_OK);
+        return new Response(status: Response::HTTP_NOT_FOUND);
     }
 
     #[ApiRoute(
@@ -208,8 +209,7 @@ class UserApiController extends AbstractController
                         'id' => 'integer',
                         'name' => 'string',
                         'shortcut' => 'string',
-                    ],
-                    'profileCaches' => 'array'
+                    ]
                 ]
             ],
             Response::HTTP_FORBIDDEN => [
@@ -222,7 +222,6 @@ class UserApiController extends AbstractController
     {
         return $this->json($this->serializer->normalize($user, null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
-            AbstractNormalizer::GROUPS => ['userProfile']
         ]));
     }
 
@@ -242,8 +241,7 @@ class UserApiController extends AbstractController
                         'id' => 'integer',
                         'name' => 'string',
                         'shortcut' => 'string',
-                    ],
-                    'profileCaches' => 'array'
+                    ]
                 ]
             ],
             Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
@@ -257,7 +255,6 @@ class UserApiController extends AbstractController
 
         $filtered = $this->serializer->normalize($user, null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
-            AbstractNormalizer::GROUPS => ['userProfile']
         ]);
 
         return $this->json($filtered);
