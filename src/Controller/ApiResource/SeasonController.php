@@ -205,7 +205,6 @@ class SeasonController extends AbstractController
     )]
     public function result(PointCalculator $calculator, Season $season, FacultyCacheRepository $facultyCacheRepository, FacultyExtraPointsRepository $extraPointsRepository): Response
     {
-
         return $this->json($calculator->processSeason($season));
     }
 

@@ -17,11 +17,11 @@ class FacultyExtraPoints
     #[ORM\JoinColumn(nullable: false)]
     private ?FacultyCache $cache = null;
 
-    #[ORM\ManyToOne(inversedBy: 'extraPoints')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'extraPoints')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
     private ?ExtraPoints $extraPoints = null;
 

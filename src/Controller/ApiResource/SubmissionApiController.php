@@ -314,11 +314,11 @@ class SubmissionApiController extends AbstractController
         $rejectedMessage = (new RejectedSubmissionMessage())->setSubmission($submission)->setMessage($message);
         $repository->save($rejectedMessage, true);
 
-//        $notification = (new Notification('Měsíční vytrvalec', ['email', 'expo']))->content($message);
+//        $notification = (new Notification('Měsíční vytrvalec', ['email']))->content($message);
 //        $recipient = new Recipient($submission->getUser()->getEmail());
 
 //        $notifier->send($notification, $recipient);
-        $firebase->send(new FirebaseNotification($submission->getUser()->getFirebaseToken(), 'Send nudes plz', 'plííííz', 'ASPON_BOOBIEZ?'));
+//        $firebase->send(new FirebaseNotification($submission->getUser()->getFirebaseToken(), 'Send nudes plz', 'plííííz', 'ASPON_BOOBIEZ?'));
 
         return new Response(status: Response::HTTP_OK);
     }
