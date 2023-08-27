@@ -8,6 +8,8 @@ use App\CustomLogic\PointCalculator;
 use App\Entity\Charity;
 use App\Entity\Season;
 use App\Repository\CharityRepository;
+use App\Repository\ExtraPointsRepository;
+use App\Repository\FacultyCacheRepository;
 use App\Repository\SeasonRepository;
 use App\Requests\SeasonRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -201,7 +203,7 @@ class SeasonController extends AbstractController
             Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
         ],
     )]
-    public function result(PointCalculator $calculator, Season $season): Response
+    public function result(PointCalculator $calculator, Season $season, FacultyCacheRepository $facultyCacheRepository, ExtraPointsRepository $extraPointsRepository): Response
     {
         return $this->json($calculator->processSeason($season));
     }

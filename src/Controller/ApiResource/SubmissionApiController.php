@@ -162,7 +162,7 @@ class SubmissionApiController extends AbstractController
         '/api/submission/list/{page}/{limit}',
         name: 'api_submission_list',
         methods: ['GET'],
-        documentation: 'Retrieves all submissions',
+        documentation: 'Retrieves all submissions for current user',
         responses: [
             Response::HTTP_OK => [
                 'message' => 'Successfully retrieved all submissions'
