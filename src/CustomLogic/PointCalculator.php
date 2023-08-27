@@ -28,8 +28,7 @@ class PointCalculator
     {
         $submissions = $this->submissionRepository->findAcceptedInSeasonAndWeek($season, $week);
 
-//        $extraPointClasses = [WeeklyDistanceExtraPoints::class, DailyDistanceExtraPoints::class, WeeklyElevationExtraPoints::class];
-        $extraPointClasses = [DailyDistanceExtraPoints::class];
+        $extraPointClasses = [WeeklyDistanceExtraPoints::class, DailyDistanceExtraPoints::class, WeeklyElevationExtraPoints::class];
         $extraPoints = [];
 
         $activities = [];
