@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Activity;
 use App\Entity\ProfileCache;
+use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\UserCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -38,7 +40,8 @@ class UserCacheRepository extends ServiceEntityRepository
             'user' => $submission->getUser(),
             'activity' => $submission->getActivity(),
             'week' => $submission->getWeek(),
-        ]) ?? new UserCache($submission->getUser(), $submission->getActivity(), $submission->getWeek());
+            'season' => $submission->getSeason(),
+        ]) ?? new UserCache($submission->getUser(), $submission->getActivity(), $submission->getSeason(), $submission->getWeek());
 
         $userCache
             ->updateDistance(fn($oldDistance) => $oldDistance + $submission->getDistance())
@@ -46,6 +49,44 @@ class UserCacheRepository extends ServiceEntityRepository
         ;
 
         $this->save($userCache, $flush);
+    }
+
+    public function findMaxDistanceBySeasonAndWeek(Season $season, int $week, Activity $activity): array
+    {
+        $query = $this->createQueryBuilder('uc')
+            ->select('max(uc.distance) as distance', 'IDENTITY(uc.user) as user', 'IDENTITY(uc.activity) as activity')
+            ->where('uc.season = :season')
+            ->andWhere('uc.week = :week')
+            ->andWhere('uc.activity = :activity')
+            ->groupBy('uc.user')
+
+            ->setParameter('season', $season)
+            ->setParameter('week', $week)
+            ->setParameter('activity', $activity)
+            ->getQuery()
+        ;
+
+        return $query->execute();
+//        return $this->findBy(['season' => $season, 'week' => $week, 'activity' => $activity]);
+    }
+
+    public function findMaxElevationBySeasonAndWeek(Season $season, int $week, Activity $activity): array
+    {
+        $query = $this->createQueryBuilder('uc')
+            ->select('max(uc.elevation) as elevation', 'IDENTITY(uc.user) as user', 'IDENTITY(uc.activity) as activity')
+            ->where('uc.season = :season')
+            ->andWhere('uc.week = :week')
+            ->andWhere('uc.activity = :activity')
+            ->groupBy('uc.user')
+
+            ->setParameter('season', $season)
+            ->setParameter('week', $week)
+            ->setParameter('activity', $activity)
+            ->getQuery()
+        ;
+
+        return $query->execute();
+//        return $this->findBy(['season' => $season, 'week' => $week, 'activity' => $activity]);
     }
 
 //    /**

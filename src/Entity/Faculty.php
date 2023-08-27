@@ -12,15 +12,15 @@ class Faculty
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'fetchFacultySummary'])]
+    #[Groups(['fetchSubmission', 'fetchFacultySummary', 'fetchSeasonResult'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['fetchSubmission', 'fetchFacultySummary'])]
+    #[Groups(['fetchSubmission', 'fetchFacultySummary', 'fetchSeasonResult'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 10)]
-    #[Groups(['fetchSubmission', 'fetchFacultySummary'])]
+    #[Groups(['fetchSubmission', 'fetchFacultySummary', 'fetchSeasonResult'])]
     private ?string $shortcut = null;
 
     #[ORM\Column]

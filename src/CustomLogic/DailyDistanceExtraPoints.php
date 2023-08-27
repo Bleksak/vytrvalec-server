@@ -8,7 +8,6 @@ class DailyDistanceExtraPoints implements ExtraPoints
 {
     private array $users = [];
     private array $max = [];
-    private int $maxUser = -1;
     private ?\DateTimeInterface $lastDate = null;
 
     public static function getUniqueName(): string
@@ -35,7 +34,6 @@ class DailyDistanceExtraPoints implements ExtraPoints
     {
         $this->finalize();
 
-        $this->maxUser = -1;
         $this->users = [];
         $this->lastDate = $date;
     }
@@ -46,7 +44,7 @@ class DailyDistanceExtraPoints implements ExtraPoints
         $user = $submission->getUser()->getId();
         $date = $submission->getDate();
 
-        if ($date !== $this->lastDate && !empty($this->users)) {
+        if ($this->lastDate === null || $date->diff($this->lastDate)->days !== 0) {
             $this->process($date);
         }
 
@@ -55,19 +53,29 @@ class DailyDistanceExtraPoints implements ExtraPoints
         }
 
         $this->users[$user]['distance'] += $distance;
-
-        if ($this->maxUser === -1 || $this->users[$user] > $this->users[$this->maxUser]) {
-            $this->maxUser = $user;
-        }
     }
 
     public function finalize(): void
     {
         if (!empty($this->users)) {
+            $maxUsers = [];
+            $maxDistance = 0;
+
+            foreach($this->users as $user => $values) {
+
+                if($values['distance'] === $maxDistance) {
+                    $maxUsers[$user] = $values['faculty'];
+                }
+
+                if($values['distance'] > $maxDistance) {
+                    $maxDistance = $values['distance'];
+                    $maxUsers = [$user => $values['faculty']];
+                }
+            }
+
             $this->max[] = [
-                'user' => $this->maxUser,
-                'faculty' => $this->users[$this->maxUser]['faculty'],
-                'distance' => $this->users[$this->maxUser]['distance']
+                'users' => $maxUsers,
+                'distance' => $maxDistance
             ];
         }
     }
@@ -79,22 +87,23 @@ class DailyDistanceExtraPoints implements ExtraPoints
         }
 
         $maxDistance = 0;
-        $maxUser = -1;
-        $maxFaculty = -1;
+        $maxUsers = [];
 
-        foreach ($this->max as $days) {
-            if ($days['distance'] > $maxDistance) {
-                $maxUser = $days['user'];
-                $maxDistance = $days['distance'];
-                $maxFaculty = $days['faculty'];
+        foreach ($this->max as $day) {
+            if($day['distance'] === $maxDistance) {
+                $maxUsers = array_merge($maxUsers, $day['users']);
+            }
+
+            if ($day['distance'] > $maxDistance) {
+                $maxUsers = $day['users'];
+                $maxDistance = $day['distance'];
             }
         }
 
         return [
             'name' => self::getUniqueName(),
-            'user_id' => $maxUser,
-            'distance' => $maxDistance,
-            'faculty' => $maxFaculty,
+            'users' => $maxUsers,
+            'value' => $maxDistance,
             'reward' => self::reward(),
         ];
     }

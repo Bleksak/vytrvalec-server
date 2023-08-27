@@ -320,6 +320,7 @@ class SubmissionApiController extends AbstractController
         $rejectedMessage = (new RejectedSubmissionMessage())->setSubmission($submission)->setMessage($message);
         $repository->save($rejectedMessage, true);
 
+
         //        $notification = (new Notification('Měsíční vytrvalec', ['email', 'expo']))->content($message);
 //        $recipient = new Recipient($submission->getUser()->getEmail());
 

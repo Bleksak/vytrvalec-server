@@ -21,19 +21,24 @@ class UserCache
     private ?int $week = null;
 
     #[ORM\Column]
-    private ?int $distance = null;
+    private ?int $distance = 0;
 
     #[ORM\Column]
-    private ?int $elevation = null;
+    private ?int $elevation = 0;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Activity $activity = null;
 
-    public function __construct(User $user, Activity $activity, int $week)
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Season $season = null;
+
+    public function __construct(User $user, Activity $activity, Season $season, int $week)
     {
         $this->user = $user;
         $this->activity = $activity;
+        $this->season = $season;
         $this->week = $week;
     }
 
@@ -98,6 +103,18 @@ class UserCache
     public function setActivity(?Activity $activity): static
     {
         $this->activity = $activity;
+
+        return $this;
+    }
+
+    public function getSeason(): ?Season
+    {
+        return $this->season;
+    }
+
+    public function setSeason(?Season $season): static
+    {
+        $this->season = $season;
 
         return $this;
     }

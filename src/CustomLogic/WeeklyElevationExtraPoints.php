@@ -63,24 +63,25 @@ class WeeklyElevationExtraPoints implements ExtraPoints
         }
 
         $maxElevation = 0;
-        $maxUser = -1;
-        $maxFaculty = -1;
+        $maxUsers = [];
 
         foreach($this->users as $user => $values) {
             $distance = $values['elevation'];
 
+            if($distance === $maxElevation) {
+                $maxUsers[$user] = $values['faculty'];
+            }
+
             if($distance > $maxElevation) {
-                $maxUser = $user;
+                $maxUsers = [$user => $values['faculty']];
                 $maxElevation = $distance;
-                $maxFaculty = $values['faculty'];
             }
         }
 
         return [
             'name' => self::getUniqueName(),
-            'user_id' => $maxUser,
-            'elevation' => $maxElevation,
-            'faculty' => $maxFaculty,
+            'users' => $maxUsers,
+            'value' => $maxElevation,
             'reward' => self::reward(),
         ];
     }

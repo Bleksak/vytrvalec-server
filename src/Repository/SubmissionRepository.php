@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Activity;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -108,28 +109,94 @@ class SubmissionRepository extends ServiceEntityRepository
         return $this->findBy(['season' => $season, 'accepted' => true, 'week' => $week], orderBy: ['date' => 'ASC']);
     }
 
-//    /**
-//     * @return Submission[] Returns an array of Submission objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findUnreviewedInSeason(Season $season): array
+    {
+        return $this->findBy(['season' => $season, 'reviewed' => false]);
+    }
 
-//    public function findOneBySomeField($value): ?Submission
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    private function getDailyMax(array $submissions, $day, $startIndex): array
+    {
+        $index = $startIndex;
+        $distance = [];
+        $increment = 1;
+
+        while($index < sizeof($submissions) ) {
+            if($submissions[$index]->getDate()->diff($day)->days != 0) {
+                $increment = 0;
+                break;
+            }
+
+            $submission = $submissions[$index];
+            if(!array_key_exists($submission->getUser()->getId(), $distance)) {
+                $distance[$submission->getUser()->getId()] = 0;
+            }
+
+            $distance[$submission->getUser()->getId()] += $submission->getDistance();
+
+            $index += 1;
+        }
+
+        $users = [];
+        $maxDistance = 0;
+
+        foreach($distance as $user => $value) {
+            if($value === $maxDistance) {
+                $users[] = $user;
+            }
+
+            if($value > $maxDistance) {
+                $maxDistance = $value;
+                $users = [$user];
+            }
+        }
+
+        $nextIndex = $index + $increment < sizeof($submissions) ? $index + $increment : null;
+
+        return [
+            'next' => $nextIndex,
+            'distance' => $maxDistance,
+            'users' => $users
+        ];
+    }
+
+    public function findMaxDailyDistanceBySeasonAndWeek(Season $season, int $week, Activity $activity): array
+    {
+        /**
+         * @var Submission[] $submissions
+         */
+        $submissions = $this->findBy(['season' => $season, 'week' => $week, 'activity' => $activity, 'accepted' => true], orderBy: ['date' => 'ASC']);
+
+        if(empty($submissions)) {
+            return [];
+        }
+
+        $index = 0;
+
+        $currentMax = 0;
+        $currentUsers = [];
+
+        while($index !== null) {
+            $day = $submissions[$index]?->getDate();
+            $result = $this->getDailyMax($submissions, $day, $index);
+
+            $index = $result['next'];
+            $distance = $result['distance'];
+            $users = $result['users'];
+
+            if($distance === $currentMax) {
+                $currentUsers = array_merge($currentUsers, $users);
+            }
+
+            if($distance > $currentMax) {
+                $currentMax = $distance;
+                $currentUsers = $users;
+            }
+        }
+
+        return array_map(fn($user) => [
+            'user' => $user,
+            'distance' => $currentMax,
+            'activity' => $activity->getId()
+        ], $currentUsers);
+    }
 }

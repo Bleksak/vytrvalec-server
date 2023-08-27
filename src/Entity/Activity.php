@@ -14,11 +14,11 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
     private ?string $name = null;
 
     #[ORM\Column]
