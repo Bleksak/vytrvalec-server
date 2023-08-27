@@ -21,28 +21,9 @@ class ExtraPointsRepository extends ServiceEntityRepository
         parent::__construct($registry, ExtraPoints::class);
     }
 
-//    /**
-//     * @return ExtraPoints[] Returns an array of ExtraPoints objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('e.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findByName(string $name): ?ExtraPoints
+    {
+        return $this->findOneBy(['name' => $name]);
+    }
 
-//    public function findOneBySomeField($value): ?ExtraPoints
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

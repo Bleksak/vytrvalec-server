@@ -51,24 +51,25 @@ class WeeklyDistanceExtraPoints implements ExtraPoints
         }
 
         $maxDistance = 0;
-        $maxUser = -1;
-        $maxFaculty = -1;
+        $maxUsers = [];
 
         foreach($this->users as $user => $values) {
             $distance = $values['distance'];
 
+            if($distance === $maxDistance) {
+                $maxUsers[$user] = $values['faculty'];
+            }
+
             if($distance > $maxDistance) {
-                $maxUser = $user;
+                $maxUsers = [$user => $values['faculty']];
                 $maxDistance = $distance;
-                $maxFaculty = $values['faculty'];
             }
         }
 
         return [
             'name' => self::getUniqueName(),
-            'user_id' => $maxUser,
-            'distance' => $maxDistance,
-            'faculty' => $maxFaculty,
+            'users' => $maxUsers,
+            'value' => $maxDistance,
             'reward' => self::reward(),
         ];
     }

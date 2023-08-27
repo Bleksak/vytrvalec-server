@@ -14,6 +14,7 @@ use App\Repository\SeasonRepository;
 use App\Requests\SeasonRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -203,9 +204,11 @@ class SeasonController extends AbstractController
             Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
         ],
     )]
-    public function result(PointCalculator $calculator, Season $season, FacultyCacheRepository $facultyCacheRepository, FacultyExtraPointsRepository $extraPointsRepository): Response
+    public function result(Season $season, FacultyCacheRepository $facultyCacheRepository, FacultyExtraPointsRepository $extraPointsRepository): Response
     {
-        return $this->json($calculator->processSeason($season));
+        return $this->json($this->serializer->normalize($facultyCacheRepository->findCaches($season), null, [
+            AbstractNormalizer::GROUPS => ['fetchSeasonResult']
+        ]));
     }
 
     #[ApiRoute(
@@ -236,5 +239,11 @@ class SeasonController extends AbstractController
         ]);
 
         return $this->json($season);
+    }
+
+    #[Route('/cache/{season}', env:'dev')]
+    public function cacheTest(Season $season, FacultyExtraPointsRepository $extraPointsRepository)
+    {
+        dd($extraPointsRepository->constructForWeek($season, 2));
     }
 }

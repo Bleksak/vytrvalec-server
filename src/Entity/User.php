@@ -17,11 +17,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
     private ?string $email = null;
 
     #[ORM\Column(type: 'json')]
@@ -36,11 +36,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $banned = false;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
     private ?string $firstName = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
     private ?string $lastName = null;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'])]

@@ -2,7 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Activity;
+use App\Entity\Faculty;
 use App\Entity\FacultyCache;
+use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\UserCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -38,7 +41,8 @@ class FacultyCacheRepository extends ServiceEntityRepository
             'faculty' => $submission->getFaculty(),
             'activity' => $submission->getActivity(),
             'week' => $submission->getWeek(),
-        ]) ?? new FacultyCache($submission->getFaculty(), $submission->getActivity(), $submission->getWeek());
+            'season' => $submission->getSeason(),
+        ]) ?? new FacultyCache($submission->getFaculty(), $submission->getActivity(), $submission->getSeason(), $submission->getWeek());
 
         $facultyCache
             ->updateDistance(fn($oldDistance) => $oldDistance + $submission->getDistance())
@@ -46,5 +50,25 @@ class FacultyCacheRepository extends ServiceEntityRepository
         ;
 
         $this->save($facultyCache, $flush);
+    }
+
+    public function findByWeek(Season $season, int $week): array
+    {
+        return $this->findBy(['season' => $season, 'week' => $week]);
+    }
+
+    public function findCaches(Season $season): array
+    {
+        return $this->findBy(['season' => $season]);
+    }
+
+    public function findCache(Faculty $faculty, Activity $activity, int $week, Season $season): ?FacultyCache
+    {
+        return $this->findOneBy([
+            'faculty' => $faculty,
+            'activity' => $activity,
+            'week' => $week,
+            'season' => $season,
+        ]);
     }
 }

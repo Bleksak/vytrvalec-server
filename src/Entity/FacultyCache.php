@@ -6,6 +6,7 @@ use App\Repository\FacultyCacheRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacultyCacheRepository::class)]
 class FacultyCache
@@ -13,37 +14,46 @@ class FacultyCache
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['fetchSeasonResult'])]
     private ?int $id = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['fetchSeasonResult'])]
     private ?Faculty $faculty = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['fetchSeasonResult'])]
     private ?Activity $activity = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['fetchSeasonResult'])]
     private ?Season $season = null;
 
     #[ORM\Column]
+    #[Groups(['fetchSeasonResult'])]
     private ?int $week = null;
 
     #[ORM\Column]
+    #[Groups(['fetchSeasonResult'])]
     private ?int $distance = null;
 
     #[ORM\Column]
+    #[Groups(['fetchSeasonResult'])]
     private ?int $elevation = null;
 
-    #[ORM\OneToMany(mappedBy: 'cache', targetEntity: FacultyExtraPoints::class)]
+    #[ORM\OneToMany(mappedBy: 'cache', targetEntity: FacultyExtraPoints::class, fetch: 'EAGER')]
+    #[Groups(['fetchSeasonResult'])]
     private Collection $extraPoints;
 
-    public function __construct(Faculty $faculty, Activity $activity, int $week)
+    public function __construct(Faculty $faculty, Activity $activity, Season $season, int $week)
     {
         $this->extraPoints = new ArrayCollection();
         $this->faculty = $faculty;
         $this->activity = $activity;
+        $this->season = $season;
         $this->week = $week;
     }
 
