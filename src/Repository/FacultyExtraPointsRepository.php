@@ -21,6 +21,11 @@ class FacultyExtraPointsRepository extends ServiceEntityRepository
         parent::__construct($registry, FacultyExtraPoints::class);
     }
 
+    public function getOrConstruct()
+    {
+        
+    }
+
 //    /**
 //     * @return FacultyExtraPoints[] Returns an array of FacultyExtraPoints objects
 //     */
