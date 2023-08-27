@@ -142,24 +142,29 @@ class SubmissionApiController extends AbstractController
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
 
-        return $this->json($this->serializer->normalize(
-            [
-                'pages' => $pageCount,
-                'submissions' => $submissions,
-                'users' => $users,
-            ], null, [
-            AbstractNormalizer::GROUPS => ['fetchSubmission'],
-            AbstractNormalizer::CALLBACKS => [
-                'season' => fn($object) => $object->getId(),
-                'activity' => fn($object) => $object->getId(),
-                'user' => fn($object) => $object->getId(),
-                'faculty' => fn($object) => $object->getId(),
-            ],
-        ]));
+        return $this->json(
+            $this->serializer->normalize(
+                [
+                    'pages' => $pageCount,
+                    'submissions' => $submissions,
+                    'users' => $users,
+                ],
+                null,
+                [
+                    AbstractNormalizer::GROUPS => ['fetchSubmission'],
+                    AbstractNormalizer::CALLBACKS => [
+                        'season' => fn($object) => $object->getId(),
+                        'activity' => fn($object) => $object->getId(),
+                        'user' => fn($object) => $object->getId(),
+                        'faculty' => fn($object) => $object->getId(),
+                    ],
+                ]
+            )
+        );
     }
 
     #[ApiRoute(
-        '/api/submission/list/{page}/{limit}',
+        '/api/submission/user/list/{page}/{limit}',
         name: 'api_submission_list',
         methods: ['GET'],
         documentation: 'Retrieves all submissions for current user',
@@ -173,8 +178,9 @@ class SubmissionApiController extends AbstractController
     {
         $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
+        $nextPage = $page + 1 >= $pageCount ? $page + 1 : null;
 
-        return $this->json($this->serializer->normalize(['pages' => $pageCount, 'submissions' => $submissions], null, [
+        return $this->json($this->serializer->normalize(['nextPage' => $nextPage, 'submissions' => $submissions], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['faculty', 'user'],
             AbstractNormalizer::CALLBACKS => [
@@ -307,18 +313,19 @@ class SubmissionApiController extends AbstractController
         $this->submissionRepository->save($submission);
 
         $message = $request->getPayload()->get('message');
-        if(empty($message)) {
+        if (empty($message)) {
             $message = 'Vaše aktivita ze dne ' . $submission->getDate()->format('d. m. Y') . ' byla zamítnuta.\nZkontrolujte prosím zadané údaje a případně je upravte.\n\nDěkujeme za pochopení,\nKatedra tělesné výchovy a sportu ZČU v Plzni';
         }
 
         $rejectedMessage = (new RejectedSubmissionMessage())->setSubmission($submission)->setMessage($message);
         $repository->save($rejectedMessage, true);
 
-//        $notification = (new Notification('Měsíční vytrvalec', ['email']))->content($message);
+
+        //        $notification = (new Notification('Měsíční vytrvalec', ['email', 'expo']))->content($message);
 //        $recipient = new Recipient($submission->getUser()->getEmail());
 
-//        $notifier->send($notification, $recipient);
-//        $firebase->send(new FirebaseNotification($submission->getUser()->getFirebaseToken(), 'Send nudes plz', 'plííííz', 'ASPON_BOOBIEZ?'));
+        //        $notifier->send($notification, $recipient);
+        $firebase->send(new FirebaseNotification($submission->getUser()->getFirebaseToken(), 'Send nudes plz', 'plííííz', 'ASPON_BOOBIEZ?'));
 
         return new Response(status: Response::HTTP_OK);
     }
