@@ -47,9 +47,12 @@ class RejectedSubmissionMessageRepository extends ServiceEntityRepository
     public function findByUser(User $user): array
     {
         $query = $this->createQueryBuilder('m')
-            ->select('m.message, s.accepted, s.reviewed, s.elevation, s.distance, s.image, s.date, a.name as activity')
+            ->select('m.message, s.id, s.accepted, s.reviewed, s.elevation, s.distance, s.image, s.date, a.name as activity')
             ->join(Submission::class, 's')
-            ->join(Activity::class, 'a')
+            ->join(Activity::class, 'a', Join::WITH, 'a.id = s.activity')
+            ->where('s.user = :user')
+
+            ->setParameter('user', $user)
             ->getQuery()
         ;
 
