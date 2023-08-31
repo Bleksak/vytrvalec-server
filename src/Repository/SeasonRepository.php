@@ -46,7 +46,8 @@ class SeasonRepository extends ServiceEntityRepository
         }
     }
 
-    public function getCurrent(): Season|false {
+    public function getCurrent(): Season|false
+    {
         $now = new DateTimeImmutable();
 
         $criteria = new Criteria();
@@ -54,6 +55,18 @@ class SeasonRepository extends ServiceEntityRepository
         $criteria->andWhere(Criteria::expr()->gte('end', $now));
 
         return $this->matching($criteria)->first();
+    }
+
+    public function getLast(): ?Season
+    {
+        $result = $this->createQueryBuilder('s')
+            ->select('s')
+            ->orderBy('s.end', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->execute();
+
+        return empty($result) ? null : $result[0];
     }
 
 //    /**
