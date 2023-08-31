@@ -174,14 +174,15 @@ class SubmissionApiController extends AbstractController
             ]
         ]
     )]
-    public function list(#[CurrentUser] User $user, int $page, int $limit = 50, RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository): Response
+    #[IsGranted('ROLE_USER')]
+    public function list(#[CurrentUser] User $user, RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository, int $page, int $limit = 50) : Response
     {
-        dd($rejectedSubmissionMessageRepository->findByUser($user));
+        $rejectedSubmissions = $rejectedSubmissionMessageRepository->findByUser($user);
         $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
         $nextPage = ($page + 1) > $pageCount ? null : $page + 1;
 
-        return $this->json($this->serializer->normalize(['nextPage' => $nextPage, 'submissions' => $submissions], null, [
+        return $this->json($this->serializer->normalize(['nextPage' => $nextPage, 'submissions' => $submissions, 'rejectedSubmissions' => $rejectedSubmissions], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['faculty', 'user'],
             AbstractNormalizer::CALLBACKS => [
