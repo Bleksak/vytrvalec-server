@@ -2,9 +2,13 @@
 
 namespace App\Repository;
 
+use App\Entity\Activity;
 use App\Entity\Faculty;
 use App\Entity\RejectedSubmissionMessage;
+use App\Entity\Submission;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -40,6 +44,17 @@ class RejectedSubmissionMessageRepository extends ServiceEntityRepository
         }
     }
 
+    public function findByUser(User $user): array
+    {
+        $query = $this->createQueryBuilder('m')
+            ->select('m.message, s.accepted, s.reviewed, s.elevation, s.distance, s.image, s.date, a.name as activity')
+            ->join(Submission::class, 's')
+            ->join(Activity::class, 'a')
+            ->getQuery()
+        ;
+
+        return $query->execute();
+    }
 //    /**
 //     * @return RejectedSubmissionMessage[] Returns an array of RejectedSubmissionMessage objects
 //     */

@@ -174,8 +174,9 @@ class SubmissionApiController extends AbstractController
             ]
         ]
     )]
-    public function list(#[CurrentUser] User $user, int $page, int $limit = 50): Response
+    public function list(#[CurrentUser] User $user, int $page, int $limit = 50, RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository): Response
     {
+        dd($rejectedSubmissionMessageRepository->findByUser($user));
         $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
         $nextPage = ($page + 1) > $pageCount ? null : $page + 1;
@@ -280,6 +281,26 @@ class SubmissionApiController extends AbstractController
         $this->submissionRepository->save($submission, true);
 
         return new Response(status: Response::HTTP_OK);
+    }
+
+    #[ApiRoute(
+        '/api/submission/rejected',
+        name: 'api_submission_reject',
+        methods: ['PUT'],
+        documentation: 'Rejects a <code>Submission</code> entity',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully rejected'
+            ],
+            Response::HTTP_FORBIDDEN => [
+                'message' => 'Unauthorized access',
+            ],
+        ],
+    )]
+    #[IsGranted('ROLE_USER')]
+    public function listRejected(#[CurrentUser] User $user): Response
+    {
+        $this->submissionRepository->findBy(['user' => $user, 'accepted' => false, 'reviewed' => true]);
     }
 
     #[ApiRoute(
