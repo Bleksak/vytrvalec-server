@@ -20,7 +20,7 @@ class FacultyController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/faculty/list',
+        '/api/faculty/index',
         name: 'api_faculty_list',
         methods: ['GET'],
         documentation: 'Retrieves a list of all faculties',
@@ -44,7 +44,7 @@ class FacultyController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/faculty/create',
+        '/api/faculty',
         name: 'api_faculty_create',
         methods: ['POST'],
         documentation: 'Create a new <code>Faculty</code> entity.',
@@ -86,7 +86,7 @@ class FacultyController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/faculty/update/{faculty}',
+        '/api/faculty/{faculty}',
         name: 'api_faculty_update',
         methods: ['PATCH'],
         documentation: 'Updates an existing <code>Faculty</code> entity.',

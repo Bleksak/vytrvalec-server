@@ -80,7 +80,7 @@ class SeasonController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/season/list',
+        '/api/season/index',
         name: 'api_season_list',
         methods: ['GET'],
         documentation: 'Get all seasons',
@@ -144,7 +144,7 @@ class SeasonController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/season/{season}/delete',
+        '/api/season/{season}',
         name: 'api_season_delete',
         methods: ['DELETE'],
         documentation: 'Retrieves a <code>Season</code> entity',

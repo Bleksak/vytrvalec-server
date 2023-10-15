@@ -35,7 +35,7 @@ class SubmissionApiController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/submission/create',
+        '/api/submission',
         name: 'api_submission_create',
         methods: ['POST'],
         documentation: 'Creates a new <code>Submission</code> entity',

@@ -18,11 +18,10 @@ class ActivityController extends AbstractController
 {
     public function __construct(private readonly ActivityRepository $activityRepository)
     {
-
     }
 
     #[ApiRoute(
-        '/api/activity/list',
+        '/api/activity/index',
         name: 'activities',
         methods: ['GET'],
         documentation: 'Retrieve all <code>Activity</code> entries',
@@ -40,7 +39,7 @@ class ActivityController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/activity/create',
+        '/api/activity',
         name: 'activity_create',
         methods: ['POST'],
         documentation: 'Create a new <code>Activity</code> entry',
@@ -70,7 +69,7 @@ class ActivityController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/activity/{activity}/delete',
+        '/api/activity/{activity}',
         name: 'activity_create',
         methods: ['DELETE'],
         documentation: 'Deletes an existing <code>Activity</code> entry',
