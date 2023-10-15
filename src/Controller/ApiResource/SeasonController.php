@@ -240,10 +240,4 @@ class SeasonController extends AbstractController
 
         return $this->json($season);
     }
-
-    #[Route('/cache/{season}', env:'dev')]
-    public function cacheTest(Season $season, FacultyExtraPointsRepository $extraPointsRepository)
-    {
-        dd($extraPointsRepository->constructForWeek($season, 2));
-    }
 }

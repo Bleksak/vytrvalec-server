@@ -285,26 +285,6 @@ class SubmissionApiController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/submission/rejected',
-        name: 'api_submission_reject',
-        methods: ['PUT'],
-        documentation: 'Rejects a <code>Submission</code> entity',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully rejected'
-            ],
-            Response::HTTP_FORBIDDEN => [
-                'message' => 'Unauthorized access',
-            ],
-        ],
-    )]
-    #[IsGranted('ROLE_USER')]
-    public function listRejected(#[CurrentUser] User $user): Response
-    {
-        $this->submissionRepository->findBy(['user' => $user, 'accepted' => false, 'reviewed' => true]);
-    }
-
-    #[ApiRoute(
         '/api/submission/{submission}/reject',
         name: 'api_submission_reject',
         methods: ['PUT'],
@@ -342,12 +322,7 @@ class SubmissionApiController extends AbstractController
         $rejectedMessage = (new RejectedSubmissionMessage())->setSubmission($submission)->setMessage($message);
         $repository->save($rejectedMessage, true);
 
-
-        //        $notification = (new Notification('Měsíční vytrvalec', ['email', 'expo']))->content($message);
-//        $recipient = new Recipient($submission->getUser()->getEmail());
-
-        //        $notifier->send($notification, $recipient);
-        $firebase->send(new FirebaseNotification($submission->getUser()->getFirebaseToken(), 'Send nudes plz', 'plííííz', 'ASPON_BOOBIEZ?'));
+        $firebase->send(new FirebaseNotification($submission->getUser()->getFirebaseToken(), 'Měsíční vytrvalec', $message, 'rejected_submission='.$submission->getId()));
 
         return new Response(status: Response::HTTP_OK);
     }
