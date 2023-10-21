@@ -4,7 +4,6 @@ namespace App\Controller\ApiResource;
 
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
-use App\CustomLogic\PointCalculator;
 use App\Entity\Charity;
 use App\Entity\Season;
 use App\Repository\CharityRepository;
@@ -14,7 +13,6 @@ use App\Repository\SeasonRepository;
 use App\Requests\SeasonRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -80,37 +78,6 @@ class SeasonController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/season/index',
-        name: 'api_season_list',
-        methods: ['GET'],
-        documentation: 'Get all seasons',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully retrieved all seasons',
-                'response' => [
-                    [
-                        'id' => 'integer',
-                        'start' => 'date',
-                        'end' => 'date',
-                        'charity' => [
-                            'name' => 'string',
-                            'description' => 'string'
-                        ],
-                    ]
-                ]
-            ]
-        ],
-    )]
-    public function seasonList(): Response
-    {
-        $seasons = $this->serializer->normalize($this->seasonRepository->findAll(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions'],
-        ]);
-
-        return $this->json($seasons);
-    }
-
-    #[ApiRoute(
         '/api/season/current',
         name: 'api_season_current',
         methods: ['GET'],
@@ -128,14 +95,14 @@ class SeasonController extends AbstractController
                     ],
                 ]
             ],
-            Response::HTTP_NOT_FOUND => ['message' => 'Currently season has not been found']
+            Response::HTTP_NOT_FOUND => ['message' => 'Current season has not been found']
         ],
     )]
     public function current(): Response
     {
         $season = $this->seasonRepository->getCurrent();
         if ($season === false) {
-            return new Response(status: Response::HTTP_NOT_FOUND);
+            return $this->json([], Response::HTTP_NOT_FOUND);
         }
 
         return $this->json($this->serializer->normalize($season, null, [
@@ -239,5 +206,36 @@ class SeasonController extends AbstractController
         ]);
 
         return $this->json($season);
+    }
+
+    #[ApiRoute(
+        '/api/season',
+        name: 'api_season_list',
+        methods: ['GET'],
+        documentation: 'Get all seasons',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieved all seasons',
+                'response' => [
+                    [
+                        'id' => 'integer',
+                        'start' => 'date',
+                        'end' => 'date',
+                        'charity' => [
+                            'name' => 'string',
+                            'description' => 'string'
+                        ],
+                    ]
+                ]
+            ]
+        ],
+    )]
+    public function seasonList(): Response
+    {
+        $seasons = $this->serializer->normalize($this->seasonRepository->findAll(), null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions'],
+        ]);
+
+        return $this->json($seasons);
     }
 }
