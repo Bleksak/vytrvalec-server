@@ -323,7 +323,7 @@ class SubmissionApiController extends AbstractController
         $rejectedMessage = (new RejectedSubmissionMessage())->setSubmission($submission)->setMessage($message);
         $repository->save($rejectedMessage, true);
 
-        $firebase->send(new FirebaseNotification($submission->getUser()->getFirebaseToken(), 'Měsíční vytrvalec', $message, 'rejected_submission='.$submission->getId()));
+        $firebase->send(new FirebaseNotification($submission->getUser()->getToken(), 'Měsíční vytrvalec', $message, 'rejected_submission='.$submission->getId()));
 
         return new Response(status: Response::HTTP_OK);
     }

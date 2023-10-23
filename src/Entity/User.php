@@ -54,7 +54,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Collection $submissions;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $expoToken = null;
+    private ?string $token = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
     private Collection $profileCaches;
@@ -221,14 +221,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getExpoToken(): ?string
+    public function getToken(): ?string
     {
-        return $this->expoToken;
+        return $this->token;
     }
 
-    public function setExpoToken(?string $expoToken): static
+    public function setExpoToken(?string $token): static
     {
-        $this->expoToken = $expoToken;
+        $this->token = $token;
 
         return $this;
     }
