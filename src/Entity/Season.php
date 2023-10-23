@@ -43,9 +43,12 @@ class Season
     #[ORM\OneToMany(mappedBy: 'season', targetEntity: Submission::class)]
     private Collection $submissions;
 
-    public function __construct()
+    public function __construct(DateTimeInterface $start, DateTimeInterface $end, Charity $charity)
     {
         $this->submissions = new ArrayCollection();
+        $this->start = $start;
+        $this->end = $end;
+        $this->charity = $charity;
     }
 
     public function getId(): ?int

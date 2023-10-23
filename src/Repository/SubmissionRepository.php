@@ -7,6 +7,7 @@ use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -46,18 +47,18 @@ class SubmissionRepository extends ServiceEntityRepository
     public function findAllByUser(User $user, int $page, int $limit): Paginator
     {
         $query = $this->createQueryBuilder('s')
-            ->select('s')
-            ->where('s.user = :userId')
-            ->andWhere('s.accepted = :accepted')
+        ->select('s')
+        ->where('s.user = :userId')
+        ->andWhere('s.accepted = :accepted')
 
-            ->setParameter('userId', $user->getId())
-            ->setParameter('accepted', true)
+        ->setParameter('userId', $user->getId())
+        ->setParameter('accepted', true)
         ;
 
         $paginator = new Paginator($query);
         $paginator->getQuery()
-            ->setFirstResult(($page-1) * $limit)
-            ->setMaxResults($limit)
+        ->setFirstResult(($page-1) * $limit)
+        ->setMaxResults($limit)
         ;
 
         return $paginator;
@@ -66,15 +67,15 @@ class SubmissionRepository extends ServiceEntityRepository
     public function findBySeason(Season $season, int $page, int $limit): Paginator
     {
         $query = $this->createQueryBuilder('s')
-            ->select('s')
-            ->where('s.season = :seasonId')
-            ->setParameter('seasonId', $season->getId())
+        ->select('s')
+        ->where('s.season = :seasonId')
+        ->setParameter('seasonId', $season->getId())
         ;
 
         $paginator = new Paginator($query);
         $paginator->getQuery()
-            ->setFirstResult(($page-1) * $limit)
-            ->setMaxResults($limit)
+        ->setFirstResult(($page-1) * $limit)
+        ->setMaxResults($limit)
         ;
 
         return $paginator;
@@ -83,19 +84,19 @@ class SubmissionRepository extends ServiceEntityRepository
     public function findUsersBySeason(Season $season, int $page, int $limit): Paginator
     {
         $query = $this->getEntityManager()->createQueryBuilder()
-            ->select('u')
-            ->from(User::class, 'u')
-            ->join('u.submissions', 's')
-            ->where('s.season = :seasonId')
+        ->select('u')
+        ->from(User::class, 'u')
+        ->join('u.submissions', 's')
+        ->where('s.season = :seasonId')
 
-            ->setParameter('seasonId', $season->getId())
-            ->distinct()
+        ->setParameter('seasonId', $season->getId())
+        ->distinct()
         ;
 
         $paginator = new Paginator($query);
         $paginator->getQuery()
-            ->setFirstResult(($page-1) * $limit)
-            ->setMaxResults($limit)
+        ->setFirstResult(($page-1) * $limit)
+        ->setMaxResults($limit)
         ;
 
         return $paginator;
@@ -104,12 +105,29 @@ class SubmissionRepository extends ServiceEntityRepository
     public function findAcceptedInSeasonAndWeek(Season $season, int $week): array
     {
         // TODO: re-enable this
-//        $maxWeek = intdiv((new \DateTimeImmutable())->diff($season->getStart())->days, 7);
-//        if($week > $maxWeek) {
-//            return [];
-//        }
+        // $maxWeek = intdiv((new \DateTimeImmutable())->diff($season->getStart())->days, 7);
+        // if($week > $maxWeek) {
+        //     return [];
+        // }
 
-        return $this->findBy(['season' => $season, 'accepted' => true, 'week' => $week], orderBy: ['date' => 'ASC']);
+        return $this->createQueryBuilder('sub')
+            ->select('sub')
+            ->where('sub.season = :season')
+            ->andWhere('sub.week = :week')
+            ->andWhere('sub.accepted = :accepted')
+            ->orderBy('sub.date', 'ASC')
+            ->getQuery()
+            ->setParameters([
+                'week' => $week,
+                'season' => $season,
+                'accepted' => true
+            ])
+            ->setFetchMode(Submission::class, 'submission', ClassMetadataInfo::FETCH_EAGER)
+            ->setFetchMode(Submission::class, 'user', ClassMetadataInfo::FETCH_EAGER)
+            ->setFetchMode(Submission::class, 'activity', ClassMetadataInfo::FETCH_EAGER)
+            ->setFetchMode(Submission::class, 'faculty', ClassMetadataInfo::FETCH_EAGER)
+            ->execute()
+        ;
     }
 
     public function findUnreviewedInSeason(Season $season): array

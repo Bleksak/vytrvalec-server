@@ -326,12 +326,4 @@ class SubmissionApiController extends AbstractController
 
         return new Response(status: Response::HTTP_OK);
     }
-
-    #[Route('/notifyTest', name: 'notification_test', env: 'dev')]
-    public function notificationTest(Firebase $firebase): Response
-    {
-        $firebase->send(new FirebaseNotification('/topics/new_season', 'Send nudes plz', 'plííííz', 'ASPON_BOOBIEZ?'));
-
-        return new Response('OK', 200);
-    }
 }

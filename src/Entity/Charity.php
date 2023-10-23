@@ -25,6 +25,12 @@ class Charity
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
     private ?string $description = null;
 
+    public function __construct(string $name, string $description)
+    {
+        $this->name = $name;
+        $this->description = $description;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

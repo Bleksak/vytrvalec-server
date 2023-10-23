@@ -2,15 +2,9 @@
 
 namespace App\Repository;
 
-use App\Entity\Activity;
-use App\Entity\Faculty;
 use App\Entity\Season;
-use App\Entity\Submission;
-use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -46,51 +40,27 @@ class SeasonRepository extends ServiceEntityRepository
         }
     }
 
-    public function getCurrent(): Season|false
+    public function getCurrent(): ?Season
     {
-        $now = new DateTimeImmutable();
+        $query = $this->createQueryBuilder('s')
+            ->select('s')
+            ->where('s.start <= :now')
+            ->andWhere('s.end >= :now')
+            ->setParameter('now', new DateTimeImmutable())
+            ->setMaxResults(1)
+            ->getQuery()
+        ;
 
-        $criteria = new Criteria();
-        $criteria->where(Criteria::expr()->lt('start', $now));
-        $criteria->andWhere(Criteria::expr()->gte('end', $now));
-
-        return $this->matching($criteria)->first();
+        return $query->getOneOrNullResult();
     }
 
     public function getLast(): ?Season
     {
-        $result = $this->createQueryBuilder('s')
+        return $this->createQueryBuilder('s')
             ->select('s')
             ->orderBy('s.end', 'ASC')
             ->setMaxResults(1)
             ->getQuery()
-            ->execute();
-
-        return empty($result) ? null : $result[0];
+            ->getOneOrNullResult();
     }
-
-//    /**
-//     * @return Season[] Returns an array of Season objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Season
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }
