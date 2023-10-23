@@ -240,26 +240,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->profileCaches;
     }
-
-    public function addProfileCache(ProfileCache $profileCache): static
-    {
-        if (!$this->profileCaches->contains($profileCache)) {
-            $this->profileCaches->add($profileCache);
-            $profileCache->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProfileCache(ProfileCache $profileCache): static
-    {
-        if ($this->profileCaches->removeElement($profileCache)) {
-            // set the owning side to null (unless already changed)
-            if ($profileCache->getUser() === $this) {
-                $profileCache->setUser(null);
-            }
-        }
-
-        return $this;
-    }
 }
