@@ -39,6 +39,17 @@ class FacultyRepository extends ServiceEntityRepository
         }
     }
 
+    public function findForSelect(): array
+    {
+        $faculties = [];
+
+        foreach($this->findBy(['visible' => true]) as $faculty) {
+            $faculties[$faculty->getId()] = $faculty->getShortcut();
+        }
+
+        return $faculties;
+    }
+
 //    /**
 //     * @return Faculty[] Returns an array of Faculty objects
 //     */

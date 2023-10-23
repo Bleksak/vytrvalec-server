@@ -7,6 +7,7 @@ use App\Attributes\ApiRoute;
 use App\Entity\Activity;
 use App\Repository\ActivityRepository;
 use App\Requests\ActivityCreateRequest;
+use App\Requests\ActivityUpdateRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -16,31 +17,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[ApiResource('Activity')]
 class ActivityController extends AbstractController
 {
-    public function __construct(private ActivityRepository $activityRepository)
+    public function __construct(private readonly ActivityRepository $activityRepository)
     {
-
     }
 
     #[ApiRoute(
-        '/api/activity/list',
-        name: 'activities',
-        methods: ['GET'],
-        documentation: 'Retrieve all <code>Activity</code> entries',
-        responses: [
-            Response::HTTP_OK => ['message' => 'Successfully retrieved'],
-            Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access']
-        ],
-    )]
-    #[IsGranted('ROLE_USER')]
-    public function activityList(SerializerInterface $serializer): Response
-    {
-        return $this->json($serializer->normalize($this->activityRepository->findAll(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions']
-        ]));
-    }
-
-    #[ApiRoute(
-        '/api/activity/create',
+        '/api/activity',
         name: 'activity_create',
         methods: ['POST'],
         documentation: 'Create a new <code>Activity</code> entry',
@@ -70,13 +52,14 @@ class ActivityController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/activity/{activity}/delete',
-        name: 'activity_create',
+        '/api/activity/{activity}',
+        name: 'activity_delete',
         methods: ['DELETE'],
         documentation: 'Deletes an existing <code>Activity</code> entry',
         responses: [
             Response::HTTP_OK => ['message' => 'Successfully deleted'],
             Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
+            Response::HTTP_NOT_FOUND => ['message' => 'Not found'],
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
@@ -87,40 +70,41 @@ class ActivityController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/activity/{activity}/enable',
-        name: 'activity_enable',
+        '/api/activity/{activity}',
+        name: 'activity_patch',
         methods: ['PATCH'],
-        documentation: 'Enables an <code>Activity</code> entry',
+        documentation: 'Updates an <code>Activity</code> entry',
         responses: [
-            Response::HTTP_OK => ['message' => 'Successfully enabled'],
+            Response::HTTP_OK => ['message' => 'Successfully patched'],
             Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function enable(Activity $activity): Response
+    public function update(Activity $activity, ActivityUpdateRequest $request): Response
     {
-        $activity->setActive(true);
-        $this->activityRepository->save($activity, true);
+        $activity->setName($request->getName() ?? $activity->getName());
+        $activity->setActive($request->getActive() ?? $activity->isActive());
+        $activity->setMinElevation($request->getMinElevation() ?? $activity->getMinElevation());
 
+        $this->activityRepository->save($activity, true);
         return new Response(status: Response::HTTP_OK);
     }
 
     #[ApiRoute(
-        '/api/activity/{activity}/disable',
-        name: 'activity_disable',
-        methods: ['PATCH'],
-        documentation: 'Disables an <code>Activity</code> entry',
+        '/api/activity',
+        name: 'activity_index',
+        methods: ['GET'],
+        documentation: 'Retrieve all <code>Activity</code> entries',
         responses: [
-            Response::HTTP_OK => ['message' => 'Successfully disabled'],
-            Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
+            Response::HTTP_OK => ['message' => 'Successfully retrieved'],
+            Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access']
         ],
     )]
-    #[IsGranted('ROLE_STAFF')]
-    public function disable(Activity $activity): Response
+    public function activityList(SerializerInterface $serializer): Response
     {
-        $activity->setActive(false);
-        $this->activityRepository->save($activity, true);
-
-        return new Response(status: Response::HTTP_OK);
+        return $this->json($serializer->normalize($this->activityRepository->findAll(), null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions']
+        ]));
     }
+
 }

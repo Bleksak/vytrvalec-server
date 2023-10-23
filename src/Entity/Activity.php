@@ -14,31 +14,27 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
     private ?string $name = null;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'userProfile'])]
     private ?bool $active = null;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
-    private ?int $min_elevation = null;
+    #[Groups(['fetchSubmission', 'userProfile'])]
+    private ?int $minElevation = null;
 
-    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: ProfileCache::class)]
-    private Collection $profileCaches;
-
-//    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: Submission::class, orphanRemoval: true)]
-//    private Collection $submissions;
+    #[ORM\OneToMany(mappedBy: 'faculty', targetEntity: FacultyCache::class)]
+    private Collection $facultyCaches;
 
     public function __construct()
     {
-//        $this->submissions = new ArrayCollection();
-$this->profileCaches = new ArrayCollection();
+        $this->facultyCaches = new ArrayCollection();
     }
     
     public function getId(): ?int
@@ -72,43 +68,18 @@ $this->profileCaches = new ArrayCollection();
 
     public function getMinElevation(): ?int
     {
-        return $this->min_elevation;
+        return $this->minElevation;
     }
 
-    public function setMinElevation(int $min_elevation): self
+    public function setMinElevation(int $minElevation): self
     {
-        $this->min_elevation = $min_elevation;
+        $this->minElevation = $minElevation;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, ProfileCache>
-     */
-    public function getProfileCaches(): Collection
+    public function getFacultyCaches(): ?Collection
     {
-        return $this->profileCaches;
-    }
-
-    public function addProfileCache(ProfileCache $profileCache): static
-    {
-        if (!$this->profileCaches->contains($profileCache)) {
-            $this->profileCaches->add($profileCache);
-            $profileCache->setActivity($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProfileCache(ProfileCache $profileCache): static
-    {
-        if ($this->profileCaches->removeElement($profileCache)) {
-            // set the owning side to null (unless already changed)
-            if ($profileCache->getActivity() === $this) {
-                $profileCache->setActivity(null);
-            }
-        }
-
-        return $this;
+        return $this->facultyCaches;
     }
 }

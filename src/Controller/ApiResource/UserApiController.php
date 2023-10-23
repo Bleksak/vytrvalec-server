@@ -53,13 +53,14 @@ class UserApiController extends AbstractController
         requestScheme: [
             'email' => 'string',
             'password' => 'string',
+            'firebase_token' => 'string',
         ],
         fakeName: 'api_user_login',
         fakePath: '/api/user/login',
     )]
     public function login(): Response
     {
-        return $this->json([]);
+        return new Response(status: Response::HTTP_NOT_FOUND);
     }
 
     #[ApiRoute(
@@ -80,11 +81,11 @@ class UserApiController extends AbstractController
     )]
     public function logout(): Response
     {
-        return new Response(status: Response::HTTP_OK);
+        return new Response(status: Response::HTTP_NOT_FOUND);
     }
 
     #[ApiRoute(
-        '/api/user/register',
+        '/api/user',
         name: 'api_user_register',
         methods: ['POST'],
         documentation: 'Creates a new <code>User</code> entity',
@@ -161,71 +162,7 @@ class UserApiController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/user/list',
-        name: 'api_user_list',
-        methods: ['GET'],
-        documentation: 'Retrieve all <code>User</code> entities',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully retrieved all User entities',
-                'response' => [
-                    [
-                        'id' => 'integer',
-                        'email' => 'string',
-                        'roles' => ['ROLE_USER', 'ROLE_STAFF'],
-                        'faculty' => [
-                            'id' => 'integer',
-                            'name' => 'string',
-                            'shortcut' => 'string',
-                        ]
-                    ]
-                ]
-            ],
-            Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
-        ],
-    )]
-    #[IsGranted('ROLE_STAFF')]
-    public function userList(): Response
-    {
-        return $this->json($this->serializer->normalize($this->userRepository->findAll(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
-        ]));
-    }
-
-    #[ApiRoute(
-        '/api/user/profile',
-        name: 'api_user_current_profile',
-        methods: ['GET'],
-        documentation: 'Retrieve a currently logged <code>User</code> entity',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully retrieves a User entity',
-                'response' => [
-                    'id' => 'integer',
-                    'email' => 'string',
-                    'roles' => ['ROLE_USER', 'ROLE_STAFF'],
-                    'faculty' => [
-                        'id' => 'integer',
-                        'name' => 'string',
-                        'shortcut' => 'string',
-                    ]
-                ]
-            ],
-            Response::HTTP_FORBIDDEN => [
-                'message' => 'Unauthorized access',
-            ],
-        ],
-    )]
-    #[IsGranted('ROLE_USER')]
-    public function currentUserData(#[CurrentUser] User $user): Response
-    {
-        return $this->json($this->serializer->normalize($user, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
-        ]));
-    }
-
-    #[ApiRoute(
-        '/api/user/{user}/profile',
+        '/api/user/{user}',
         name: 'api_user_profile',
         methods: ['GET'],
         documentation: 'Retrieve a <code>User</code> entity',
@@ -258,4 +195,37 @@ class UserApiController extends AbstractController
 
         return $this->json($filtered);
     }
+
+    #[ApiRoute(
+        '/api/user',
+        name: 'api_user_list',
+        methods: ['GET'],
+        documentation: 'Retrieve all <code>User</code> entities',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieved all User entities',
+                'response' => [
+                    [
+                        'id' => 'integer',
+                        'email' => 'string',
+                        'roles' => ['ROLE_USER', 'ROLE_STAFF'],
+                        'faculty' => [
+                            'id' => 'integer',
+                            'name' => 'string',
+                            'shortcut' => 'string',
+                        ]
+                    ]
+                ]
+            ],
+            Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
+        ],
+    )]
+    #[IsGranted('ROLE_STAFF')]
+    public function userList(): Response
+    {
+        return $this->json($this->serializer->normalize($this->userRepository->findAll(), null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
+        ]));
+    }
+
 }

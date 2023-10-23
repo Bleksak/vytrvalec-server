@@ -15,7 +15,9 @@ class ActivityCreateRequest extends BaseRequest
     protected ?string $name = null;
 
     #[NotBlank(message: 'blank')]
-    protected ?int $min_elevation = 0;
+    protected ?int $minElevation = 0;
+
+    protected ?bool $active = null;
 
     public function getName(): ?string
     {
@@ -24,7 +26,7 @@ class ActivityCreateRequest extends BaseRequest
 
     public function getMinElevation(): ?int
     {
-        return $this->min_elevation;
+        return $this->minElevation;
     }
 
     protected function validateMinElevation(): ?ConstraintViolationInterface

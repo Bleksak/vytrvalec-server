@@ -19,22 +19,22 @@ class Season
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
     private ?DateTimeInterface $start = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
     private ?DateTimeInterface $end = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
     private ?Charity $charity = null;
 
     /**
@@ -43,9 +43,12 @@ class Season
     #[ORM\OneToMany(mappedBy: 'season', targetEntity: Submission::class)]
     private Collection $submissions;
 
-    public function __construct()
+    public function __construct(DateTimeInterface $start, DateTimeInterface $end, Charity $charity)
     {
         $this->submissions = new ArrayCollection();
+        $this->start = $start;
+        $this->end = $end;
+        $this->charity = $charity;
     }
 
     public function getId(): ?int

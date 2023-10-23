@@ -30,7 +30,6 @@ class PointCalculator
 
         $extraPointClasses = [WeeklyDistanceExtraPoints::class, DailyDistanceExtraPoints::class, WeeklyElevationExtraPoints::class];
         $extraPoints = [];
-
         $activities = [];
 
         foreach($submissions as $submission) {
@@ -46,7 +45,6 @@ class PointCalculator
                 $activities[$activity]['extras'] = [];
 
                 foreach($extraPointClasses as $extra) {
-                    // TODO: check if week is accepted here
                     if($extra::acceptsWeek($week)) {
                         $cls = new $extra();
                         $extraPoints[$activity][] = $cls;

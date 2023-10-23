@@ -4,11 +4,14 @@ namespace App\Controller\ApiResource;
 
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
+use App\Entity\RejectedSubmissionMessage;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
-use App\Repository\ActivityRepository;
 use App\Repository\ProfileCacheRepository;
+use App\Notifications\Firebase\Firebase;
+use App\Notifications\Firebase\FirebaseNotification;
+use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Requests\SubmissionRequest;
@@ -19,10 +22,6 @@ use ImagickException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\NotifierInterface;
-use Symfony\Component\Notifier\Recipient\Recipient;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -31,12 +30,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[ApiResource('Submission')]
 class SubmissionApiController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em, private readonly SubmissionRepository $submissionRepository, private readonly ActivityRepository $activityRepository, private readonly SerializerInterface $serializer)
+    public function __construct(private readonly EntityManagerInterface $em, private readonly SubmissionRepository $submissionRepository, private readonly SerializerInterface $serializer)
     {
     }
 
     #[ApiRoute(
-        '/api/submission/create',
+        '/api/submission',
         name: 'api_submission_create',
         methods: ['POST'],
         documentation: 'Creates a new <code>Submission</code> entity',
@@ -143,39 +142,47 @@ class SubmissionApiController extends AbstractController
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
 
-        return $this->json($this->serializer->normalize(
-            [
-                'pages' => $pageCount,
-                'submissions' => $submissions,
-                'users' => $users,
-            ], null, [
-            AbstractNormalizer::GROUPS => ['fetchSubmission'],
-            AbstractNormalizer::CALLBACKS => [
-                'season' => fn($object) => $object->getId(),
-                'activity' => fn($object) => $object->getId(),
-                'user' => fn($object) => $object->getId(),
-                'faculty' => fn($object) => $object->getId(),
-            ],
-        ]));
+        return $this->json(
+            $this->serializer->normalize(
+                [
+                    'pages' => $pageCount,
+                    'submissions' => $submissions,
+                    'users' => $users,
+                ],
+                null,
+                [
+                    AbstractNormalizer::GROUPS => ['fetchSubmission'],
+                    AbstractNormalizer::CALLBACKS => [
+                        'season' => fn($object) => $object->getId(),
+                        'activity' => fn($object) => $object->getId(),
+                        'user' => fn($object) => $object->getId(),
+                        'faculty' => fn($object) => $object->getId(),
+                    ],
+                ]
+            )
+        );
     }
 
     #[ApiRoute(
-        '/api/submission/list/{page}/{limit}',
+        '/api/submission/user/list/{page}/{limit}',
         name: 'api_submission_list',
         methods: ['GET'],
-        documentation: 'Retrieves all submissions',
+        documentation: 'Retrieves all submissions for current user',
         responses: [
             Response::HTTP_OK => [
                 'message' => 'Successfully retrieved all submissions'
             ]
         ]
     )]
-    public function list(#[CurrentUser] User $user, int $page, int $limit = 50): Response
+    #[IsGranted('ROLE_USER')]
+    public function list(#[CurrentUser] User $user, RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository, int $page, int $limit = 50) : Response
     {
+        $rejectedSubmissions = $rejectedSubmissionMessageRepository->findByUser($user);
         $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
+        $nextPage = ($page + 1) > $pageCount ? null : $page + 1;
 
-        return $this->json($this->serializer->normalize(['pages' => $pageCount, 'submissions' => $submissions], null, [
+        return $this->json($this->serializer->normalize(['nextPage' => $nextPage, 'submissions' => $submissions, 'rejectedSubmissions' => $rejectedSubmissions], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['faculty', 'user'],
             AbstractNormalizer::CALLBACKS => [
@@ -299,20 +306,24 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function reject(Request $request, Submission $submission, NotifierInterface $notifier): Response
+    public function reject(Request $request, Submission $submission, RejectedSubmissionMessageRepository $repository, Firebase $firebase): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
         $this->setState($submission, false);
-        $this->submissionRepository->save($submission, true);
+        $this->submissionRepository->save($submission);
 
         $message = $request->getPayload()->get('message');
+        if (empty($message)) {
+            $message = 'Vaše aktivita ze dne ' . $submission->getDate()->format('d. m. Y') . ' byla zamítnuta.\nZkontrolujte prosím zadané údaje a případně je upravte.\n\nDěkujeme za pochopení,\nKatedra tělesné výchovy a sportu ZČU v Plzni';
+        }
 
-        $notification = (new Notification('Měsíční vytrvalec', ['email', 'expo']))->content($message);
-        $recipient = new Recipient($submission->getUser()->getEmail(), $submission->getUser()->getExpoToken());
-        $notifier->send($notification, $recipient);
+        $rejectedMessage = (new RejectedSubmissionMessage())->setSubmission($submission)->setMessage($message);
+        $repository->save($rejectedMessage, true);
+
+        $firebase->send(new FirebaseNotification($submission->getUser()->getFirebaseToken(), 'Měsíční vytrvalec', $message, 'rejected_submission='.$submission->getId()));
 
         return new Response(status: Response::HTTP_OK);
     }

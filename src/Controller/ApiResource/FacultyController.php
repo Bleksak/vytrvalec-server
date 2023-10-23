@@ -19,32 +19,9 @@ class FacultyController extends AbstractController
     {
     }
 
-    #[ApiRoute(
-        '/api/faculty/list',
-        name: 'api_faculty_list',
-        methods: ['GET'],
-        documentation: 'Retrieves a list of all faculties',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'List of all faculties',
-                'response' => [
-                    [
-                        'id' => 'integer',
-                        'name' => 'string',
-                        'shortcut' => 'string',
-                        'visible' => 'boolean'
-                    ]
-                ]
-            ]
-        ],
-    )]
-    public function facultyList(): Response
-    {
-        return $this->json($this->facultyRepository->findAll());
-    }
 
     #[ApiRoute(
-        '/api/faculty/create',
+        '/api/faculty',
         name: 'api_faculty_create',
         methods: ['POST'],
         documentation: 'Create a new <code>Faculty</code> entity.',
@@ -86,7 +63,7 @@ class FacultyController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/faculty/update/{faculty}',
+        '/api/faculty/{faculty}',
         name: 'api_faculty_update',
         methods: ['PATCH'],
         documentation: 'Updates an existing <code>Faculty</code> entity.',
@@ -130,5 +107,53 @@ class FacultyController extends AbstractController
         return $this->json([
             'success' => true
         ], Response::HTTP_OK);
+    }
+    
+    #[ApiRoute(
+        '/api/faculty',
+        name: 'api_faculty_list',
+        methods: ['GET'],
+        documentation: 'Retrieves a list of all faculties',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'List of all faculties',
+                'response' => [
+                    [
+                        'id' => 'integer',
+                        'name' => 'string',
+                        'shortcut' => 'string',
+                        'visible' => 'boolean'
+                    ]
+                ]
+            ]
+        ],
+    )]
+    public function facultyList(): Response
+    {
+        return $this->json($this->facultyRepository->findAll());
+    }
+
+    #[ApiRoute(
+        '/api/faculty/{faculty}',
+        name: 'api_faculty_list',
+        methods: ['GET'],
+        documentation: 'Retrieve a faculty',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Faculty',
+                'response' => [
+                    [
+                        'id' => 'integer',
+                        'name' => 'string',
+                        'shortcut' => 'string',
+                        'visible' => 'boolean'
+                    ]
+                ]
+            ]
+        ],
+    )]
+    public function faculty(Faculty $faculty): Response
+    {
+        return $this->json($faculty);
     }
 }
