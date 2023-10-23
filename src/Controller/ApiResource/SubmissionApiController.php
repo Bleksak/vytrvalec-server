@@ -8,6 +8,7 @@ use App\Entity\RejectedSubmissionMessage;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
+use App\Repository\ProfileCacheRepository;
 use App\Notifications\Firebase\Firebase;
 use App\Notifications\Firebase\FirebaseNotification;
 use App\Repository\RejectedSubmissionMessageRepository;
@@ -21,7 +22,6 @@ use ImagickException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -272,14 +272,15 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function accept(Submission $submission): Response
+    public function accept(Submission $submission, ProfileCacheRepository $profileCacheRepository): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
         $this->setState($submission, true);
-        $this->submissionRepository->save($submission, true);
+        $this->submissionRepository->save($submission);
+        $profileCacheRepository->addCache($submission, true);
 
         return new Response(status: Response::HTTP_OK);
     }

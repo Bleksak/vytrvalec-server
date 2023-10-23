@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -17,58 +16,53 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
+    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
+    #[Groups(['fetchSubmission'])]
     private ?string $email = null;
 
+    /**
+     * @var string[]
+     */
     #[ORM\Column(type: 'json')]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission'])]
     private array $roles = [];
 
     #[ORM\Column]
     private ?string $password = null;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission'])]
     private ?bool $banned = false;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
+    #[Groups(['fetchSubmission'])]
     private ?string $firstName = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
+    #[Groups(['fetchSubmission'])]
     private ?string $lastName = null;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission'])]
     private ?Faculty $faculty = null;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private ?string $firebaseToken = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class, orphanRemoval: true)]
     private ?Collection $submissions;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $expoToken = null;
+
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
     private Collection $profileCaches;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: FacultyExtraPoints::class)]
-    private Collection $extraPoints;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserCache::class)]
-    private Collection $userCache;
 
     public function __construct()
     {
         $this->submissions = new ArrayCollection();
         $this->profileCaches = new ArrayCollection();
-        $this->extraPoints = new ArrayCollection();
-        $this->userCache = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -227,14 +221,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getFirebaseToken(): ?string
+    public function getExpoToken(): ?string
     {
-        return $this->firebaseToken;
+        return $this->expoToken;
     }
 
-    public function setFirebaseToken(string $firebaseToken): static
+    public function setExpoToken(?string $expoToken): static
     {
-        $this->firebaseToken = $firebaseToken;
+        $this->expoToken = $expoToken;
 
         return $this;
     }
@@ -247,60 +241,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->profileCaches;
     }
 
-    /**
-     * @return Collection<int, FacultyExtraPoints>
-     */
-    public function getExtraPoints(): Collection
+    public function addProfileCache(ProfileCache $profileCache): static
     {
-        return $this->extraPoints;
-    }
-
-    public function addExtraPoint(FacultyExtraPoints $extraPoint): static
-    {
-        if (!$this->extraPoints->contains($extraPoint)) {
-            $this->extraPoints->add($extraPoint);
-            $extraPoint->setUser($this);
+        if (!$this->profileCaches->contains($profileCache)) {
+            $this->profileCaches->add($profileCache);
+            $profileCache->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeExtraPoint(FacultyExtraPoints $extraPoint): static
+    public function removeProfileCache(ProfileCache $profileCache): static
     {
-        if ($this->extraPoints->removeElement($extraPoint)) {
+        if ($this->profileCaches->removeElement($profileCache)) {
             // set the owning side to null (unless already changed)
-            if ($extraPoint->getUser() === $this) {
-                $extraPoint->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, UserCache>
-     */
-    public function getUserCaches(): Collection
-    {
-        return $this->userCache;
-    }
-
-    public function addUserCache(UserCache $userCache): static
-    {
-        if (!$this->userCache->contains($userCache)) {
-            $this->userCache->add($userCache);
-            $userCache->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserCache(UserCache $userCache): static
-    {
-        if ($this->userCache->removeElement($userCache)) {
-            // set the owning side to null (unless already changed)
-            if ($userCache->getUser() === $this) {
-                $userCache->setUser(null);
+            if ($profileCache->getUser() === $this) {
+                $profileCache->setUser(null);
             }
         }
 

@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\ProfileCacheRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProfileCacheRepository::class)]
 class ProfileCache
@@ -17,15 +16,12 @@ class ProfileCache
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'profileCaches')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['userProfile'])]
     private ?Activity $activity;
 
     #[ORM\Column]
-    #[Groups(['userProfile'])]
     private ?int $distance = 0;
 
     #[ORM\Column]
-    #[Groups(['userProfile'])]
     private ?int $elevation = 0;
 
     public function __construct(User $user, Activity $activity)

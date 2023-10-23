@@ -2,11 +2,8 @@
 
 namespace App\Repository;
 
-use App\Entity\Activity;
 use App\Entity\ProfileCache;
-use App\Entity\Season;
 use App\Entity\Submission;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -34,13 +31,9 @@ class ProfileCacheRepository extends ServiceEntityRepository
         }
     }
 
-    public function addCache(Submission $submission, bool $flush = false): void
+    public function addCache(Submission $submission, bool $flush = false)
     {
-        $profileCache = $this->findOneBy([
-            'user' => $submission->getUser(),
-            'activity' => $submission->getActivity()
-        ]) ?? new ProfileCache($submission->getUser(), $submission->getActivity());
-
+        $profileCache = $this->findOneBy(['user' => $submission->getUser(), 'activity' => $submission->getActivity()]) ?? new ProfileCache($submission->getUser(), $submission->getActivity());
         $profileCache
             ->updateDistance(fn($oldDistance) => $oldDistance + $submission->getDistance())
             ->updateElevation(fn($oldElevation) => $oldElevation + $submission->getElevation())
