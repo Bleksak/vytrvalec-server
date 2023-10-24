@@ -20,16 +20,11 @@ class RejectedSubmissionMessage
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeInterface $createdAt;
 
-    public function __construct()
+    public function __construct(Submission $submission, string $message)
     {
         $this->createdAt = new \DateTimeImmutable();
-    }
-
-    public function setSubmission(Submission $submission): static
-    {
         $this->submission = $submission;
-
-        return $this;
+        $this->message = $message;
     }
 
     public function getSubmission(): ?Submission
@@ -42,22 +37,8 @@ class RejectedSubmissionMessage
         return $this->message;
     }
 
-    public function setMessage(string $message): static
-    {
-        $this->message = $message;
-
-        return $this;
-    }
-
     public function getTimeCreated(): ?\DateTimeInterface
     {
         return $this->createdAt;
-    }
-
-    public function setTimeCreated(\DateTimeInterface $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
     }
 }
