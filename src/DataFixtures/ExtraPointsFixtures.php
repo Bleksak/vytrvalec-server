@@ -8,26 +8,17 @@ use Doctrine\Persistence\ObjectManager;
 
 class ExtraPointsFixtures extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $dailyDistanceExtraPoints = new ExtraPoints();
-        $dailyDistanceExtraPoints->setName('daily_distance');
-        $dailyDistanceExtraPoints->setPoints(1);
-        $dailyDistanceExtraPoints->setWeek(2);
+        $dailyDistanceExtraPoints = new ExtraPoints('daily_distance', 1, 2);
 
         $manager->persist($dailyDistanceExtraPoints);
 
-        $weeklyDistanceExtraPoints = new ExtraPoints();
-        $weeklyDistanceExtraPoints->setName('weekly_distance');
-        $weeklyDistanceExtraPoints->setPoints(1);
-        $weeklyDistanceExtraPoints->setWeek(2);
+        $weeklyDistanceExtraPoints = new ExtraPoints('weekly_distance', 1, 2);
 
         $manager->persist($weeklyDistanceExtraPoints);
 
-        $weeklyElevationExtraPoints = new ExtraPoints();
-        $weeklyElevationExtraPoints->setName('weekly_elevation');
-        $weeklyElevationExtraPoints->setPoints(2);
-        $weeklyElevationExtraPoints->setWeek(3);
+        $weeklyElevationExtraPoints = new ExtraPoints('weekly_elevation', 2, 3);
 
         $manager->persist($weeklyElevationExtraPoints);
 

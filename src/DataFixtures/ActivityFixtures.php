@@ -10,15 +10,8 @@ class ActivityFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $biking = new Activity();
-        $biking->setActive(true);
-        $biking->setName("Kolo/Koloběžka");
-        $biking->setMinElevation(1500);
-
-        $running = new Activity();
-        $running->setActive(true);
-        $running->setName("Běh/Chůze");
-        $running->setMinElevation(1000);
+        $biking = new Activity('Kolo/Koloběžka', 1500);
+        $running = new Activity('Běh/Chůze', 1000);
 
         $manager->persist($running);
         $manager->persist($biking);
