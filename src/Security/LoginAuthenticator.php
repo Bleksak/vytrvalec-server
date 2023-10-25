@@ -5,7 +5,6 @@ namespace App\Security;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -86,8 +85,7 @@ class LoginAuthenticator extends AbstractAuthenticator
         $user = $token->getUser();
 
         if($firebaseToken !== null && $user instanceof User) {
-            // TODO: set token
-//            $user->setExpoToken($expoToken);
+            $user->setToken($$firebaseToken);
             $this->userRepository->save($user, true);
         }
 
