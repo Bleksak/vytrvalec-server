@@ -132,7 +132,7 @@ class FacultyController extends AbstractController
 
     #[ApiRoute(
         '/api/faculty/{faculty}',
-        name: 'api_faculty_list',
+        name: 'api_faculty_get',
         methods: ['GET'],
         documentation: 'Retrieve a faculty',
         responses: [
