@@ -31,15 +31,15 @@ class BaseTest extends WebTestCase
         return $this->client->getContainer()->get(EntityManagerInterface::class);
     }
 
-    protected function createUser($email, $password, $roles = []): void
+    protected function createUser(string $email, string $password, array $roles = []): void
     {
         $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
 
-        $this->client->request('POST', '/api/user/register', [
+        $this->client->request('POST', '/api/user', [
             "email" => $email,
             "password" => $password,
-            "firstName" => "string",
-            "lastName" => "string",
+            "firstName" => 'string',
+            "lastName" => 'string',
             "faculty" => $faculty->getId(),
         ]);
 
@@ -52,7 +52,7 @@ class BaseTest extends WebTestCase
         }
     }
 
-    protected function loginUser($email, $password): void
+    protected function loginUser(string $email, string $password): void
     {
         $this->client->request('POST', '/api/user/login', [
             'email' => $email,
@@ -60,7 +60,7 @@ class BaseTest extends WebTestCase
         ]);
     }
 
-    protected function grantRole($role = []): void
+    protected function grantRole(array $role = []): void
     {
         $testUser = 'TestUser@TestUser.com';
         $testPassword = 'TestingPassword45511';
