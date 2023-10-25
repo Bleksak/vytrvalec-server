@@ -5,7 +5,6 @@ namespace App\Notifications\Firebase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransport;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
-use Symfony\Component\Notifier\Bridge\Firebase\Notification\AndroidNotification;
 use Symfony\Component\Notifier\Bridge\Firebase\Notification\WebNotification;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -23,7 +22,7 @@ class Firebase
 
     public function send(FirebaseNotification $notification): SentMessage
     {
-        $webNotification = (new AndroidNotification($notification->to(), []))
+        $webNotification = (new WebNotification($notification->to(), []))
             ->title($notification->title())
         ;
 
