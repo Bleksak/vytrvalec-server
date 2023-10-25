@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
 
 #[UniqueValue(fields: ['email'], em: User::class, message: 'not_unique_email')]
-class RegistrationRequest extends BaseRequest
+class UserCreateRequest extends BaseRequest
 {
     #[Email(message: 'invalid_format')]
     #[NotBlank(message: 'blank')]
