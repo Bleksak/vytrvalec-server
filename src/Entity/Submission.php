@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\SubmissionRepository;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -20,7 +21,7 @@ class Submission
 
     #[ORM\Column(nullable: true)]
     #[Groups(['fetchSubmission'])]
-    private ?bool $accepted = null;
+    private ?bool $accepted = false;
 
     #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
@@ -42,7 +43,7 @@ class Submission
 
     #[ORM\Column]
     #[Groups(['fetchSubmission'])]
-    private ?bool $reviewed = null;
+    private ?bool $reviewed = false;
 
     #[ORM\Column(length: 255)]
     #[Groups(['fetchSubmission'])]
@@ -64,6 +65,20 @@ class Submission
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Faculty $faculty = null;
+
+    public function __construct(User $user, Activity $activity, Season $season, int $distance, ?int $elevation = null)
+    {
+        $this->date = new DateTimeImmutable();
+
+        $this->user = $user;
+        $this->faculty = $user->getFaculty();
+        $this->activity = $activity;
+        $this->season = $season;
+        $this->distance = $distance;
+        $this->elevation = $elevation;
+
+        $this->calculateWeek();
+    }
 
     public function getId(): ?int
     {

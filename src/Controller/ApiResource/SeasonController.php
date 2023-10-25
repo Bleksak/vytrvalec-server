@@ -60,18 +60,10 @@ class SeasonController extends AbstractController
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        $season = new Season();
-        $season->setStart($request->getStart());
-        $season->setEnd($request->getEnd());
-
-        $charity = new Charity();
-        $charity->setName($request->getCharityName());
-        $charity->setDescription($request->getCharityDescription());
-
+        $charity = new Charity($request->getCharityName(), $request->getCharityDescription());
+        $season = new Season($request->getStart(), $request->getEnd(), $charity);
+        
         $charityRepository->save($charity);
-
-        $season->setCharity($charity);
-
         $this->seasonRepository->save($season, true);
 
         return new Response(status: Response::HTTP_CREATED);

@@ -52,10 +52,7 @@ class FacultyController extends AbstractController
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        $faculty = new Faculty();
-        $faculty->setName($request->getName());
-        $faculty->setShortcut($request->getShortcut());
-        $faculty->setVisible($request->getVisible());
+        $faculty = new Faculty($request->getName(), $request->getShortcut(), $request->getVisible());
 
         $this->facultyRepository->save($faculty, true);
 

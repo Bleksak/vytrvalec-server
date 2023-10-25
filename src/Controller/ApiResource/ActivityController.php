@@ -2,6 +2,7 @@
 
 namespace App\Controller\ApiResource;
 
+use App\Action\ActivityActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
 use App\Entity\Activity;
@@ -17,7 +18,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[ApiResource('Activity')]
 class ActivityController extends AbstractController
 {
-    public function __construct(private readonly ActivityRepository $activityRepository)
+    public function __construct(
+        private readonly ActivityRepository $activityRepository,
+        private readonly ActivityActions $action,
+    )
     {
     }
 
@@ -41,11 +45,7 @@ class ActivityController extends AbstractController
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        $activity = new Activity();
-        $activity->setActive(true);
-        $activity->setName($request->getName());
-        $activity->setMinElevation($request->getMinElevation());
-
+        $activity = new Activity($request->getName(), $request->getMinElevation());
         $this->activityRepository->save($activity, true);
 
         return new Response(status: Response::HTTP_OK);
@@ -65,6 +65,8 @@ class ActivityController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function delete(Activity $activity): Response
     {
+        // TODO: check if deletable(has no submissions)
+
         $this->activityRepository->remove($activity, true);
         return new Response(status: Response::HTTP_OK);
     }

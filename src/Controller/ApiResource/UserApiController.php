@@ -120,13 +120,7 @@ class UserApiController extends AbstractController
             return $this->json($messages, Response::HTTP_BAD_REQUEST);
         }
 
-        $user = new User();
-
-        $user->setEmail($request->getEmail());
-        $user->setPassword($hasher->hashPassword($user, $request->getPassword()));
-        $user->setFaculty($request->getFaculty());
-        $user->setFirstName($request->getFirstName());
-        $user->setLastName($request->getLastName());
+        $user = new User($request->getEmail(), $request->getPassword(), $request->getFirstName(), $request->getLastName(), $request->getFaculty());
 
         $constraints = $validator->validate($user);
         if (count($constraints) != 0) {
