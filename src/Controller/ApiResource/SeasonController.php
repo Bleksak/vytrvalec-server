@@ -2,6 +2,7 @@
 
 namespace App\Controller\ApiResource;
 
+use App\Action\SeasonActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
 use App\Entity\Charity;
@@ -20,12 +21,16 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[ApiResource('Season')]
 class SeasonController extends AbstractController
 {
-    public function __construct(private readonly SeasonRepository $seasonRepository, private readonly SerializerInterface $serializer)
+    public function __construct(
+        private readonly SeasonRepository $seasonRepository,
+        private readonly SerializerInterface $serializer,
+        private readonly SeasonActions $action,
+    )
     {
     }
 
     #[ApiRoute(
-        '/api/season/create',
+        '/api/season',
         name: 'api_season_create',
         methods: ['POST'],
         documentation: 'Creates a new <code>Season</code> entity',
@@ -60,11 +65,9 @@ class SeasonController extends AbstractController
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        $charity = new Charity($request->getCharityName(), $request->getCharityDescription());
-        $season = new Season($request->getStart(), $request->getEnd(), $charity);
-        
-        $charityRepository->save($charity);
-        $this->seasonRepository->save($season, true);
+        $season = new Season($request->getStart(), $request->getEnd(), new Charity($request->getCharityName(), $request->getCharityDescription()));
+
+        $this->action->create($season);
 
         return new Response(status: Response::HTTP_CREATED);
     }
@@ -127,6 +130,7 @@ class SeasonController extends AbstractController
         }
 
         $this->seasonRepository->remove($season);
+        
         return new Response(status: Response::HTTP_OK);
     }
 

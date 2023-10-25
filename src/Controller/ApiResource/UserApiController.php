@@ -2,11 +2,12 @@
 
 namespace App\Controller\ApiResource;
 
+use App\Action\UserActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Requests\RegistrationRequest;
+use App\Requests\UserCreateRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +21,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[ApiResource(resourceName: 'User')]
 class UserApiController extends AbstractController
 {
-    public function __construct(private readonly SerializerInterface $serializer, private readonly UserRepository $userRepository)
+    public function __construct(
+        private readonly SerializerInterface $serializer,
+        private readonly UserRepository $userRepository,
+        private readonly UserActions $action,
+    )
     {
     }
 
@@ -82,60 +87,6 @@ class UserApiController extends AbstractController
     public function logout(): Response
     {
         return new Response(status: Response::HTTP_NOT_FOUND);
-    }
-
-    #[ApiRoute(
-        '/api/user',
-        name: 'api_user_register',
-        methods: ['POST'],
-        documentation: 'Creates a new <code>User</code> entity',
-        responses: [
-            Response::HTTP_CREATED => [
-                'message' => 'User successfully created',
-            ],
-            Response::HTTP_BAD_REQUEST => [
-                'message' => 'Bad request',
-            ],
-        ],
-        requestScheme: [
-            'email' => 'string',
-            'password' => 'string',
-            'firstName' => 'string',
-            'lastName' => 'string',
-            'faculty' => 'integer'
-        ],
-    )]
-    public function register(RegistrationRequest $request, EntityManagerInterface $em, ValidatorInterface $validator, UserPasswordHasherInterface $hasher): Response
-    {
-        if ($this->isGranted('ROLE_USER')) {
-            return $this->json([
-                // TODO: message
-                'TODO: nelze registrovat protoze uz je prihlasenej'
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        $messages = $request->validate();
-
-        if (count($messages) != 0) {
-            return $this->json($messages, Response::HTTP_BAD_REQUEST);
-        }
-
-        $user = new User($request->getEmail(), $request->getPassword(), $request->getFirstName(), $request->getLastName(), $request->getFaculty());
-
-        $constraints = $validator->validate($user);
-        if (count($constraints) != 0) {
-            $messages = [];
-            foreach ($constraints as $constraint) {
-                $messages[] = $constraint->getMessage();
-            }
-
-            return $this->json($messages, Response::HTTP_BAD_REQUEST);
-        }
-
-        $em->persist($user);
-        $em->flush();
-
-        return new Response(status: Response::HTTP_CREATED);
     }
 
     #[ApiRoute(
@@ -221,5 +172,44 @@ class UserApiController extends AbstractController
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
         ]));
     }
+    #[ApiRoute(
+        '/api/user',
+        name: 'api_user_register',
+        methods: ['POST'],
+        documentation: 'Creates a new <code>User</code> entity',
+        responses: [
+            Response::HTTP_CREATED => [
+                'message' => 'User successfully created',
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Bad request',
+            ],
+        ],
+        requestScheme: [
+            'email' => 'string',
+            'password' => 'string',
+            'firstName' => 'string',
+            'lastName' => 'string',
+            'faculty' => 'integer'
+        ],
+    )]
+    public function register(UserCreateRequest $request): Response
+    {
+        if ($this->isGranted('ROLE_USER')) {
+            return $this->json([
+                // TODO: message
+                'TODO: nelze registrovat protoze uz je prihlasenej'
+            ], Response::HTTP_BAD_REQUEST);
+        }
 
+        $messages = $request->validate();
+
+        if (count($messages) != 0) {
+            return $this->json($messages, Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->action->create($request);
+
+        return new Response(status: Response::HTTP_CREATED);
+    }
 }

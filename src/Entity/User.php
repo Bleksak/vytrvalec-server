@@ -61,7 +61,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
     private Collection $profileCaches;
 
-    public function __construct(string $email, string $password, string $firstName, string $lastName, Faculty $faculty, array $roles = [], string $token = null)
+    public function __construct(string $email, string $firstName, string $lastName, Faculty $faculty, array $roles = [], string $token = null)
     {
         $this->submissions = new ArrayCollection();
         $this->profileCaches = new ArrayCollection();
@@ -72,8 +72,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->faculty = $faculty;
         $this->roles = $roles;
         $this->token = $token;
-
-        $this->password = $password;
     }
 
     public function getId(): ?int
@@ -136,10 +134,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPassword(string $password): self
     {
-        $hasherFactory = new PasswordHasherFactory([UserPasswordHasher::class]);
-        $passwordHasher = new UserPasswordHasher($hasherFactory);
-
-        $this->password = $passwordHasher->hashPassword($this, $password);
+        $this->password = $password;
         
         return $this;
     }

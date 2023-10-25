@@ -12,7 +12,7 @@ class UserTest extends BaseTest
     {
         $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
 
-        $this->client->request('POST', '/api/user/register', [
+        $this->client->request('POST', '/api/user', [
             "email" => "aasdf@asdf.com",
             "password" => "Qwerty123",
             "firstName" => "string",
@@ -27,7 +27,7 @@ class UserTest extends BaseTest
     {
         $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
 
-        $this->client->request('POST', '/api/user/register', [
+        $this->client->request('POST', '/api/user', [
             "email" => "aasdf@asdf.com",
             "password" => "Qwerty123",
             "firstName" => "string",
@@ -35,7 +35,7 @@ class UserTest extends BaseTest
             "faculty" => $faculty->getId()
         ]);
 
-        $this->client->request('POST', '/api/user/register', [
+        $this->client->request('POST', '/api/user', [
             "email" => "aasdf@asdf.com",
             "password" => "Qwerty123",
             "firstName" => "string",
@@ -48,7 +48,7 @@ class UserTest extends BaseTest
 
     public function testRegisterInvalidFaculty(): void
     {
-        $this->client->request('POST', '/api/user/register', [
+        $this->client->request('POST', '/api/user', [
             "email" => "aasdf@asdf.com",
             "password" => "Qwerty123",
             "firstName" => "string",
@@ -63,7 +63,7 @@ class UserTest extends BaseTest
     {
         $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
 
-        $this->client->request('POST', '/api/user/register', [
+        $this->client->request('POST', '/api/user', [
             "email" => "aasdf@asdf",
             "password" => "Qwerty123",
             "firstName" => "string",
