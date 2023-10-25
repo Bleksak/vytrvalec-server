@@ -45,14 +45,8 @@ class UserCreateCommand extends Command
         
         $role = $io->choice('Select the users\' role: ', ['ROLE_STAFF', 'ROLE_USER']);
 
-        $user = new User();
-        $user->setEmail($email);
-        $user->setPassword($this->hasher->hashPassword($user, $password));
-        $user->setFaculty($this->facultyRepository->findOneBy(['shortcut' => $faculty]));
-        $user->setRoles([$role]);
-        $user->setFirstName($firstName);
-        $user->setLastName($lastName);
-        
+        $user = new User($email, $password, $firstName, $lastName, $faculty, [$role]);
+
         $this->userRepository->save($user, true);
         $io->success('User successfully created');
 

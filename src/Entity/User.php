@@ -6,6 +6,8 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -59,10 +61,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
     private Collection $profileCaches;
 
-    public function __construct()
+    public function __construct(string $email, string $password, string $firstName, string $lastName, Faculty $faculty, array $roles = [], string $token = null)
     {
         $this->submissions = new ArrayCollection();
         $this->profileCaches = new ArrayCollection();
+        
+        $this->email = $email;
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
+        $this->faculty = $faculty;
+        $this->roles = $roles;
+        $this->token = $token;
+
+        $this->password = $password;
     }
 
     public function getId(): ?int
@@ -110,7 +121,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @param string[] $roles
-     * @return $this
      */
     public function setRoles(array $roles): self
     {
@@ -119,9 +129,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): string
     {
         return $this->password;
@@ -129,18 +136,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPassword(string $password): self
     {
-        $this->password = $password;
+        $hasherFactory = new PasswordHasherFactory([UserPasswordHasher::class]);
+        $passwordHasher = new UserPasswordHasher($hasherFactory);
 
+        $this->password = $passwordHasher->hashPassword($this, $password);
+        
         return $this;
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function eraseCredentials(): void
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 
     public function getFaculty(): ?Faculty
@@ -199,34 +200,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->submissions;
     }
 
-    public function addSubmission(Submission $submission): self
-    {
-        if (!$this->submissions->contains($submission)) {
-            $this->submissions->add($submission);
-            $submission->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSubmission(Submission $submission): self
-    {
-        if ($this->submissions->removeElement($submission)) {
-            // set the owning side to null (unless already changed)
-            if ($submission->getUser() === $this) {
-                $submission->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getToken(): ?string
+            public function getToken(): ?string
     {
         return $this->token;
     }
 
-    public function setExpoToken(?string $token): static
+    public function setToken(?string $token): static
     {
         $this->token = $token;
 
@@ -239,5 +218,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getProfileCaches(): Collection
     {
         return $this->profileCaches;
+    }
+
+    public function eraseCredentials(): void
+    {
     }
 }

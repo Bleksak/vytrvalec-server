@@ -27,6 +27,13 @@ class ExtraPoints
     #[Groups(['fetchSeasonResult'])]
     private ?int $week = null;
 
+    public function __construct(string $name, int $points, int $week)
+    {
+        $this->name = $name;
+        $this->points = $points;
+        $this->week = $week;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

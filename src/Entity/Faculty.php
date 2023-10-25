@@ -27,6 +27,13 @@ class Faculty
     #[Groups(['fetchSubmission'])]
     private ?bool $visible = null;
 
+    public function __construct(string $name, string $shortcut, bool $visible)
+    {
+        $this->name = $name;
+        $this->shortcut = $shortcut;
+        $this->visible = $visible;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

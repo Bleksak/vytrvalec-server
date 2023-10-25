@@ -2,24 +2,22 @@
 
 namespace App\Controller\ApiResource;
 
+use App\Action\SubmissionActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
-use App\Entity\RejectedSubmissionMessage;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use App\Repository\ProfileCacheRepository;
-use App\Notifications\Firebase\Firebase;
-use App\Notifications\Firebase\FirebaseNotification;
 use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Requests\SubmissionRequest;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
 use ImagickException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -30,7 +28,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[ApiResource('Submission')]
 class SubmissionApiController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em, private readonly SubmissionRepository $submissionRepository, private readonly SerializerInterface $serializer)
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly SerializerInterface $serializer,
+        private readonly SubmissionActions $action,
+    )
     {
     }
 
@@ -65,34 +68,31 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_USER')]
-    public function create(#[CurrentUser] User $user, SubmissionRequest $request, Request $httpRequest, SeasonRepository $seasonRepository): Response
+    public function create(
+        #[CurrentUser] User $user, 
+        SubmissionRequest $request,
+        Request $httpRequest,
+        SeasonRepository $seasonRepository,
+        Filesystem $fs,
+    ): Response
     {
         $errors = $request->validate();
         if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        $submission = new Submission();
         $season = $seasonRepository->getCurrent();
 
-        if (!$season) {
+        if ($season === null) {
             return $this->json(['no_season'], Response::HTTP_BAD_REQUEST);
         }
 
-        $submission->setSeason($season);
-        $submission->setElevation($request->getElevation());
-        $submission->setDistance($request->getDistance());
+        $submission = new Submission($user, $request->getActivity(), $season, $request->getDistance(), $request->getElevation());
 
-        $submission->setUser($user);
-        $submission->setActivity($request->getActivity());
-        $submission->setReviewed(false);
-        $submission->setAccepted(false);
-        $submission->setDate(new DateTimeImmutable());
-        $submission->setFaculty($user->getFaculty());
-        $submission->calculateWeek();
-
-        $uniquePath = uniqid('/uploads/') . '.jpg';
-        $absolutePath = $httpRequest->server->get('DOCUMENT_ROOT') . $uniquePath;
+        do {
+            $uniquePath = '/uploads/' . uniqid(moreEntropy: true) . '.jpg';
+            $absolutePath = $this->getParameter('kernel.project_dir') . $uniquePath;
+        } while($fs->exists($absolutePath));
 
         try {
             $img = new Imagick($request->getImage()->getRealPath());
@@ -175,7 +175,12 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_USER')]
-    public function list(#[CurrentUser] User $user, RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository, int $page, int $limit = 50) : Response
+    public function list(
+        #[CurrentUser] User $user,
+        RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository,
+        int $page,
+        int $limit = 50
+    ): Response
     {
         $rejectedSubmissions = $rejectedSubmissionMessageRepository->findByUser($user);
         $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
@@ -242,8 +247,7 @@ class SubmissionApiController extends AbstractController
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
-        $this->em->remove($submission);
-        $this->em->flush();
+        $this->action->delete($submission);
 
         return new Response(status: Response::HTTP_OK);
     }
@@ -278,9 +282,8 @@ class SubmissionApiController extends AbstractController
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
-        $this->setState($submission, true);
-        $this->submissionRepository->save($submission);
-        $profileCacheRepository->addCache($submission, true);
+        $profileCacheRepository->addCache($submission);
+        $this->action->accept($submission);
 
         return new Response(status: Response::HTTP_OK);
     }
@@ -306,24 +309,13 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function reject(Request $request, Submission $submission, RejectedSubmissionMessageRepository $repository, Firebase $firebase): Response
+    public function reject(Request $request, Submission $submission): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
-        $this->setState($submission, false);
-        $this->submissionRepository->save($submission);
-
-        $message = $request->getPayload()->get('message');
-        if (empty($message)) {
-            $message = 'Vaše aktivita ze dne ' . $submission->getDate()->format('d. m. Y') . ' byla zamítnuta.\nZkontrolujte prosím zadané údaje a případně je upravte.\n\nDěkujeme za pochopení,\nKatedra tělesné výchovy a sportu ZČU v Plzni';
-        }
-
-        $rejectedMessage = (new RejectedSubmissionMessage())->setSubmission($submission)->setMessage($message);
-        $repository->save($rejectedMessage, true);
-
-        $firebase->send(new FirebaseNotification($submission->getUser()->getToken(), 'Měsíční vytrvalec', $message, 'rejected_submission='.$submission->getId()));
+        $this->action->reject($submission, $request->getPayload()->get('message', ''));
 
         return new Response(status: Response::HTTP_OK);
     }

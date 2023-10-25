@@ -19,22 +19,25 @@ class Activity
 
     #[ORM\Column(length: 255)]
     #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
-    private ?string $name = null;
+    private string $name;
 
     #[ORM\Column]
     #[Groups(['fetchSubmission', 'userProfile'])]
-    private ?bool $active = null;
+    private bool $active = true;
 
     #[ORM\Column]
     #[Groups(['fetchSubmission', 'userProfile'])]
-    private ?int $minElevation = null;
+    private int $minElevation;
 
     #[ORM\OneToMany(mappedBy: 'faculty', targetEntity: FacultyCache::class)]
     private Collection $facultyCaches;
 
-    public function __construct()
+    public function __construct(string $name, int $minElevation)
     {
         $this->facultyCaches = new ArrayCollection();
+
+        $this->name = $name;
+        $this->minElevation = $minElevation;
     }
     
     public function getId(): ?int
@@ -70,7 +73,7 @@ class Activity
     {
         return $this->minElevation;
     }
-
+    
     public function setMinElevation(int $minElevation): self
     {
         $this->minElevation = $minElevation;

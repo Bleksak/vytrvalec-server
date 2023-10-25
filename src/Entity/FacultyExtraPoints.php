@@ -12,7 +12,7 @@ class FacultyExtraPoints
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'extraPoints')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?FacultyCache $cache = null;
+    private ?FacultyCache $facultyCache = null;
 
     #[ORM\Id]
     #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'extraPoints')]
@@ -29,51 +29,11 @@ class FacultyExtraPoints
     #[ORM\Column]
     private ?int $value = null;
 
-    public function getCache(): ?FacultyCache
+    public function __construct(FacultyCache $facultyCache, User $user, ExtraPoints $extraPoints, int $value)
     {
-        return $this->cache;
-    }
-
-    public function setCache(?FacultyCache $cache): static
-    {
-        $this->cache = $cache;
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
+        $this->facultyCache = $facultyCache;
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function getExtraPoints(): ?ExtraPoints
-    {
-        return $this->extraPoints;
-    }
-
-    public function setExtraPoints(?ExtraPoints $extraPoints): static
-    {
         $this->extraPoints = $extraPoints;
-
-        return $this;
-    }
-
-    public function getValue(): ?int
-    {
-        return $this->value;
-    }
-
-    public function setValue(int $value): static
-    {
         $this->value = $value;
-
-        return $this;
     }
 }
