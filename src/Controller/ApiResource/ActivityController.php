@@ -105,7 +105,7 @@ class ActivityController extends AbstractController
     public function activityList(SerializerInterface $serializer): Response
     {
         return $this->json($serializer->normalize($this->activityRepository->findAll(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions']
+            AbstractNormalizer::GROUPS => ['fetchActivity'],
         ]));
     }
 
