@@ -85,7 +85,7 @@ class LoginAuthenticator extends AbstractAuthenticator
         $user = $token->getUser();
 
         if($firebaseToken !== null && $user instanceof User) {
-            $user->setToken($$firebaseToken);
+            $user->setToken($firebaseToken);
             $this->userRepository->save($user, true);
         }
 

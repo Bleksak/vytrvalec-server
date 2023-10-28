@@ -126,7 +126,7 @@ class UserApiController extends AbstractController
             Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
         ],
     )]
-    public function userData(#[CurrentUser] User $currentUser): Response
+    public function currentUserData(#[CurrentUser] User $currentUser): Response
     {
         $filtered = $this->serializer->normalize($currentUser, null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
