@@ -6,17 +6,15 @@ use App\Action\UserActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
 use App\Entity\User;
+use App\Form\UserCreateFormType;
 use App\Repository\UserRepository;
-use App\Requests\UserCreateRequest;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[ApiResource(resourceName: 'User')]
 class UserApiController extends AbstractController
@@ -107,6 +105,37 @@ class UserApiController extends AbstractController
     }
 
     #[ApiRoute(
+        '/api/user/current',
+        name: 'api_user_current_profile',
+        methods: ['GET'],
+        documentation: 'Retrieve a <code>User</code> entity',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieves a User entity',
+                'response' => [
+                    'id' => 'integer',
+                    'email' => 'string',
+                    'roles' => ['ROLE_USER', 'ROLE_STAFF'],
+                    'faculty' => [
+                        'id' => 'integer',
+                        'name' => 'string',
+                        'shortcut' => 'string',
+                    ]
+                ]
+            ],
+            Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
+        ],
+    )]
+    public function userData(#[CurrentUser] User $currentUser): Response
+    {
+        $filtered = $this->serializer->normalize($currentUser, null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
+        ]);
+
+        return $this->json($filtered);
+    }
+
+    #[ApiRoute(
         '/api/user/{user}',
         name: 'api_user_profile',
         methods: ['GET'],
@@ -172,6 +201,7 @@ class UserApiController extends AbstractController
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
         ]));
     }
+
     #[ApiRoute(
         '/api/user',
         name: 'api_user_register',
@@ -193,7 +223,7 @@ class UserApiController extends AbstractController
             'faculty' => 'integer'
         ],
     )]
-    public function register(UserCreateRequest $request): Response
+    public function register(Request $request): Response
     {
         if ($this->isGranted('ROLE_USER')) {
             return $this->json([
@@ -202,13 +232,14 @@ class UserApiController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $messages = $request->validate();
+        $form = $this->createForm(UserCreateFormType::class);
+        $data = $request->getPayload()->all();
+    
+        $form->submit($data);
 
-        if (count($messages) != 0) {
-            return $this->json($messages, Response::HTTP_BAD_REQUEST);
-        }
-
-        $this->action->create($request);
+        $userDto = $form->getData();
+    
+        $this->action->create($userDto);
 
         return new Response(status: Response::HTTP_CREATED);
     }
