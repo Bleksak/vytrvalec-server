@@ -218,8 +218,8 @@ class UserApiController extends AbstractController
         requestScheme: [
             'email' => 'string',
             'password' => 'string',
-            'firstName' => 'string',
-            'lastName' => 'string',
+            'first_name' => 'string',
+            'last_name' => 'string',
             'faculty' => 'integer'
         ],
     )]
@@ -233,13 +233,23 @@ class UserApiController extends AbstractController
         }
 
         $form = $this->createForm(UserCreateFormType::class);
-        $data = $request->getPayload()->all();
-    
-        $form->submit($data);
+        $form->submit($request->getPayload()->all());
 
-        $userDto = $form->getData();
-    
-        $this->action->create($userDto);
+        if(!$form->isValid()) {
+            $errors = [];
+
+            foreach($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        }
+
+        $errors = $this->action->create($form->getData());
+
+        if(!empty($errors)) {
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        }
 
         return new Response(status: Response::HTTP_CREATED);
     }

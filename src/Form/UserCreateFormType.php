@@ -2,11 +2,9 @@
 
 namespace App\Form;
 
-use App\Dto\UserCreateDTO;
+use App\Dto\UserDto;
 use App\Entity\Faculty;
-use App\Requests\UserCreateRequest;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -22,26 +20,26 @@ class UserCreateFormType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'constraints' => [
-                    new Assert\NotBlank(message: 'blank_email'),
+                    new Assert\NotBlank(message: 'blank_email', allowNull: false),
                     new Assert\Email(message: 'bad_email'),
                 ]
             ])
             ->add('first_name', TextType::class, [
+                'property_path' => 'firstName',
                 'constraints' => [
-                    new Assert\NotBlank(message: 'blank_first_name'),
+                    new Assert\NotBlank(message: 'blank_first_name', allowNull: false),
                 ]
             ])
             ->add('last_name', TextType::class, [
+                'property_path' => 'lastName',
                 'constraints' => [
-                    new Assert\NotBlank(message: 'blank_last_name'),
+                    new Assert\NotBlank(message: 'blank_last_name', allowNull: false),
                 ]
             ])
             ->add('password', PasswordType::class, [
                 'constraints' => [
-                    new Assert\NotBlank(message: 'blank_password'),
-                    new Assert\NotNull(message: 'blank_password'),
-                    // TODO: Uncomment this and configure the strength
-                    // new Assert\PasswordStrength(message: 'weak_password'),
+                    new Assert\NotBlank(message: 'blank_password', allowNull: false),
+                    new Assert\PasswordStrength(message: 'weak_password', minScore: 2),
                 ]
             ])
             ->add('faculty', EntityType::class, [
@@ -50,21 +48,15 @@ class UserCreateFormType extends AbstractType
                 'required' => true,
                 'invalid_message' => 'invalid_faculty',
                 'constraints' => [
-                    new Assert\NotBlank(message: 'invalid_faculty'),
-                    new Assert\NotNull(message: 'invalid_faculty'),
+                    new Assert\NotBlank(message: 'invalid_faculty', allowNull: false),
                 ]
             ])
-            ->setMethod('POST')
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'constraints' => [
-                new UniqueEntity(['message' => 'not_unique_email', 'fields' => 'email']),
-            ],
-            'data_class' => UserCreateDto::class,
-        ]);
+        $resolver->setDefault('data_class', UserDto::class);
+        $resolver->setDefault('csrf_protection', false);
     }
 }

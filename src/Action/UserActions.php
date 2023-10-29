@@ -2,9 +2,10 @@
 
 namespace App\Action;
 
+use App\Dto\UserDto;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Requests\UserCreateRequest;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserActions
@@ -16,12 +17,20 @@ class UserActions
     {
     }
 
-    public function create(UserCreateRequest $request): void
+    /**
+    * @return array<int, string>
+    */
+    public function create(UserDto $dto): array
     {
-        $user = new User($request->getEmail(), $request->getFirstName(), $request->getLastName(), $request->getFaculty());
-
-        $user->setPassword($this->hasher->hashPassword($user, $request->getPassword()));
+        $user = new User($dto->email, $dto->firstName, $dto->lastName, $dto->faculty); 
+        $user->setPassword($this->hasher->hashPassword($user, $dto->password));
         
-        $this->userRepository->save($user, true);
+        try {
+            $this->userRepository->save($user, true);
+        } catch(UniqueConstraintViolationException $e) {
+            return ['not_unique_email'];
+        }
+
+        return [];
     }
 }

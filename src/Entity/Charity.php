@@ -13,16 +13,15 @@ class Charity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
+    #[Assert\NotBlank] #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 10000)]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
     private ?string $description = null;
 
     public function __construct(string $name, string $description)

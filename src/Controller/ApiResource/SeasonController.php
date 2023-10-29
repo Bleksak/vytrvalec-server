@@ -5,14 +5,14 @@ namespace App\Controller\ApiResource;
 use App\Action\SeasonActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
-use App\Entity\Charity;
 use App\Entity\Season;
+use App\Form\SeasonCreateFormType;
 use App\Repository\CharityRepository;
 use App\Repository\FacultyCacheRepository;
 use App\Repository\FacultyExtraPointsRepository;
 use App\Repository\SeasonRepository;
-use App\Requests\SeasonRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -57,18 +57,25 @@ class SeasonController extends AbstractController
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function create(SeasonRequest $request, CharityRepository $charityRepository): Response
+    public function create(Request $request, CharityRepository $charityRepository): Response
     {
-        $errors = $request->validate();
+        $form = $this->createForm(SeasonCreateFormType::class);
 
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        $form->submit($request->getPayload()->all());
+
+        if(!$form->isValid()) {
+
+            $errors = [];
+            
+            foreach($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
-        $season = new Season($request->getStart(), $request->getEnd(), new Charity($request->getCharityName(), $request->getCharityDescription()));
-
-        $this->action->create($season);
-
+        $this->action->create($form->getData());
+        
         return new Response(status: Response::HTTP_CREATED);
     }
 
@@ -206,7 +213,7 @@ class SeasonController extends AbstractController
 
     #[ApiRoute(
         '/api/season',
-        name: 'api_season_list',
+        name: 'api_season_index',
         methods: ['GET'],
         documentation: 'Get all seasons',
         responses: [

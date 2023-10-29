@@ -6,10 +6,10 @@ use App\Action\ActivityActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
 use App\Entity\Activity;
+use App\Form\ActivityFormType;
 use App\Repository\ActivityRepository;
-use App\Requests\ActivityCreateRequest;
-use App\Requests\ActivityUpdateRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -37,16 +37,22 @@ class ActivityController extends AbstractController
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function create(ActivityCreateRequest $request): Response
+    public function create(Request $request): Response
     {
-        $errors = $request->validate();
+        $form = $this->createForm(ActivityFormType::class);
+        $form->submit($request->getPayload()->all());
 
-        if(!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        if(!$form->isValid()) {
+            $errors = [];
+
+            foreach($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
-        $activity = new Activity($request->getName(), $request->getMinElevation());
-        $this->activityRepository->save($activity, true);
+        $this->action->create($form->getData());
 
         return new Response(status: Response::HTTP_OK);
     }
@@ -65,9 +71,12 @@ class ActivityController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function delete(Activity $activity): Response
     {
-        // TODO: check if deletable(has no submissions)
+        if(!$this->action->delete($activity)) {
+            return $this->json(['errors' => [
+                'activity_has_submissions'
+            ]], Response::HTTP_BAD_REQUEST);
+        }
 
-        $this->activityRepository->remove($activity, true);
         return new Response(status: Response::HTTP_OK);
     }
 
@@ -82,13 +91,26 @@ class ActivityController extends AbstractController
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function update(Activity $activity, ActivityUpdateRequest $request): Response
+    public function updatePatch(Request $request, Activity $activity): Response
     {
-        $activity->setName($request->getName() ?? $activity->getName());
-        $activity->setActive($request->getActive() ?? $activity->isActive());
-        $activity->setMinElevation($request->getMinElevation() ?? $activity->getMinElevation());
+        $form = $this->createForm(ActivityFormType::class, null, [
+            'method' => $request->getMethod(),
+        ]);
 
-        $this->activityRepository->save($activity, true);
+        $form->submit($request->getPayload()->all());
+
+        if(!$form->isValid()) {
+            $errors = [];
+
+            foreach($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->action->update($activity, $form->getData());
+        
         return new Response(status: Response::HTTP_OK);
     }
 

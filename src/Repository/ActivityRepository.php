@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Activity;
+use App\Entity\Submission;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -47,5 +48,16 @@ class ActivityRepository extends ServiceEntityRepository
         }
 
         return $activities;
+    }
+
+    public function submissionsCount(Activity $activity): int
+    {
+        return $this->createQueryBuilder('a')
+            ->select('COUNT(*)')
+            ->from(Submission::class, 's')
+            ->where(['s.activity = :activity'])
+            ->setParameter('activity', $activity->getId())
+            ->getQuery()
+            ->execute();
     }
 }

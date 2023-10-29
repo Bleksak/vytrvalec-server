@@ -22,7 +22,7 @@ class Activity
     private string $name;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchActivity'])]
     private bool $active = true;
 
     #[ORM\Column]

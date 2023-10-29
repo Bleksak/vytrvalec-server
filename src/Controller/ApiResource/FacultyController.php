@@ -2,23 +2,26 @@
 
 namespace App\Controller\ApiResource;
 
+use App\Action\FacultyActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
 use App\Entity\Faculty;
+use App\Form\FacultyFormType;
 use App\Repository\FacultyRepository;
-use App\Requests\FacultyCreateRequest;
-use App\Requests\FacultyUpdateRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[ApiResource('Faculty')]
 class FacultyController extends AbstractController
 {
-    public function __construct(private readonly FacultyRepository $facultyRepository)
+    public function __construct(
+        private readonly FacultyActions $action,
+        private readonly FacultyRepository $facultyRepository,
+    )
     {
     }
-
 
     #[ApiRoute(
         '/api/faculty',
@@ -44,17 +47,22 @@ class FacultyController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function create(FacultyCreateRequest $request): Response
+    public function create(Request $request): Response
     {
-        $errors = $request->validate();
+        $form = $this->createForm(FacultyFormType::class);
+        $form->submit($request->getPayload()->all());
 
-        if(!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        if(!$form->isValid()) {
+            $errors = [];
+
+            foreach($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
-        $faculty = new Faculty($request->getName(), $request->getShortcut(), $request->getVisible());
-
-        $this->facultyRepository->save($faculty, true);
+        $this->action->create($form->getData());
 
         return new Response(status: Response::HTTP_CREATED);
     }
@@ -87,47 +95,27 @@ class FacultyController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function update(Faculty $faculty, FacultyUpdateRequest $request): Response
+    public function updatePatch(Request $request, Faculty $faculty): Response
     {
-        $errors = $request->validate();
+        $form = $this->createForm(FacultyFormType::class, null, [
+            'method' => $request->getMethod()
+        ]);
 
-        if(!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        $form->submit($request->getPayload()->all());
+
+        if(!$form->isValid()) {
+            $errors = [];
+
+            foreach($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
-        $faculty->setName($request->getName() ?? $faculty->getName());
-        $faculty->setShortcut($request->getShortcut() ?? $faculty->getShortcut());
-        $faculty->setVisible($request->getVisible() ?? $faculty->isVisible());
+        $this->action->update($faculty, $form->getData());
 
-        $this->facultyRepository->save($faculty, true);
-
-        return $this->json([
-            'success' => true
-        ], Response::HTTP_OK);
-    }
-    
-    #[ApiRoute(
-        '/api/faculty',
-        name: 'api_faculty_list',
-        methods: ['GET'],
-        documentation: 'Retrieves a list of all faculties',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'List of all faculties',
-                'response' => [
-                    [
-                        'id' => 'integer',
-                        'name' => 'string',
-                        'shortcut' => 'string',
-                        'visible' => 'boolean'
-                    ]
-                ]
-            ]
-        ],
-    )]
-    public function facultyList(): Response
-    {
-        return $this->json($this->facultyRepository->findAll());
+        return $this->json([], Response::HTTP_OK);
     }
 
     #[ApiRoute(
@@ -152,5 +140,29 @@ class FacultyController extends AbstractController
     public function faculty(Faculty $faculty): Response
     {
         return $this->json($faculty);
+    }
+
+    #[ApiRoute(
+        '/api/faculty',
+        name: 'api_faculty_index',
+        methods: ['GET'],
+        documentation: 'Retrieves a list of all faculties',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'List of all faculties',
+                'response' => [
+                    [
+                        'id' => 'integer',
+                        'name' => 'string',
+                        'shortcut' => 'string',
+                        'visible' => 'boolean'
+                    ]
+                ]
+            ]
+        ],
+    )]
+    public function facultyList(): Response
+    {
+        return $this->json($this->facultyRepository->findAll());
     }
 }

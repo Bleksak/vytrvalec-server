@@ -38,8 +38,8 @@ class BaseTest extends WebTestCase
         $this->client->request('POST', '/api/user', [
             "email" => $email,
             "password" => $password,
-            "firstName" => 'string',
-            "lastName" => 'string',
+            "first_name" => 'string',
+            "last_name" => 'string',
             "faculty" => $faculty->getId(),
         ]);
 

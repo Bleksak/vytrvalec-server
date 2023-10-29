@@ -2,6 +2,7 @@
 
 namespace App\Action;
 
+use App\Dto\SeasonDto;
 use App\Entity\Season;
 use App\Repository\SeasonRepository;
 
@@ -13,9 +14,10 @@ class SeasonActions
     {
     }
 
-    public function create(Season $season): void
+    public function create(SeasonDto $seasonDto): void
     {
-        // here we assume the season entity is complete!
+        $season = new Season($seasonDto->start, $seasonDto->end, seasonDto->charity);
+
         $this->seasonRepository->save($season, true);
     }
 
