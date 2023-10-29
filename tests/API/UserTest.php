@@ -8,15 +8,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserTest extends BaseTest
 {
+    const PASSWORD = 'Qwertaz!1231@pepega';
+    
     public function testRegister(): void
     {
         $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
 
         $this->client->request('POST', '/api/user', [
             "email" => "aasdf@asdf.com",
-            "password" => "Qwerty123",
-            "firstName" => "string",
-            "lastName" => "string",
+            "password" => self::PASSWORD,
+            "first_name" => "string",
+            "last_name" => "string",
             "faculty" => $faculty->getId()
         ]);
 
@@ -29,17 +31,17 @@ class UserTest extends BaseTest
 
         $this->client->request('POST', '/api/user', [
             "email" => "aasdf@asdf.com",
-            "password" => "Qwerty123",
-            "firstName" => "string",
-            "lastName" => "string",
+            "password" => self::PASSWORD,
+            "first_name" => "string",
+            "last_name" => "string",
             "faculty" => $faculty->getId()
         ]);
 
         $this->client->request('POST', '/api/user', [
             "email" => "aasdf@asdf.com",
-            "password" => "Qwerty123",
-            "firstName" => "string",
-            "lastName" => "string",
+            "password" => self::PASSWORD,
+            "first_name" => "string",
+            "last_name" => "string",
             "faculty" => $faculty->getId()
         ]);
 
@@ -50,9 +52,9 @@ class UserTest extends BaseTest
     {
         $this->client->request('POST', '/api/user', [
             "email" => "aasdf@asdf.com",
-            "password" => "Qwerty123",
-            "firstName" => "string",
-            "lastName" => "string",
+            "password" => self::PASSWORD,
+            "first_name" => "string",
+            "last_name" => "string",
             "faculty" => -1,
         ]);
 
@@ -65,9 +67,9 @@ class UserTest extends BaseTest
 
         $this->client->request('POST', '/api/user', [
             "email" => "aasdf@asdf",
-            "password" => "Qwerty123",
-            "firstName" => "string",
-            "lastName" => "string",
+            "password" => self::PASSWORD,
+            "first_name" => "string",
+            "last_name" => "string",
             "faculty" => $faculty->getId(),
         ]);
 
@@ -76,8 +78,8 @@ class UserTest extends BaseTest
 
     public function testUserLogin(): void
     {
-        $this->createUser('aasdf@asdf.com', 'Qwerty123');
-        $this->loginUser('aasdf@asdf.com', 'Qwerty123');
+        $this->createUser('aasdf@asdf.com', self::PASSWORD);
+        $this->loginUser('aasdf@asdf.com', self::PASSWORD);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertResponseHasCookie('jwt');
@@ -85,9 +87,9 @@ class UserTest extends BaseTest
 
     public function testUserLoggedInRegister(): void
     {
-        $this->createUser('aasdf@asdf.com', 'Qwerty123');
-        $this->loginUser('aasdf@asdf.com', 'Qwerty123');
-        $this->createUser('aasdf@asdf.com', 'Qwerty123');
+        $this->createUser('aasdf@asdf.com', self::PASSWORD);
+        $this->loginUser('aasdf@asdf.com', self::PASSWORD);
+        $this->createUser('aasdf@asdf.com', self::PASSWORD);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
     }

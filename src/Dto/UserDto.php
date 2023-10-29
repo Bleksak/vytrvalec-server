@@ -4,7 +4,7 @@ namespace App\Dto;
 
 use App\Entity\Faculty;
 
-class UserCreateDto
+class UserDto
 {
     public string $email;
     public string $username;

@@ -14,19 +14,19 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult', 'fetchActivity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult', 'fetchActivity'])]
     private string $name;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchActivity'])]
     private bool $active = true;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'userProfile'])]
+    #[Groups(['fetchSubmission', 'userProfile', 'fetchActivity'])]
     private int $minElevation;
 
     #[ORM\OneToMany(mappedBy: 'faculty', targetEntity: FacultyCache::class)]
