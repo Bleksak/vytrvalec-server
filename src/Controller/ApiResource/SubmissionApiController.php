@@ -282,7 +282,6 @@ class SubmissionApiController extends AbstractController
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
-        $profileCacheRepository->addCache($submission);
         $this->action->accept($submission);
 
         return new Response(status: Response::HTTP_OK);

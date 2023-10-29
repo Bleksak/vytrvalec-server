@@ -38,7 +38,7 @@ class SubmissionActions
 
     public function accept(Submission $submission): void
     {
-        $this->profileCacheRepository->addCache($submission, true);
+        $this->profileCacheRepository->addCache($submission, false);
         $this->setState($submission, true);
     }
 
