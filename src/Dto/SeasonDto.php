@@ -3,11 +3,11 @@
 namespace App\Dto;
 
 use App\Entity\Charity;
-use DateTimeImmutable;
+use DateTime;
 
 class SeasonDto
 {
-    public DateTimeImmutable $start;
-    public DateTimeImmutable $end;
-    public Charity $charity;
+    public ?DateTime $start;
+    public ?DateTime $end;
+    public ?Charity $charity;
 }

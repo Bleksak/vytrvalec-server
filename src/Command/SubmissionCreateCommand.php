@@ -74,7 +74,6 @@ class SubmissionCreateCommand extends Command
         $submission->setAccepted(true);
         $submission->setActivity($this->activityRepository->findOneBy(['name' => $activityName]));
         $submission->setUser($user);
-        $submission->setFaculty($user->getFaculty());
         $submission->setDistance(rand(1000, 10000));
         $submission->setElevation(rand(1000, 10000));
         $submission->calculateWeek();

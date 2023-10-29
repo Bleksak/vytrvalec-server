@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Dto\SeasonDto;
 use App\Entity\Charity;
-use DateTimeImmutable;
+use DateTime;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -16,17 +16,24 @@ class SeasonCreateFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $now = new DateTimeImmutable();
-
+        $now = new DateTime();
+        $now->setTime(0, 0, 0);
+        
         $builder->add('start', DateType::class, [
             'constraints' => [
+                new Assert\NotBlank(null, 'blank_start', false),
                 new Assert\GreaterThanOrEqual($now)
-            ]
+            ],
+            'widget' => 'single_text',
+            'format' => 'yyyy-MM-dd',
         ]);
         $builder->add('end', DateType::class, [
             'constraints' => [
+                new Assert\NotBlank(null, 'blank_end', false),
                 new Assert\GreaterThan(propertyPath: 'parent.all[start].data')
-            ]
+            ],
+            'widget' => 'single_text',
+            'format' => 'yyyy-MM-dd',
         ]);
 
         $builder->add('charity', EntityType::class, [
