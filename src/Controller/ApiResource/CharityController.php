@@ -32,9 +32,9 @@ class CharityController extends AbstractController
         methods: ['POST'],
         documentation: 'Create a new Charity entity',
         responses: [
-            Response::HTTP_BAD_REQUEST => 'Bad data',
-            Response::HTTP_UNAUTHORIZED => 'Unauthorized access',
-            Response::HTTP_CREATED => 'Entity created',
+            Response::HTTP_BAD_REQUEST => ['message' => 'Bad data'],
+            Response::HTTP_UNAUTHORIZED => ['message' => 'Unauthorized access'],
+            Response::HTTP_CREATED => ['message' => 'Entity created'],
         ],
         requestScheme: [
             'name' => 'string',
@@ -68,7 +68,7 @@ class CharityController extends AbstractController
         methods: ['GET'],
         documentation: 'Get a charity entity',
         responses: [
-            Response::HTTP_OK => 'Entity received',
+            Response::HTTP_OK => ['message' => 'Charity entity'],
         ],
     )]
     public function get(Charity $charity): Response
@@ -85,7 +85,7 @@ class CharityController extends AbstractController
         methods: ['PATCH'],
         documentation: 'Patch a charity entity',
         responses: [
-            Response::HTTP_OK => 'Patched successfully',
+            Response::HTTP_OK => ['message' => 'Patched successfully'],
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
@@ -118,7 +118,7 @@ class CharityController extends AbstractController
         methods: ['GET'],
         documentation: 'List of charity entities',
         responses: [
-            Response::HTTP_OK => 'Patched successfully',
+            Response::HTTP_OK => ['message' => 'List of charities'],
         ],
     )]
     public function index(): Response

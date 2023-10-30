@@ -42,7 +42,7 @@ class WeeklyElevationExtraPoints implements ExtraPoints
         $elevation = $submission->getElevation();
 
         if(!array_key_exists($user, $this->users)) {
-            $this->users[$user] = ['faculty' => $submission->getFaculty()->getId(), 'elevation' => 0];
+            $this->users[$user] = ['faculty' => $submission->getUser()->getFaculty()->getId(), 'elevation' => 0];
         }
 
         $this->users[$user]['elevation'] += $elevation;

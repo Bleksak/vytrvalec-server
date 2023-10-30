@@ -34,7 +34,7 @@ class PointCalculator
 
         foreach($submissions as $submission) {
             $activity = $submission->getActivity()->getId();
-            $faculty = $submission->getFaculty()->getId();
+            $faculty = $submission->getUser()->getFaculty()->getId();
 
             if(!array_key_exists($activity, $activities)) {
                 $activities[$activity] = ['faculties' => []];

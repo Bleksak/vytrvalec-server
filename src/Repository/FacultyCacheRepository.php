@@ -38,11 +38,11 @@ class FacultyCacheRepository extends ServiceEntityRepository
     public function addCache(Submission $submission, bool $flush = false): void
     {
         $facultyCache = $this->findOneBy([
-            'faculty' => $submission->getFaculty(),
+            'faculty' => $submission->getUser()->getFaculty(),
             'activity' => $submission->getActivity(),
             'week' => $submission->getWeek(),
             'season' => $submission->getSeason(),
-        ]) ?? new FacultyCache($submission->getFaculty(), $submission->getActivity(), $submission->getSeason(), $submission->getWeek());
+        ]) ?? new FacultyCache($submission->getUser()->getFaculty(), $submission->getActivity(), $submission->getSeason(), $submission->getWeek());
 
         $facultyCache
             ->updateDistance(fn($oldDistance) => $oldDistance + $submission->getDistance())

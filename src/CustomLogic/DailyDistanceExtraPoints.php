@@ -49,7 +49,7 @@ class DailyDistanceExtraPoints implements ExtraPoints
         }
 
         if (!array_key_exists($user, $this->users)) {
-            $this->users[$user] = ['faculty' => $submission->getFaculty()->getId(), 'distance' => 0];
+            $this->users[$user] = ['faculty' => $submission->getUser()->getFaculty()->getId(), 'distance' => 0];
         }
 
         $this->users[$user]['distance'] += $distance;

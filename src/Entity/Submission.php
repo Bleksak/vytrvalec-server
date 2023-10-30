@@ -62,16 +62,11 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private ?DateTimeInterface $date = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Faculty $faculty = null;
-
     public function __construct(User $user, Activity $activity, Season $season, int $distance, ?int $elevation = null)
     {
         $this->date = new DateTimeImmutable();
 
         $this->user = $user;
-        $this->faculty = $user->getFaculty();
         $this->activity = $activity;
         $this->season = $season;
         $this->distance = $distance;
@@ -208,18 +203,6 @@ class Submission
     public function setWeek(int $week): static
     {
         $this->week = $week;
-
-        return $this;
-    }
-
-    public function getFaculty(): ?Faculty
-    {
-        return $this->faculty;
-    }
-
-    public function setFaculty(?Faculty $faculty): static
-    {
-        $this->faculty = $faculty;
 
         return $this;
     }
