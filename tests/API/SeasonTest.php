@@ -2,29 +2,32 @@
 
 namespace App\Tests\API;
 
+use App\Entity\Charity;
 use App\Test\BaseTest;
 use Symfony\Component\HttpFoundation\Response;
 
 class SeasonTest extends BaseTest
 {
-    // public function testCreate(): void
-    // {
-    //     $this->grantRole(['ROLE_STAFF']);
+    public function testCreate(): void
+    {
+        $this->grantRole(['ROLE_STAFF']);
+        $this->makeCharity();
 
-    //     $today = new \DateTimeImmutable();
-    //     $beginDate = $today->add(new \DateInterval('P1W'));
-    //     $endDate = $today->add(new \DateInterval('P4W'));
+        $charity = $this->getEntityManager()->getRepository(Charity::class)->findOneBy(['name' => 'CharityTest']);
 
-    //     $this->client->jsonRequest('POST', '/api/season', [
-    //         'start' => $beginDate->format('Y-m-d'),
-    //         'end' => $endDate->format('Y-m-d'),
-    //         'charityName' => 'Test',
-    //         'charityDescription' => 'test'
-    //     ]);
+        $today = new \DateTimeImmutable();
+        $beginDate = $today->add(new \DateInterval('P1W'));
+        $endDate = $today->add(new \DateInterval('P4W'));
 
-    //     $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->client->jsonRequest('POST', '/api/season', [
+            'start' => $beginDate->format('Y-m-d'),
+            'end' => $endDate->format('Y-m-d'),
+            'charity' => $charity->getId(),
+        ]);
 
-    // }
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+
+    }
 
     public function testCreateNotLoggedIn(): void
     {

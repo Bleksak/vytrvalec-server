@@ -2,17 +2,21 @@
 
 namespace App\Test;
 
+use App\Entity\Charity;
 use App\Entity\Faculty;
 use App\Entity\User;
+use DateInterval;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Input\StringInput;
 
 class BaseTest extends WebTestCase
 {
     protected static ?Application $application = null;
-    protected $client;
+    protected KernelBrowser $client;
 
     /**
      * @throws \Exception
@@ -67,6 +71,32 @@ class BaseTest extends WebTestCase
 
         $this->createUser($testUser, $testPassword, $role);
         $this->loginUser($testUser, $testPassword);
+    }
+
+    protected function makeCharity(): void
+    {
+        $this->client->jsonRequest('POST', '/api/charity', [
+            'name' => 'CharityTest',
+            'description' => 'CharityTestDescription',
+        ]);
+    }
+
+    protected function makeSeason(): void
+    {
+        $this->makeCharity();
+        $repository = $this->getEntityManager()->getRepository(Charity::class);
+        $charity = $repository->findOneBy(['name' => 'CharityTest']);
+
+        $now = new DateTimeImmutable();
+        $now = $now->setTime(0, 0, 0);
+
+        $end = $now->add(new DateInterval('P4W'));
+
+        $this->client->jsonRequest('POST', '/api/season', [
+            'start' => $now->format('Y-m-d'),
+            'end' => $end->format('Y-m-d'),
+            'charity' => $charity->getId(),
+        ]);
     }
 
     /**
