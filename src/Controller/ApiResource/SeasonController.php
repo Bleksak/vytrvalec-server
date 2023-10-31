@@ -5,6 +5,7 @@ namespace App\Controller\ApiResource;
 use App\Action\SeasonActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
+use App\CustomLogic\PointCalculator;
 use App\Entity\Season;
 use App\Form\SeasonCreateFormType;
 use App\Repository\CharityRepository;
@@ -174,11 +175,9 @@ class SeasonController extends AbstractController
             Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
         ],
     )]
-    public function result(Season $season, FacultyCacheRepository $facultyCacheRepository, FacultyExtraPointsRepository $extraPointsRepository): Response
+    public function result(Season $season, FacultyCacheRepository $facultyCacheRepository, PointCalculator $calculator): Response
     {
-        return $this->json($this->serializer->normalize($facultyCacheRepository->findCaches($season), null, [
-            AbstractNormalizer::GROUPS => ['fetchSeasonResult']
-        ]));
+        return $this->json($calculator->processSeason($season));
     }
 
     #[ApiRoute(

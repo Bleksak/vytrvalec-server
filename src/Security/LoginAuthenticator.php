@@ -76,7 +76,9 @@ class LoginAuthenticator extends AbstractAuthenticator
 
         $response = new JsonResponse([
             'token' => $jwt,
-            'user' => $this->serializer->normalize($token->getUser(), null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries']]),
+            'user' => $this->serializer->normalize($token->getUser(), null, [
+                AbstractNormalizer::GROUPS => ['fetchUser']
+            ]),
         ]);
 
         $response->headers->setCookie(new Cookie('jwt', $jwt, $expirationTime, secure: $request->isSecure(), httpOnly: true));

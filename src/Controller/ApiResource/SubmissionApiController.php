@@ -9,16 +9,11 @@ use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use App\Form\SubmissionForm;
-use App\Repository\ProfileCacheRepository;
 use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
-use App\Requests\SubmissionRequest;
 use Doctrine\ORM\EntityManagerInterface;
-use Imagick;
-use ImagickException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -236,12 +231,6 @@ class SubmissionApiController extends AbstractController
         return new Response(status: Response::HTTP_OK);
     }
 
-    private function setState(Submission $submission, bool $state): void
-    {
-        $submission->setAccepted($state);
-        $submission->setReviewed(true);
-    }
-
     #[ApiRoute(
         '/api/submission/{submission}/accept',
         name: 'api_submission_accept',
@@ -260,7 +249,7 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function accept(Submission $submission, ProfileCacheRepository $profileCacheRepository): Response
+    public function accept(Submission $submission): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);

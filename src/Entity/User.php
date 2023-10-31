@@ -16,38 +16,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?string $email = null;
 
     /**
      * @var string[]
      */
     #[ORM\Column(type: 'json')]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchUser'])]
     private array $roles = [];
 
     #[ORM\Column]
     private ?string $password = null;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?bool $banned = false;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?string $firstName = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?string $lastName = null;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission'])]
+    #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?Faculty $faculty = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class, orphanRemoval: true)]
