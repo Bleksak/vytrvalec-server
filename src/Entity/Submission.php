@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Index(columns: ['week'], name: 'week_index')]
+#[ORM\Index(columns: ['season'], name: 'season_index')]
 class Submission
 {
     #[ORM\Id]
