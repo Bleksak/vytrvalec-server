@@ -90,7 +90,7 @@ class SubmissionApiController extends AbstractController
         $submission = new Submission($user, $request->getActivity(), $season, $request->getDistance(), $request->getElevation());
 
         do {
-            $uniquePath = '/uploads/' . uniqid(moreEntropy: true) . '.jpg';
+            $uniquePath = '/uploads/' . uniqid(more_entropy: true) . '.jpg';
             $absolutePath = $this->getParameter('kernel.project_dir') . $uniquePath;
         } while($fs->exists($absolutePath));
 
