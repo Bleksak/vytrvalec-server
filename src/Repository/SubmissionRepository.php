@@ -49,10 +49,8 @@ class SubmissionRepository extends ServiceEntityRepository
         $query = $this->createQueryBuilder('s')
         ->select('s')
         ->where('s.user = :userId')
-        ->andWhere('s.accepted = :accepted')
 
         ->setParameter('userId', $user->getId())
-        ->setParameter('accepted', true)
         ;
 
         $paginator = new Paginator($query);

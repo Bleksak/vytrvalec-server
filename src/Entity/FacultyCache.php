@@ -44,7 +44,7 @@ class FacultyCache
     #[Groups(['fetchSeasonResult'])]
     private ?int $elevation = null;
 
-    #[ORM\OneToMany(mappedBy: 'cache', targetEntity: FacultyExtraPoints::class, fetch: 'EAGER')]
+    #[ORM\OneToMany(mappedBy: 'facultyCache', targetEntity: FacultyExtraPoints::class, fetch: 'EAGER')]
     #[Groups(['fetchSeasonResult'])]
     private Collection $extraPoints;
 

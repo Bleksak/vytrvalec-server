@@ -45,7 +45,7 @@ class SubmissionActions
     {
         // 1. upload image
 
-        $dirname = $this->parameterBag->get('kernel.project_dir') . '/uploads/';
+        $dirname = $this->parameterBag->get('kernel.project_dir') . '/public/uploads/';
         
         do {
             $uniquePath = uniqid(more_entropy: true) . '.jpg';
