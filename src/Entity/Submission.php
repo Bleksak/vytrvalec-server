@@ -21,54 +21,55 @@ class Submission
 
     #[ORM\Column(nullable: true)]
     #[Groups(['fetchSubmission'])]
-    private ?bool $accepted = false;
+    private bool $accepted = false;
 
     #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission'])]
-    private ?Season $season = null;
+    private Season $season;
 
     #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission'])]
-    private ?User $user = null;
+    private User $user;
 
     #[ORM\Column]
     #[Groups(['fetchSubmission'])]
-    private ?int $elevation = null;
+    private int $elevation = 0;
 
     #[ORM\Column]
     #[Groups(['fetchSubmission'])]
-    private ?int $distance = null;
+    private int $distance;
 
     #[ORM\Column]
     #[Groups(['fetchSubmission'])]
-    private ?bool $reviewed = false;
+    private bool $reviewed = false;
 
     #[ORM\Column(length: 255)]
     #[Groups(['fetchSubmission'])]
-    private ?string $image = null;
+    private string $image;
 
     #[ORM\Column]
     #[Groups(['fetchSubmission'])]
-    private ?int $week = null;
+    private int $week;
 
     #[ORM\ManyToOne(inversedBy: 'season')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission'])]
-    private ?Activity $activity = null;
+    private Activity $activity;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Groups(['fetchSubmission'])]
-    private ?DateTimeInterface $date = null;
+    private DateTimeInterface $date;
 
-    public function __construct(User $user, Activity $activity, Season $season, int $distance, ?int $elevation = null)
+    public function __construct(User $user, Activity $activity, Season $season, string $image, int $distance, ?int $elevation = null)
     {
         $this->date = new DateTimeImmutable();
 
         $this->user = $user;
         $this->activity = $activity;
         $this->season = $season;
+        $this->image = $image;
         $this->distance = $distance;
         $this->elevation = $elevation;
 

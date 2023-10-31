@@ -8,6 +8,7 @@ use App\Attributes\ApiRoute;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
+use App\Form\SubmissionForm;
 use App\Repository\ProfileCacheRepository;
 use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
@@ -69,51 +70,34 @@ class SubmissionApiController extends AbstractController
     )]
     #[IsGranted('ROLE_USER')]
     public function create(
-        #[CurrentUser] User $user, 
-        SubmissionRequest $request,
-        Request $httpRequest,
+        #[CurrentUser] User $user,
         SeasonRepository $seasonRepository,
-        Filesystem $fs,
+        Request $request,
     ): Response
     {
-        $errors = $request->validate();
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
         $season = $seasonRepository->getCurrent();
 
         if ($season === null) {
-            return $this->json(['no_season'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['errors'=> ['no_season']], Response::HTTP_BAD_REQUEST);
         }
 
-        $submission = new Submission($user, $request->getActivity(), $season, $request->getDistance(), $request->getElevation());
+        $form = $this->createForm(SubmissionForm::class);
+        $form->submit($request->request->all() + $request->files->all());
 
-        do {
-            $uniquePath = '/uploads/' . uniqid(more_entropy: true) . '.jpg';
-            $absolutePath = $this->getParameter('kernel.project_dir') . $uniquePath;
-        } while($fs->exists($absolutePath));
+        if(!$form->isValid()) {
+            $errors = [];
 
-        try {
-            $img = new Imagick($request->getImage()->getRealPath());
-            $profiles = $img->getImageProfiles("icc");
-
-            $img->stripImage();
-            if (!empty($profiles)) {
-                $img->profileImage("icc", $profiles['icc']);
+            foreach($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
             }
 
-            $img->setImageFormat('jpeg');
-            $img->setImageCompressionQuality(90);
-            $img->writeImage($absolutePath);
-        } catch (ImagickException) {
-            return new Response(status: Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
-        $submission->setImage($uniquePath);
-
-        $this->em->persist($submission);
-        $this->em->flush();
+        $errors = $this->action->create($form->getData(), $user, $season);
+        if(!empty($errors)) {
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        }
 
         return new Response(status: Response::HTTP_CREATED);
     }
