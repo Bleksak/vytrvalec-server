@@ -11,7 +11,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Index(columns: ['week'], name: 'week_index')]
-#[ORM\Index(columns: ['season'], name: 'season_index')]
 class Submission
 {
     #[ORM\Id]
@@ -24,12 +23,12 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private bool $accepted = false;
 
-    #[ORM\ManyToOne(inversedBy: 'submissions')]
+    #[ORM\ManyToOne(inversedBy: 'submissions', fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission'])]
     private Season $season;
 
-    #[ORM\ManyToOne(inversedBy: 'submissions')]
+    #[ORM\ManyToOne(inversedBy: 'submissions', fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission'])]
     private User $user;
@@ -54,10 +53,11 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private int $week;
 
-    #[ORM\ManyToOne(inversedBy: 'season')]
+    #[ORM\ManyToOne(inversedBy: 'submission', fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission'])]
     private Activity $activity;
+
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Groups(['fetchSubmission'])]
