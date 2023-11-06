@@ -100,6 +100,9 @@ class SubmissionRepository extends ServiceEntityRepository
         return $paginator;
     }
 
+    /**
+    * @return array<int, Submission>
+    */
     public function findAcceptedInSeasonAndWeek(Season $season, int $week): array
     {
         // TODO: re-enable this
@@ -113,6 +116,8 @@ class SubmissionRepository extends ServiceEntityRepository
             ->where('sub.season = :season')
             ->andWhere('sub.week = :week')
             ->andWhere('sub.accepted = :accepted')
+            ->orderBy('sub.activity_id', 'ASC')
+            ->orderBy('user.faculty_id', 'ASC')
             ->orderBy('sub.date', 'ASC')
             ->getQuery()
             ->setParameters([
@@ -123,7 +128,7 @@ class SubmissionRepository extends ServiceEntityRepository
             ->setFetchMode(Submission::class, 'submission', ClassMetadataInfo::FETCH_EAGER)
             ->setFetchMode(Submission::class, 'user', ClassMetadataInfo::FETCH_EAGER)
             ->setFetchMode(Submission::class, 'activity', ClassMetadataInfo::FETCH_EAGER)
-            ->setFetchMode(Submission::class, 'faculty', ClassMetadataInfo::FETCH_EAGER)
+            ->setFetchMode(User::class, 'faculty', ClassMetadataInfo::FETCH_EAGER)
             ->execute()
         ;
     }

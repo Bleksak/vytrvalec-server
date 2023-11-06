@@ -45,7 +45,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?string $lastName = null;
 
-    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist', 'remove'], fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?Faculty $faculty = null;
