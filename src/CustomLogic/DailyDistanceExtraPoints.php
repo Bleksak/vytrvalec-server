@@ -2,110 +2,47 @@
 
 namespace App\CustomLogic;
 
-use App\Entity\Submission;
+use App\Entity\Season;
+use Doctrine\ORM\EntityManagerInterface;
 
 class DailyDistanceExtraPoints implements ExtraPoints
 {
-    private array $users = [];
-    private array $max = [];
-    private ?\DateTimeInterface $lastDate = null;
-
+    public function __construct(private readonly EntityManagerInterface $entityManagerInterface)
+    {
+    }
+    
     public static function getUniqueName(): string
     {
         return 'daily_distance';
     }
 
-    public static function acceptsWeek(int $week): bool
+    public static function getWeek(): int
     {
-        return $week === 2;
+        return 2;
+    }
+    
+    public function calculate(Season $season): array
+    {
+        $query = $this->entityManagerInterface->getConnection()->prepare('
+            SELECT MAX(su) as distance_sum, activity_id, user_id, activity_id
+                FROM (
+                    SELECT SUM(s.distance) as su, s.activity_id as activity_id, s.user_id as user_id, s.date
+                        FROM submission s
+                        WHERE s.week = ? AND s.accepted = ? AND s.season_id = ?
+                        GROUP BY s.date, s.user_id, s.activity_id
+                ) as sums
+                GROUP BY activity_id;
+        ');
+
+        $query->bindValue(1, self::getWeek());
+        $query->bindValue(2, true);
+        $query->bindValue(3, $season->getId());
+
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     public static function reward(): int
     {
         return 1;
     }
-
-    public function requiresActivity(): bool
-    {
-        return false;
-    }
-
-    private function process(\DateTimeInterface $date): void
-    {
-        $this->finalize();
-
-        $this->users = [];
-        $this->lastDate = $date;
-    }
-
-    public function accumulate(Submission $submission): void
-    {
-        $distance = $submission->getDistance();
-        $user = $submission->getUser()->getId();
-        $date = $submission->getDate();
-
-        if ($this->lastDate === null || $date->diff($this->lastDate)->days !== 0) {
-            $this->process($date);
-        }
-
-        if (!array_key_exists($user, $this->users)) {
-            $this->users[$user] = ['faculty' => $submission->getUser()->getFaculty()->getId(), 'distance' => 0];
-        }
-
-        $this->users[$user]['distance'] += $distance;
-    }
-
-    public function finalize(): void
-    {
-        if (!empty($this->users)) {
-            $maxUsers = [];
-            $maxDistance = 0;
-
-            foreach($this->users as $user => $values) {
-
-                if($values['distance'] === $maxDistance) {
-                    $maxUsers[$user] = $values['faculty'];
-                }
-
-                if($values['distance'] > $maxDistance) {
-                    $maxDistance = $values['distance'];
-                    $maxUsers = [$user => $values['faculty']];
-                }
-            }
-
-            $this->max[] = [
-                'users' => $maxUsers,
-                'distance' => $maxDistance
-            ];
-        }
-    }
-
-    public function getWinners(): array
-    {
-        if (empty($this->max)) {
-            return [];
-        }
-
-        $maxDistance = 0;
-        $maxUsers = [];
-
-        foreach ($this->max as $day) {
-            if($day['distance'] === $maxDistance) {
-                $maxUsers = array_merge($maxUsers, $day['users']);
-            }
-
-            if ($day['distance'] > $maxDistance) {
-                $maxUsers = $day['users'];
-                $maxDistance = $day['distance'];
-            }
-        }
-
-        return [
-            'name' => self::getUniqueName(),
-            'users' => $maxUsers,
-            'value' => $maxDistance,
-            'reward' => self::reward(),
-        ];
-    }
-
 }

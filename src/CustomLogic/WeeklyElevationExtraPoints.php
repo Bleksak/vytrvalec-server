@@ -2,87 +2,47 @@
 
 namespace App\CustomLogic;
 
-use App\Entity\Activity;
-use App\Entity\Submission;
+use App\Entity\Season;
+use Doctrine\ORM\EntityManagerInterface;
 
 class WeeklyElevationExtraPoints implements ExtraPoints
 {
-    private ?Activity $activity = null;
-    private array $users = [];
-    private bool $eligible = false;
+    public function __construct(private readonly EntityManagerInterface $entityManagerInterface)
+    {
+    }
 
     public static function getUniqueName(): string
     {
         return 'weekly_elevation';
     }
 
-    public static function acceptsWeek(int $week): bool
+    public static function getWeek(): int
     {
-        return $week === 3;
+        return 3;
     }
 
-    public function requiresActivity(): bool
+    public function calculate(Season $season): array
     {
-        return true;
-    }
+        $query = $this->entityManagerInterface->getConnection()->prepare('
+            SELECT MAX(elevation_sum) as elevation, activity_id, user_id
+                FROM (
+                    SELECT SUM(s.elevation) as elevation_sum, s.activity_id as activity_id, s.user_id as user_id
+                        FROM submission s
+                        WHERE s.week = ? AND s.accepted = ? AND s.season_id = ?
+                        GROUP BY s.date, s.user_id, s.activity_id
+                ) as sums
+            GROUP BY activity_id;
+        ');
 
-    public function setActivity(Activity $activity): void
-    {
-        $this->activity = $activity;
+        $query->bindValue(1, self::getWeek());
+        $query->bindValue(2, true);
+        $query->bindValue(3, $season->getId());
+
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     public static function reward(): int
     {
         return 1;
-    }
-
-    public function accumulate(Submission $submission): void
-    {
-        $user = $submission->getUser()->getId();
-        $elevation = $submission->getElevation();
-
-        if(!array_key_exists($user, $this->users)) {
-            $this->users[$user] = ['faculty' => $submission->getUser()->getFaculty()->getId(), 'elevation' => 0];
-        }
-
-        $this->users[$user]['elevation'] += $elevation;
-
-        if($this->users[$user]['elevation'] >= $this->activity->getMinElevation()) {
-            $this->eligible = true;
-        }
-    }
-
-    public function finalize(): void
-    {
-    }
-
-    public function getWinners(): array
-    {
-        if(!$this->eligible) {
-            return [];
-        }
-
-        $maxElevation = 0;
-        $maxUsers = [];
-
-        foreach($this->users as $user => $values) {
-            $distance = $values['elevation'];
-
-            if($distance === $maxElevation) {
-                $maxUsers[$user] = $values['faculty'];
-            }
-
-            if($distance > $maxElevation) {
-                $maxUsers = [$user => $values['faculty']];
-                $maxElevation = $distance;
-            }
-        }
-
-        return [
-            'name' => self::getUniqueName(),
-            'users' => $maxUsers,
-            'value' => $maxElevation,
-            'reward' => self::reward(),
-        ];
     }
 }
