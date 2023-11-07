@@ -135,4 +135,12 @@ class Season
 
         return $today >= $start && $today < $end;
     }
+
+    public function getWeekCount(): int
+    {
+        $start = DateTimeImmutable::createFromInterface($this->getStart());
+        $end = DateTimeImmutable::createFromInterface($this->getEnd());
+
+        return 1 + intdiv($end->diff($start)->days, 7);
+    }
 }

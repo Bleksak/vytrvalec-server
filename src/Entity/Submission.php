@@ -33,13 +33,13 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private User $user;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::BIGINT)]
     #[Groups(['fetchSubmission'])]
-    private int $elevation = 0;
+    private string $elevation = '0';
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::BIGINT)]
     #[Groups(['fetchSubmission'])]
-    private int $distance;
+    private string $distance;
 
     #[ORM\Column]
     #[Groups(['fetchSubmission'])]

@@ -2,75 +2,47 @@
 
 namespace App\CustomLogic;
 
-use App\Entity\Submission;
+use App\Entity\Season;
+use Doctrine\ORM\EntityManagerInterface;
 
 class WeeklyDistanceExtraPoints implements ExtraPoints
 {
-    private array $users = [];
+    public function __construct(private readonly EntityManagerInterface $entityManagerInterface)
+    {
+    }
+
+    public static function getWeek(): int
+    {
+        return 2;
+    }
+
+    public function calculate(Season $season): array
+    {
+        $query = $this->entityManagerInterface->getConnection()->prepare('
+            SELECT MAX(distance_sum) as value, activity_id, user_id
+                FROM (
+                    SELECT SUM(s.distance) as distance_sum, s.activity_id as activity_id, s.user_id as user_id
+                        FROM submission s
+                        WHERE s.week = ? AND s.accepted = ? AND s.season_id = ?
+                        GROUP BY s.date, s.user_id, s.activity_id
+                ) as sums
+                GROUP BY activity_id;
+        ');
+
+        $query->bindValue(1, self::getWeek());
+        $query->bindValue(2, true);
+        $query->bindValue(3, $season->getId());
+
+        return $query->executeQuery()->fetchAllAssociative();
+    }
 
     public static function getUniqueName(): string
     {
         return 'weekly_distance';
     }
 
-    public static function acceptsWeek(int $week): bool
-    {
-        return $week === 2;
-    }
-
     public static function reward(): int
     {
         return 1;
-    }
-
-    public function requiresActivity(): bool
-    {
-        return false;
-    }
-
-    public function accumulate(Submission $submission): void
-    {
-        $user = $submission->getUser()->getId();
-        $distance = $submission->getDistance();
-
-        if(!array_key_exists($user, $this->users)) {
-            $this->users[$user] = ['faculty' => $submission->getUser()->getFaculty()->getId(), 'distance' => 0];
-        }
-
-        $this->users[$user]['distance'] += $distance;
-    }
-
-    public function finalize(): void
-    {
-    }
-
-    public function getWinners(): array
-    {
-        if(empty($this->users)) {
-            return [];
-        }
-
-        $maxDistance = 0;
-        $maxUsers = [];
-
-        foreach($this->users as $user => $values) {
-            $distance = $values['distance'];
-
-            if($distance === $maxDistance) {
-                $maxUsers[$user] = $values['faculty'];
-            }
-
-            if($distance > $maxDistance) {
-                $maxUsers = [$user => $values['faculty']];
-                $maxDistance = $distance;
-            }
-        }
-
-        return [
-            'name' => self::getUniqueName(),
-            'users' => $maxUsers,
-            'value' => $maxDistance,
-            'reward' => self::reward(),
-        ];
     }
 }
