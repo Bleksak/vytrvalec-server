@@ -71,8 +71,11 @@ class SeasonResult
             $extras = $cls->calculate($season);
             foreach($extras as $extra) {
                 $results[$cls->getWeek()][$extra['activity_id']]->extras[] = new ExtraPointsDto($extra['user_id'], $extra['faculty_id'], $cls->getUniqueName(), $extra['value'], $cls->reward());
-                
             }
+        }
+
+        for($i = 0; $i < $weeks; ++$i) {
+            $results[$i] = array_values($results[$i]);
         }
 
         return $results;
