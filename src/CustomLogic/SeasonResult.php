@@ -70,7 +70,7 @@ class SeasonResult
         foreach($extraPointsClasses as $cls) {
             $extras = $cls->calculate($season);
             foreach($extras as $extra) {
-                $results[$cls->getWeek()][$extra['activity_id']]->extras[] = new ExtraPointsDto($extra['user_id'], $cls->getUniqueName(), $extra['value'], $cls->reward());
+                $results[$cls->getWeek()][$extra['activity_id']]->extras[] = new ExtraPointsDto($extra['user_id'], $extra['faculty_id'], $cls->getUniqueName(), $extra['value'], $cls->reward());
                 
             }
         }
