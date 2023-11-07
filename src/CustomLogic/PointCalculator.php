@@ -7,23 +7,34 @@ use App\Repository\ActivityRepository;
 use App\Repository\FacultyRepository;
 use App\Repository\SubmissionRepository;
 use App\Repository\UserRepository;
+use App\Dto\ActivityResultDto;
 
 class PointCalculator
 {
     public function __construct(private readonly UserRepository $userRepository, private ActivityRepository $activityRepository, private FacultyRepository $facultyRepository, private SubmissionRepository $submissionRepository)
     {
     }
+
+    /**
+    * @return array<int, array<int, ActivityResultDto>>
+    */
     public function processSeason(Season $season): array
     {
         $weeks = [];
 
         for($week = 0; $week < 4; ++$week) {
-            $weeks[] = $this->processWeek($season, $week);
+            $weekResults = $this->processWeek($season, $week);
+            if(!empty($weekResults)) {
+                $weeks[] = $weekResults;
+            }
         }
 
         return $weeks;
     }
 
+    /**
+    * @return array<int, ActivityResultDto>
+    */
     public function processWeek(Season $season, int $week): array
     {
         $submissions = $this->submissionRepository->findAcceptedInSeasonAndWeek($season, $week);
@@ -32,48 +43,55 @@ class PointCalculator
         $extraPoints = [];
         $activities = [];
 
+        $activitiesMapping = [];
+        $facultiesMapping = [];
+
         foreach($submissions as $submission) {
-            $activity = $submission->getActivity()->getId();
-            $faculty = $submission->getUser()->getFaculty()->getId();
+            $activity = $submission->getActivity();
+            $faculty = $submission->getUser()->getFaculty();
 
             if(!array_key_exists($activity, $activities)) {
-                $activities[$activity] = ['faculties' => []];
+                $activitiesMapping[$activity->getId()] = $activity;
+                
+                // $extraPoints[$activity->getId()] = [];
+
+                // foreach($extraPointClasses as $extra) {
+                //     if($extra::acceptsWeek($week)) {
+                //         $cls = new $extra();
+                //         $extraPoints[$activity->getId()][] = $cls;
+                //         if($cls->requiresActivity()) {
+                //             $cls->setActivity($activity);
+                //         }
+                //     }
+                // }
             }
 
-            if(!array_key_exists($activity, $extraPoints)) {
-                $extraPoints[$activity] = [];
-                $activities[$activity]['extras'] = [];
-
-                foreach($extraPointClasses as $extra) {
-                    if($extra::acceptsWeek($week)) {
-                        $cls = new $extra();
-                        $extraPoints[$activity][] = $cls;
-                        if($cls->requiresActivity()) {
-                            $cls->setActivity($submission->getActivity());
-                        }
-                    }
-                }
+            if(!array_key_exists($faculty, $activities[$activity->getId()])) {
+                $activities[$activity->getId()][$faculty->getId()] = 0;
+                $facultiesMapping[$faculty->getId()] = $faculty;
             }
 
-            if(!array_key_exists($faculty, $activities[$activity])) {
-                $activities[$activity]['faculties'][$faculty] = 0;
-            }
+            $activities[$activity->getId()][$faculty->getId()] += $submission->getDistance();
 
-            $activities[$activity]['faculties'][$faculty] += $submission->getDistance();
-
-            foreach($extraPoints[$activity] as $extra) {
-                $extra->accumulate($submission);
-            }
+            // foreach($extraPoints[$activity] as $extra) {
+            //     $extra->accumulate($submission);
+            // }
         }
 
-        foreach($extraPoints as $activityId => $activity) {
-            foreach($activity as $extraPointHandler) {
-                $extraPointHandler->finalize();
-                $result = $extraPointHandler->getWinners();
+        // foreach($extraPoints as $activityId => $activity) {
+        //     foreach($activity as $extraPointHandler) {
+        //         $extraPointHandler->finalize();
+        //         $result = $extraPointHandler->getWinners();
+                
+        //         if(!empty($result)) {
+        //             $activities[$activityId]['extras'][] = $result;
+        //         }
+        //     }
+        // }
 
-                if(!empty($result)) {
-                    $activities[$activityId]['extras'][] = $result;
-                }
+        foreach($activities as $activityId => $activityResult) {
+            foreach($activityResult as $facultyId => $facultyResult) {
+                
             }
         }
 

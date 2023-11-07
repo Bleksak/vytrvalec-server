@@ -19,7 +19,7 @@ class WeeklyDistanceExtraPoints implements ExtraPoints
     public function calculate(Season $season): array
     {
         $query = $this->entityManagerInterface->getConnection()->prepare('
-            SELECT MAX(distance_sum) as distance, activity_id, user_id
+            SELECT MAX(distance_sum) as value, activity_id, user_id
                 FROM (
                     SELECT SUM(s.distance) as distance_sum, s.activity_id as activity_id, s.user_id as user_id
                         FROM submission s

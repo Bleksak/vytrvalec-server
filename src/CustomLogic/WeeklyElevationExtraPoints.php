@@ -24,7 +24,7 @@ class WeeklyElevationExtraPoints implements ExtraPoints
     public function calculate(Season $season): array
     {
         $query = $this->entityManagerInterface->getConnection()->prepare('
-            SELECT MAX(elevation_sum) as elevation, activity_id, user_id
+            SELECT MAX(elevation_sum) as value, activity_id, user_id
                 FROM (
                     SELECT SUM(s.elevation) as elevation_sum, s.activity_id as activity_id, s.user_id as user_id
                         FROM submission s

@@ -5,16 +5,20 @@ namespace App\Controller\ApiResource;
 use App\Action\SeasonActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
+use App\CustomLogic\DailyDistanceExtraPoints;
 use App\CustomLogic\PointCalculator;
+use App\CustomLogic\SeasonResult;
+use App\CustomLogic\WeeklyDistanceExtraPoints;
 use App\Entity\Season;
 use App\Form\SeasonCreateFormType;
 use App\Repository\CharityRepository;
 use App\Repository\FacultyCacheRepository;
-use App\Repository\FacultyExtraPointsRepository;
 use App\Repository\SeasonRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -175,9 +179,15 @@ class SeasonController extends AbstractController
             Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
         ],
     )]
-    public function result(Season $season, FacultyCacheRepository $facultyCacheRepository, PointCalculator $calculator): Response
+    public function result(Season $season, SeasonResult $result): Response
     {
-        return $this->json($calculator->processSeason($season));
+        $results = $result->calculate($season);
+        
+        $season = $this->serializer->normalize($results, null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
+        ]);
+
+        return $this->json($results);
     }
 
     #[ApiRoute(
@@ -239,5 +249,15 @@ class SeasonController extends AbstractController
         ]);
 
         return $this->json($seasons);
+    }
+    
+    #[Route('/test', 'ttest')]
+    public function test(SeasonResult $result)
+    {
+        $season = $this->seasonRepository->find(3);
+        
+        $results = $result->calculate($season);
+
+        dd($results);
     }
 }

@@ -2,17 +2,8 @@
 
 namespace App\Dto;
 
-use App\Entity\Activity;
-
 class ActivityResultDto
 {
-    public Activity $activity;
-
-    /**
-    * @var FacultyResultDto[]
-    **/
-    public array $results = [];
-
     /**
     * @var ExtraPointsDto[]
     **/
@@ -22,8 +13,10 @@ class ActivityResultDto
     * @param array<int, FacultyResultDto> $results
     * @param array<int, ExtraPointsDto> $extras
     **/
-    public function __construct(Activity $activity)
+    public function __construct(
+        public readonly int $activity,
+        public readonly array $results,
+    )
     {
-        $this->activity = $activity;
     }
 }
