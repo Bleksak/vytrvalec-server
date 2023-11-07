@@ -183,7 +183,7 @@ class SeasonController extends AbstractController
     {
         $results = $result->calculate($season);
         
-        $season = $this->serializer->normalize($results, null, [
+        $results = $this->serializer->normalize($results, null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
         ]);
 
@@ -249,15 +249,5 @@ class SeasonController extends AbstractController
         ]);
 
         return $this->json($seasons);
-    }
-    
-    #[Route('/test', 'ttest')]
-    public function test(SeasonResult $result)
-    {
-        $season = $this->seasonRepository->find(3);
-        
-        $results = $result->calculate($season);
-
-        dd($results);
     }
 }
