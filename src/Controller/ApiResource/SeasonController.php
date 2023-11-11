@@ -5,33 +5,26 @@ namespace App\Controller\ApiResource;
 use App\Action\SeasonActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
-use App\CustomLogic\DailyDistanceExtraPoints;
-use App\CustomLogic\PointCalculator;
 use App\CustomLogic\SeasonResult;
-use App\CustomLogic\WeeklyDistanceExtraPoints;
 use App\Entity\Season;
-use App\Form\SeasonCreateFormType;
+use App\Form\SeasonFormType;
 use App\Repository\CharityRepository;
-use App\Repository\FacultyCacheRepository;
 use App\Repository\SeasonRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[ApiResource('Season')]
 class SeasonController extends AbstractController
 {
     public function __construct(
         private readonly SeasonRepository $seasonRepository,
-        private readonly SerializerInterface $serializer,
+        private readonly NormalizerInterface $normalizer,
         private readonly SeasonActions $action,
-    )
-    {
+    ) {
     }
 
     #[ApiRoute(
@@ -64,15 +57,15 @@ class SeasonController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function create(Request $request, CharityRepository $charityRepository): Response
     {
-        $form = $this->createForm(SeasonCreateFormType::class);
+        $form = $this->createForm(SeasonFormType::class);
 
         $form->submit($request->getPayload()->all());
 
-        if(!$form->isValid()) {
+        if (!$form->isValid()) {
 
             $errors = [];
-            
-            foreach($form->getErrors(true) as $error) {
+
+            foreach ($form->getErrors(true) as $error) {
                 $errors[] = $error->getMessage();
             }
 
@@ -80,7 +73,7 @@ class SeasonController extends AbstractController
         }
 
         $this->action->create($form->getData());
-        
+
         return new Response(status: Response::HTTP_CREATED);
     }
 
@@ -112,7 +105,7 @@ class SeasonController extends AbstractController
             return $this->json([], Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($this->serializer->normalize($season, null, [
+        return $this->json($this->normalizer->normalize($season, null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions']
         ]));
     }
@@ -142,7 +135,7 @@ class SeasonController extends AbstractController
         }
 
         $this->seasonRepository->remove($season);
-        
+
         return new Response(status: Response::HTTP_OK);
     }
 
@@ -182,8 +175,8 @@ class SeasonController extends AbstractController
     public function result(Season $season, SeasonResult $result): Response
     {
         $results = $result->calculate($season);
-        
-        $results = $this->serializer->normalize($results, null, [
+
+        $results = $this->normalizer->normalize($results, null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
         ]);
 
@@ -213,7 +206,7 @@ class SeasonController extends AbstractController
     )]
     public function season(Season $season): Response
     {
-        $season = $this->serializer->normalize($season, null, [
+        $season = $this->normalizer->normalize($season, null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
         ]);
 
@@ -244,7 +237,7 @@ class SeasonController extends AbstractController
     )]
     public function seasonList(): Response
     {
-        $seasons = $this->serializer->normalize($this->seasonRepository->findAll(), null, [
+        $seasons = $this->normalizer->normalize($this->seasonRepository->findAll(), null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions'],
         ]);
 

@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[ApiResource('Charity')]
 class CharityController extends AbstractController
@@ -21,14 +21,13 @@ class CharityController extends AbstractController
     public function __construct(
         private readonly CharityActions $action,
         private readonly CharityRepository $charityRepository,
-        private readonly SerializerInterface $serializer,
-    )
-    {
+        private readonly NormalizerInterface $normalizer,
+    ) {
     }
 
     #[ApiRoute(
-        '/api/charity', 
-        'api_charity_create', 
+        '/api/charity',
+        'api_charity_create',
         methods: ['POST'],
         documentation: 'Create a new Charity entity',
         responses: [
@@ -47,10 +46,10 @@ class CharityController extends AbstractController
         $form = $this->createForm(CharityCreateFormType::class);
         $form->submit($request->getPayload()->all());
 
-        if(!$form->isValid()) {
+        if (!$form->isValid()) {
             $errors = [];
 
-            foreach($form->getErrors(true) as $error) {
+            foreach ($form->getErrors(true) as $error) {
                 $errors[] = $error->getMessage();
             }
 
@@ -63,8 +62,8 @@ class CharityController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/charity/{charity}', 
-        'api_charity_get', 
+        '/api/charity/{charity}',
+        'api_charity_get',
         methods: ['GET'],
         documentation: 'Get a charity entity',
         responses: [
@@ -73,15 +72,15 @@ class CharityController extends AbstractController
     )]
     public function get(Charity $charity): Response
     {
-        return $this->json($this->serializer->normalize($charity, null, [
+        return $this->json($this->normalizer->normalize($charity, null, [
             AbstractNormalizer::GROUPS => ['fetchCharity'],
         ]));
     }
 
 
     #[ApiRoute(
-        '/api/charity/{charity}', 
-        'api_charity_patch', 
+        '/api/charity/{charity}',
+        'api_charity_patch',
         methods: ['PATCH'],
         documentation: 'Patch a charity entity',
         responses: [
@@ -97,10 +96,10 @@ class CharityController extends AbstractController
 
         $form->submit($request->getPayload()->all());
 
-        if(!$form->isValid()) {
+        if (!$form->isValid()) {
             $errors = [];
 
-            foreach($form->getErrors(true) as $error) {
+            foreach ($form->getErrors(true) as $error) {
                 $errors[] = $error->getMessage();
             }
 
@@ -113,8 +112,8 @@ class CharityController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/charity', 
-        'api_charity_index', 
+        '/api/charity',
+        'api_charity_index',
         methods: ['GET'],
         documentation: 'List of charity entities',
         responses: [
@@ -123,7 +122,7 @@ class CharityController extends AbstractController
     )]
     public function index(): Response
     {
-        return $this->json($this->serializer->normalize($this->charityRepository->findAll(), null, [
+        return $this->json($this->normalizer->normalize($this->charityRepository->findAll(), null, [
             AbstractNormalizer::GROUPS => ['fetchCharity']
         ]));
     }

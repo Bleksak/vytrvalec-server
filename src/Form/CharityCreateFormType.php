@@ -20,19 +20,21 @@ class CharityCreateFormType extends AbstractType
             'PATCH' => false,
             default => true,
         };
-        
+
         $builder->add('name', TextType::class, [
             'required' => $required,
-            'property_path' => 'name',
             'constraints' => [
-                new Assert\NotBlank(),
-                new Assert\NotNull(),
+                new Assert\NotBlank(message: 'blank_name'),
+                new Assert\NotNull(message: 'blank_name'),
             ],
         ]);
 
         $builder->add('description', TextareaType::class, [
-            'property_path' => 'description',
             'required' => $required,
+            'constraints' => [
+                new Assert\NotBlank(message: 'blank_description'),
+                new Assert\NotNull(message: 'blank_description'),
+            ],
         ]);
     }
 

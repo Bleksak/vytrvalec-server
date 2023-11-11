@@ -14,17 +14,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[ApiResource(resourceName: 'User')]
-class UserApiController extends AbstractController
+class UserController extends AbstractController
 {
     public function __construct(
-        private readonly SerializerInterface $serializer,
+        private readonly NormalizerInterface $normalizer,
         private readonly UserRepository $userRepository,
         private readonly UserActions $action,
-    )
-    {
+    ) {
     }
 
     #[ApiRoute(
@@ -101,7 +100,7 @@ class UserApiController extends AbstractController
     )]
     public function userCount(): Response
     {
-        return $this->json($this->userRepository->count(['banned'=>false]));
+        return $this->json($this->userRepository->count(['banned' => false]));
     }
 
     #[ApiRoute(
@@ -128,7 +127,7 @@ class UserApiController extends AbstractController
     )]
     public function currentUserData(#[CurrentUser] User $currentUser): Response
     {
-        $filtered = $this->serializer->normalize($currentUser, null, [
+        $filtered = $this->normalizer->normalize($currentUser, null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
         ]);
 
@@ -163,7 +162,7 @@ class UserApiController extends AbstractController
             $user = $currentUser;
         }
 
-        $filtered = $this->serializer->normalize($user, null, [
+        $filtered = $this->normalizer->normalize($user, null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
         ]);
 
@@ -197,7 +196,7 @@ class UserApiController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function userList(): Response
     {
-        return $this->json($this->serializer->normalize($this->userRepository->findAll(), null, [
+        return $this->json($this->normalizer->normalize($this->userRepository->findAll(), null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
         ]));
     }
@@ -235,10 +234,10 @@ class UserApiController extends AbstractController
         $form = $this->createForm(UserCreateFormType::class);
         $form->submit($request->getPayload()->all());
 
-        if(!$form->isValid()) {
+        if (!$form->isValid()) {
             $errors = [];
 
-            foreach($form->getErrors(true) as $error) {
+            foreach ($form->getErrors(true) as $error) {
                 $errors[] = $error->getMessage();
             }
 
@@ -247,7 +246,7 @@ class UserApiController extends AbstractController
 
         $errors = $this->action->create($form->getData());
 
-        if(!empty($errors)) {
+        if (!empty($errors)) {
             return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 

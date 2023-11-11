@@ -20,25 +20,29 @@ class UserCreateFormType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'constraints' => [
-                    new Assert\NotBlank(message: 'blank_email', allowNull: false),
+                    new Assert\NotBlank(message: 'blank_email'),
+                    new Assert\NotNull(message: 'blank_email'),
                     new Assert\Email(message: 'bad_email'),
                 ]
             ])
             ->add('first_name', TextType::class, [
                 'property_path' => 'firstName',
                 'constraints' => [
-                    new Assert\NotBlank(message: 'blank_first_name', allowNull: false),
+                    new Assert\NotBlank(message: 'blank_first_name'),
+                    new Assert\NotNull(message: 'blank_first_name'),
                 ]
             ])
             ->add('last_name', TextType::class, [
                 'property_path' => 'lastName',
                 'constraints' => [
-                    new Assert\NotBlank(message: 'blank_last_name', allowNull: false),
+                    new Assert\NotBlank(message: 'blank_last_name'),
+                    new Assert\NotNull(message: 'blank_last_name'),
                 ]
             ])
             ->add('password', PasswordType::class, [
                 'constraints' => [
                     new Assert\NotBlank(message: 'blank_password', allowNull: false),
+                    new Assert\NotNull(message: 'blank_password'),
                     new Assert\PasswordStrength(message: 'weak_password', minScore: 2),
                 ]
             ])
@@ -49,9 +53,9 @@ class UserCreateFormType extends AbstractType
                 'invalid_message' => 'invalid_faculty',
                 'constraints' => [
                     new Assert\NotBlank(message: 'invalid_faculty', allowNull: false),
+                    new Assert\NotNull(message: 'invalid_faculty'),
                 ]
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

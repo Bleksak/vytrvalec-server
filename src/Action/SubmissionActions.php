@@ -3,6 +3,7 @@
 namespace App\Action;
 
 use App\Dto\SubmissionDto;
+use App\Dto\SubmissionStateDto;
 use App\Entity\RejectedSubmissionMessage;
 use App\Entity\Season;
 use App\Entity\Submission;
@@ -20,42 +21,37 @@ use Imagick;
 use ImagickException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mailer\MailerInterface;
 
 class SubmissionActions
 {
     public function __construct(
-        private Firebase $firebase,
-        private MailerInterface $mailer,
-        private SubmissionRepository $submissionRepository,
-        private RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository,
-        private FacultyCacheRepository $facultyCacheRepository,
-        private UserCacheRepository $userCacheRepository,
-        private ProfileCacheRepository $profileCacheRepository,
+        private readonly Firebase $firebase,
+        private readonly MailerInterface $mailer,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository,
+        private readonly FacultyCacheRepository $facultyCacheRepository,
+        private readonly UserCacheRepository $userCacheRepository,
+        private readonly ProfileCacheRepository $profileCacheRepository,
         private readonly ParameterBagInterface $parameterBag,
         private readonly Filesystem $fs,
-    )
-    {
+    ) {
     }
 
-    /*
-    * @return array<int, string>
-    */
-    public function create(SubmissionDto $dto, User $user, Season $season): array
+    private function uploadImage(UploadedFile $image): ?string
     {
-        // 1. upload image
+        $dirname = $this->parameterBag->get('kernel.project_dir') . '/public';
 
-        $dirname = $this->parameterBag->get('kernel.project_dir') . '/public/uploads/';
-        
         do {
-            $uniquePath = uniqid(more_entropy: true) . '.jpg';
+            $uniquePath = '/uploads/' . uniqid(more_entropy: true) . '.jpg';
             $absolutePath = $dirname . $uniquePath;
-        } while($this->fs->exists($absolutePath));
+        } while ($this->fs->exists($absolutePath));
 
         $tmpPath = $uniquePath . '.tmp';
-        
-        $newFile = $dto->image->move($dirname, $tmpPath);
-        
+
+        $newFile = $image->move($dirname, $tmpPath);
+
         try {
             $img = new Imagick($newFile->getRealPath());
             $profiles = $img->getImageProfiles("icc");
@@ -68,39 +64,67 @@ class SubmissionActions
             $img->setImageFormat('jpeg');
             $img->setImageCompressionQuality(90);
             $img->writeImage($absolutePath);
-        } catch (ImagickException $e) {
-            return ['image_error'];
+        } catch (ImagickException) {
+            return null;
         } finally {
             $this->fs->remove($newFile);
         }
 
-        // 2. create submmission and save it
-        
-        $submission = new Submission($user, $dto->activity, $season, $uniquePath, $dto->distance, $dto->elevation ?? 0);
-        
+        return $uniquePath;
+    }
+
+    /*
+    * @return array<int, string>
+    */
+    public function create(SubmissionDto $dto, User $user, Season $season): array
+    {
+        $imagePath = $this->uploadImage($dto->image);
+        if ($imagePath === null) {
+            return ['image_error'];
+        }
+
+        $submission = new Submission($user, $dto->activity, $season, $imagePath, $dto->distance, $dto->elevation ?? 0);
+
         $this->submissionRepository->save($submission, true);
 
         return [];
     }
-
-    private function setState(Submission $submission, bool $state): void
+    /**
+     * @return array<int,string>
+     */
+    public function setState(Submission $submission, SubmissionStateDto $dto): array
     {
-        $submission->setReviewed(true);
-        $submission->setAccepted($state);
-        $this->submissionRepository->save($submission, true);
-    }
+        if ($dto->updatedAt !== $submission->getUpdatedAt()) {
+            return ['mismatch_updated_at'];
+        }
 
+        $submission->setReviewed(true);
+        $submission->setAccepted($dto->state);
+
+        if ($dto->state) {
+            $this->accept($submission);
+        } else {
+            $this->reject($submission, $dto->message);
+        }
+
+        $this->submissionRepository->save($submission, true);
+
+        return [];
+    }
+    /**
+     * @return array<int,string>
+     */
     public function accept(Submission $submission): void
     {
         $this->profileCacheRepository->addCache($submission, false);
-        $this->setState($submission, true);
     }
-
+    /**
+     * @return array<int,string>
+     */
     public function reject(Submission $submission, string $message): void
     {
         $this->rejectedSubmissionMessageRepository->save(new RejectedSubmissionMessage($submission, $message));
-        $this->setState($submission, false);
-        
+
         $this->firebase->send(new VytrvalecNotification($submission->getUser(), $message));
         $this->mailer->send(new VytrvalecEmail($submission->getUser(), new SubmissionRejectedEmailTemplate($submission, $message)));
     }
@@ -108,5 +132,40 @@ class SubmissionActions
     public function delete(Submission $submission): void
     {
         $this->submissionRepository->remove($submission, true);
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    public function update(Submission $submission, SubmissionDto $dto): array
+    {
+        if ($submission->getUpdatedAt() !== $dto->updatedAt) {
+            return ['mismatch_updated_at'];
+        }
+
+        if ($dto->image !== null) {
+            $imagePath = $this->uploadImage($dto->image);
+            if ($imagePath === null) {
+                return ['image_error'];
+            }
+
+            $submission->setImage($imagePath);
+        }
+
+        if ($dto->distance !== null) {
+            $submission->setDistance($dto->distance);
+        }
+
+        if ($dto->elevation !== null) {
+            $submission->setElevation($dto->elevation);
+        }
+
+        if ($dto->activity !== null) {
+            $submission->setActivity($dto->activity);
+        }
+
+        $this->submissionRepository->save($submission, true);
+
+        return [];
     }
 }

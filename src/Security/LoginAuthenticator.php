@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class LoginAuthenticator extends AbstractAuthenticator
 {
@@ -29,10 +29,10 @@ class LoginAuthenticator extends AbstractAuthenticator
         private readonly ParameterBagInterface $parameters,
         private readonly UserProviderInterface $userProvider,
         private readonly UserPasswordHasherInterface $hasher,
-        private readonly SerializerInterface $serializer,
+        private readonly NormalizerInterface $normalizer,
         private readonly UserRepository $userRepository
-    )
-    {}
+    ) {
+    }
     public function supports(Request $request): ?bool
     {
         return $request->get('_route') === 'api_user_login' && $request->isMethod('POST');
@@ -43,7 +43,7 @@ class LoginAuthenticator extends AbstractAuthenticator
         $email = $request->getPayload()->get('email');
         $password = $request->getPayload()->get('password');
 
-        if($email === null || $password === null) {
+        if ($email === null || $password === null) {
             throw new CustomUserMessageAuthenticationException('Unauthorized access');
         }
 
@@ -51,7 +51,7 @@ class LoginAuthenticator extends AbstractAuthenticator
             new UserBadge($email, function ($email) use ($password) {
                 $user = $this->userProvider->loadUserByIdentifier($email);
 
-                if(!$this->hasher->isPasswordValid($user, $password)) {
+                if (!$this->hasher->isPasswordValid($user, $password)) {
                     throw new UserNotFoundException();
                 }
 
@@ -76,7 +76,7 @@ class LoginAuthenticator extends AbstractAuthenticator
 
         $response = new JsonResponse([
             'token' => $jwt,
-            'user' => $this->serializer->normalize($token->getUser(), null, [
+            'user' => $this->normalizer->normalize($token->getUser(), null, [
                 AbstractNormalizer::GROUPS => ['fetchUser']
             ]),
         ]);
@@ -86,7 +86,7 @@ class LoginAuthenticator extends AbstractAuthenticator
         $firebaseToken = $request->getPayload()->get('firebase_token');
         $user = $token->getUser();
 
-        if($firebaseToken !== null && $user instanceof User) {
+        if ($firebaseToken !== null && $user instanceof User) {
             $user->setToken($firebaseToken);
             $this->userRepository->save($user, true);
         }
