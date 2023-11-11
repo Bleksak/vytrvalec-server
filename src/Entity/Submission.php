@@ -58,10 +58,13 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private Activity $activity;
 
-
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Groups(['fetchSubmission'])]
     private DateTimeInterface $date;
+
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Groups(['fetchSubmission'])]
+    private DateTimeInterface $updatedAt;
 
     public function __construct(User $user, Activity $activity, Season $season, string $image, int $distance, ?int $elevation = null)
     {
@@ -207,5 +210,10 @@ class Submission
         $this->week = $week;
 
         return $this;
+    }
+
+    public function getUpdatedAt(): DateTimeImmutable
+    {
+        return $this->updatedAt;
     }
 }

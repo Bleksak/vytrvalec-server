@@ -12,6 +12,8 @@ use App\Form\SubmissionForm;
 use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
+use DateMalformedStringException;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,18 +21,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[ApiResource('Submission')]
-class SubmissionApiController extends AbstractController
+class SubmissionController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly SubmissionRepository $submissionRepository,
-        private readonly SerializerInterface $serializer,
+        private readonly NormalizerInterface $normalizer,
         private readonly SubmissionActions $action,
-    )
-    {
+    ) {
     }
 
     #[ApiRoute(
@@ -68,21 +69,20 @@ class SubmissionApiController extends AbstractController
         #[CurrentUser] User $user,
         SeasonRepository $seasonRepository,
         Request $request,
-    ): Response
-    {
+    ): Response {
         $season = $seasonRepository->getCurrent();
 
         if ($season === null) {
-            return $this->json(['errors'=> ['no_season']], Response::HTTP_BAD_REQUEST);
+            return $this->json(['errors' => ['no_season']], Response::HTTP_BAD_REQUEST);
         }
 
         $form = $this->createForm(SubmissionForm::class);
         $form->submit($request->request->all() + $request->files->all());
 
-        if(!$form->isValid()) {
+        if (!$form->isValid()) {
             $errors = [];
 
-            foreach($form->getErrors(true) as $error) {
+            foreach ($form->getErrors(true) as $error) {
                 $errors[] = $error->getMessage();
             }
 
@@ -90,7 +90,7 @@ class SubmissionApiController extends AbstractController
         }
 
         $errors = $this->action->create($form->getData(), $user, $season);
-        if(!empty($errors)) {
+        if (!empty($errors)) {
             return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
@@ -122,7 +122,7 @@ class SubmissionApiController extends AbstractController
         $pageCount = 1 + intdiv($submissions->count(), $limit);
 
         return $this->json(
-            $this->serializer->normalize(
+            $this->normalizer->normalize(
                 [
                     'pages' => $pageCount,
                     'submissions' => $submissions,
@@ -132,10 +132,10 @@ class SubmissionApiController extends AbstractController
                 [
                     AbstractNormalizer::GROUPS => ['fetchSubmission'],
                     AbstractNormalizer::CALLBACKS => [
-                        'season' => fn($object) => $object->getId(),
-                        'activity' => fn($object) => $object->getId(),
-                        'user' => fn($object) => $object->getId(),
-                        'faculty' => fn($object) => $object->getId(),
+                        'season' => fn ($object) => $object->getId(),
+                        'activity' => fn ($object) => $object->getId(),
+                        'user' => fn ($object) => $object->getId(),
+                        'faculty' => fn ($object) => $object->getId(),
                     ],
                 ]
             )
@@ -159,19 +159,18 @@ class SubmissionApiController extends AbstractController
         RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository,
         int $page,
         int $limit = 50
-    ): Response
-    {
+    ): Response {
         $rejectedSubmissions = $rejectedSubmissionMessageRepository->findByUser($user);
         $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
         $nextPage = ($page + 1) > $pageCount ? null : $page + 1;
 
-        return $this->json($this->serializer->normalize(['nextPage' => $nextPage, 'submissions' => $submissions, 'rejectedSubmissions' => $rejectedSubmissions], null, [
+        return $this->json($this->normalizer->normalize(['nextPage' => $nextPage, 'submissions' => $submissions, 'rejectedSubmissions' => $rejectedSubmissions], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['faculty', 'user'],
             AbstractNormalizer::CALLBACKS => [
-                'season' => fn($object) => $object->getId(),
-                'activity' => fn($object) => $object->getId(),
+                'season' => fn ($object) => $object->getId(),
+                'activity' => fn ($object) => $object->getId(),
             ]
         ]));
     }
@@ -190,12 +189,88 @@ class SubmissionApiController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function unresolvedList(Season $season): Response
     {
-        return $this->json($this->serializer->normalize($this->submissionRepository->findBy(['season' => $season, 'reviewed' => false]), null, [
+        return $this->json($this->normalizer->normalize($this->submissionRepository->findBy(['season' => $season, 'reviewed' => false]), null, [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
                 return $object->getId();
             },
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
         ]));
+    }
+
+    #[ApiRoute(
+        '/api/submission/{submission}',
+        name: 'api_submission_edit',
+        methods: ['PATCH'],
+        documentation: 'Creates a new <code>Submission</code> entity',
+        responses: [
+            Response::HTTP_CREATED => [
+                'message' => 'Submission created successfully',
+            ],
+            Response::HTTP_FORBIDDEN => [
+                'message' => 'Unauthorized access',
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Bad request ',
+                'response' => [
+                    'distance' => 'err_negative_value',
+                    'elevation' => 'err_zero_value'
+                ]
+            ],
+            Response::HTTP_INTERNAL_SERVER_ERROR => [
+                'message' => 'Error when processing image'
+            ]
+        ],
+        requestScheme: [
+            'distance' => 'integer',
+            'elevation' => 'integer',
+            'image' => 'file',
+            'activity' => 'integer',
+            'updated_at' => 'date'
+        ]
+    )]
+    #[IsGranted('ROLE_USER')]
+    public function edit(
+        #[CurrentUser] User $user,
+        Submission $submission,
+        Request $request,
+    ): Response {
+
+        if ($submission->isAccepted()) {
+            return $this->json(['errors' => 'submission_accepted'], Response::HTTP_BAD_REQUEST);
+        }
+
+        /// 1. uzivatel da edit, admin vidi starou verzi
+        // 2. chceme, aby admin dostal error, ze vidi starou verzi a musi to zkontrolvoat znovu
+
+
+        if ($user !== $submission->getUser()) {
+            return $this->json([], Response::HTTP_NOT_FOUND);
+        }
+
+        $form = $this->createForm(SubmissionForm::class, null, [
+            'method' => $request->getMethod()
+        ]);
+
+        $form->submit($request->request->all() + $request->files->all());
+
+        if (!$form->isValid()) {
+            $errors = [];
+
+            foreach ($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        }
+
+        $dto = $form->getData();
+
+        $errors = $this->action->update($submission, $dto);
+        if (!empty($errors)) {
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        }
+
+        return new Response(status: Response::HTTP_CREATED);
     }
 
     #[ApiRoute(
@@ -249,13 +324,23 @@ class SubmissionApiController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function accept(Submission $submission): Response
+    public function accept(Submission $submission, Request $request): Response
     {
         if ($submission->isReviewed()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
-        $this->action->accept($submission);
+        try {
+            $updatedAt = new DateTime($request->getPayload()->get('updated_at'));
+        } catch (DateMalformedStringException) {
+            return $this->json(['errors' => ['mismatch_updated_at']], Response::HTTP_BAD_REQUEST);
+        }
+
+        $errors = $this->action->accept($submission, $updatedAt);
+        if (!empty($errors)) {
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        }
+
 
         return new Response(status: Response::HTTP_OK);
     }
@@ -277,7 +362,8 @@ class SubmissionApiController extends AbstractController
             ]
         ],
         requestScheme: [
-            'message' => 'string'
+            'message' => 'string',
+            'updated_at' => 'datetime',
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
@@ -287,7 +373,16 @@ class SubmissionApiController extends AbstractController
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
-        $this->action->reject($submission, $request->getPayload()->get('message', ''));
+        try {
+            $updatedAt = new DateTime($request->getPayload()->get('updated_at'));
+        } catch (DateMalformedStringException) {
+            return $this->json(['errors' => ['mismatch_updated_at']], Response::HTTP_BAD_REQUEST);
+        }
+
+        $errors = $this->action->reject($submission, $updatedAt, $request->getPayload()->get('message', ''));
+        if (!empty($errors)) {
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        }
 
         return new Response(status: Response::HTTP_OK);
     }

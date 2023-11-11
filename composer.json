@@ -42,7 +42,6 @@
         "symfony/string": "6.3.*",
         "symfony/translation": "6.3.*",
         "symfony/twig-bundle": "6.3.*",
-        "symfony/ux-react": "^2.7",
         "symfony/validator": "6.3.*",
         "symfony/web-link": "6.3.*",
         "symfony/webpack-encore-bundle": "^1.16",
@@ -85,15 +84,6 @@
         "psr-4": {
             "App\\Tests\\": "tests/"
         }
-    },
-    "replace": {
-        "symfony/polyfill-ctype": "*",
-        "symfony/polyfill-iconv": "*",
-        "symfony/polyfill-php72": "*",
-        "symfony/polyfill-php73": "*",
-        "symfony/polyfill-php74": "*",
-        "symfony/polyfill-php80": "*",
-        "symfony/polyfill-php81": "*"
     },
     "scripts": {
         "auto-scripts": {

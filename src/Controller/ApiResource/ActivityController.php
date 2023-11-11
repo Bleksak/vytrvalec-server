@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[ApiResource('Activity')]
 class ActivityController extends AbstractController
@@ -21,8 +21,7 @@ class ActivityController extends AbstractController
     public function __construct(
         private readonly ActivityRepository $activityRepository,
         private readonly ActivityActions $action,
-    )
-    {
+    ) {
     }
 
     #[ApiRoute(
@@ -42,10 +41,10 @@ class ActivityController extends AbstractController
         $form = $this->createForm(ActivityFormType::class);
         $form->submit($request->getPayload()->all());
 
-        if(!$form->isValid()) {
+        if (!$form->isValid()) {
             $errors = [];
 
-            foreach($form->getErrors(true) as $error) {
+            foreach ($form->getErrors(true) as $error) {
                 $errors[] = $error->getMessage();
             }
 
@@ -71,7 +70,7 @@ class ActivityController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function delete(Activity $activity): Response
     {
-        if(!$this->action->delete($activity)) {
+        if (!$this->action->delete($activity)) {
             return $this->json(['errors' => [
                 'activity_has_submissions'
             ]], Response::HTTP_BAD_REQUEST);
@@ -99,10 +98,10 @@ class ActivityController extends AbstractController
 
         $form->submit($request->getPayload()->all());
 
-        if(!$form->isValid()) {
+        if (!$form->isValid()) {
             $errors = [];
 
-            foreach($form->getErrors(true) as $error) {
+            foreach ($form->getErrors(true) as $error) {
                 $errors[] = $error->getMessage();
             }
 
@@ -110,7 +109,7 @@ class ActivityController extends AbstractController
         }
 
         $this->action->update($activity, $form->getData());
-        
+
         return new Response(status: Response::HTTP_OK);
     }
 
@@ -124,11 +123,10 @@ class ActivityController extends AbstractController
             Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access']
         ],
     )]
-    public function activityList(SerializerInterface $serializer): Response
+    public function activityList(NormalizerInterface $normalizer): Response
     {
-        return $this->json($serializer->normalize($this->activityRepository->findAll(), null, [
+        return $this->json($normalizer->normalize($this->activityRepository->findAll(), null, [
             AbstractNormalizer::GROUPS => ['fetchActivity'],
         ]));
     }
-
 }
