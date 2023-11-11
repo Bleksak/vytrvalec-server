@@ -273,7 +273,7 @@ class SubmissionController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/submission/{submission}/delete',
+        '/api/submission/{submission}',
         name: 'api_submission_delete',
         methods: ['DELETE'],
         documentation: 'Deletes a <code>Submission</code> entity',
