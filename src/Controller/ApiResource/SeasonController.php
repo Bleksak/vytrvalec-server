@@ -7,7 +7,7 @@ use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
 use App\CustomLogic\SeasonResult;
 use App\Entity\Season;
-use App\Form\SeasonCreateFormType;
+use App\Form\SeasonFormType;
 use App\Repository\CharityRepository;
 use App\Repository\SeasonRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -57,7 +57,7 @@ class SeasonController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function create(Request $request, CharityRepository $charityRepository): Response
     {
-        $form = $this->createForm(SeasonCreateFormType::class);
+        $form = $this->createForm(SeasonFormType::class);
 
         $form->submit($request->getPayload()->all());
 

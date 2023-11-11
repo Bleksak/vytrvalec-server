@@ -19,12 +19,12 @@ class ActivityFormType extends AbstractType
             'POST', 'PUT' => true,
             'PATCH' => false,
         };
-        
+
         $builder->add('name', TextType::class, [
             'required' => $required,
             'constraints' => [
-                new Assert\NotNull(),
-                new Assert\NotBlank(),
+                new Assert\NotNull(message: 'blank_name'),
+                new Assert\NotBlank(message: 'blank_name'),
             ]
         ]);
 
@@ -32,9 +32,10 @@ class ActivityFormType extends AbstractType
             'required' => $required,
             'property_path' => 'minElevation',
             'constraints' => [
-                new Assert\NotNull(),
-                new Assert\NotBlank(),
-                new Assert\GreaterThanOrEqual(0)
+                new Assert\NotNull(message: 'blank_min_elevation'),
+                new Assert\NotBlank(message: 'blank_min_elevation'),
+                new Assert\GreaterThanOrEqual(0, message: 'negative_min_elevation'),
+                new Assert\Type(type: IntegerType::class, message: 'invalid_min_elevation'),
             ]
         ]);
     }
@@ -45,3 +46,5 @@ class ActivityFormType extends AbstractType
         $resolver->setDefault('csrf_protection', false);
     }
 }
+
+// TEST: Tests should check for null values, blank values, negative values, string values, floating point values

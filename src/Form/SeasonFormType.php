@@ -12,33 +12,55 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class SeasonCreateFormType extends AbstractType
+class SeasonFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $method = $options['method'] ?? 'POST';
+
+        $required = match ($method) {
+            'POST', 'PUT' => true,
+            'PATCH' => false,
+        };
+
         $now = new DateTime();
         $now->setTime(0, 0, 0);
-        
+
         $builder->add('start', DateType::class, [
-            'constraints' => [
-                new Assert\NotBlank(null, 'blank_start', false),
+            'required' => $required,
+            'widget' => 'single_text',
+            'format' => 'yyyy-MM-dd',
+
+            'constraints' => ($required ? [
+                new Assert\NotBlank(message: 'blank_start'),
+                new Assert\NotNull(message: 'blank_start'),
+            ] : []) + [
                 new Assert\GreaterThanOrEqual($now)
             ],
-            'widget' => 'single_text',
-            'format' => 'yyyy-MM-dd',
         ]);
         $builder->add('end', DateType::class, [
-            'constraints' => [
-                new Assert\NotBlank(null, 'blank_end', false),
-                new Assert\GreaterThan(propertyPath: 'parent.all[start].data')
-            ],
+            'required' => $required,
             'widget' => 'single_text',
             'format' => 'yyyy-MM-dd',
+
+            'constraints' => ($required ? [
+                new Assert\NotBlank(message: 'blank_end'),
+                new Assert\NotNull(message: 'blank_end'),
+            ] : []) + [
+                new Assert\GreaterThan(propertyPath: 'parent.all[start].data')
+            ],
         ]);
 
         $builder->add('charity', EntityType::class, [
+            'required' => $required,
             'class' => Charity::class,
             'choice_label' => 'name',
+            'invalid_message' => 'invalid_charity',
+
+            'constraints' => ($required ? [
+                new Assert\NotBlank(message: 'blank_charity'),
+                new Assert\NotNull(message: 'blank_charity'),
+            ] : [])
         ]);
     }
 

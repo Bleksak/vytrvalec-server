@@ -3,6 +3,7 @@
 namespace App\Action;
 
 use App\Dto\SubmissionDto;
+use App\Dto\SubmissionStateDto;
 use App\Entity\RejectedSubmissionMessage;
 use App\Entity\Season;
 use App\Entity\Submission;
@@ -16,7 +17,6 @@ use App\Repository\ProfileCacheRepository;
 use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SubmissionRepository;
 use App\Repository\UserCacheRepository;
-use DateTime;
 use Imagick;
 use ImagickException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -89,52 +89,51 @@ class SubmissionActions
 
         return [];
     }
-
-    private function setState(Submission $submission, DateTime $lastUpdatedAt, bool $state): bool
-    {
-        if ($lastUpdatedAt !== $submission->getUpdatedAt()) {
-            return false;
-        }
-
-        $submission->setReviewed(true);
-        $submission->setAccepted($state);
-        $this->submissionRepository->save($submission, true);
-
-        return true;
-    }
     /**
      * @return array<int,string>
      */
-    public function accept(Submission $submission, DateTime $lastUpdatedAt): array
+    public function setState(Submission $submission, SubmissionStateDto $dto): array
     {
-        if (!$this->setState($submission, $lastUpdatedAt, false)) {
+        if ($dto->updatedAt !== $submission->getUpdatedAt()) {
             return ['mismatch_updated_at'];
         }
-        $this->profileCacheRepository->addCache($submission, true);
+
+        $submission->setReviewed(true);
+        $submission->setAccepted($dto->state);
+
+        if ($dto->state) {
+            $this->accept($submission);
+        } else {
+            $this->reject($submission, $dto->message);
+        }
+
+        $this->submissionRepository->save($submission, true);
 
         return [];
     }
     /**
      * @return array<int,string>
      */
-    public function reject(Submission $submission, DateTime $lastUpdatedAt, string $message): array
+    public function accept(Submission $submission): void
     {
-        if (!$this->setState($submission, $lastUpdatedAt, false)) {
-            return ['mismatch_updated_at'];
-        }
-
+        $this->profileCacheRepository->addCache($submission, false);
+    }
+    /**
+     * @return array<int,string>
+     */
+    public function reject(Submission $submission, string $message): void
+    {
         $this->rejectedSubmissionMessageRepository->save(new RejectedSubmissionMessage($submission, $message));
 
         $this->firebase->send(new VytrvalecNotification($submission->getUser(), $message));
         $this->mailer->send(new VytrvalecEmail($submission->getUser(), new SubmissionRejectedEmailTemplate($submission, $message)));
-
-        return [];
     }
 
     public function delete(Submission $submission): void
     {
         $this->submissionRepository->remove($submission, true);
     }
+
     /**
      * @return array<int,string>
      */

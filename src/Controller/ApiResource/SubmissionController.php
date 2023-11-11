@@ -9,11 +9,10 @@ use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use App\Form\SubmissionForm;
+use App\Form\SubmissionStateFormType;
 use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
-use DateMalformedStringException;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -307,79 +306,43 @@ class SubmissionController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/submission/{submission}/accept',
-        name: 'api_submission_accept',
-        methods: ['PUT'],
-        documentation: 'Accepts a <code>Submission</code> entity',
+        '/api/submission/{submission}/state',
+        name: 'api_submission_state',
+        methods: ['PATCH'],
+        documentation: 'Accepts/rejects a <code>Submission</code> entity',
         responses: [
             Response::HTTP_OK => [
-                'message' => 'Successfully accepted'
+                'message' => 'Successfully changed state'
             ],
             Response::HTTP_FORBIDDEN => [
                 'message' => 'Unauthorized access',
             ],
             Response::HTTP_BAD_REQUEST => [
-                'message' => 'Cannot accept'
-            ]
-        ]
-    )]
-    #[IsGranted('ROLE_STAFF')]
-    public function accept(Submission $submission, Request $request): Response
-    {
-        if ($submission->isReviewed()) {
-            return new Response(status: Response::HTTP_BAD_REQUEST);
-        }
-
-        try {
-            $updatedAt = new DateTime($request->getPayload()->get('updated_at'));
-        } catch (DateMalformedStringException) {
-            return $this->json(['errors' => ['mismatch_updated_at']], Response::HTTP_BAD_REQUEST);
-        }
-
-        $errors = $this->action->accept($submission, $updatedAt);
-        if (!empty($errors)) {
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
-        }
-
-
-        return new Response(status: Response::HTTP_OK);
-    }
-
-    #[ApiRoute(
-        '/api/submission/{submission}/reject',
-        name: 'api_submission_reject',
-        methods: ['PUT'],
-        documentation: 'Rejects a <code>Submission</code> entity',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully rejected'
-            ],
-            Response::HTTP_FORBIDDEN => [
-                'message' => 'Unauthorized access',
-            ],
-            Response::HTTP_BAD_REQUEST => [
-                'message' => 'Cannot reject'
+                'message' => 'Cannot set state (invalid values sent)'
             ]
         ],
         requestScheme: [
-            'message' => 'string',
             'updated_at' => 'datetime',
-        ]
+            'state' => 'bool',
+        ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function reject(Request $request, Submission $submission): Response
+    public function setState(Submission $submission, Request $request): Response
     {
-        if ($submission->isReviewed()) {
-            return new Response(status: Response::HTTP_BAD_REQUEST);
+        $form = $this->createForm(SubmissionStateFormType::class);
+        $form->submit($request->getPayload()->all());
+
+        if (!$form->isValid()) {
+            $errors = [];
+
+            foreach ($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
-        try {
-            $updatedAt = new DateTime($request->getPayload()->get('updated_at'));
-        } catch (DateMalformedStringException) {
-            return $this->json(['errors' => ['mismatch_updated_at']], Response::HTTP_BAD_REQUEST);
-        }
-
-        $errors = $this->action->reject($submission, $updatedAt, $request->getPayload()->get('message', ''));
+        $errors = $this->action->setState($submission, $form->getData());
         if (!empty($errors)) {
             return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
