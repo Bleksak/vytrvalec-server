@@ -63,11 +63,11 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private DateTimeInterface $date;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')]
     #[Groups(['fetchSubmission'])]
     private DateTimeInterface $updatedAt;
 
-    public function __construct(User $user, Activity $activity, Season $season, string $image, int $distance, ?int $elevation = null)
+    public function __construct(User $user, Activity $activity, Season $season, string $image, int $distance, int $elevation = 0)
     {
         $this->date = new DateTimeImmutable();
 
