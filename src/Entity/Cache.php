@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Dto\ActivityResultDto;
 use App\Repository\CacheRepository;
+use DateTimeInterface;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CacheRepository::class)]
@@ -17,6 +19,9 @@ class Cache
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private Season $season;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP')]
+    private DateTimeInterface $createdAt;
 
     #[ORM\Column]
     private array $data;
@@ -42,5 +47,10 @@ class Cache
     public function getData(): array
     {
         return $this->data;
+    }
+
+    public function getCreatedAt(): DateTimeInterface
+    {
+        return $this->createdAt;
     }
 }
