@@ -40,16 +40,6 @@ class ActivityRepository extends ServiceEntityRepository
         }
     }
 
-    public function findForSelect(): array
-    {
-        $activities = [];
-        foreach($this->findBy(['active' => true]) as $activity) {
-            $activities[$activity->getId()] = $activity->getName();
-        }
-
-        return $activities;
-    }
-
     public function submissionsCount(Activity $activity): int
     {
         return $this->createQueryBuilder('a')

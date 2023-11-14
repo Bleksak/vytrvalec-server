@@ -11,12 +11,11 @@ use Doctrine\ORM\EntityManagerInterface;
 class SeasonResult
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManagerInterface, 
+        private readonly EntityManagerInterface $entityManagerInterface,
         private readonly DailyDistanceExtraPoints $dailyDistanceExtraPoints,
         private readonly WeeklyDistanceExtraPoints $weeklyDistanceExtraPoints,
         private readonly WeeklyElevationExtraPoints $weeklyElevationExtraPoints,
-    )
-    {
+    ) {
     }
     /**
      * @return array<int,array<string,mixed>>
@@ -40,7 +39,7 @@ class SeasonResult
     }
 
     /**
-     * @return array<int,array>
+     * @return array<int,array<ActivityResultDto>>
      */
     public function calculate(Season $season): array
     {
@@ -49,11 +48,11 @@ class SeasonResult
 
         $extraPointsClasses = [$this->dailyDistanceExtraPoints, $this->weeklyDistanceExtraPoints, $this->weeklyElevationExtraPoints];
 
-        for($i = 0; $i < $weeks; ++$i) {
+        for ($i = 0; $i < $weeks; ++$i) {
             $weeklyResult = $this->calculateWeek($season, $i);
             $activities = [];
-            foreach($weeklyResult as $result) {
-                if(!array_key_exists($result['activity_id'], $activities)) {
+            foreach ($weeklyResult as $result) {
+                if (!array_key_exists($result['activity_id'], $activities)) {
                     $activities[$result['activity_id']] = [];
                 }
 
@@ -62,19 +61,19 @@ class SeasonResult
 
             $results[$i] = [];
 
-            foreach($activities as $activityId => $activity) {
+            foreach ($activities as $activityId => $activity) {
                 $results[$i][$activityId] = new ActivityResultDto($activityId, $activity);
             }
         }
 
-        foreach($extraPointsClasses as $cls) {
+        foreach ($extraPointsClasses as $cls) {
             $extras = $cls->calculate($season);
-            foreach($extras as $extra) {
+            foreach ($extras as $extra) {
                 $results[$cls->getWeek()][$extra['activity_id']]->extras[] = new ExtraPointsDto($extra['user_id'], $extra['faculty_id'], $cls->getUniqueName(), $extra['value'], $cls->reward());
             }
         }
 
-        for($i = 0; $i < $weeks; ++$i) {
+        for ($i = 0; $i < $weeks; ++$i) {
             $results[$i] = array_values($results[$i]);
         }
 
