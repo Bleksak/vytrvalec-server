@@ -35,7 +35,7 @@ class Submission
 
     #[ORM\Column(type: Types::BIGINT)]
     #[Groups(['fetchSubmission'])]
-    private string $elevation = '0';
+    private string $elevation;
 
     #[ORM\Column(type: Types::BIGINT)]
     #[Groups(['fetchSubmission'])]

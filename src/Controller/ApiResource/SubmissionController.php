@@ -34,6 +34,39 @@ class SubmissionController extends AbstractController
     }
 
     #[ApiRoute(
+        path: '/api/submission/{submission}',
+        name: 'api_submission_delete',
+        methods: ['DELETE'],
+        documentation: 'Deletes a <code>Submission</code> entity',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully deleted'
+            ],
+            Response::HTTP_FORBIDDEN => [
+                'message' => 'Unauthorized access',
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Cannot delete'
+            ]
+        ]
+    )]
+    #[IsGranted('ROLE_USER')]
+    public function delete(#[CurrentUser] User $user, Submission $submission): Response
+    {
+        if (!$user->hasRole('ROLE_STAFF') && $user !== $submission->getUser()) {
+            return new Response(status: Response::HTTP_FORBIDDEN);
+        }
+
+        if ($submission->isReviewed()) {
+            return new Response(status: Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->action->delete($submission);
+
+        return new Response(status: Response::HTTP_OK);
+    }
+
+    #[ApiRoute(
         '/api/submission',
         name: 'api_submission_create',
         methods: ['POST'],
@@ -272,38 +305,6 @@ class SubmissionController extends AbstractController
         return new Response(status: Response::HTTP_CREATED);
     }
 
-    #[ApiRoute(
-        '/api/submission/{submission}',
-        name: 'api_submission_delete',
-        methods: ['DELETE'],
-        documentation: 'Deletes a <code>Submission</code> entity',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully deleted'
-            ],
-            Response::HTTP_FORBIDDEN => [
-                'message' => 'Unauthorized access',
-            ],
-            Response::HTTP_BAD_REQUEST => [
-                'message' => 'Cannot delete'
-            ]
-        ]
-    )]
-    #[IsGranted('ROLE_USER')]
-    public function delete(#[CurrentUser] User $user, Submission $submission): Response
-    {
-        if (!$user->hasRole('ROLE_STAFF') && $user !== $submission->getUser()) {
-            return new Response(status: Response::HTTP_FORBIDDEN);
-        }
-
-        if ($submission->isReviewed()) {
-            return new Response(status: Response::HTTP_BAD_REQUEST);
-        }
-
-        $this->action->delete($submission);
-
-        return new Response(status: Response::HTTP_OK);
-    }
 
     #[ApiRoute(
         '/api/submission/{submission}/state',
