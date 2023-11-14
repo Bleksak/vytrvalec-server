@@ -63,7 +63,7 @@ class ExtraPoints
         return $this;
     }
 
-    public function getWeek()
+    public function getWeek(): int
     {
         return $this->week;
     }
