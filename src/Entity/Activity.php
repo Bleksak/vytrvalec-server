@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\ActivityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -29,17 +27,12 @@ class Activity
     #[Groups(['fetchSubmission', 'userProfile', 'fetchActivity'])]
     private int $minElevation;
 
-    #[ORM\OneToMany(mappedBy: 'faculty', targetEntity: FacultyCache::class)]
-    private Collection $facultyCaches;
-
     public function __construct(string $name, int $minElevation)
     {
-        $this->facultyCaches = new ArrayCollection();
-
         $this->name = $name;
         $this->minElevation = $minElevation;
     }
-    
+
     public function getId(): ?int
     {
         return $this->id;
@@ -73,16 +66,11 @@ class Activity
     {
         return $this->minElevation;
     }
-    
+
     public function setMinElevation(int $minElevation): self
     {
         $this->minElevation = $minElevation;
 
         return $this;
-    }
-
-    public function getFacultyCaches(): ?Collection
-    {
-        return $this->facultyCaches;
     }
 }

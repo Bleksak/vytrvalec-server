@@ -12,11 +12,9 @@ use App\Notifications\EmailTemplate\SubmissionRejectedEmailTemplate;
 use App\Notifications\Firebase\Firebase;
 use App\Notifications\VytrvalecEmail;
 use App\Notifications\VytrvalecNotification;
-use App\Repository\FacultyCacheRepository;
 use App\Repository\ProfileCacheRepository;
 use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SubmissionRepository;
-use App\Repository\UserCacheRepository;
 use Imagick;
 use ImagickException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -31,8 +29,6 @@ class SubmissionActions
         private readonly MailerInterface $mailer,
         private readonly SubmissionRepository $submissionRepository,
         private readonly RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository,
-        private readonly FacultyCacheRepository $facultyCacheRepository,
-        private readonly UserCacheRepository $userCacheRepository,
         private readonly ProfileCacheRepository $profileCacheRepository,
         private readonly ParameterBagInterface $parameterBag,
         private readonly Filesystem $fs,

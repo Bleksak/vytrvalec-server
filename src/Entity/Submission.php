@@ -53,16 +53,17 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private int $week;
 
-    #[ORM\ManyToOne(inversedBy: 'submission', fetch: 'EAGER')]
+    #[ORM\ManyToOne(fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission'])]
     private Activity $activity;
+
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Groups(['fetchSubmission'])]
     private DateTimeInterface $date;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Groups(['fetchSubmission'])]
     private DateTimeInterface $updatedAt;
 
