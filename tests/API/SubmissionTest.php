@@ -15,9 +15,9 @@ class SubmissionTest extends BaseTest
         $this->makeCharity();
         $this->makeSeason();
 
-        $uploadedFile = new UploadedFile(__DIR__ . '/huba.jpg', 'huba.jpg', test: true);
+        $uploadedFile = new UploadedFile(__DIR__ . '/houba.jpg', 'huba.jpg', test: true);
         $activities = $this->getEntityManager()->getRepository(Activity::class)->findAll();
-       
+
         $this->client->request('POST', '/api/submission', [
             "distance" => 100,
             "elevation" => 100,
