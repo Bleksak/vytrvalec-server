@@ -12,11 +12,19 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class BaseTest extends WebTestCase
 {
     protected static ?Application $application = null;
     protected KernelBrowser $client;
+
+    public function getUploadedFile(string $filename): UploadedFile
+    {
+        copy(__DIR__ . '/' . $filename, __DIR__ . '/' . $filename . '.tmp');
+        $file = new UploadedFile(__DIR__ . '/' . $filename . '.tmp', $filename, test: true);
+        return $file;
+    }
 
     /**
      * @throws \Exception
@@ -47,7 +55,7 @@ class BaseTest extends WebTestCase
             "faculty" => $faculty->getId(),
         ]);
 
-        if(!empty($roles)) {
+        if (!empty($roles)) {
             $user = $this->getEntityManager()->getRepository(User::class)->findOneBy(['email' => $email]);
             $user->setRoles($roles);
 
@@ -118,5 +126,4 @@ class BaseTest extends WebTestCase
 
         return self::$application;
     }
-
 }

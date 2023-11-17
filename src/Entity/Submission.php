@@ -63,7 +63,7 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private DateTimeInterface $date;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', updatable: false, insertable: false)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', updatable: false, insertable: false, generated: 'ALWAYS')]
     #[Groups(['fetchSubmission'])]
     private DateTimeInterface $updatedAt;
 

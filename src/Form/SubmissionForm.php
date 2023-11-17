@@ -66,6 +66,8 @@ class SubmissionForm extends AbstractType
         $builder->add('updated_at', DateTimeType::class, [
             'required' => $method === 'PATCH',
             'property_path' => 'updatedAt',
+            'widget' => 'single_text',
+            'input' => 'datetime_immutable',
             'constraints' => ($method === 'PATCH' ? [
                 new Assert\NotBlank(message: 'blank_updated_at'),
                 new Assert\NotNull(message: 'blank_updated_at'),

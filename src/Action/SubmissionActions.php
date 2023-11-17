@@ -90,7 +90,7 @@ class SubmissionActions
      */
     public function setState(Submission $submission, SubmissionStateDto $dto): array
     {
-        if ($dto->updatedAt !== $submission->getUpdatedAt()) {
+        if ($dto->updatedAt != $submission->getUpdatedAt()) {
             return ['mismatch_updated_at'];
         }
 
@@ -135,7 +135,7 @@ class SubmissionActions
      */
     public function update(Submission $submission, SubmissionDto $dto): array
     {
-        if ($submission->getUpdatedAt() !== $dto->updatedAt) {
+        if ($submission->getUpdatedAt() != $dto->updatedAt) {
             return ['mismatch_updated_at'];
         }
 

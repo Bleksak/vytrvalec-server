@@ -233,7 +233,7 @@ class SubmissionController extends AbstractController
         '/api/submission/{submission}',
         name: 'api_submission_edit',
         methods: ['PATCH'],
-        documentation: 'Creates a new <code>Submission</code> entity',
+        documentation: 'Edits a <code>Submission</code> entity',
         responses: [
             Response::HTTP_CREATED => [
                 'message' => 'Submission created successfully',
@@ -271,9 +271,8 @@ class SubmissionController extends AbstractController
             return $this->json(['errors' => 'submission_accepted'], Response::HTTP_BAD_REQUEST);
         }
 
-        /// 1. uzivatel da edit, admin vidi starou verzi
+        // 1. uzivatel da edit, admin vidi starou verzi
         // 2. chceme, aby admin dostal error, ze vidi starou verzi a musi to zkontrolvoat znovu
-
 
         if ($user !== $submission->getUser()) {
             return $this->json([], Response::HTTP_NOT_FOUND);

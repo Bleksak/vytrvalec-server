@@ -14,12 +14,12 @@ class SubmissionStateFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('createdAt', DateTimeType::class, [
+        $builder->add('updated_at', DateTimeType::class, [
             'required' => true,
-            'property_path' => 'created_at',
+            'property_path' => 'updatedAt',
             'constraints' => [
-                new Assert\NotBlank(message: 'blank_created_at'),
-                new Assert\NotNull(message: 'blank_created_at'),
+                new Assert\NotBlank(message: 'blank_updated_at'),
+                new Assert\NotNull(message: 'blank_updated_at'),
             ],
         ]);
 
