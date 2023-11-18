@@ -19,9 +19,9 @@ class CacheController extends AbstractController
 
     #[ApiRoute(
         '/api/cache/season/{season}',
-        name: 'api_season_index',
+        name: 'api_cache_season',
         methods: ['GET'],
-        documentation: 'Get all seasons',
+        documentation: 'Cache season results',
         responses: [
             Response::HTTP_CREATED => [
                 'message' => 'Successfully cached a season',
