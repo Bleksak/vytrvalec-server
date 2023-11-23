@@ -43,7 +43,7 @@ class API extends AbstractController
 
                 $classAttributes = $declaringClass->getAttributes(ApiResource::class);
 
-                if(!empty($classAttributes)) {
+                if (!empty($classAttributes)) {
                     $classArgs = $classAttributes[0]->getArguments();
                     $resourceName = $classArgs['resourceName'] ?? $classArgs[0];
                 } else {
@@ -52,7 +52,7 @@ class API extends AbstractController
 
                 $attrs = $method->getAttributes(ApiRoute::class);
 
-                if(empty($attrs)) continue;
+                if (empty($attrs)) continue;
 
                 $apiRouteAttribute = $attrs[0]->newInstance();
 
@@ -63,15 +63,14 @@ class API extends AbstractController
 
                 $scheme = $apiRouteAttribute->getRequestScheme();
                 $responses = $apiRouteAttribute->getResponses();
-                if($scheme !== null) {
+                if ($scheme !== null) {
                     $routes[$resourceName][$name]['scheme'] = $scheme;
                 }
 
-                if($responses !== null) {
+                if ($responses !== null) {
                     $routes[$resourceName][$name]['responses'] = $responses;
                 }
-            }
-            catch(ReflectionException) {
+            } catch (ReflectionException) {
             }
         }
 

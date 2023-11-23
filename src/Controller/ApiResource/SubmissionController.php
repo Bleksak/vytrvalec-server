@@ -140,7 +140,6 @@ class SubmissionController extends AbstractController
                 'response' => [
                     'pages' => 'integer',
                     'submissions' => 'array',
-                    'users' => 'array'
                 ]
             ]
         ]
@@ -149,7 +148,6 @@ class SubmissionController extends AbstractController
     public function listSeason(Season $season, int $page): Response
     {
         $limit = 50;
-        $users = $this->submissionRepository->findUsersBySeason($season, $page, $limit);
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
 
@@ -158,7 +156,6 @@ class SubmissionController extends AbstractController
                 [
                     'pages' => $pageCount,
                     'submissions' => $submissions,
-                    'users' => $users,
                 ],
                 null,
                 [
@@ -166,7 +163,6 @@ class SubmissionController extends AbstractController
                     AbstractNormalizer::CALLBACKS => [
                         'season' => fn ($object) => $object->getId(),
                         'activity' => fn ($object) => $object->getId(),
-                        'user' => fn ($object) => $object->getId(),
                         'faculty' => fn ($object) => $object->getId(),
                     ],
                 ]

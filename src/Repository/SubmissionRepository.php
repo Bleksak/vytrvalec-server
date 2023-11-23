@@ -47,17 +47,15 @@ class SubmissionRepository extends ServiceEntityRepository
     public function findAllByUser(User $user, int $page, int $limit): Paginator
     {
         $query = $this->createQueryBuilder('s')
-        ->select('s')
-        ->where('s.user = :userId')
+            ->select('s')
+            ->where('s.user = :userId')
 
-        ->setParameter('userId', $user->getId())
-        ;
+            ->setParameter('userId', $user->getId());
 
         $paginator = new Paginator($query);
         $paginator->getQuery()
-        ->setFirstResult(($page-1) * $limit)
-        ->setMaxResults($limit)
-        ;
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
 
         return $paginator;
     }
@@ -65,16 +63,15 @@ class SubmissionRepository extends ServiceEntityRepository
     public function findBySeason(Season $season, int $page, int $limit): Paginator
     {
         $query = $this->createQueryBuilder('s')
-        ->select('s')
-        ->where('s.season = :seasonId')
-        ->setParameter('seasonId', $season->getId())
-        ;
+            ->select('s')
+            ->where('s.season = :seasonId')
+            ->orderBy('s.date DESC')
+            ->setParameter('seasonId', $season->getId());
 
         $paginator = new Paginator($query);
         $paginator->getQuery()
-        ->setFirstResult(($page-1) * $limit)
-        ->setMaxResults($limit)
-        ;
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
 
         return $paginator;
     }
@@ -82,27 +79,25 @@ class SubmissionRepository extends ServiceEntityRepository
     public function findUsersBySeason(Season $season, int $page, int $limit): Paginator
     {
         $query = $this->getEntityManager()->createQueryBuilder()
-        ->select('u')
-        ->from(User::class, 'u')
-        ->join('u.submissions', 's')
-        ->where('s.season = :seasonId')
+            ->select('u')
+            ->from(User::class, 'u')
+            ->join('u.submissions', 's')
+            ->where('s.season = :seasonId')
 
-        ->setParameter('seasonId', $season->getId())
-        ->distinct()
-        ;
+            ->setParameter('seasonId', $season->getId())
+            ->distinct();
 
         $paginator = new Paginator($query);
         $paginator->getQuery()
-        ->setFirstResult(($page-1) * $limit)
-        ->setMaxResults($limit)
-        ;
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
 
         return $paginator;
     }
 
     /**
-    * @return array<int, Submission>
-    */
+     * @return array<int, Submission>
+     */
     public function findAcceptedInSeasonAndWeek(Season $season, int $week): array
     {
         // TODO: re-enable this
@@ -129,8 +124,7 @@ class SubmissionRepository extends ServiceEntityRepository
             ->setFetchMode(Submission::class, 'user', ClassMetadataInfo::FETCH_EAGER)
             ->setFetchMode(Submission::class, 'activity', ClassMetadataInfo::FETCH_EAGER)
             ->setFetchMode(User::class, 'faculty', ClassMetadataInfo::FETCH_EAGER)
-            ->execute()
-        ;
+            ->execute();
     }
 
     public function findUnreviewedInSeason(Season $season): array
@@ -144,14 +138,14 @@ class SubmissionRepository extends ServiceEntityRepository
         $distance = [];
         $increment = 1;
 
-        while($index < sizeof($submissions) ) {
-            if($submissions[$index]->getDate()->diff($day)->days != 0) {
+        while ($index < sizeof($submissions)) {
+            if ($submissions[$index]->getDate()->diff($day)->days != 0) {
                 $increment = 0;
                 break;
             }
 
             $submission = $submissions[$index];
-            if(!array_key_exists($submission->getUser()->getId(), $distance)) {
+            if (!array_key_exists($submission->getUser()->getId(), $distance)) {
                 $distance[$submission->getUser()->getId()] = 0;
             }
 
@@ -163,12 +157,12 @@ class SubmissionRepository extends ServiceEntityRepository
         $users = [];
         $maxDistance = 0;
 
-        foreach($distance as $user => $value) {
-            if($value === $maxDistance) {
+        foreach ($distance as $user => $value) {
+            if ($value === $maxDistance) {
                 $users[] = $user;
             }
 
-            if($value > $maxDistance) {
+            if ($value > $maxDistance) {
                 $maxDistance = $value;
                 $users = [$user];
             }
@@ -190,7 +184,7 @@ class SubmissionRepository extends ServiceEntityRepository
          */
         $submissions = $this->findBy(['season' => $season, 'week' => $week, 'activity' => $activity, 'accepted' => true], orderBy: ['date' => 'ASC']);
 
-        if(empty($submissions)) {
+        if (empty($submissions)) {
             return [];
         }
 
@@ -199,7 +193,7 @@ class SubmissionRepository extends ServiceEntityRepository
         $currentMax = 0;
         $currentUsers = [];
 
-        while($index !== null) {
+        while ($index !== null) {
             $day = $submissions[$index]?->getDate();
             $result = $this->getDailyMax($submissions, $day, $index);
 
@@ -207,17 +201,17 @@ class SubmissionRepository extends ServiceEntityRepository
             $distance = $result['distance'];
             $users = $result['users'];
 
-            if($distance === $currentMax) {
+            if ($distance === $currentMax) {
                 $currentUsers = array_merge($currentUsers, $users);
             }
 
-            if($distance > $currentMax) {
+            if ($distance > $currentMax) {
                 $currentMax = $distance;
                 $currentUsers = $users;
             }
         }
 
-        return array_map(fn($user) => [
+        return array_map(fn ($user) => [
             'user' => $user,
             'distance' => $currentMax,
             'activity' => $activity->getId()
