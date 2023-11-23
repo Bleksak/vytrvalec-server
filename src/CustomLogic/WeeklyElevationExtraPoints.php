@@ -26,13 +26,13 @@ class WeeklyElevationExtraPoints implements ExtraPoints
         $query = $this->entityManagerInterface->getConnection()->prepare('
             SELECT MAX(elevation_sum) as value, activity_id, user_id, faculty_id
                 FROM (
-                    SELECT SUM(s.elevation) as elevation_sum, s.activity_id as activity_id, s.user_id as user_id, u.faculty_id as faculty_id
+                    SELECT SUM(s.elevation) as elevation_sum, a.min_elevation, s.activity_id as activity_id, s.user_id as user_id, u.faculty_id as faculty_id
                         FROM submission s
                         INNER JOIN user u ON s.user_id = u.id
                         INNER JOIN activity a ON s.activity_id = a.id
                         WHERE s.week = ? AND s.accepted = ? AND s.season_id = ?
                         GROUP BY s.date, s.user_id, s.activity_id
-                        HAVING(elevation_sum) > a.min_elevation
+                        HAVING(elevation_sum) >= min_elevation
                 ) as sums
             GROUP BY activity_id;
         ');
