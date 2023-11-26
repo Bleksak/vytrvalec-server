@@ -49,7 +49,7 @@ class SubmissionRepository extends ServiceEntityRepository
         $query = $this->createQueryBuilder('s')
             ->select('s')
             ->where('s.user = :userId')
-
+            ->orderBy('s.date DESC')
             ->setParameter('userId', $user->getId());
 
         $paginator = new Paginator($query);

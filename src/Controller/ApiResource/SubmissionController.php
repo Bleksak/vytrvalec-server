@@ -217,7 +217,7 @@ class SubmissionController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function unresolvedList(Season $season): Response
     {
-        return $this->json($this->normalizer->normalize($this->submissionRepository->findBy(['season' => $season, 'reviewed' => false]), null, [
+        return $this->json($this->normalizer->normalize($this->submissionRepository->findBy(['season' => $season, 'reviewed' => false], ['date' => 'ASC']), null, [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
                 return $object->getId();
             },
@@ -320,6 +320,7 @@ class SubmissionController extends AbstractController
         requestScheme: [
             'updated_at' => 'datetime',
             'state' => 'bool',
+            'message' => '?string'
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
