@@ -24,17 +24,26 @@ class WeeklyElevationExtraPoints implements ExtraPoints
     public function calculate(Season $season): array
     {
         $query = $this->entityManagerInterface->getConnection()->prepare('
-            SELECT MAX(elevation_sum) as value, activity_id, user_id, faculty_id
-                FROM (
-                    SELECT SUM(s.elevation) as elevation_sum, a.min_elevation, s.activity_id as activity_id, s.user_id as user_id, u.faculty_id as faculty_id
-                        FROM submission s
-                        INNER JOIN user u ON s.user_id = u.id
-                        INNER JOIN activity a ON s.activity_id = a.id
-                        WHERE s.week = ? AND s.accepted = ? AND s.season_id = ?
-                        GROUP BY s.date, s.user_id, s.activity_id
-                        HAVING(elevation_sum) >= min_elevation
-                ) as sums
-            GROUP BY activity_id;
+            WITH
+                sub AS (
+                    SELECT SUM(s.elevation) as value, a.min_elevation s.activity_id as activity_id, s.user_id as user_id, s.date
+                    FROM submission s
+                    INNER JOIN activity a ON s.activity_id = a.id
+                    WHERE s.week = ? AND s.accepted = ? AND s.season_id = ?
+                    GROUP BY s.date, s.user_id, s.activity_id
+                    HAVING(value) >= min_elevation
+                ),
+                sorted AS (
+                    SELECT *, ROW_NUMBER() OVER (
+                    PARTITION BY activity_id
+                        ORDER BY value DESC
+                    )
+                    AS row_num
+                    FROM sub
+                )
+            SELECT value, activity_id, user_id, faculty_id FROM sorted s
+            INNER JOIN user u ON u.id = s.user_id
+            WHERE s.row_num = 1
         ');
 
         $query->bindValue(1, self::getWeek());

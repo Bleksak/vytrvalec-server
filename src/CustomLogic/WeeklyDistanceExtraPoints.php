@@ -19,15 +19,25 @@ class WeeklyDistanceExtraPoints implements ExtraPoints
     public function calculate(Season $season): array
     {
         $query = $this->entityManagerInterface->getConnection()->prepare('
-            SELECT MAX(distance_sum) as value, activity_id, user_id, faculty_id
-                FROM (
-                    SELECT SUM(s.distance) as distance_sum, s.activity_id as activity_id, s.user_id as user_id, u.faculty_id as faculty_id
-                        FROM submission s
-                        INNER JOIN user u ON u.id = s.user_id
-                        WHERE s.week = ? AND s.accepted = ? AND s.season_id = ?
-                        GROUP BY s.date, s.user_id, s.activity_id
-                ) as sums
-                GROUP BY activity_id;
+            WITH
+                sub AS (
+                    SELECT SUM(s.distance) as value, s.activity_id as activity_id, s.user_id as user_id
+                    FROM submission s
+                    WHERE s.week = ? AND s.accepted = ? AND s.season_id = ?
+                    GROUP BY s.user_id, s.activity_id
+                ),
+                sorted AS (
+                    SELECT *, ROW_NUMBER() OVER (
+                    PARTITION BY activity_id
+                        ORDER BY value DESC
+                    )
+                    AS row_num
+                    FROM sub
+                )
+            SELECT value, activity_id, user_id, faculty_id
+            FROM sorted s
+            INNER JOIN user u ON u.id = s.user_id
+            WHERE s.row_num = 1
         ');
 
         $query->bindValue(1, self::getWeek());
