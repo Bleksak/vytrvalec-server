@@ -59,7 +59,7 @@ class Submission
     private Activity $activity;
 
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Groups(['fetchSubmission'])]
     private DateTimeInterface $date;
 

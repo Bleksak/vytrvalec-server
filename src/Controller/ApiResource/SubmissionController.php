@@ -145,7 +145,7 @@ class SubmissionController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function listSeason(Season $season, int $page): Response
+    public function listSeason(Season $season, int $page = 1): Response
     {
         $limit = 50;
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
@@ -195,7 +195,6 @@ class SubmissionController extends AbstractController
 
         return $this->json($this->normalizer->normalize(['nextPage' => $nextPage, 'submissions' => $submissions, 'rejectedSubmissions' => $rejectedSubmissions], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['faculty', 'user'],
             AbstractNormalizer::CALLBACKS => [
                 'season' => fn ($object) => $object->getId(),
                 'activity' => fn ($object) => $object->getId(),

@@ -3,6 +3,7 @@
 namespace App\Tests\API;
 
 use App\Entity\Activity;
+use App\Entity\Season;
 use App\Entity\Submission;
 use App\Test\BaseTest;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -63,5 +64,42 @@ class SubmissionTest extends BaseTest
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+    }
+
+    public function testOrdering(): void
+    {
+        $this->grantRole(['ROLE_STAFF']);
+        $this->makeCharity();
+        $this->makeSeason();
+
+        $uploadedFile = $this->getUploadedFile('houba.jpg');
+        $activities = $this->getEntityManager()->getRepository(Activity::class)->findAll();
+
+        $this->client->request('POST', '/api/submission', [
+            "distance" => 100,
+            "elevation" => 100,
+            "activity" => $activities[0]->getId(),
+        ], [
+            'image' => $uploadedFile
+        ]);
+
+        $uploadedFile = $this->getUploadedFile('houba.jpg');
+        sleep(1);
+
+        $this->client->request('POST', '/api/submission', [
+            "distance" => 100,
+            "elevation" => 100,
+            "activity" => $activities[0]->getId(),
+        ], [
+            'image' => $uploadedFile
+        ]);
+
+
+        $currentSeason = $this->getEntityManager()->getRepository(Season::class)->getCurrent();
+
+        $this->client->request('GET', '/api/submission/list/'.$currentSeason->getId().'/1');
+        $response = json_decode($this->client->getResponse()->getContent())->submissions;
+
+        $this->assertTrue($response[0]->date > $response[1]->date, 'Submission ordering is incorrect');
     }
 }
