@@ -2,11 +2,11 @@
 
 namespace App\Dto;
 
-use DateTime;
+use DateTimeImmutable;
 
 class SubmissionStateDto
 {
-    public ?DateTime $updatedAt = null;
+    public ?DateTimeImmutable $updatedAt = null;
     public ?bool $state = null;
     public string $message;
 }

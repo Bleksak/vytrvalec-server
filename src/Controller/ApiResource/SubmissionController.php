@@ -252,7 +252,7 @@ class SubmissionController extends AbstractController
             'elevation' => 'integer',
             'image' => 'file',
             'activity' => 'integer',
-            'updated_at' => 'date'
+            'updated_at' => 'datetime'
         ]
     )]
     #[IsGranted('ROLE_USER')]
@@ -267,7 +267,7 @@ class SubmissionController extends AbstractController
         }
 
         // 1. uzivatel da edit, admin vidi starou verzi
-        // 2. chceme, aby admin dostal error, ze vidi starou verzi a musi to zkontrolvoat znovu
+        // 2. chceme, aby admin dostal error, ze vidi starou verzi a musi to zkontrolovat znovu
 
         if ($user !== $submission->getUser()) {
             return $this->json([], Response::HTTP_NOT_FOUND);

@@ -64,6 +64,18 @@ class SubmissionTest extends BaseTest
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+
+        $this->client->request(
+            'PATCH',
+            '/api/submission/'.$submission->getId().'/state',
+            [
+                'updated_at' => $submission->getUpdatedAt()->format('Y-m-d H:i:s'),
+                'state' => true,
+                'message' => '',
+            ]
+        );
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
     }
 
     public function testOrdering(): void
