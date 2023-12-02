@@ -43,7 +43,9 @@ class SubmissionRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
+    /**
+     * @return Paginator<<missing>>
+     */
     public function findAllByUser(User $user, int $page, int $limit): Paginator
     {
         $query = $this->createQueryBuilder('s')
@@ -59,7 +61,9 @@ class SubmissionRepository extends ServiceEntityRepository
 
         return $paginator;
     }
-
+    /**
+     * @return Paginator<<missing>>
+     */
     public function findBySeason(Season $season, int $page, int $limit): Paginator
     {
         $query = $this->createQueryBuilder('s')
@@ -106,5 +110,22 @@ class SubmissionRepository extends ServiceEntityRepository
             ->setFetchMode(Submission::class, 'activity', ClassMetadataInfo::FETCH_EAGER)
             ->setFetchMode(User::class, 'faculty', ClassMetadataInfo::FETCH_EAGER)
             ->execute();
+    }
+
+    /**
+     * @return array<int,array<string,mixed>>
+     */
+    public function getTotalStatistics(): array
+    {
+        $query = $this->getEntityManager()->getConnection()->prepare('
+            SELECT a.name as activity, sub.distance as distance(
+                SELECT s.activity_id as activity_id, SUM(s.distance) as distance
+                FROM submission s
+                WHERE s.accepted = 1
+            ) sub
+            INNER JOIN activity a ON a.id = sub.activity_id;
+        ');
+
+        return $query->executeQuery()->fetchAllAssociative();
     }
 }
