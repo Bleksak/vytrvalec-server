@@ -34,8 +34,7 @@ class SubmissionForm extends AbstractType
         $builder->add('distance', IntegerType::class, [
             'required' => $required,
             'constraints' => ($required ? [
-                new Assert\NotBlank(message: 'blank_distance'),
-                new Assert\NotNull(message: 'blank_distance'),
+                new Assert\NotBlank(message: 'blank_distance', allowNull: false),
             ] : []) + [
                 new Assert\GreaterThanOrEqual(0, message: 'negative_distance'),
             ],
@@ -44,8 +43,7 @@ class SubmissionForm extends AbstractType
         $builder->add('image', FileType::class, [
             'required' => $required,
             'constraints' => ($required ? [
-                new Assert\NotBlank(message: 'blank_image'),
-                new Assert\NotNull(message: 'blank_image'),
+                new Assert\NotBlank(message: 'blank_image', allowNull: false),
             ] : []) + [
                 new Assert\Image(mimeTypesMessage: 'bad_image'),
             ],
@@ -58,8 +56,7 @@ class SubmissionForm extends AbstractType
             'invalid_message' => 'invalid_activity',
 
             'constraints' => ($required ? [
-                new Assert\NotBlank(message: 'blank_activity'),
-                new Assert\NotNull(message: 'blank_activity'),
+                new Assert\NotBlank(message: 'blank_activity', allowNull: false),
             ] : []),
         ]);
 
@@ -69,8 +66,7 @@ class SubmissionForm extends AbstractType
             'widget' => 'single_text',
             'input' => 'datetime_immutable',
             'constraints' => ($method === 'PATCH' ? [
-                new Assert\NotBlank(message: 'blank_updated_at'),
-                new Assert\NotNull(message: 'blank_updated_at'),
+                new Assert\NotBlank(message: 'blank_updated_at', allowNull: false),
             ] : []),
         ]);
     }

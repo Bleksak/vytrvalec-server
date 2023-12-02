@@ -23,8 +23,7 @@ class ActivityFormType extends AbstractType
         $builder->add('name', TextType::class, [
             'required' => $required,
             'constraints' => [
-                new Assert\NotNull(message: 'blank_name'),
-                new Assert\NotBlank(message: 'blank_name'),
+                new Assert\NotBlank(message: 'blank_name', allowNull: false),
             ]
         ]);
 
@@ -32,8 +31,7 @@ class ActivityFormType extends AbstractType
             'required' => $required,
             'property_path' => 'minElevation',
             'constraints' => [
-                new Assert\NotNull(message: 'blank_min_elevation'),
-                new Assert\NotBlank(message: 'blank_min_elevation'),
+                new Assert\NotBlank(message: 'blank_min_elevation', allowNull: false),
                 new Assert\GreaterThanOrEqual(0, message: 'negative_min_elevation'),
                 new Assert\Type(type: IntegerType::class, message: 'invalid_min_elevation'),
             ]

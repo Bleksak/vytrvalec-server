@@ -20,40 +20,35 @@ class UserCreateFormType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'constraints' => [
-                    new Assert\NotBlank(message: 'blank_email'),
-                    new Assert\NotNull(message: 'blank_email'),
-                    new Assert\Email(message: 'bad_email'),
+                    new Assert\NotBlank(message: 'blank', allowNull: false),
+                    new Assert\Email(message: 'invalid'),
                 ]
             ])
             ->add('first_name', TextType::class, [
                 'property_path' => 'firstName',
                 'constraints' => [
-                    new Assert\NotBlank(message: 'blank_first_name'),
-                    new Assert\NotNull(message: 'blank_first_name'),
+                    new Assert\NotBlank(message: 'blank', allowNull: false),
                 ]
             ])
             ->add('last_name', TextType::class, [
                 'property_path' => 'lastName',
                 'constraints' => [
-                    new Assert\NotBlank(message: 'blank_last_name'),
-                    new Assert\NotNull(message: 'blank_last_name'),
+                    new Assert\NotBlank(message: 'blank', allowNull: false),
                 ]
             ])
             ->add('password', PasswordType::class, [
                 'constraints' => [
-                    new Assert\NotBlank(message: 'blank_password', allowNull: false),
-                    new Assert\NotNull(message: 'blank_password'),
-                    new Assert\PasswordStrength(message: 'weak_password', minScore: 2),
+                    new Assert\NotBlank(message: 'blank', allowNull: false),
+                    new Assert\PasswordStrength(message: 'weak', minScore: 2),
                 ]
             ])
             ->add('faculty', EntityType::class, [
                 'class' => Faculty::class,
                 'choice_filter' => 'visible',
                 'required' => true,
-                'invalid_message' => 'invalid_faculty',
+                'invalid_message' => 'invalid',
                 'constraints' => [
-                    new Assert\NotBlank(message: 'invalid_faculty', allowNull: false),
-                    new Assert\NotNull(message: 'invalid_faculty'),
+                    new Assert\NotBlank(message: 'invalid', allowNull: false),
                 ]
             ]);
     }

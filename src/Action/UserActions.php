@@ -24,11 +24,11 @@ class UserActions
     {
         $user = new User($dto->email, $dto->firstName, $dto->lastName, $dto->faculty); 
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
-        
+
         try {
             $this->userRepository->save($user, true);
         } catch(UniqueConstraintViolationException $e) {
-            return ['not_unique_email'];
+            return ['email' => ['not_unique']];
         }
 
         return [];

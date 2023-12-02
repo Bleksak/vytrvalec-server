@@ -8,6 +8,7 @@ use App\Attributes\ApiRoute;
 use App\Entity\User;
 use App\Form\UserCreateFormType;
 use App\Repository\UserRepository;
+use App\Validation\FormErrors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -225,29 +226,22 @@ class UserController extends AbstractController
     public function register(Request $request): Response
     {
         if ($this->isGranted('ROLE_USER')) {
-            return $this->json([
-                // TODO: message
-                'TODO: nelze registrovat protoze uz je prihlasenej'
-            ], Response::HTTP_BAD_REQUEST);
+            return $this->json(['auth' => ['logged_in']], Response::HTTP_BAD_REQUEST);
         }
 
         $form = $this->createForm(UserCreateFormType::class);
         $form->submit($request->getPayload()->all());
 
-        if (!$form->isValid()) {
-            $errors = [];
+        $errors = FormErrors::collect($form);
 
-            foreach ($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        if(!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $errors = $this->action->create($form->getData());
 
         if (!empty($errors)) {
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         return new Response(status: Response::HTTP_CREATED);
