@@ -117,10 +117,12 @@ class SubmissionRepository extends ServiceEntityRepository
     public function getTotalStatistics(): array
     {
         $query = $this->getEntityManager()->getConnection()->prepare('
-            SELECT a.name as activity, sub.distance as distance(
+            SELECT a.name as activity, sub.distance as distance
+            FROM (
                 SELECT s.activity_id as activity_id, SUM(s.distance) as distance
                 FROM submission s
                 WHERE s.accepted = 1
+                GROUP BY s.activity_id
             ) sub
             INNER JOIN activity a ON a.id = sub.activity_id;
         ');
