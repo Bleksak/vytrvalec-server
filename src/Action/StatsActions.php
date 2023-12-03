@@ -20,11 +20,11 @@ class StatsActions
     public function getTotalStatistics(): array
     {
         $users = $this->userRepository->getActiveUsersCount();
-        $submissions = $this->submissionRepository->getTotalStatistics();
+        $activities = $this->submissionRepository->getTotalStatistics();
 
         return [
             'users' => $users,
-            'submissions' => $submissions
+            'activities' => $activities
         ];
     }
 }
