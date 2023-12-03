@@ -24,7 +24,7 @@ class StatsController extends AbstractController {
     #[ApiRoute(
         '/api/stats',
         name: 'stats_index',
-        methods: ['PATCH'],
+        methods: ['GET'],
         documentation: 'Retrieve overall statistics',
         responses: [
             Response::HTTP_OK => [
