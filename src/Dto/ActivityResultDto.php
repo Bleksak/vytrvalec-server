@@ -11,7 +11,6 @@ class ActivityResultDto
 
     /**
      * @param array<int, FacultyResultDto> $results
-     * @param array<int, ExtraPointsDto> $extras
      **/
     public function __construct(
         public readonly int $activity,

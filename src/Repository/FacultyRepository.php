@@ -38,40 +38,4 @@ class FacultyRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
-    public function findForSelect(): array
-    {
-        $faculties = [];
-
-        foreach($this->findBy(['visible' => true]) as $faculty) {
-            $faculties[$faculty->getId()] = $faculty->getShortcut();
-        }
-
-        return $faculties;
-    }
-
-//    /**
-//     * @return Faculty[] Returns an array of Faculty objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('f')
-//            ->andWhere('f.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('f.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Faculty
-//    {
-//        return $this->createQueryBuilder('f')
-//            ->andWhere('f.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

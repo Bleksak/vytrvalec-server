@@ -42,7 +42,9 @@ class BaseTest extends WebTestCase
     {
         return $this->client->getContainer()->get(EntityManagerInterface::class);
     }
-
+    /**
+     * @param array<int,mixed> $roles
+     */
     protected function createUser(string $email, string $password, array $roles = []): void
     {
         $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
@@ -71,7 +73,9 @@ class BaseTest extends WebTestCase
             'password' => $password
         ]);
     }
-
+    /**
+     * @param array<int, string> $role
+     */
     protected function grantRole(array $role = []): void
     {
         $testUser = 'TestUser@TestUser.com';
@@ -110,7 +114,7 @@ class BaseTest extends WebTestCase
     /**
      * @throws \Exception
      */
-    protected static function runCommand($command): void
+    protected static function runCommand(string $command): void
     {
         $command = sprintf('%s --quiet', $command);
         self::getApplication()->run(new StringInput($command));

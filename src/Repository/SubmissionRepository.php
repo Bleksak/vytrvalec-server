@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Activity;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -44,7 +43,7 @@ class SubmissionRepository extends ServiceEntityRepository
         }
     }
     /**
-     * @return Paginator<<missing>>
+     * @return Paginator<Submission>
      */
     public function findAllByUser(User $user, int $page, int $limit): Paginator
     {
@@ -62,7 +61,7 @@ class SubmissionRepository extends ServiceEntityRepository
         return $paginator;
     }
     /**
-     * @return Paginator<<missing>>
+     * @return Paginator<Submission>
      */
     public function findBySeason(Season $season, int $page, int $limit): Paginator
     {

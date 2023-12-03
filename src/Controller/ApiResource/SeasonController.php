@@ -100,7 +100,7 @@ class SeasonController extends AbstractController
     public function current(): Response
     {
         $season = $this->seasonRepository->getCurrent();
-        if ($season === false) {
+        if ($season === null) {
             return $this->json([], Response::HTTP_NOT_FOUND);
         }
 

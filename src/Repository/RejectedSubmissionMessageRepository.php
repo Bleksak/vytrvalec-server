@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Activity;
-use App\Entity\Faculty;
 use App\Entity\RejectedSubmissionMessage;
 use App\Entity\Submission;
 use App\Entity\User;
