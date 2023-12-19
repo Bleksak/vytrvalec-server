@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Dto\FacultyDto;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -37,7 +37,7 @@ class FacultyFormType extends AbstractType
             ] : []
         ]);
 
-        $builder->add('visible', CheckboxType::class, [
+        $builder->add('visible', HiddenType::class, [
             'required' => false,
             'empty_data' => match ($method) {
                 'POST', 'PUT' => true,
