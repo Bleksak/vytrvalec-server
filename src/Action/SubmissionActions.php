@@ -112,6 +112,12 @@ class SubmissionActions
      */
     public function accept(Submission $submission): void
     {
+        $rejectedSubmission = $this->rejectedSubmissionMessageRepository->find($submission->getId());
+
+        if($rejectedSubmission !== null) {
+            $this->rejectedSubmissionMessageRepository->remove($rejectedSubmission);
+        }
+
         $this->profileCacheRepository->addCache($submission, false);
     }
     /**
@@ -158,6 +164,12 @@ class SubmissionActions
 
         if ($dto->activity !== null) {
             $submission->setActivity($dto->activity);
+        }
+
+        $rejectedSubmission = $this->rejectedSubmissionMessageRepository->find($submission->getId());
+
+        if($rejectedSubmission !== null) {
+            $this->rejectedSubmissionMessageRepository->remove($rejectedSubmission);
         }
 
         $this->submissionRepository->save($submission, true);

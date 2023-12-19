@@ -193,12 +193,13 @@ class SubmissionController extends AbstractController
         $pageCount = 1 + intdiv($submissions->count(), $limit);
         $nextPage = ($page + 1) > $pageCount ? null : $page + 1;
 
-        return $this->json($this->normalizer->normalize(['nextPage' => $nextPage, 'submissions' => $submissions, 'rejectedSubmissions' => $rejectedSubmissions], null, [
+        return $this->json($this->normalizer->normalize([
+            'nextPage' => $nextPage,
+            'submissions' => $submissions,
+            'rejectedSubmissions' => $rejectedSubmissions
+        ], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
-            AbstractNormalizer::CALLBACKS => [
-                'season' => fn ($object) => $object->getId(),
-                'activity' => fn ($object) => $object->getId(),
-            ]
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
         ]));
     }
 
