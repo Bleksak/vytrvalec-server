@@ -127,7 +127,10 @@ class SubmissionActions
     {
         $this->rejectedSubmissionMessageRepository->save(new RejectedSubmissionMessage($submission, $message));
 
-        $this->firebase->send(new VytrvalecNotification($submission->getUser(), $message));
+        if($submission->getUser()->getToken() !== null) {
+            $this->firebase->send(new VytrvalecNotification($submission->getUser(), $message));
+        }
+
         $this->mailer->send(new VytrvalecEmail($submission->getUser(), new SubmissionRejectedEmailTemplate($submission, $message)));
     }
 

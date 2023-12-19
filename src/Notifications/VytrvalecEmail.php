@@ -14,7 +14,7 @@ class VytrvalecEmail extends TemplatedEmail
 
         // TODO: use env for the mail
         $this
-            ->from(new Address('vytrvale@ntis.zcu.cz'), 'Měsíční vytrvalec')
+            ->from(new Address('vytrvale@ntis.zcu.cz', 'Měsíční Vytrvalec'))
             ->to($recipient->getEmail())
             ->subject($template->getSubject())
             ->htmlTemplate($template->getTemplate())
