@@ -27,25 +27,25 @@ class SubmissionForm extends AbstractType
         $builder->add('elevation', IntegerType::class, [
             'required' => false,
             'constraints' => [
-                new Assert\GreaterThanOrEqual(0, message: 'negative_elevation'),
+                new Assert\GreaterThanOrEqual(0, message: 'negative'),
             ],
         ]);
 
         $builder->add('distance', IntegerType::class, [
             'required' => $required,
             'constraints' => ($required ? [
-                new Assert\NotBlank(message: 'blank_distance', allowNull: false),
+                new Assert\NotBlank(message: 'blank', allowNull: false),
             ] : []) + [
-                new Assert\GreaterThanOrEqual(0, message: 'negative_distance'),
+                new Assert\GreaterThanOrEqual(1, message: 'negative'),
             ],
         ]);
 
         $builder->add('image', FileType::class, [
             'required' => $required,
             'constraints' => ($required ? [
-                new Assert\NotBlank(message: 'blank_image', allowNull: false),
+                new Assert\NotBlank(message: 'blank', allowNull: false),
             ] : []) + [
-                new Assert\Image(mimeTypesMessage: 'bad_image'),
+                new Assert\Image(mimeTypesMessage: 'invalid', maxSize: '4M', maxSizeMessage: 'too_large'),
             ],
         ]);
 
@@ -53,10 +53,10 @@ class SubmissionForm extends AbstractType
             'required' => $required,
             'class' => Activity::class,
             'choice_label' => 'name',
-            'invalid_message' => 'invalid_activity',
+            'invalid_message' => 'invalid',
 
             'constraints' => ($required ? [
-                new Assert\NotBlank(message: 'blank_activity', allowNull: false),
+                new Assert\NotBlank(message: 'blank', allowNull: false),
             ] : []),
         ]);
 
@@ -66,7 +66,7 @@ class SubmissionForm extends AbstractType
             'widget' => 'single_text',
             'input' => 'datetime_immutable',
             'constraints' => ($method === 'PATCH' ? [
-                new Assert\NotBlank(message: 'blank_updated_at', allowNull: false),
+                new Assert\NotBlank(message: 'blank', allowNull: false),
             ] : []),
         ]);
     }
