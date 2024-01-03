@@ -157,7 +157,7 @@ class UserController extends AbstractController
             Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
         ],
     )]
-    public function userData(#[CurrentUser] User $currentUser, User $user = null): Response
+    public function userData(#[CurrentUser] User $currentUser, User $user): Response
     {
         if (!$this->isGranted('ROLE_STAFF')) {
             $user = $currentUser;
@@ -191,14 +191,15 @@ class UserController extends AbstractController
                     ]
                 ]
             ],
-            Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
+            Response::HTTP_UNAUTHORIZED => ['message' => 'Unauthorized access'],
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function userList(): Response
     {
         return $this->json($this->normalizer->normalize($this->userRepository->findAll(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
+            AbstractNormalizer::GROUPS => ['fetchUser'],
+            // AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
         ]));
     }
 
