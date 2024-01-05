@@ -7,6 +7,8 @@ use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
 use App\Entity\User;
 use App\Form\UserCreateFormType;
+use App\Form\UserEditFormType;
+use App\Form\UserPasswordFormType;
 use App\Repository\UserRepository;
 use App\Validation\FormErrors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -246,5 +248,95 @@ class UserController extends AbstractController
         }
 
         return new Response(status: Response::HTTP_CREATED);
+    }
+
+    #[ApiRoute(
+        '/api/user/{user}',
+        name: 'api_user_patch',
+        methods: ['PATCH'],
+        documentation: 'Updates a <code>User</code> entity',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'User successfully edited',
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Bad request',
+            ],
+            Response::HTTP_FORBIDDEN => [
+                'message' => 'Forbidden access',
+            ],
+        ],
+        requestScheme: [
+            'email?' => 'string',
+            'password?' => 'string',
+            'first_name?' => 'string',
+            'last_name?' => 'string',
+            'faculty?' => 'integer'
+        ],
+    )]
+    #[IsGranted('ROLE_USER')]
+    public function update(Request $request, User $user = null, #[CurrentUser] User $currentUser): Response
+    {
+        // either the user is admin trying to edit other users data
+        // or the user is trying to edit his own data
+
+        if (!$this->isGranted('ROLE_STAFF') && $currentUser->getId() !== $user->getId()) {
+            return $this->json(status: Response::HTTP_FORBIDDEN);
+        }
+
+        if ($user === null) {
+            $user = $currentUser;
+        }
+
+        $form = $this->createForm(UserEditFormType::class);
+        $form->submit($request->getPayload()->all());
+
+        $errors = FormErrors::collect($form);
+
+        if(!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->action->update($user, $form->getData());
+
+        return new Response(status: Response::HTTP_OK);
+    }
+
+    #[ApiRoute(
+        '/api/user/password',
+        name: 'api_user_update_password',
+        methods: ['POST'],
+        documentation: 'Set a user\'s password',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Password changed successfully',
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Bad request',
+            ],
+            Response::HTTP_FORBIDDEN => [
+                'message' => 'Forbidden access',
+            ],
+        ],
+        requestScheme: [
+            'password' => 'string',
+        ],
+    )]
+    #[IsGranted('ROLE_USER')]
+    public function updatePassword(Request $request, #[CurrentUser] User $currentUser): Response
+    {
+        $form = $this->createForm(UserPasswordFormType::class);
+        $form->submit($request->getPayload()->all());
+
+        $errors = FormErrors::collect($form);
+
+        if(!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        }
+
+        $password = $form->getData()['password'];
+        $this->action->updatePassword($currentUser, $password);
+
+        return new Response(status: Response::HTTP_OK);
     }
 }
