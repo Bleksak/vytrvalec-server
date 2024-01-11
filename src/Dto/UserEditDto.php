@@ -6,10 +6,10 @@ use App\Entity\Faculty;
 
 class UserEditDto
 {
-    public string $email;
-    public string $firstName;
-    public string $lastName;
-    public Faculty $faculty;
-    public bool $banned;
-    public array $roles;
+    public ?string $email = null;
+    public ?string $firstName = null;
+    public ?string $lastName = null;
+    public ?Faculty $faculty = null;
+    public ?bool $banned = null;
+    public ?array $roles = null;
 }

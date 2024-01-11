@@ -284,6 +284,10 @@ class UserController extends AbstractController
             return $this->json(status: Response::HTTP_FORBIDDEN);
         }
 
+        if(!$this->isGranted('ROLE_STAFF') && $request->getPayload()->get('roles', null) !== null) {
+            return $this->json(status: Response::HTTP_FORBIDDEN);
+        }
+
         if ($user === null) {
             $user = $currentUser;
         }
