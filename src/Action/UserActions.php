@@ -62,7 +62,12 @@ class UserActions
             $user->setRoles($dto->roles);
         }
 
-        $this->userRepository->save($user, true);
+        // TODO: return type
+        // try {
+            $this->userRepository->save($user, true);
+        // } catch(UniqueConstraintViolationException $e) {
+        //     return ['email' => ['not_unique']];
+        // }
     }
 
     public function updatePassword(User $currentUser, string $password): void
