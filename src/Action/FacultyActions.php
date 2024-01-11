@@ -15,11 +15,12 @@ class FacultyActions
         
     }
 
-    public function create(FacultyDto $dto): void
+    public function create(FacultyDto $dto): int
     {
         $faculty = new Faculty($dto->name, $dto->shortcut, $dto->visible);
-
         $this->facultyRepository->save($faculty, true);
+
+        return $faculty->getId();
     }
 
     public function update(Faculty $faculty, FacultyDto $dto): void

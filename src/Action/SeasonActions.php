@@ -15,13 +15,16 @@ class SeasonActions
     ) {
     }
 
-    public function create(SeasonDto $seasonDto): void
+    public function create(SeasonDto $seasonDto): int
     {
         $season = new Season($seasonDto->start, $seasonDto->end, $seasonDto->charity);
 
         $this->seasonRepository->save($season, true);
+
+        return $season->getId();
     }
 
+    // TODO: delete
     public function cacheResults(Season $season): void
     {
         $weeklyResults = $this->seasonResult->calculate($season);

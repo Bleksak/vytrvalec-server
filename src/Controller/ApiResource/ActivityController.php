@@ -51,9 +51,9 @@ class ActivityController extends AbstractController
             return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
-        $this->action->create($form->getData());
+        $id = $this->action->create($form->getData());
 
-        return new Response(status: Response::HTTP_OK);
+        return $this->json(['id' => $id], Response::HTTP_OK);
     }
 
     #[ApiRoute(

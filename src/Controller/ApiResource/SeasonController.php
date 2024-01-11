@@ -71,9 +71,9 @@ class SeasonController extends AbstractController
             return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
-        $this->action->create($form->getData());
+        $id = $this->action->create($form->getData());
 
-        return new Response(status: Response::HTTP_CREATED);
+        return $this->json(['id' => $id], Response::HTTP_CREATED);
     }
 
     #[ApiRoute(

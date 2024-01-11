@@ -12,10 +12,12 @@ class CharityActions
     {
     }
 
-    public function create(CharityDto $dto): void
+    public function create(CharityDto $dto): int
     {
         $charity = new Charity($dto->name, $dto->description);
         $this->charityRepository->save($charity, true);
+
+        return $charity->getId();
     }
 
     public function update(Charity $charity, CharityDto $dto): void

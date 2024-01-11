@@ -14,11 +14,12 @@ class ActivityActions
     {
     }
 
-    public function create(ActivityDto $dto): void
+    public function create(ActivityDto $dto): int
     {
         $activity = new Activity($dto->name, $dto->minElevation);
-
         $this->activityRepository->save($activity, true);
+
+        return $activity->getId();
     }
 
     public function update(Activity $activity, ActivityDto $dto): void
