@@ -225,10 +225,7 @@ class SeasonController extends AbstractController
                         'id' => 'integer',
                         'start' => 'date',
                         'end' => 'date',
-                        'charity' => [
-                            'name' => 'string',
-                            'description' => 'string'
-                        ],
+                        'charity' => 'number',
                     ]
                 ]
             ]
@@ -238,6 +235,7 @@ class SeasonController extends AbstractController
     {
         $seasons = $this->normalizer->normalize($this->seasonRepository->findOrdered(), null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions'],
+            AbstractNormalizer::CALLBACKS => ['charity' => fn($charity) => $charity->getId()]
         ]);
 
         return $this->json($seasons);
