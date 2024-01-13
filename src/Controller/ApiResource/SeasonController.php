@@ -207,6 +207,7 @@ class SeasonController extends AbstractController
     {
         $season = $this->normalizer->normalize($season, null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
+            AbstractNormalizer::CALLBACKS => ['charity' => fn($charity) => $charity->getId()]
         ]);
 
         return $this->json($season);
