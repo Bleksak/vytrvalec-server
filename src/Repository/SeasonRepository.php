@@ -63,4 +63,13 @@ class SeasonRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function findOrdered(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s')
+            ->orderBy('s.start', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

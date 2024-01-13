@@ -236,7 +236,7 @@ class SeasonController extends AbstractController
     )]
     public function seasonList(): Response
     {
-        $seasons = $this->normalizer->normalize($this->seasonRepository->findAll(), null, [
+        $seasons = $this->normalizer->normalize($this->seasonRepository->findOrdered(), null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions'],
         ]);
 
