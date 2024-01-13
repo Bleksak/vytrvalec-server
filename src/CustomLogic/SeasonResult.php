@@ -59,10 +59,14 @@ class SeasonResult
                 $activities[$result['activity_id']][] = new FacultyResultDto($result['faculty_id'], $result['distance']);
             }
 
-            $results[$i] = [];
+            $activityResult = [];
 
             foreach ($activities as $activityId => $activity) {
-                $results[$i][$activityId] = new ActivityResultDto($activityId, $activity);
+                $activityResult[$activityId] = new ActivityResultDto($activityId, $activity);
+            }
+
+            if(!empty($activityResult)) {
+                $results[$i] = $activityResult;
             }
         }
 
@@ -73,8 +77,10 @@ class SeasonResult
             }
         }
 
-        for ($i = 0; $i < $weeks; ++$i) {
-            $results[$i] = array_values($results[$i]);
+        for($i = 0; $i < $weeks; ++$i) {
+            if(array_key_exists($i, $results)) {
+                $results[$i] = array_values($results[$i]);
+            }
         }
 
         return $results;
