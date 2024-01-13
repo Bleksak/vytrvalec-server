@@ -13,6 +13,7 @@ use App\Form\SubmissionStateFormType;
 use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
+use App\Validation\FormErrors;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -111,13 +112,8 @@ class SubmissionController extends AbstractController
         $form = $this->createForm(SubmissionForm::class);
         $form->submit($request->request->all() + $request->files->all());
 
-        if (!$form->isValid()) {
-            $errors = [];
-
-            foreach ($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-
+        if(!$form->isValid()) {
+            $errors = FormErrors::collect($form);
             return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
@@ -232,7 +228,7 @@ class SubmissionController extends AbstractController
         documentation: 'Edits a <code>Submission</code> entity',
         responses: [
             Response::HTTP_CREATED => [
-                'message' => 'Submission created successfully',
+                'message' => 'Submission edited successfully',
             ],
             Response::HTTP_FORBIDDEN => [
                 'message' => 'Unauthorized access',
