@@ -141,6 +141,6 @@ class Season
         $start = DateTimeImmutable::createFromInterface($this->getStart());
         $end = DateTimeImmutable::createFromInterface($this->getEnd());
 
-        return 1 + intdiv($end->diff($start)->days, 7);
+        return intdiv($end->diff($start)->days, 7);
     }
 }
