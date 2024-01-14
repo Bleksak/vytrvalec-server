@@ -5,6 +5,7 @@ namespace App\CustomLogic;
 use App\Dto\ActivityResultDto;
 use App\Dto\ExtraPointsDto;
 use App\Dto\FacultyResultDto;
+use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -66,22 +67,18 @@ class SeasonResult
             }
 
             if(!empty($activityResult)) {
-                $results[$i] = $activityResult;
+                $results[$i] = new WeeklyResultDto($i, $activityResult);
             }
         }
 
         foreach ($extraPointsClasses as $cls) {
             $extras = $cls->calculate($season);
             foreach ($extras as $extra) {
-                $results[$cls->getWeek()][$extra['activity_id']]->extras[] = new ExtraPointsDto($extra['user_id'], $extra['faculty_id'], $cls->getUniqueName(), $extra['value'], $cls->reward());
+                $results[$cls->getWeek()]->activities[$extra['activity_id']]->extras[] = new ExtraPointsDto($extra['user_id'], $extra['faculty_id'], $cls->getUniqueName(), $extra['value'], $cls->reward());
             }
         }
 
-        for($i = 0; $i < $weeks; ++$i) {
-            if(array_key_exists($i, $results)) {
-                $results[$i] = array_values($results[$i]);
-            }
-        }
+        $results = array_values($results);
 
         return $results;
     }
