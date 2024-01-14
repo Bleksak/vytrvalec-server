@@ -173,13 +173,7 @@ class SeasonController extends AbstractController
     )]
     public function result(Season $season, SeasonResult $result): Response
     {
-        $results = $result->calculate($season);
-
-        $results = $this->normalizer->normalize($results, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
-        ]);
-
-        return $this->json($results);
+        return $this->json($result->calculate($season));
     }
 
     #[ApiRoute(
