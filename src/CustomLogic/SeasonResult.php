@@ -80,6 +80,10 @@ class SeasonResult
 
         $results = array_values($results);
 
+        foreach ($results as $key => $result) {
+            $result->activities = array_values($result->activities);
+        }
+
         return $results;
     }
 }
