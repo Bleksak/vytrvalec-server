@@ -17,6 +17,13 @@ class CacheActions
 
     public function cacheSeason(Season $season): void
     {
-        $this->cacheRepository->save(new Cache($season, $this->seasonResult->calculate($season)), true);
+        $cache = $this->cacheRepository->findOneBy(['season' => $season->getId()]);
+
+        if($cache !== null) {
+            $cache->setData($this->seasonResult->calculate($season));
+            $this->cacheRepository->save($cache, true);
+        } else {
+            $this->cacheRepository->save(new Cache($season, $this->seasonResult->calculate($season)), true);
+        }
     }
 }

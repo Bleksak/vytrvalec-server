@@ -8,6 +8,7 @@ use App\Attributes\ApiRoute;
 use App\CustomLogic\SeasonResult;
 use App\Entity\Season;
 use App\Form\SeasonFormType;
+use App\Repository\CacheRepository;
 use App\Repository\SeasonRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -171,9 +172,36 @@ class SeasonController extends AbstractController
             Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
         ],
     )]
-    public function result(Season $season, SeasonResult $result): Response
+    public function result(Season $season, SeasonResult $result, CacheRepository $cacheRepository): Response
     {
+        $cache = $cacheRepository->findOneBy(['season' => $season->getId()]);
+
+        if($cache !== null) {
+            return $this->json($cache->getData());
+        }
+
         return $this->json($result->calculate($season));
+    }
+
+    #[ApiRoute(
+        '/api/season/{season}/submissions',
+        name: 'api_season_submissions',
+        methods: ['GET'],
+        documentation: 'Retrieves all submissions from a given <code>Season</code> entity',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieved a season entity',
+                'response' => []
+            ],
+            Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
+        ],
+    )]
+    #[IsGranted('ROLE_STAFF')]
+    public function submissions(Season $season): Response
+    {
+        return $this->json($this->normalizer->normalize($season->getSubmissions(), null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions', 'season'],
+        ]));
     }
 
     #[ApiRoute(
