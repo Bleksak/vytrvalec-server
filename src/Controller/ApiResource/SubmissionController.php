@@ -5,6 +5,8 @@ namespace App\Controller\ApiResource;
 use App\Action\SubmissionActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
+use App\Entity\Activity;
+use App\Entity\Faculty;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -141,11 +143,20 @@ class SubmissionController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function listSeason(Season $season, int $page = 1): Response
+    public function listSeason(
+        Season $season,
+        int $page = 1,
+        Request $request
+    ): Response
     {
         $limit = 50;
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
+
+        $scheme = $request->getScheme();
+        $hostname = $request->getHost();
+
+        $url = $scheme . '://' . $hostname;
 
         return $this->json(
             $this->normalizer->normalize(
@@ -157,9 +168,10 @@ class SubmissionController extends AbstractController
                 [
                     AbstractNormalizer::GROUPS => ['fetchSubmission'],
                     AbstractNormalizer::CALLBACKS => [
-                        'season' => fn ($object) => $object->getId(),
-                        'activity' => fn ($object) => $object->getId(),
-                        'faculty' => fn ($object) => $object->getId(),
+                        'season' => fn (Season $object) => $object->getId(),
+                        'activity' => fn (Activity $object) => $object->getId(),
+                        'faculty' => fn (Faculty $object) => $object->getId(),
+                        'image' => fn (string $image) => $url . $image,
                     ],
                 ]
             )
@@ -182,20 +194,29 @@ class SubmissionController extends AbstractController
         #[CurrentUser] User $user,
         RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository,
         int $page,
-        int $limit = 50
+        int $limit = 50,
+        Request $request,
     ): Response {
         $rejectedSubmissions = $rejectedSubmissionMessageRepository->findByUser($user);
         $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
         $nextPage = ($page + 1) > $pageCount ? null : $page + 1;
 
+        $scheme = $request->getScheme();
+        $hostname = $request->getHost();
+
+        $url = $scheme . '://' . $hostname;
+
         return $this->json($this->normalizer->normalize([
             'nextPage' => $nextPage,
             'submissions' => $submissions,
-            'rejectedSubmissions' => $rejectedSubmissions
+            'rejectedSubmissions' => $rejectedSubmissions,
         ], null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
+            AbstractNormalizer::CALLBACKS => [
+                'image' => fn (string $image) => $url . $image,
+            ]
         ]));
     }
 
@@ -211,13 +232,19 @@ class SubmissionController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function unresolvedList(Season $season): Response
+    public function unresolvedList(Season $season, Request $request): Response
     {
+        $scheme = $request->getScheme();
+        $hostname = $request->getHost();
+
+        $url = $scheme . '://' . $hostname;
+
         return $this->json($this->normalizer->normalize($this->submissionRepository->findBy(['season' => $season, 'reviewed' => false], ['date' => 'ASC']), null, [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
                 return $object->getId();
             },
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
+            AbstractNormalizer::CALLBACKS => ['image' => fn (string $image) => $url . $image]
         ]));
     }
 

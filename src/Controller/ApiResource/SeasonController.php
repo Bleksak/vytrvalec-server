@@ -197,10 +197,16 @@ class SeasonController extends AbstractController
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function submissions(Season $season): Response
+    public function submissions(Season $season, Request $request): Response
     {
+        $scheme = $request->getScheme();
+        $hostname = $request->getHost();
+
+        $url = $scheme . '://' . $hostname;
+
         return $this->json($this->normalizer->normalize($season->getSubmissions(), null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions', 'season'],
+            AbstractNormalizer::CALLBACKS => ['image' => fn (string $image) => $url . $image]
         ]));
     }
 
