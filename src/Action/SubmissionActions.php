@@ -125,7 +125,17 @@ class SubmissionActions
      */
     public function reject(Submission $submission, string $message): void
     {
-        $this->rejectedSubmissionMessageRepository->save(new RejectedSubmissionMessage($submission, $message));
+        $rejectedSubmission = $this->rejectedSubmissionMessageRepository->findOneBy(['submission' => $submission]);
+        if($rejectedSubmission !== null) {
+            $rejectedSubmission->setMessage($message);
+            $this->rejectedSubmissionMessageRepository->save($rejectedSubmission, true);
+        } else {
+            $this->rejectedSubmissionMessageRepository->save(new RejectedSubmissionMessage($submission, $message));
+        }
+
+        if($submission->isReviewed() && $submission->isAccepted()) {
+            $this->profileCacheRepository->removeCache($submission, true);
+        }
 
         if($submission->getUser()->getToken() !== null) {
             $this->firebase->send(new VytrvalecNotification($submission->getUser(), $message));

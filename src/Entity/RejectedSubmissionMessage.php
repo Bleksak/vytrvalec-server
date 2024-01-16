@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\RejectedSubmissionMessageRepository;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -40,5 +41,10 @@ class RejectedSubmissionMessage
     public function getTimeCreated(): ?\DateTimeInterface
     {
         return $this->createdAt;
+    }
+
+    public function setMessage(string $message): void
+    {
+        $this->message = $message;
     }
 }

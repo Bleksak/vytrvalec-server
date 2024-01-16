@@ -352,17 +352,14 @@ class SubmissionController extends AbstractController
         $form = $this->createForm(SubmissionStateFormType::class);
         $form->submit($request->getPayload()->all());
 
-        if (!$form->isValid()) {
-            $errors = [];
+        $errors = FormErrors::collect($form);
 
-            foreach ($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-
+        if (!empty($errors)) {
             return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
         $errors = $this->action->setState($submission, $form->getData());
+
         if (!empty($errors)) {
             return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
