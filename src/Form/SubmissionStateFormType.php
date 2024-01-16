@@ -21,16 +21,16 @@ class SubmissionStateFormType extends AbstractType
             'widget' => 'single_text',
             'input' => 'datetime_immutable',
             'constraints' => [
-                new Assert\NotBlank(message: 'blank_updated_at'),
-                new Assert\NotNull(message: 'blank_updated_at'),
+                new Assert\NotBlank(message: 'blank'),
+                new Assert\NotNull(message: 'blank'),
             ],
         ]);
 
         $builder->add('state', HiddenType::class, [
             'required' => true,
             'constraints' => [
-                new Assert\NotBlank(message: 'blank_state'),
-                new Assert\NotNull(message: 'blank_state'),
+                new Assert\NotBlank(message: 'blank'),
+                new Assert\NotNull(message: 'blank'),
             ],
         ]);
 
