@@ -205,7 +205,7 @@ class SeasonController extends AbstractController
         $url = $scheme . '://' . $hostname;
 
         return $this->json($this->normalizer->normalize($season->getSubmissions(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions', 'season'],
+            AbstractNormalizer::GROUPS => ['fetchSubmission'],
             AbstractNormalizer::CALLBACKS => ['image' => fn (string $image) => $url . $image]
         ]));
     }
