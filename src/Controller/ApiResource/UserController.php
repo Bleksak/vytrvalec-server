@@ -131,7 +131,7 @@ class UserController extends AbstractController
     public function currentUserData(#[CurrentUser] User $currentUser): Response
     {
         $filtered = $this->normalizer->normalize($currentUser, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'user']
         ]);
 
         return $this->json($filtered);
