@@ -221,25 +221,25 @@ class SubmissionController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/submission/unresolved/{season}',
+        '/api/submission/unresolved',
         name: 'api_submission_list_unresolved',
         methods: ['GET'],
-        documentation: 'Retrieves all unresolved submissions in the given season',
+        documentation: 'Retrieves some unresolved submissions across all seasons',
         responses: [
             Response::HTTP_OK => [
-                'message' => 'Successfully retrieved all unresolved submissions'
+                'message' => 'Successfully retrieved some unresolved submissions'
             ]
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function unresolvedList(Season $season, Request $request): Response
+    public function unresolvedList(Request $request): Response
     {
         $scheme = $request->getScheme();
         $hostname = $request->getHost();
 
         $url = $scheme . '://' . $hostname;
 
-        return $this->json($this->normalizer->normalize($this->submissionRepository->findBy(['season' => $season, 'reviewed' => false], ['date' => 'ASC']), null, [
+        return $this->json($this->normalizer->normalize($this->submissionRepository->findUnreviewed(25), null, [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
                 return $object->getId();
             },

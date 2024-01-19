@@ -112,6 +112,21 @@ class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
+    * @return array<int,Submission>
+    */
+    public function findUnreviewed(int $limit): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s')
+            ->andWhere('s.reviewed = :reviewed')
+            ->setParameter('reviewed', false)
+            ->orderBy('s.date', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @return array<int,array<string,mixed>>
      */
     public function getTotalStatistics(): array
