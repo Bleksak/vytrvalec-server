@@ -28,6 +28,7 @@ class SubmissionStateFormType extends AbstractType
 
         $builder->add('state', HiddenType::class, [
             'required' => true,
+            'empty_data' => false,
             'constraints' => [
                 new Assert\NotBlank(message: 'blank'),
                 new Assert\NotNull(message: 'blank'),
