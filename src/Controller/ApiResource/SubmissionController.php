@@ -221,7 +221,7 @@ class SubmissionController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/submission/unresolved',
+        '/api/submission/unresolved/{count}',
         name: 'api_submission_list_unresolved',
         methods: ['GET'],
         documentation: 'Retrieves some unresolved submissions across all seasons',
@@ -232,14 +232,14 @@ class SubmissionController extends AbstractController
         ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function unresolvedList(Request $request): Response
+    public function unresolvedList(Request $request, int $count): Response
     {
         $scheme = $request->getScheme();
         $hostname = $request->getHost();
 
         $url = $scheme . '://' . $hostname;
 
-        return $this->json($this->normalizer->normalize($this->submissionRepository->findUnreviewed(25), null, [
+        return $this->json($this->normalizer->normalize($this->submissionRepository->findUnreviewed($count), null, [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
                 return $object->getId();
             },
