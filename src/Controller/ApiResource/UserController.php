@@ -8,7 +8,7 @@ use App\Attributes\ApiRoute;
 use App\Entity\User;
 use App\Form\UserCreateFormType;
 use App\Form\UserEditFormType;
-use App\Form\UserPasswordFormType;
+use App\Form\UserAccountChangeFormType;
 use App\Repository\UserRepository;
 use App\Validation\FormErrors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -201,7 +201,6 @@ class UserController extends AbstractController
     {
         return $this->json($this->normalizer->normalize($this->userRepository->findAll(), null, [
             AbstractNormalizer::GROUPS => ['fetchUser'],
-            // AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
         ]));
     }
 
@@ -251,6 +250,49 @@ class UserController extends AbstractController
     }
 
     #[ApiRoute(
+        '/api/user/change',
+        name: 'api_user_update_password',
+        methods: ['PATCH'],
+        documentation: 'Set a user\'s password',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Password changed successfully',
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Bad request',
+            ],
+            Response::HTTP_FORBIDDEN => [
+                'message' => 'Forbidden access',
+            ],
+        ],
+        requestScheme: [
+            'email?' => 'string',
+            'password?' => 'string',
+            'old_password' => 'string',
+        ],
+    )]
+    #[IsGranted('ROLE_USER')]
+    public function updateAccount(Request $request, #[CurrentUser] User $currentUser): Response
+    {
+        $form = $this->createForm(UserAccountChangeFormType::class);
+        $form->submit($request->getPayload()->all());
+
+        $errors = FormErrors::collect($form);
+
+        if(!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        }
+
+        $errors = $this->action->updateAccount($currentUser, $form->getData());
+
+        if(!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        }
+
+        return new Response(status: Response::HTTP_OK);
+    }
+
+    #[ApiRoute(
         '/api/user/{user}',
         name: 'api_user_patch',
         methods: ['PATCH'],
@@ -274,24 +316,9 @@ class UserController extends AbstractController
             'faculty?' => 'integer'
         ],
     )]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted('ROLE_STAFF')]
     public function update(Request $request, User $user = null, #[CurrentUser] User $currentUser): Response
     {
-        // either the user is admin trying to edit other users data
-        // or the user is trying to edit his own data
-
-        if (!$this->isGranted('ROLE_STAFF') && $currentUser->getId() !== $user->getId()) {
-            return $this->json(status: Response::HTTP_FORBIDDEN);
-        }
-
-        if(!$this->isGranted('ROLE_STAFF') && $request->getPayload()->get('roles', null) !== null) {
-            return $this->json(status: Response::HTTP_FORBIDDEN);
-        }
-
-        if ($user === null) {
-            $user = $currentUser;
-        }
-
         $form = $this->createForm(UserEditFormType::class);
         $form->submit($request->getPayload()->all());
 
@@ -302,44 +329,6 @@ class UserController extends AbstractController
         }
 
         $this->action->update($user, $form->getData());
-
-        return new Response(status: Response::HTTP_OK);
-    }
-
-    #[ApiRoute(
-        '/api/user/password',
-        name: 'api_user_update_password',
-        methods: ['POST'],
-        documentation: 'Set a user\'s password',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Password changed successfully',
-            ],
-            Response::HTTP_BAD_REQUEST => [
-                'message' => 'Bad request',
-            ],
-            Response::HTTP_FORBIDDEN => [
-                'message' => 'Forbidden access',
-            ],
-        ],
-        requestScheme: [
-            'password' => 'string',
-        ],
-    )]
-    #[IsGranted('ROLE_USER')]
-    public function updatePassword(Request $request, #[CurrentUser] User $currentUser): Response
-    {
-        $form = $this->createForm(UserPasswordFormType::class);
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
-
-        if(!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $password = $form->getData()['password'];
-        $this->action->updatePassword($currentUser, $password);
 
         return new Response(status: Response::HTTP_OK);
     }

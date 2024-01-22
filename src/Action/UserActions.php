@@ -2,12 +2,14 @@
 
 namespace App\Action;
 
+use App\Dto\UserAccountChangeDto as AppUserAccountChangeDto;
 use App\Dto\UserDto;
 use App\Dto\UserEditDto;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use UserAccountChangeDto;
 
 class UserActions
 {
@@ -34,8 +36,10 @@ class UserActions
 
         return [];
     }
-
-    public function update(User $user, UserEditDto $dto): void
+    /**
+     * @return array<string,array<int,string>>
+     */
+    public function update(User $user, UserEditDto $dto): array
     {
         // update all fields that are not null
         if ($dto->email !== null) {
@@ -62,19 +66,37 @@ class UserActions
             $user->setRoles($dto->roles);
         }
 
-        // TODO: return type
-        // try {
+        try {
             $this->userRepository->save($user, true);
-        // } catch(UniqueConstraintViolationException $e) {
-        //     return ['email' => ['not_unique']];
-        // }
-    }
+        } catch(UniqueConstraintViolationException $e) {
+            return ['email' => ['not_unique']];
+        }
 
-    public function updatePassword(User $currentUser, string $password): void
+        return [];
+    }
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public function updateAccount(User $currentUser, AppUserAccountChangeDto $dto): array
     {
-        $hashedPassword = $this->hasher->hashPassword($currentUser, $password);
+        if($dto->email === null && $dto->password === null) {
+            return ['email' => ['blank'], 'password' => ['blank']];
+        }
+
+        if(!$this->hasher->isPasswordValid($currentUser, $dto->oldPassword)) {
+            return ['old_password' => ['mismatch']];
+        }
+
+        $hashedPassword = $this->hasher->hashPassword($currentUser, $dto->password);
         $currentUser->setPassword($hashedPassword);
 
-        $this->userRepository->save($currentUser, true);
+        try {
+            $this->userRepository->save($currentUser, true);
+        }
+        catch(UniqueConstraintViolationException $e) {
+            return ['email' => ['not_unique']];
+        }
+
+        return [];
     }
 }
