@@ -32,7 +32,7 @@ class CacheController extends AbstractController
     public function cacheSeason(Season $season): Response
     {
         if ($season->isRunning()) {
-            return $this->json(['errors' => ['season_still_running']], Response::HTTP_BAD_REQUEST);
+            return $this->json(['season' => 'still_running'], Response::HTTP_BAD_REQUEST);
         }
 
         $this->action->cacheSeason($season);

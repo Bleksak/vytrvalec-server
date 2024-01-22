@@ -8,6 +8,7 @@ use App\Attributes\ApiRoute;
 use App\Entity\Faculty;
 use App\Form\FacultyFormType;
 use App\Repository\FacultyRepository;
+use App\Validation\FormErrors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,14 +53,10 @@ class FacultyController extends AbstractController
         $form = $this->createForm(FacultyFormType::class);
         $form->submit($request->getPayload()->all());
 
-        if(!$form->isValid()) {
-            $errors = [];
+        $errors = FormErrors::collect($form);
 
-            foreach($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        if (!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $id = $this->action->create($form->getData());
@@ -103,14 +100,10 @@ class FacultyController extends AbstractController
 
         $form->submit($request->getPayload()->all());
 
-        if(!$form->isValid()) {
-            $errors = [];
+        $errors = FormErrors::collect($form);
 
-            foreach($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        if (!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $this->action->update($faculty, $form->getData());

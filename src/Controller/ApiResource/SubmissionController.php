@@ -108,20 +108,22 @@ class SubmissionController extends AbstractController
         $season = $seasonRepository->getCurrent();
 
         if ($season === null) {
-            return $this->json(['errors' => ['no_season']], Response::HTTP_BAD_REQUEST);
+            return $this->json(['season' => ['no_season']], Response::HTTP_BAD_REQUEST);
         }
 
         $form = $this->createForm(SubmissionForm::class);
         $form->submit($request->request->all() + $request->files->all());
 
-        if(!$form->isValid()) {
-            $errors = FormErrors::collect($form);
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        $errors = FormErrors::collect($form);
+
+        if (!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $errors = $this->action->create($form->getData(), $user, $season);
+
         if (!empty($errors)) {
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         return new Response(status: Response::HTTP_CREATED);
@@ -287,7 +289,7 @@ class SubmissionController extends AbstractController
     ): Response {
 
         if ($submission->isAccepted()) {
-            return $this->json(['errors' => 'submission_accepted'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['submission' => ['accepted']], Response::HTTP_BAD_REQUEST);
         }
 
         // 1. uzivatel da edit, admin vidi starou verzi
@@ -303,21 +305,17 @@ class SubmissionController extends AbstractController
 
         $form->submit($request->request->all() + $request->files->all());
 
-        if (!$form->isValid()) {
-            $errors = [];
+        $errors = FormErrors::collect($form);
 
-            foreach ($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        if (!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $dto = $form->getData();
 
         $errors = $this->action->update($submission, $dto);
         if (!empty($errors)) {
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         return new Response(status: Response::HTTP_CREATED);
@@ -355,13 +353,13 @@ class SubmissionController extends AbstractController
         $errors = FormErrors::collect($form);
 
         if (!empty($errors)) {
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $errors = $this->action->setState($submission, $form->getData());
 
         if (!empty($errors)) {
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         return new Response(status: Response::HTTP_OK);

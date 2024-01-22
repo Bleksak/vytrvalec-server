@@ -8,6 +8,7 @@ use App\Attributes\ApiRoute;
 use App\Entity\Activity;
 use App\Form\ActivityFormType;
 use App\Repository\ActivityRepository;
+use App\Validation\FormErrors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,14 +42,10 @@ class ActivityController extends AbstractController
         $form = $this->createForm(ActivityFormType::class);
         $form->submit($request->getPayload()->all());
 
-        if (!$form->isValid()) {
-            $errors = [];
+        $errors = FormErrors::collect($form);
 
-            foreach ($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        if(!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $id = $this->action->create($form->getData());
@@ -71,9 +68,9 @@ class ActivityController extends AbstractController
     public function delete(Activity $activity): Response
     {
         if (!$this->action->delete($activity)) {
-            return $this->json(['errors' => [
-                'activity_has_submissions'
-            ]], Response::HTTP_BAD_REQUEST);
+            return $this->json([
+                'activity' => ['has_submissions']
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         return new Response(status: Response::HTTP_OK);
@@ -98,14 +95,10 @@ class ActivityController extends AbstractController
 
         $form->submit($request->getPayload()->all());
 
-        if (!$form->isValid()) {
-            $errors = [];
+        $errors = FormErrors::collect($form);
 
-            foreach ($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        if(!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $this->action->update($activity, $form->getData());

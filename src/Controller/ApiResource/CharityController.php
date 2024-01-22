@@ -8,6 +8,7 @@ use App\Attributes\ApiRoute;
 use App\Entity\Charity;
 use App\Form\CharityCreateFormType;
 use App\Repository\CharityRepository;
+use App\Validation\FormErrors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,14 +47,10 @@ class CharityController extends AbstractController
         $form = $this->createForm(CharityCreateFormType::class);
         $form->submit($request->getPayload()->all());
 
-        if (!$form->isValid()) {
-            $errors = [];
+        $errors = FormErrors::collect($form);
 
-            foreach ($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        if(!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $id = $this->action->create($form->getData());
@@ -96,14 +93,10 @@ class CharityController extends AbstractController
 
         $form->submit($request->getPayload()->all());
 
-        if (!$form->isValid()) {
-            $errors = [];
+        $errors = FormErrors::collect($form);
 
-            foreach ($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        if(!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $this->action->update($charity, $form->getData());

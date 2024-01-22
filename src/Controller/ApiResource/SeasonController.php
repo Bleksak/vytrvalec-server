@@ -10,6 +10,7 @@ use App\Entity\Season;
 use App\Form\SeasonFormType;
 use App\Repository\CacheRepository;
 use App\Repository\SeasonRepository;
+use App\Validation\FormErrors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -61,15 +62,10 @@ class SeasonController extends AbstractController
 
         $form->submit($request->getPayload()->all());
 
-        if (!$form->isValid()) {
+        $errors = FormErrors::collect($form);
 
-            $errors = [];
-
-            foreach ($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        if(!empty($errors)) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $id = $this->action->create($form->getData());
