@@ -12,10 +12,6 @@ use Doctrine\ORM\Mapping as ORM;
 class Cache
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\OneToOne]
     #[ORM\JoinColumn(nullable: false)]
     private Season $season;
@@ -30,6 +26,7 @@ class Cache
      */
     public function __construct(Season $season, array $data)
     {
+        $this->createdAt = new \DateTimeImmutable();
         $this->season = $season;
         $this->data = $data;
     }

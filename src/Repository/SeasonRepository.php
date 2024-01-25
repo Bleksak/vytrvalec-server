@@ -72,4 +72,17 @@ class SeasonRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    /**
+     * @return Season[]
+     */
+    public function findPast(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s')
+            ->where('s.end < :now')
+            ->orderBy('s.start', 'DESC')
+            ->setParameter('now', new DateTimeImmutable())
+            ->getQuery()
+            ->getResult();
+    }
 }

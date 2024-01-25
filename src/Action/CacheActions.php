@@ -18,12 +18,13 @@ class CacheActions
     public function cacheSeason(Season $season): void
     {
         $cache = $this->cacheRepository->findOneBy(['season' => $season->getId()]);
+        $result = $this->seasonResult->calculate($season);
 
         if($cache !== null) {
-            $cache->setData($this->seasonResult->calculate($season));
+            $cache->setData($result);
             $this->cacheRepository->save($cache, true);
         } else {
-            $this->cacheRepository->save(new Cache($season, $this->seasonResult->calculate($season)), true);
+            $this->cacheRepository->save(new Cache($season, $result), true);
         }
     }
 }

@@ -63,7 +63,6 @@ class SeasonController extends AbstractController
         $form->submit($request->getPayload()->all());
 
         $errors = FormErrors::collect($form);
-
         if(!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
@@ -134,6 +133,8 @@ class SeasonController extends AbstractController
 
         return new Response(status: Response::HTTP_OK);
     }
+    
+
 
     #[ApiRoute(
         '/api/season/{season}/results',
@@ -207,6 +208,36 @@ class SeasonController extends AbstractController
     }
 
     #[ApiRoute(
+        '/api/season/past',
+        name: 'api_season_index_past',
+        methods: ['GET'],
+        documentation: 'Retrieves all past <code>Season</code> entities',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Successfully retrieved entities',
+                'response' => [
+                    'id' => 'integer',
+                    'start' => 'date',
+                    'end' => 'date',
+                    'charity' => [
+                        'name' => 'string',
+                        'description' => 'string'
+                    ],
+                ]
+            ],
+            Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
+        ],
+    )]
+    public function indexPast(): Response
+    {
+        $seasons = $this->normalizer->normalize($this->seasonRepository->findPast(), null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
+        ]);
+
+        return $this->json($seasons);
+    }
+
+    #[ApiRoute(
         '/api/season/{season}',
         name: 'api_season',
         methods: ['GET'],
@@ -218,10 +249,7 @@ class SeasonController extends AbstractController
                     'id' => 'integer',
                     'start' => 'date',
                     'end' => 'date',
-                    'charity' => [
-                        'name' => 'string',
-                        'description' => 'string'
-                    ],
+                    'charity' => 'integer',
                 ]
             ],
             Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
