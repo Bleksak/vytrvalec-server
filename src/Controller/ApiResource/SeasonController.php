@@ -129,12 +129,10 @@ class SeasonController extends AbstractController
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
-        $this->seasonRepository->remove($season);
+        $this->seasonRepository->remove($season, true);
 
         return new Response(status: Response::HTTP_OK);
     }
-    
-
 
     #[ApiRoute(
         '/api/season/{season}/results',
