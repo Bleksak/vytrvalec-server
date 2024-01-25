@@ -124,7 +124,8 @@ class Season
 
     public function canDelete(): bool
     {
-        return $this->getStart() >= new DateTimeImmutable('now');
+        return $this->getSubmissions()->isEmpty();
+        // return $this->getStart() >= new DateTimeImmutable('now');
     }
     
     public function isRunning(): bool
