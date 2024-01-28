@@ -29,4 +29,17 @@ class CacheRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    /**
+    * @return array<int, array<int, WeeklyResultDto>>
+    */
+    public function findLastN(int $n): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.season', 's')
+            ->orderBy('s.start', 'DESC')
+            ->setMaxResults($n)
+            ->getQuery()
+            ->getResult();
+    }
 }
