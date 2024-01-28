@@ -8,17 +8,34 @@ use App\Attributes\ApiRoute;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[ApiResource('Stats')]
 class StatsController extends AbstractController {
-    public function __construct(private readonly StatsActions $action)
+    public function __construct(
+      private readonly StatsActions $action,
+      private readonly NormalizerInterface $normalizer,
+    )
     {
-
     }
 
+    #[ApiRoute(
+        '/api/stats',
+        name: 'stats_user_index',
+        methods: ['GET'],
+        documentation: 'Retrieve user statistics',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Statistics retrieved successfully',
+            ],
+        ],
+    )]
     public function indexUserStatistics(User $user): Response
     {
-        
+        return $this->normalizer->normalize($user->getProfileCaches(), null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
+        ]);
     }
 
     #[ApiRoute(
