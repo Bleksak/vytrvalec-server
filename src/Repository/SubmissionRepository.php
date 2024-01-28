@@ -80,38 +80,6 @@ class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<int, Submission>
-     */
-    public function findAcceptedInSeasonAndWeek(Season $season, int $week): array
-    {
-        // TODO: re-enable this
-        // $maxWeek = intdiv((new \DateTimeImmutable())->diff($season->getStart())->days, 7);
-        // if($week > $maxWeek) {
-        //     return [];
-        // }
-
-        return $this->createQueryBuilder('sub')
-            ->select('sub')
-            ->where('sub.season = :season')
-            ->andWhere('sub.week = :week')
-            ->andWhere('sub.accepted = :accepted')
-            ->addOrderBy('sub.activity_id', 'ASC')
-            ->addOrderBy('user.faculty_id', 'ASC')
-            ->addOrderBy('sub.date', 'ASC')
-            ->getQuery()
-            ->setParameters([
-                'week' => $week,
-                'season' => $season,
-                'accepted' => true
-            ])
-            ->setFetchMode(Submission::class, 'submission', ClassMetadataInfo::FETCH_EAGER)
-            ->setFetchMode(Submission::class, 'user', ClassMetadataInfo::FETCH_EAGER)
-            ->setFetchMode(Submission::class, 'activity', ClassMetadataInfo::FETCH_EAGER)
-            ->setFetchMode(User::class, 'faculty', ClassMetadataInfo::FETCH_EAGER)
-            ->execute();
-    }
-
-    /**
     * @return array<int,Submission>
     */
     public function findUnreviewed(int $limit): array
