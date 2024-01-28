@@ -119,4 +119,23 @@ class CharityController extends AbstractController
             AbstractNormalizer::GROUPS => ['fetchCharity']
         ]));
     }
+
+    #[ApiRoute(
+        '/api/charity/{charity}',
+        'api_charity_delete',
+        methods: ['DELETE'],
+        documentation: 'Delete a <code>Charity</code> entity',
+        responses: [
+            Response::HTTP_BAD_REQUEST => ['message' => 'Bad data'],
+            Response::HTTP_UNAUTHORIZED => ['message' => 'Unauthorized access'],
+            Response::HTTP_OK => ['message' => 'Entity removed'],
+        ],
+    )]
+    #[IsGranted('ROLE_STAFF')]
+    public function delete(Charity $charity): Response
+    {
+        $this->charityRepository->remove($charity, true);
+
+        return new Response(status: Response::HTTP_OK);
+    }
 }

@@ -38,4 +38,18 @@ class CharityRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    /**
+    * @return Charity[]
+    */
+    public function findSeasonsByCharity(Charity $charity): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('s')
+            ->from('App\Entity\Season', 's')
+            ->where('s.charity = :charity')
+            ->setParameter('charity', $charity)
+            ->getQuery()
+            ->getResult();
+    }
 }

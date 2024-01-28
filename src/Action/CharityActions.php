@@ -27,4 +27,17 @@ class CharityActions
 
         $this->charityRepository->save($charity, true);
     }
+
+    public function remove(Charity $charity): bool
+    {
+        $seasons = $this->charityRepository->findSeasonsByCharity($charity);
+
+        if(!empty($seasons)) {
+            return false;
+        }
+
+        $this->charityRepository->remove($charity, true);
+
+        return true;
+    }
 }
