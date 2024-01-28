@@ -112,6 +112,11 @@ class SubmissionActions
      */
     public function accept(Submission $submission): void
     {
+        // noop when already accepted, otherwise profile cache would stack
+        if ($submission->isReviewed() && $submission->isAccepted()) {
+            return;
+        }
+
         $rejectedSubmission = $this->rejectedSubmissionMessageRepository->find($submission->getId());
 
         if($rejectedSubmission !== null) {
@@ -126,6 +131,7 @@ class SubmissionActions
     public function reject(Submission $submission, string $message): void
     {
         $rejectedSubmission = $this->rejectedSubmissionMessageRepository->findOneBy(['submission' => $submission]);
+
         if($rejectedSubmission !== null) {
             $rejectedSubmission->setMessage($message);
             $this->rejectedSubmissionMessageRepository->save($rejectedSubmission, true);
