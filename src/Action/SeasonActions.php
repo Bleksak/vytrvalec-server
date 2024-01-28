@@ -23,21 +23,4 @@ class SeasonActions
 
         return $season->getId();
     }
-
-    // TODO: delete
-    public function cacheResults(Season $season): void
-    {
-        $weeklyResults = $this->seasonResult->calculate($season);
-
-        foreach ($weeklyResults as $week => $activityResults) {
-            foreach ($activityResults as $activityResult) {
-                $activity = $activityResult->activity;
-
-                foreach ($activityResult->results as $facultyResult) {
-                    // $facultyResult->faculty
-                    // $facultyResult->distance
-                }
-            }
-        }
-    }
 }
