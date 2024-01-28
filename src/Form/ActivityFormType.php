@@ -44,5 +44,3 @@ class ActivityFormType extends AbstractType
         $resolver->setDefault('csrf_protection', false);
     }
 }
-
-// TEST: Tests should check for null values, blank values, negative values, string values, floating point values
