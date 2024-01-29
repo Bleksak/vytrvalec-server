@@ -97,7 +97,7 @@ class LoginAuthenticator extends AbstractAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         return new JsonResponse([
-            $exception->getMessageKey(),
+            'auth' => ['invalid_credentials'],
         ], Response::HTTP_BAD_REQUEST);
     }
 }
