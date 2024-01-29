@@ -19,9 +19,24 @@ class StatsController extends AbstractController {
     )
     {
     }
+    #[ApiRoute(
+        '/api/stats/total',
+        name: 'stats_index',
+        methods: ['GET'],
+        documentation: 'Retrieve overall statistics',
+        responses: [
+          Response::HTTP_OK => [
+            'message' => 'Statistics retrieved successfully',
+          ],
+        ],
+    )]
+    public function indexTotalStatistics(): Response
+    {
+        return $this->json($this->action->getTotalStatistics());
+    }
 
     #[ApiRoute(
-        '/api/stats',
+        '/api/stats/{user}',
         name: 'stats_user_index',
         methods: ['GET'],
         documentation: 'Retrieve user statistics',
@@ -31,26 +46,15 @@ class StatsController extends AbstractController {
             ],
         ],
     )]
-    public function indexUserStatistics(User $user): Response
+    public function indexUserStatistics(User $user = null): Response
     {
-        return $this->normalizer->normalize($user->getProfileCaches(), null, [
+        if($user === null) {
+            $user = $this->getUser();
+        }
+
+        return $this->json($this->normalizer->normalize($user?->getProfileCaches(), null, [
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
-        ]);
+        ]));
     }
 
-    #[ApiRoute(
-        '/api/stats',
-        name: 'stats_index',
-        methods: ['GET'],
-        documentation: 'Retrieve overall statistics',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Statistics retrieved successfully',
-            ],
-        ],
-    )]
-    public function indexTotalStatistics(): Response
-    {
-        return $this->json($this->action->getTotalStatistics());
-    }
 }
