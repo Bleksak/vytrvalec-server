@@ -191,7 +191,6 @@ class SubmissionController extends AbstractController
             ]
         ]
     )]
-    #[IsGranted('ROLE_USER')]
     public function list(
         #[CurrentUser] User $user,
         RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository,
@@ -199,21 +198,14 @@ class SubmissionController extends AbstractController
         int $limit = 50,
         Request $request,
     ): Response {
-        $rejectedSubmissions = $rejectedSubmissionMessageRepository->findByUser($user);
-        $submissions = $this->submissionRepository->findAllByUser($user, $page, $limit);
-        $pageCount = 1 + intdiv($submissions->count(), $limit);
-        $nextPage = ($page + 1) > $pageCount ? null : $page + 1;
+        $submissions = $rejectedSubmissionMessageRepository->findByUser($user);
 
         $scheme = $request->getScheme();
         $hostname = $request->getHost();
 
         $url = $scheme . '://' . $hostname;
 
-        return $this->json($this->normalizer->normalize([
-            'nextPage' => $nextPage,
-            'submissions' => $submissions,
-            'rejectedSubmissions' => $rejectedSubmissions,
-        ], null, [
+        return $this->json($this->normalizer->normalize($submissions, null, [
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
             AbstractNormalizer::CALLBACKS => [

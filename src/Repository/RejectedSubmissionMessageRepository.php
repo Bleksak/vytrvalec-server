@@ -45,16 +45,22 @@ class RejectedSubmissionMessageRepository extends ServiceEntityRepository
 
     public function findByUser(User $user): array
     {
-        $query = $this->createQueryBuilder('m')
-            ->select('m.message, s.id, s.accepted, s.reviewed, s.elevation, s.distance, s.image, s.date, a.name as activity')
-            ->join(Submission::class, 's')
-            ->join(Activity::class, 'a', Join::WITH, 'a.id = s.activity')
-            ->where('s.user = :user')
+        $query = $this->getEntityManager()->getConnection()->prepare('
+            SELECT * FROM (
+                SELECT null as message, s.id as s_id, s.activity_id, s.week, s.distance, s.elevation, s.accepted, s.reviewed, s.date, s.image
+                FROM submission s
+                WHERE s.user_id = :user
+                UNION ALL
+                SELECT m.message, s.id as s_id, s.activity_id, s.week, s.distance, s.elevation, s.accepted, s.reviewed, s.date, s.image
+                FROM rejected_submission_message m
+                INNER JOIN submission s ON s.id = m.id
+                WHERE s.user_id = :user
+            ) s
+            ORDER BY s.date DESC
+        ');
 
-            ->setParameter('user', $user)
-            ->getQuery()
-        ;
+        $query->bindValue('user', $user->getId());
 
-        return $query->execute();
+        return $query->executeQuery()->fetchAssociative();
     }
 }
