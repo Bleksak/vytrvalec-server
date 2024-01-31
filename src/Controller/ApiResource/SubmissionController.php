@@ -181,7 +181,7 @@ class SubmissionController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/submission/user/list/{page}/{limit}',
+        '/api/submission/user',
         name: 'api_submission_list',
         methods: ['GET'],
         documentation: 'Retrieves all submissions for current user',
