@@ -203,13 +203,11 @@ class SubmissionController extends AbstractController
 
         $url = $scheme . '://' . $hostname;
 
-        return $this->json($this->normalizer->normalize($submissions, null, [
-            AbstractNormalizer::GROUPS => ['fetchSubmission'],
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
-            AbstractNormalizer::CALLBACKS => [
-                'image' => fn (string $image) => $url . $image,
-            ]
-        ]));
+        foreach($submissions as &$submission) {
+            $submission['image'] = $url . $submission['image'];
+        }
+
+        return $this->json($submissions);
     }
 
     #[ApiRoute(
