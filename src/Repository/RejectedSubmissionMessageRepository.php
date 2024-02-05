@@ -61,6 +61,6 @@ class RejectedSubmissionMessageRepository extends ServiceEntityRepository
 
         $query->bindValue('user', $user->getId());
 
-        return $query->executeQuery()->fetchAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 }
