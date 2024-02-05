@@ -147,8 +147,8 @@ class SubmissionController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function listSeason(
         Season $season,
+        Request $request,
         int $page = 1,
-        Request $request
     ): Response
     {
         $limit = 50;
