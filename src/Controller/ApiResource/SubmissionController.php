@@ -194,8 +194,6 @@ class SubmissionController extends AbstractController
     public function list(
         #[CurrentUser] User $user,
         RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository,
-        int $page,
-        int $limit = 50,
         Request $request,
     ): Response {
         $submissions = $rejectedSubmissionMessageRepository->findByUser($user);
