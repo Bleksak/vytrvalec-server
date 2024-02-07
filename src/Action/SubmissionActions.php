@@ -191,6 +191,8 @@ class SubmissionActions
             $this->rejectedSubmissionMessageRepository->remove($rejectedSubmission);
         }
 
+        $submission->setReviewed(false);
+
         $this->submissionRepository->save($submission, true);
 
         return [];
