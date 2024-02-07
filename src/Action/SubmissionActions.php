@@ -152,6 +152,12 @@ class SubmissionActions
 
     public function delete(Submission $submission): void
     {
+        $rejectedSubmission = $this->rejectedSubmissionMessageRepository->findOneBy(['submission' => $submission]);
+
+        if($rejectedSubmission !== null) {
+            $this->rejectedSubmissionMessageRepository->remove($rejectedSubmission);
+        }
+
         $this->submissionRepository->remove($submission, true);
     }
 
