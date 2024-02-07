@@ -60,7 +60,7 @@ class SubmissionController extends AbstractController
             return new Response(status: Response::HTTP_FORBIDDEN);
         }
 
-        if ($submission->isReviewed()) {
+        if ($submission->isReviewed() && $submission->isAccepted()) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
