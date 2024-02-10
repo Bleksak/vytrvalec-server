@@ -69,6 +69,10 @@ class SeasonController extends AbstractController
 
         $id = $this->action->create($form->getData());
 
+        if($id === -1) {
+            return $this->json(['season' => 'season_exists'], Response::HTTP_BAD_REQUEST);
+        }
+
         return $this->json(['id' => $id], Response::HTTP_CREATED);
     }
 

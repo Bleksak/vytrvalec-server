@@ -17,6 +17,12 @@ class SeasonActions
 
     public function create(SeasonDto $seasonDto): int
     {
+        $existingSeason = $this->seasonRepository->findByStartMonth($seasonDto->start);
+
+        if($existingSeason !== null) {
+            return -1;
+        }
+
         $season = new Season($seasonDto->start, $seasonDto->end, $seasonDto->charity);
 
         $this->seasonRepository->save($season, true);
