@@ -11,6 +11,11 @@ abstract class EmailTemplate
         return $this->context;
     }
 
+    public function setContext(string $name, mixed $value): void
+    {
+        $this->context[$name] = $value;
+    }
+
     abstract public function getSubject(): string;
     abstract public function getTemplate(): string;
 }

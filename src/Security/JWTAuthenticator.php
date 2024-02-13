@@ -28,7 +28,7 @@ class JWTAuthenticator extends AbstractAuthenticator
     public function supports(Request $request): ?bool
     {
         // if using isGranted properly, this is not a vulnerability
-        return ($request->cookies->has('jwt') || $request->headers->has('Authorization')) && $request->get('_route') !== 'api_user_login';
+        return ($request->headers->has('Authorization')) && $request->get('_route') !== 'api_user_login';
     }
 
     private function getHeaderToken(Request $request) : string|null

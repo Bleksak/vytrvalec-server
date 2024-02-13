@@ -2,6 +2,7 @@
 parameters:
     jwt_secret: '%env(JWT_SECRET)%'
     firebase_dsn: '%env(FIREBASE_DSN)%'
+    client_url: '%env(CLIENT_URL)%'
 
 framework:
     secret: '%env(APP_SECRET)%'

@@ -2,14 +2,17 @@
 
 namespace App\Action;
 
-use App\Dto\UserAccountChangeDto as AppUserAccountChangeDto;
+use App\Dto\UserAccountChangeDto;
 use App\Dto\UserDto;
 use App\Dto\UserEditDto;
+use App\Dto\PasswordResetDto;
 use App\Entity\User;
+use App\Notifications\EmailTemplate\ForgottenPasswordEmailTemplate;
 use App\Notifications\EmailTemplate\RegisterEmailTemplate;
 use App\Notifications\VytrvalecEmail;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -19,6 +22,7 @@ class UserActions
         private UserRepository $userRepository,
         private UserPasswordHasherInterface $hasher,
         private MailerInterface $mailer,
+        private ParameterBagInterface $params,
     )
     {
     }
@@ -81,7 +85,7 @@ class UserActions
     /**
      * @return array<string, array<int, string>>
      */
-    public function updateAccount(User $currentUser, AppUserAccountChangeDto $dto): array
+    public function updateAccount(User $currentUser, UserAccountChangeDto $dto): array
     {
         if($dto->email === null && $dto->password === null) {
             return ['email' => ['blank'], 'password' => ['blank']];
@@ -100,6 +104,36 @@ class UserActions
         catch(UniqueConstraintViolationException $e) {
             return ['email' => ['not_unique']];
         }
+
+        return [];
+    }
+
+    public function forgottenPasswordRequest(string $email, string $lang): void
+    {
+        $user = $this->userRepository->findOneBy(['email' => $email]);
+        $user->setPasswordResetToken(bin2hex(random_bytes(168)));
+
+        $this->userRepository->save($user, true);
+
+        $mail = new ForgottenPasswordEmailTemplate();
+        $mail->setContext('password_reset_link', $this->params->get('client_url') . '/reset-password/' . $user->getPasswordResetToken());
+
+        $this->mailer->send(new VytrvalecEmail($email, new ForgottenPasswordEmailTemplate()));
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    public function forgottenPasswordReset(PasswordResetDto $dto): array
+    {
+        $user = $this->userRepository->findOneBy(['passwordResetToken' => $dto->passwordResetToken]);
+
+        if($user === null) {
+            return ['user_not_found'];
+        }
+
+        $user->setPassword($this->hasher->hashPassword($user, $dto->password));
+        $user->setPasswordResetToken(null);
 
         return [];
     }

@@ -6,6 +6,7 @@ use App\Action\UserActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
 use App\Entity\User;
+use App\Form\PasswordResetFormType;
 use App\Form\UserCreateFormType;
 use App\Form\UserEditFormType;
 use App\Form\UserAccountChangeFormType;
@@ -38,9 +39,9 @@ class UserController extends AbstractController
     #[Route('/api/testing', name:'testing')]
     public function testingRoute(MailerInterface $m): Response
     {
-        $m->send(new VytrvalecEmail('test@test.com', new RegisterEmailTemplate()));
+        // $m->send(new VytrvalecEmail('test@test.com', new RegisterEmailTemplate()));
 
-        return $this->render('emails/register.twig');
+        return $this->render('emails/forgotten_password.twig', ['password_reset_link' => 'https://google.com']);
     }
 
     #[ApiRoute(
@@ -149,6 +150,65 @@ class UserController extends AbstractController
         ]);
 
         return $this->json($filtered);
+    }
+
+    #[ApiRoute(
+        '/api/user/password/{lang}',
+        name: 'api_user_forgotten_password',
+        methods: ['POST'],
+        documentation: 'Sends an email with a link to reset your password',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Password reset email sent',
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Bad request',
+            ]
+        ]
+    )]
+    public function forgottenPasswordRequest(Request $request, string $lang = 'cs'): Response
+    {
+        $email = $request->get('email');
+
+        if($email === null) {
+            return new Response(status: HTTP_BAD_REQUEST);
+        }
+
+        $this->action->forgottenPasswordRequest($email, $lang);
+
+        return new Response(status: HTTP_OK);
+    }
+
+    #[ApiRoute(
+        '/api/user/reset-password/',
+        name: 'api_user_forgotten_password',
+        methods: ['POST'],
+        documentation: 'Sends an email with a link to reset your password',
+        responses: [
+            Response::HTTP_OK => [
+                'message' => 'Password reset email sent',
+            ],
+            Response::HTTP_BAD_REQUEST => [
+                'message' => 'Bad request',
+            ]
+        ]
+    )]
+    public function forgottenPasswordReset(Request $request): Response
+    {
+        $form = $this->createForm(PasswordResetFormType::class);
+        $form->submit($request->getPayload());
+
+        if(!$form->isValid()) {
+            return $this->json(FormErrors::collect($form));
+        }
+
+        $errors = $this->action->forgottenPasswordReset($form->getData());
+
+        if(!empty($errors)) {
+            return $this->json($errors);
+        }
+
+        return new Response(status: HTTP_OK);
     }
 
     #[ApiRoute(

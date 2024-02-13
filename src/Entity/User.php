@@ -58,6 +58,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
     private Collection $profileCaches;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $passwordResetToken = null;
     /**
      * @param array<int,string> $roles
      */
@@ -217,5 +220,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
+    }
+
+    public function getPasswordResetToken(): ?string
+    {
+        return $this->passwordResetToken;
+    }
+
+    public function setPasswordResetToken(?string $passwordResetToken): static
+    {
+        $this->passwordResetToken = $passwordResetToken;
+
+        return $this;
     }
 }

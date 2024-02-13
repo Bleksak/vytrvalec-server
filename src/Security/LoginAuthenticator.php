@@ -81,7 +81,7 @@ class LoginAuthenticator extends AbstractAuthenticator
             ]),
         ]);
 
-        $response->headers->setCookie(new Cookie('jwt', $jwt, $expirationTime, secure: $request->isSecure(), httpOnly: true));
+        // $response->headers->setCookie(new Cookie('jwt', $jwt, $expirationTime, secure: $request->isSecure(), httpOnly: true));
 
         $firebaseToken = $request->getPayload()->get('firebase_token');
         $user = $token->getUser();
