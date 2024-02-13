@@ -24,6 +24,9 @@ framework:
     validation:
         email_validation_mode: strict
 
+    assets:
+        base_url: '%env(APP_URL)%'
+
 when@test:
     framework:
         test: true

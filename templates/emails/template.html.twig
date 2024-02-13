@@ -1,45 +1,48 @@
+{%apply inline_css(source('@styles/foundation.css'), source('@styles/foundation-emails.css')) %}
+{% apply inky_to_html %}
 <!DOCTYPE html>
 <html>
-<head>
-    {% block stylesheets %}
-        {{ encore_entry_link_tags('emails') }}
-    {% endblock %}
-
-    <style>
-        .divider {
-            width: 100%;
-            border-top: 1px solid black;
-            margin-bottom: 20px;
-        }
-    </style>
-</head>
-
 <body>
-
-{% apply inky_to_html %}
-
-    <container>
+    <container style="padding-top: 20px;">
     {% block head %}
-            <row class="collapse">
-                <columns large="2">Image</columns>
+            <row style="border-bottom: 2px solid #aaa;">
+                <columns style="padding-top: 10px;" large="2">
+                    <img style="width: 75px;" src="{{ absolute_url(asset('build/images/favicon.png')) }}" alt="Měsíční Vytrvalec" />
+                </columns>
                 <columns large="6">
-                    <container>
+                    <container style="margin-top: 30px;">
                         <row>
-                            <columns>Katedra</columns>
+                            <columns style="padding-bottom: 0;">
+                                <h1 style="margin: 0; font-weight: bold; font-size: 21px; color: #005cab;">Katedra</h1>
+                            </columns>
                         </row>
                         <row>
-                            <columns>tělesné výchovy a sportu</columns>
+                            <columns>
+                                <h2 style="margin: 0; font-weight: bolder; font-size: 19px; color: #aaa;">tělesné výchovy a sportu</h2>
+                            </columns>
                         </row>
                     </container>
                 </columns>
-                <columns large="4">Měsíční Vytrvalec</columns>
+                <columns large="4">
+                    <container style="margin-top: 60px;">
+                        <row>
+                            <columns style="padding-bottom: 0;">
+                                <h3 style="margin: 0; font-weight: bolder; font-size: 19px; color: #005cab;">Měsíční Vytrvalec</h3>
+                            </columns>
+                        </row>
+                    </container>
+                </columns>
             </row>
-            <div class="divider"></div>
     {% endblock %}
+    <row>
+        <columns align="right" style="padding-top: 20px;">
+            {% block content %}{% endblock %}
+        </columns>
+    </row>
 
-    {% block content %}{% endblock %}
     </container>
 
-{% endapply %}
 </body>
 </html>
+{% endapply %}
+{% endapply %}

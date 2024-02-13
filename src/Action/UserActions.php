@@ -6,16 +6,19 @@ use App\Dto\UserAccountChangeDto as AppUserAccountChangeDto;
 use App\Dto\UserDto;
 use App\Dto\UserEditDto;
 use App\Entity\User;
+use App\Notifications\EmailTemplate\RegisterEmailTemplate;
+use App\Notifications\VytrvalecEmail;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use UserAccountChangeDto;
 
 class UserActions
 {
     public function __construct(
         private UserRepository $userRepository,
         private UserPasswordHasherInterface $hasher,
+        private MailerInterface $mailer,
     )
     {
     }
@@ -30,6 +33,7 @@ class UserActions
 
         try {
             $this->userRepository->save($user, true);
+            $this->mailer->send(new VytrvalecEmail($dto->email, new RegisterEmailTemplate()));
         } catch(UniqueConstraintViolationException $e) {
             return ['email' => ['not_unique']];
         }

@@ -38,7 +38,7 @@ class UserController extends AbstractController
     #[Route('/api/testing', name:'testing')]
     public function testingRoute(MailerInterface $m): Response
     {
-        // $m->send(new VytrvalecEmail('test@test.com', new RegisterEmailTemplate()));
+        $m->send(new VytrvalecEmail('test@test.com', new RegisterEmailTemplate()));
 
         return $this->render('emails/register.twig');
     }
