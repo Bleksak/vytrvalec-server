@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('emails') }}
+    {% endblock %}
+
+    <style>
+        .divider {
+            width: 100%;
+            border-top: 1px solid black;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+{% apply inky_to_html %}
+
+    <container>
+    {% block head %}
+            <row class="collapse">
+                <columns large="2">Image</columns>
+                <columns large="6">
+                    <container>
+                        <row>
+                            <columns>Katedra</columns>
+                        </row>
+                        <row>
+                            <columns>tělesné výchovy a sportu</columns>
+                        </row>
+                    </container>
+                </columns>
+                <columns large="4">Měsíční Vytrvalec</columns>
+            </row>
+            <div class="divider"></div>
+    {% endblock %}
+
+    {% block content %}{% endblock %}
+    </container>
+
+{% endapply %}
+</body>
+</html>
