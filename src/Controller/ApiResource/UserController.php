@@ -154,7 +154,7 @@ class UserController extends AbstractController
 
     #[ApiRoute(
         '/api/user/password/{lang}',
-        name: 'api_user_forgotten_password',
+        name: 'api_user_forgotten_password_request',
         methods: ['POST'],
         documentation: 'Sends an email with a link to reset your password',
         responses: [
@@ -168,7 +168,12 @@ class UserController extends AbstractController
     )]
     public function forgottenPasswordRequest(Request $request, string $lang = 'cs'): Response
     {
-        $email = $request->get('email');
+        $supportedLanguages = ['cs', 'en'];
+        if(!in_array($lang, $supportedLanguages)) {
+            $lang = 'cs';
+        }
+
+        $email = $request->getPayload()->get('email');
 
         if($email === null) {
             return new Response(status: Response::HTTP_BAD_REQUEST);

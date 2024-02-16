@@ -111,14 +111,14 @@ class UserActions
     public function forgottenPasswordRequest(string $email, string $lang): void
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
-        $user->setPasswordResetToken(bin2hex(random_bytes(168)));
+        $user->setPasswordResetToken(bin2hex(random_bytes(120)));
 
         $this->userRepository->save($user, true);
 
         $mail = new ForgottenPasswordEmailTemplate();
         $mail->setContext('password_reset_link', $this->params->get('client_url') . '/reset-password/' . $user->getPasswordResetToken());
 
-        $this->mailer->send(new VytrvalecEmail($email, new ForgottenPasswordEmailTemplate()));
+        $this->mailer->send(new VytrvalecEmail($email, $mail));
     }
 
     /**
