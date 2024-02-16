@@ -171,12 +171,12 @@ class UserController extends AbstractController
         $email = $request->get('email');
 
         if($email === null) {
-            return new Response(status: HTTP_BAD_REQUEST);
+            return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
         $this->action->forgottenPasswordRequest($email, $lang);
 
-        return new Response(status: HTTP_OK);
+        return new Response(status: Response::HTTP_OK);
     }
 
     #[ApiRoute(
@@ -196,7 +196,7 @@ class UserController extends AbstractController
     public function forgottenPasswordReset(Request $request): Response
     {
         $form = $this->createForm(PasswordResetFormType::class);
-        $form->submit($request->getPayload());
+        $form->submit($request->getPayload()->all());
 
         if(!$form->isValid()) {
             return $this->json(FormErrors::collect($form));
@@ -208,7 +208,7 @@ class UserController extends AbstractController
             return $this->json($errors);
         }
 
-        return new Response(status: HTTP_OK);
+        return new Response(status: Response::HTTP_OK);
     }
 
     #[ApiRoute(
