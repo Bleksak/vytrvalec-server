@@ -147,7 +147,8 @@ class SubmissionActions
             $this->firebase->send(new VytrvalecNotification($submission->getUser(), $message));
         }
 
-        $this->mailer->send(new VytrvalecEmail($submission->getUser(), new SubmissionRejectedEmailTemplate($submission, $message)));
+        // TODO: send mail when it's styled
+        // $this->mailer->send(new VytrvalecEmail($submission->getUser(), new SubmissionRejectedEmailTemplate($submission, $message)));
     }
 
     public function delete(Submission $submission): void

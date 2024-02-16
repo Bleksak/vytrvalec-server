@@ -111,7 +111,7 @@ class UserActions
     public function forgottenPasswordRequest(string $email, string $lang): void
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
-        $user->setPasswordResetToken(bin2hex(random_bytes(120)));
+        $user->setPasswordResetToken(bin2hex(random_bytes(90)));
 
         $this->userRepository->save($user, true);
 
