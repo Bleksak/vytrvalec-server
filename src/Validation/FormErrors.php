@@ -2,14 +2,14 @@
 
 namespace App\Validation;
 
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
 class FormErrors
 {
     /**
      * @return array<string, array<int, string>>
      */
-    public static function collect(Form $form): array
+    public static function collect(FormInterface $form): array
     {
         $errors = [];
         foreach($form as $child) {
