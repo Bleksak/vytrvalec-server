@@ -47,14 +47,14 @@ class RejectedSubmissionMessageRepository extends ServiceEntityRepository
     {
         $query = $this->getEntityManager()->getConnection()->prepare('
             SELECT * FROM (
-                SELECT null as message, s.id as s_id, s.activity_id, s.week, s.distance, s.elevation, s.accepted, s.reviewed, s.date, s.image, s.updated_at
+                SELECT null as message, s.id as id, s.activity_id, s.week, s.distance, s.elevation, s.accepted, s.reviewed, s.date, s.image, s.updated_at
                 FROM submission s
                 WHERE s.user_id = :user
                 AND NOT EXISTS (
                     SELECT id FROM rejected_submission_message m WHERE m.id = s.id
                 )
                 UNION ALL
-                SELECT m.message, s.id as s_id, s.activity_id, s.week, s.distance, s.elevation, s.accepted, s.reviewed, s.date, s.image, s.updated_at
+                SELECT m.message, s.id as id, s.activity_id, s.week, s.distance, s.elevation, s.accepted, s.reviewed, s.date, s.image, s.updated_at
                 FROM rejected_submission_message m
                 INNER JOIN submission s ON s.id = m.id
                 WHERE s.user_id = :user
