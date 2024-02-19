@@ -94,14 +94,14 @@ class SubmissionActions
             return ['mismatch_updated_at'];
         }
 
-        $submission->setReviewed(true);
-        $submission->setAccepted($dto->state);
-
         if ($dto->state) {
             $this->accept($submission);
         } else {
             $this->reject($submission, $dto->message);
         }
+
+        $submission->setReviewed(true);
+        $submission->setAccepted($dto->state);
 
         $this->submissionRepository->save($submission, true);
 
@@ -123,7 +123,7 @@ class SubmissionActions
             $this->rejectedSubmissionMessageRepository->remove($rejectedSubmission);
         }
 
-        $this->profileCacheRepository->addCache($submission, false);
+        $this->profileCacheRepository->addCache($submission, true);
     }
     /**
      * @return array<int,string>

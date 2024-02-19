@@ -349,7 +349,7 @@ class SubmissionController extends AbstractController
         if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
-        
+
         return $this->json($submission->getUpdatedAt());
     }
 }
