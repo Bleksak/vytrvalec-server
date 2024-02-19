@@ -396,7 +396,7 @@ class UserController extends AbstractController
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function update(Request $request, User $user = null, #[CurrentUser] User $currentUser): Response
+    public function update(Request $request, User $user = null): Response
     {
         $form = $this->createForm(UserEditFormType::class);
         $form->submit($request->getPayload()->all());
