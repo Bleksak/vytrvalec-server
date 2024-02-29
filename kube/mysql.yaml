@@ -17,6 +17,7 @@ kind: StatefulSet
 metadata:
   name: db
 spec:
+  serviceName: db
   selector:
     matchLabels:
       app: db

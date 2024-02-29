@@ -45,8 +45,8 @@ RUN npm install && npm run build
 RUN composer install --no-interaction && composer dump
 
 RUN { \
-        echo 'APP_ENV=dev'; \
-        echo 'APP_DEBUG=true'; \
+        echo 'APP_ENV=prod'; \
+        echo 'APP_DEBUG=false'; \
         echo 'APP_SECRET=55d65dd62cf9470efc0b38d7684c22a8'; \
         echo 'JWT_SECRET=jwt_28xcvwoWE93749sdhfjk'; \
         echo 'FIREBASE_DSN=firebase://magnetka136@gmail.com:yToo625c6W53835+@default'; \
