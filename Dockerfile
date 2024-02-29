@@ -49,7 +49,7 @@ RUN { \
         echo 'APP_DEBUG=true'; \
         echo 'APP_SECRET=55d65dd62cf9470efc0b38d7684c22a8'; \
         echo 'JWT_SECRET=jwt_28xcvwoWE93749sdhfjk'; \
-        echo 'FIREBASE_DSN=TODO: replace; \
+        echo 'FIREBASE_DSN=firebase://magnetka136@gmail.com:yToo625c6W53835+@default'; \
         echo 'APP_URL=https://vytrvalec.kts.zcu.cz/api'; \
         echo 'CLIENT_URL=https://vytrvalec.kts.zcu.cz'; \
         echo 'DATABASE_URL="mysql://db:db@db/db?serverVersion=8.3.0&charset=utf8"'; \
@@ -57,4 +57,3 @@ RUN { \
         echo 'CORS_ALLOW_ORIGIN="vytrvalec.kts.zcu.cz"'; \
         echo 'MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0'; \
     } > .env.local
-
