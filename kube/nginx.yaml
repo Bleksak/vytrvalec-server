@@ -19,8 +19,12 @@ spec:
           configMap:
             name: nginx-config
 
+      imagePullSecrets:
+        - name: server-deploy-token
+
       containers:
       - name: vytrvalec-nginx
+        imagePullPolicy: IfNotPresent
         image: nginx:1.25.4-alpine
         ports:
           - containerPort: 80
@@ -35,8 +39,8 @@ spec:
 
       - name: vytrvalec-web
         # TODO: tady zmenit image na url
-        imagePullPolicy: IfNotPresent
-        image: web
+        imagePullPolicy: Always
+        image: ipmil.civ.zcu.cz:4567/kiv/vytrvalec-server/app:${CI_COMMIT_SHORT_SHA}
         volumeMounts:
           - name: shared-files
             mountPath: /var/www/vytrvalec

@@ -1,0 +1,34 @@
+image: alpine:3.19
+
+variables:
+  K8S_VERSION: v1.22.5
+  APP: ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_SHORT_SHA}
+  KUSTOMIZE: kustomization/kustomize.yaml
+
+# build docker images
+build application image:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  # comment this out on production
+  when: manual
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile Dockerfile --destination $APP --verbosity info
+
+# deploy test to kubernetes
+deploy test:
+  stage: deploy
+  environment: production
+  #only:
+  #  - /^test/
+  when: manual
+  script:
+    - wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$K8S_VERSION/bin/linux/amd64/kubectl
+    - chmod +x /usr/local/bin/kubectl
+    - apk add gettext
+    - cat kube/nginx.yaml | envsubst | tee kube/nginx.yaml
+    - kubectl apply -f kube
+
