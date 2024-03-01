@@ -45,16 +45,15 @@ RUN npm install && npm run build
 RUN composer install --no-interaction && composer dump
 
 RUN { \
-        echo 'APP_ENV=dev'; \
-        echo 'APP_DEBUG=true'; \
-        echo 'APP_SECRET=55d65dd62cf9470efc0b38d7684c22a8'; \
-        echo 'JWT_SECRET=jwt_28xcvwoWE93749sdhfjk'; \
-        echo 'FIREBASE_DSN=TODO: replace; \
+        echo 'APP_ENV=prod'; \
+        echo 'APP_DEBUG=false'; \
+        echo 'APP_SECRET=$APP_SECRET'; \
+        echo 'JWT_SECRET=$JWT_SECRET'; \
+        echo 'FIREBASE_DSN=firebase://$FIREBASE_EMAIL:$FIREBASE_PASSWORD+@default'; \
         echo 'APP_URL=https://vytrvalec.kts.zcu.cz/api'; \
         echo 'CLIENT_URL=https://vytrvalec.kts.zcu.cz'; \
         echo 'DATABASE_URL="mysql://db:db@db/db?serverVersion=8.3.0&charset=utf8"'; \
-        echo 'MAILER_DSN=smtp://localhost:1025'; \
+        echo 'MAILER_DSN=smtp://$SMTP_USER:$SMTP_PASSWORD@$SMTP_HOST:$SMTP_PORT'; \
         echo 'CORS_ALLOW_ORIGIN="vytrvalec.kts.zcu.cz"'; \
         echo 'MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0'; \
     } > .env.local
-
