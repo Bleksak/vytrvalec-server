@@ -9,7 +9,7 @@ variables:
 build application image:
   stage: build
   image:
-    name: gcr.io/kaniko-project/executor:debug
+    name: papko26/kaniko_envsubst
     entrypoint: [""]
   # comment this out on production
   when: manual
