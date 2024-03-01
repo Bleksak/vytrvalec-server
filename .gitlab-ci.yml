@@ -9,14 +9,13 @@ variables:
 build application image:
   stage: build
   image:
-    name: gcr.io/kaniko-project/executor:debug
+    name: papko26/kaniko_envsubst
     entrypoint: [""]
   # comment this out on production
   when: manual
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - apk add gettext
     - cat Dockerfile | envsubst | tee Dockerfile
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile Dockerfile --destination $APP --verbosity info
 
