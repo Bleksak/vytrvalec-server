@@ -54,6 +54,6 @@ class WeeklyDistanceExtraPoints implements ExtraPoints
 
     public static function reward(): int
     {
-        return 1;
+        return 2;
     }
 }
