@@ -1,7 +1,8 @@
 FROM php:8.2.14-fpm
 
+RUN curl -sL https://deb.nodesource.com/setup_21.x | bash -
 RUN apt-get update -y \
-    && apt-get install -y nginx libmagickwand-dev libicu-dev libxslt-dev libpng-dev sendmail zlib1g-dev libzip-dev libonig-dev curl
+    && apt-get install -y nginx libmagickwand-dev libicu-dev libxslt-dev libpng-dev sendmail zlib1g-dev libzip-dev libonig-dev curl nodejs supervisor
 
 # PHP_CPPFLAGS are used by the docker-php-ext-* scripts
 ENV PHP_CPPFLAGS="$PHP_CPPFLAGS -std=c++11"
@@ -11,16 +12,9 @@ RUN bash -c '[[ -n "$(pecl list | grep imagick)" ]]\
  || (pecl install imagick && docker-php-ext-enable imagick)'
 
 RUN docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install opcache \
     && docker-php-ext-configure intl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd \
-    && docker-php-ext-install intl \
-    && docker-php-ext-install zip \
-    && docker-php-ext-install mbstring \
-    && docker-php-ext-install ffi \
-    && docker-php-ext-install xsl \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install -j$(nproc) opcache gd intl zip mbstring ffi xsl
 RUN { \
         echo 'opcache.memory_consumption=128'; \
         echo 'opcache.interned_strings_buffer=8'; \
@@ -32,9 +26,6 @@ RUN { \
 
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-RUN curl -sL https://deb.nodesource.com/setup_21.x | bash - \
-    && apt-get install -y nodejs
 
 WORKDIR /app
 COPY . .
@@ -57,3 +48,14 @@ RUN { \
         echo 'CORS_ALLOW_ORIGIN="vytrvalec.kts.zcu.cz"'; \
         echo 'MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0'; \
     } > .env.local
+
+RUN {\
+        echo '[program:queue]'; \
+        echo 'command=php bin/console messenger:consume async'; \
+        echo 'autostart=true'; \
+        echo 'autorestart=true'; \
+        echo 'stderr_logfile=/var/log/queue.err.log'; \
+        echo 'stdout_logfile=/var/log/queue.out.log'; \
+    } > /etc/supervisor/conf.d/queue.conf
+
+RUN rm -rf /var/lib/apt/lists/*

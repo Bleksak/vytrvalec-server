@@ -49,12 +49,13 @@ spec:
         volumeMounts:
           - name: shared-files
             mountPath: /var/www/vytrvalec
+
           - name: upload-pv
             mountPath: /var/www/vytrvalec/public/uploads
         lifecycle:
           postStart:
             exec:
-              command: ["/bin/sh", "-c", "cp -r /app/. /var/www/vytrvalec && chown -R www-data:www-data /var/www/vytrvalec"]
+                command: ["/bin/sh", "-c", "cp -r /app/. /var/www/vytrvalec && chown -R www-data:www-data /var/www/vytrvalec && supervisord -c /etc/supervisor/supervisord.conf"]
 ---
 apiVersion: v1
 kind: Service
