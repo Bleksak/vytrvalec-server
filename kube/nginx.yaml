@@ -18,6 +18,9 @@ spec:
         - name: nginx-config-volume
           configMap:
             name: nginx-config
+        - name: upload-pv
+          persistentVolumeClaim:
+            claimName: upload-pv
 
       imagePullSecrets:
         - name: server-deploy-token
@@ -36,6 +39,9 @@ spec:
           - name: nginx-config-volume
             mountPath: /etc/nginx/conf.d/default.conf
             subPath: default.conf
+
+          - name: upload-pv
+            mountPath: /var/www/vytrvalec/public/uploads
 
       - name: vytrvalec-web
         imagePullPolicy: Always
@@ -61,3 +67,15 @@ spec:
       protocol: TCP
       targetPort: 80
       name: http
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: upload-pv
+spec:
+  storageClassName: csi-rbd-synergia
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
