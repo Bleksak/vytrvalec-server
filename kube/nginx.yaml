@@ -3,6 +3,7 @@ kind: StatefulSet
 metadata:
   name: vytrvalec-nginx
 spec:
+  serviceName: vytrvalec-nginx-statefulset
   selector:
     matchLabels:
       app: vytrvalec-nginx
