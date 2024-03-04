@@ -1,9 +1,8 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: vytrvalec-nginx
 spec:
-  serviceName: vytrvalec-nginx-statefulset
   selector:
     matchLabels:
       app: vytrvalec-nginx
@@ -50,6 +49,8 @@ spec:
         volumeMounts:
           - name: shared-files
             mountPath: /var/www/vytrvalec
+          - name: upload-pv
+            mountPath: /var/www/vytrvalec/public/uploads
         lifecycle:
           postStart:
             exec:
