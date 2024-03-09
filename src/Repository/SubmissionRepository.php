@@ -6,7 +6,6 @@ use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -42,37 +41,43 @@ class SubmissionRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
     /**
      * @return Paginator<Submission>
      */
     public function findAllByUser(User $user, int $page, int $limit): Paginator
     {
-        $query = $this->createQueryBuilder('s')
+        $query = $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->where('s.user = :userId')
             ->addOrderBy('s.date', 'DESC')
             ->setParameter('userId', $user->getId());
 
         $paginator = new Paginator($query);
-        $paginator->getQuery()
+        $paginator
+            ->getQuery()
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
 
         return $paginator;
     }
+
     /**
      * @return Paginator<Submission>
      */
     public function findBySeason(Season $season, int $page, int $limit): Paginator
     {
-        $query = $this->createQueryBuilder('s')
+        $query = $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->where('s.season = :seasonId')
             ->orderBy('s.date', 'DESC')
             ->setParameter('seasonId', $season->getId());
 
         $paginator = new Paginator($query);
-        $paginator->getQuery()
+        $paginator
+            ->getQuery()
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
 
@@ -80,11 +85,12 @@ class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
-    * @return array<int,Submission>
-    */
+     * @return array<int,Submission>
+     */
     public function findUnreviewed(int $limit): array
     {
-        return $this->createQueryBuilder('s')
+        return $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->andWhere('s.reviewed = :reviewed')
             ->setParameter('reviewed', false)
@@ -111,5 +117,61 @@ class SubmissionRepository extends ServiceEntityRepository
         ');
 
         return $query->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * @param array<string,string> $filter
+     * @return Paginator<Submission>
+     */
+    public function findBySeasonAndFilter(Season $season, array $filter, int $page, int $limit): Paginator
+    {
+        $queryBuilder = $this
+            ->createQueryBuilder('s')
+            ->select('s')
+            ->where('s.season = :seasonId')
+            ->join('s.user', 'u')
+            ->setParameter('seasonId', $season->getId())
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->addOrderBy('s.date', 'ASC')
+            ->addOrderBy('s.id', 'ASC');
+
+        foreach ($filter as $key => $value) {
+            $queryBuilder = match ($key) {
+                'date' => $queryBuilder
+                    ->andWhere('s.date = :date')
+                    ->setParameter('date', $value),
+
+                'week' => $queryBuilder
+                    ->andWhere('s.week = :weekId')
+                    ->setParameter('weekId', $value),
+
+                'accepted' => $queryBuilder
+                    ->andWhere('s.accepted = :accepted')
+                    ->setParameter('accepted', $value),
+
+                'reviewed' => $queryBuilder
+                    ->andWhere('s.reviewed = :reviewed')
+                    ->setParameter('reviewed', $value),
+
+                'user' => $queryBuilder
+                    ->andWhere('u.email LIKE :userId')
+                    ->setParameter('userId', $value),
+
+                'faculty' => $queryBuilder
+                    ->andWhere('u.faculty = :facultyId')
+                    ->setParameter('facultyId', $value),
+
+                'activity' => $queryBuilder
+                    ->andWhere('s.activity = :activityId')
+                    ->setParameter('activityId', $value),
+
+                default => $queryBuilder,
+            };
+        }
+
+        $paginator = new Paginator($queryBuilder->getQuery());
+
+        return $paginator;
     }
 }

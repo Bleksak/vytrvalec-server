@@ -6,10 +6,13 @@ use App\Action\SeasonActions;
 use App\Attributes\ApiResource;
 use App\Attributes\ApiRoute;
 use App\CustomLogic\SeasonResult;
+use App\Entity\Activity;
+use App\Entity\Faculty;
 use App\Entity\Season;
 use App\Form\SeasonFormType;
 use App\Repository\CacheRepository;
 use App\Repository\SeasonRepository;
+use App\Repository\SubmissionRepository;
 use App\Validation\FormErrors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,8 +28,7 @@ class SeasonController extends AbstractController
         private readonly SeasonRepository $seasonRepository,
         private readonly NormalizerInterface $normalizer,
         private readonly SeasonActions $action,
-    ) {
-    }
+    ) {}
 
     #[ApiRoute(
         '/api/season',
@@ -63,13 +65,13 @@ class SeasonController extends AbstractController
         $form->submit($request->getPayload()->all());
 
         $errors = FormErrors::collect($form);
-        if(!empty($errors)) {
+        if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $id = $this->action->create($form->getData());
 
-        if($id === -1) {
+        if ($id === -1) {
             return $this->json(['season' => 'season_exists'], Response::HTTP_BAD_REQUEST);
         }
 
@@ -104,9 +106,15 @@ class SeasonController extends AbstractController
             return $this->json([], Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($this->normalizer->normalize($season, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions']
-        ]));
+        return $this->json(
+            $this->normalizer->normalize(
+                $season,
+                null,
+                [
+                    AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions']
+                ]
+            )
+        );
     }
 
     #[ApiRoute(
@@ -142,7 +150,7 @@ class SeasonController extends AbstractController
         '/api/season/{season}/results',
         name: 'api_season_results',
         methods: ['GET'],
-        documentation: 'Retrieves a <code>Season</code>\'s results',
+        documentation: "Retrieves a <code>Season</code>'s results",
         responses: [
             Response::HTTP_OK => [
                 'message' => 'Successfully calculated results',
@@ -175,7 +183,7 @@ class SeasonController extends AbstractController
     {
         $cache = $cacheRepository->findOneBy(['season' => $season->getId()]);
 
-        if($cache !== null) {
+        if ($cache !== null) {
             return $this->json($cache->getData());
         }
 
@@ -196,17 +204,49 @@ class SeasonController extends AbstractController
         ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function submissions(Season $season, Request $request): Response
+    public function submissions(SubmissionRepository $submissionRepository, Season $season, Request $request): Response
     {
         $scheme = $request->getScheme();
         $hostname = $request->getHost();
 
         $url = $scheme . '://' . $hostname;
 
-        return $this->json($this->normalizer->normalize($season->getSubmissions(), null, [
-            AbstractNormalizer::GROUPS => ['fetchSubmission'],
-            AbstractNormalizer::CALLBACKS => ['image' => fn (string $image) => $url . $image]
-        ]));
+        $queryFilterKeys = [
+            'date',
+            'week',
+            'accepted',
+            'reviewed',
+            'user',
+            'faculty',
+            'activity'
+        ];
+
+        $queryFilter = [];
+        foreach ($queryFilterKeys as $key) {
+            $data = $request->get($key, null);
+
+            if($data !== null) {
+                $queryFilter[$key] = $data;
+            }
+        }
+
+        $results = $submissionRepository->findBySeasonAndFilter($season, $queryFilter, $request->get('page', 1), 25);
+
+        return $this->json(
+            $this->normalizer->normalize(
+                $results,
+                null,
+                [
+                    AbstractNormalizer::GROUPS => ['fetchSubmission'],
+                    AbstractNormalizer::CALLBACKS => [
+                        'image' => fn(string $image) => $url . $image,
+                        'activity' => fn(Activity $activity) => $activity->getId(),
+                        'faculty' => fn(Faculty $faculty) => $faculty->getId(),
+                    ],
+                    AbstractNormalizer::IGNORED_ATTRIBUTES => ['season']
+                ]
+            )
+        );
     }
 
     #[ApiRoute(
@@ -232,9 +272,13 @@ class SeasonController extends AbstractController
     )]
     public function indexPast(): Response
     {
-        $seasons = $this->normalizer->normalize($this->seasonRepository->findPast(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
-        ]);
+        $seasons = $this->normalizer->normalize(
+            $this->seasonRepository->findPast(),
+            null,
+            [
+                AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
+            ]
+        );
 
         return $this->json($seasons);
     }
@@ -259,10 +303,14 @@ class SeasonController extends AbstractController
     )]
     public function season(Season $season): Response
     {
-        $season = $this->normalizer->normalize($season, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
-            AbstractNormalizer::CALLBACKS => ['charity' => fn($charity) => $charity->getId()]
-        ]);
+        $season = $this->normalizer->normalize(
+            $season,
+            null,
+            [
+                AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
+                AbstractNormalizer::CALLBACKS => ['charity' => fn($charity) => $charity->getId()]
+            ]
+        );
 
         return $this->json($season);
     }
@@ -288,10 +336,14 @@ class SeasonController extends AbstractController
     )]
     public function seasonList(): Response
     {
-        $seasons = $this->normalizer->normalize($this->seasonRepository->findOrdered(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions'],
-            AbstractNormalizer::CALLBACKS => ['charity' => fn($charity) => $charity->getId()]
-        ]);
+        $seasons = $this->normalizer->normalize(
+            $this->seasonRepository->findOrdered(),
+            null,
+            [
+                AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions'],
+                AbstractNormalizer::CALLBACKS => ['charity' => fn($charity) => $charity->getId()]
+            ]
+        );
 
         return $this->json($seasons);
     }
