@@ -188,7 +188,7 @@ class UserController extends AbstractController
         '/api/user/reset-password/',
         name: 'api_user_forgotten_password',
         methods: ['POST'],
-        documentation: 'Sends an email with a link to reset your password',
+        documentation: 'Resets the users\' password if the token is valid',
         responses: [
             Response::HTTP_OK => [
                 'message' => 'Password reset email sent',
@@ -204,13 +204,13 @@ class UserController extends AbstractController
         $form->submit($request->getPayload()->all());
 
         if(!$form->isValid()) {
-            return $this->json(FormErrors::collect($form));
+            return $this->json(FormErrors::collect($form), Response::HTTP_BAD_REQUEST);
         }
 
         $errors = $this->action->forgottenPasswordReset($form->getData());
 
         if(!empty($errors)) {
-            return $this->json($errors);
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         return new Response(status: Response::HTTP_OK);
