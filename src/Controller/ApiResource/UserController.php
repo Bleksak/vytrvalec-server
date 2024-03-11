@@ -185,13 +185,13 @@ class UserController extends AbstractController
     }
 
     #[ApiRoute(
-        '/api/user/reset-password/',
+        '/api/user/reset-password',
         name: 'api_user_forgotten_password',
         methods: ['POST'],
-        documentation: 'Sends an email with a link to reset your password',
+        documentation: 'Restarts user password',
         responses: [
             Response::HTTP_OK => [
-                'message' => 'Password reset email sent',
+                'message' => 'Successfully changed password',
             ],
             Response::HTTP_BAD_REQUEST => [
                 'message' => 'Bad request',
