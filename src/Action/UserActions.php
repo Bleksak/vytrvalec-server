@@ -135,6 +135,8 @@ class UserActions
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
         $user->setPasswordResetToken(null);
 
+        $this->userRepository->save($user, true);
+
         return [];
     }
 }
