@@ -156,7 +156,7 @@ class SubmissionRepository extends ServiceEntityRepository
 
                 'user' => $queryBuilder
                     ->andWhere('u.email LIKE :userId')
-                    ->setParameter('userId', $value),
+                    ->setParameter('userId', $value . '%'),
 
                 'faculty' => $queryBuilder
                     ->andWhere('u.faculty = :facultyId')
