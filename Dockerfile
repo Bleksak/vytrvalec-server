@@ -1,3 +1,6 @@
+ENV UPLOAD_LIMIT=100M
+ENV PHP_MEMORY_LIMIT=256M
+
 FROM php:8.2.14-fpm
 
 RUN curl -sL https://deb.nodesource.com/setup_21.x | bash -
