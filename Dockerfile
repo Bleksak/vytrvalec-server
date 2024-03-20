@@ -63,6 +63,8 @@ RUN {\
 
 RUN rm -rf /var/lib/apt/lists/*
 
+RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+
 RUN {\
     echo 'memory_limit = 256M'; \
     echo 'upload_max_filesize = 100M'; \
