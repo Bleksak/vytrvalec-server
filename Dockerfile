@@ -66,4 +66,4 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN {\
     echo 'memory_limit = 256M'; \
     echo 'upload_max_filesize = 100M'; \
-} > $PHP_INI_DIR/conf.d/memory_limit.ini
+} > /usr/local/etc/php/conf.d/memory_limit.ini
