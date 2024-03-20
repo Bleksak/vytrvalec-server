@@ -45,7 +45,7 @@ class SubmissionForm extends AbstractType
             'constraints' => ($required ? [
                 new Assert\NotBlank(message: 'blank', allowNull: false),
             ] : []) + [
-                new Assert\Image(mimeTypesMessage: 'invalid', maxSize: '4M', maxSizeMessage: 'too_large'),
+                new Assert\Image(mimeTypesMessage: 'invalid', maxSize: '15M', maxSizeMessage: 'too_large'),
             ],
         ]);
 
