@@ -10,17 +10,11 @@ use App\Form\PasswordResetFormType;
 use App\Form\UserCreateFormType;
 use App\Form\UserEditFormType;
 use App\Form\UserAccountChangeFormType;
-use App\Notifications\EmailTemplate\RegisterEmailTemplate;
-use App\Notifications\VytrvalecEmail;
 use App\Repository\UserRepository;
 use App\Validation\FormErrors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -34,14 +28,6 @@ class UserController extends AbstractController
         private readonly UserRepository $userRepository,
         private readonly UserActions $action,
     ) {
-    }
-
-    #[Route('/api/testing', name:'testing')]
-    public function testingRoute(MailerInterface $m): Response
-    {
-        // $m->send(new VytrvalecEmail('test@test.com', new RegisterEmailTemplate()));
-
-        return $this->render('emails/forgotten_password.twig', ['password_reset_link' => 'https://google.com']);
     }
 
     #[ApiRoute(
