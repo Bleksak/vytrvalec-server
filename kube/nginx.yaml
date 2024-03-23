@@ -78,7 +78,7 @@ metadata:
 spec:
   storageClassName: csi-rbd-synergia
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 20Gi
