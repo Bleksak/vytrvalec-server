@@ -44,6 +44,7 @@ RUN { \
         echo 'APP_SECRET=${APP_SECRET}'; \
         echo 'JWT_SECRET=${JWT_SECRET}'; \
         echo 'FIREBASE_DSN=firebase://${FIREBASE_EMAIL}:${FIREBASE_PASSWORD}+@default'; \
+        echo 'APP_BASE_URL=https://vytrvalec.kts.zcu.cz'; \
         echo 'APP_URL=https://vytrvalec.kts.zcu.cz/api'; \
         echo 'CLIENT_URL=https://vytrvalec.kts.zcu.cz'; \
         echo 'DATABASE_URL="mysql://db:db@db/db?serverVersion=8.3.0&charset=utf8"'; \

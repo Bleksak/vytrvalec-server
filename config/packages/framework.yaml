@@ -1,5 +1,7 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 parameters:
+    app_base: '%env(APP_BASE_URL)%'
+    app_url: '%env(APP_URL)%'
     jwt_secret: '%env(JWT_SECRET)%'
     firebase_dsn: '%env(FIREBASE_DSN)%'
     client_url: '%env(CLIENT_URL)%'

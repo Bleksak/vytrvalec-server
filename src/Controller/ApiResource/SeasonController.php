@@ -206,7 +206,7 @@ class SeasonController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function submissions(SubmissionRepository $submissionRepository, Season $season, Request $request): Response
     {
-        $url = $request->getSchemeAndHttpHost();
+        $url = $this->getParameter('app_base');
 
         $queryFilterKeys = [
             'date',

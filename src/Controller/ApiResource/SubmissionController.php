@@ -155,7 +155,7 @@ class SubmissionController extends AbstractController
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
 
-        $url = $request->getSchemeAndHttpHost();
+        $url = $this->getParameter('app_base');
 
         return $this->json(
             $this->normalizer->normalize(
@@ -195,7 +195,7 @@ class SubmissionController extends AbstractController
     ): Response {
         $submissions = $rejectedSubmissionMessageRepository->findByUser($user);
 
-        $url = $request->getSchemeAndHttpHost();
+        $url = $this->getParameter('app_base');
 
         foreach($submissions as &$submission) {
             $submission['image'] = $url . $submission['image'];
@@ -218,7 +218,7 @@ class SubmissionController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function unresolvedList(Request $request, int $count): Response
     {
-        $url = $request->getSchemeAndHttpHost();
+        $url = $this->getParameter('app_base');
 
         return $this->json($this->normalizer->normalize($this->submissionRepository->findUnreviewed($count), null, [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
