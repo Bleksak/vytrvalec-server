@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransport;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\Notification\WebNotification;
+use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -34,6 +35,10 @@ class Firebase
             ->options($webNotification)
         ;
 
-        return $this->firebase->send($message);
+        try {
+            return $this->firebase->send($message);
+        } catch(TransportException) {
+            return null;
+        }
     }
 }
