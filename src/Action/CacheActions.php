@@ -20,6 +20,10 @@ class CacheActions
         $cache = $this->cacheRepository->findOneBy(['season' => $season->getId()]);
         $result = $this->seasonResult->calculate($season);
 
+        if(empty($result)) {
+            return;
+        }
+
         if($cache !== null) {
             $cache->setData($result);
             $this->cacheRepository->save($cache, true);
