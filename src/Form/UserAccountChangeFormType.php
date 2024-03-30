@@ -25,7 +25,7 @@ class UserAccountChangeFormType extends AbstractType
         $builder->add('password', PasswordType::class, [
             'property_path' => 'password',
             'constraints' => [
-                new Assert\PasswordStrength(message: 'weak', minScore: 2),
+                new Assert\PasswordStrength(message: 'weak', minScore: 1),
             ]
         ]);
         $builder->add('email', EmailType::class, [

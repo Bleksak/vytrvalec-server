@@ -18,7 +18,7 @@ class PasswordResetFormType extends AbstractType
             ->add('password', PasswordType::class, [
                 'constraints' => [
                     new Assert\NotBlank(message: 'blank', allowNull: false),
-                    new Assert\PasswordStrength(message: 'weak', minScore: 2),
+                    new Assert\PasswordStrength(message: 'weak', minScore: 1),
                 ]
             ])
             ->add('password_reset_token', TextType::class, [
