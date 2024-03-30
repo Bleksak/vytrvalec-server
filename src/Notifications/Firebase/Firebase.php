@@ -21,7 +21,7 @@ class Firebase
             ->create(new Dsn($parameterBag->get('firebase_dsn')));
     }
 
-    public function send(FirebaseNotification $notification): SentMessage
+    public function send(FirebaseNotification $notification): ?SentMessage
     {
         $webNotification = (new WebNotification($notification->to(), []))
             ->title($notification->title())
