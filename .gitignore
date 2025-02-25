@@ -26,3 +26,9 @@ yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
 .idea
+.vscode
+.helix
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###

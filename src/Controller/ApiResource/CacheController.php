@@ -3,30 +3,28 @@
 namespace App\Controller\ApiResource;
 
 use App\Action\CacheActions;
-use App\Attributes\ApiResource;
-use App\Attributes\ApiRoute;
 use App\Entity\Season;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[ApiResource('Cache')]
-class CacheController extends AbstractController
+final class CacheController extends AbstractController
 {
     public function __construct(private readonly CacheActions $action)
     {
     }
 
-    #[ApiRoute(
+    #[Route(
         '/api/cache/season/{season}',
         name: 'api_cache_season',
         methods: ['GET'],
-        documentation: 'Cache season results',
-        responses: [
-            Response::HTTP_CREATED => [
-                'message' => 'Successfully cached a season',
-            ]
-        ],
+        // documentation: 'Cache season results',
+        // responses: [
+        //     Response::HTTP_CREATED => [
+        //         'message' => 'Successfully cached a season',
+        //     ]
+        // ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function cacheSeason(Season $season): Response

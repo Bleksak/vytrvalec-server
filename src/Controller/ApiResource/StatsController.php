@@ -3,52 +3,54 @@
 namespace App\Controller\ApiResource;
 
 use App\Action\StatsActions;
-use App\Attributes\ApiResource;
-use App\Attributes\ApiRoute;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-#[ApiResource('Stats')]
-class StatsController extends AbstractController {
+final class StatsController extends AbstractController
+{
     public function __construct(
-      private readonly StatsActions $action,
-      private readonly NormalizerInterface $normalizer,
-    )
-    {
+        private readonly StatsActions $action,
+        private readonly NormalizerInterface $normalizer,
+    ) {
     }
-    #[ApiRoute(
+
+    #[Route(
         '/api/stats/total',
         name: 'stats_index',
         methods: ['GET'],
-        documentation: 'Retrieve overall statistics',
-        responses: [
-          Response::HTTP_OK => [
-            'message' => 'Statistics retrieved successfully',
-          ],
-        ],
+        // documentation: 'Retrieve overall statistics',
+        // responses: [
+        //   Response::HTTP_OK => [
+        //     'message' => 'Statistics retrieved successfully',
+        //   ],
+        // ],
     )]
     public function indexTotalStatistics(): Response
     {
         return $this->json($this->action->getTotalStatistics());
     }
 
-    #[ApiRoute(
+    #[Route(
         '/api/stats/{user}',
         name: 'stats_user_index',
         methods: ['GET'],
-        documentation: 'Retrieve user statistics',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Statistics retrieved successfully',
-            ],
-        ],
+        // documentation: 'Retrieve user statistics',
+        // responses: [
+        //     Response::HTTP_OK => [
+        //         'message' => 'Statistics retrieved successfully',
+        //     ],
+        // ],
     )]
-    public function indexUserStatistics(User $user = null): Response
+    public function indexUserStatistics(?User $user = null): Response
     {
-        if($user === null) {
+        if ($user === null) {
+            /**
+             * @var ?User $user
+             */
             $user = $this->getUser();
         }
 
@@ -56,5 +58,4 @@ class StatsController extends AbstractController {
             AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
         ]));
     }
-
 }

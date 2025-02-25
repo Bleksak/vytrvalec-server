@@ -3,8 +3,6 @@
 namespace App\Controller\ApiResource;
 
 use App\Action\SubmissionActions;
-use App\Attributes\ApiResource;
-use App\Attributes\ApiRoute;
 use App\Entity\Activity;
 use App\Entity\Faculty;
 use App\Entity\Season;
@@ -16,42 +14,40 @@ use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Validation\FormErrors;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-#[ApiResource('Submission')]
-class SubmissionController extends AbstractController
+final class SubmissionController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $em,
         private readonly SubmissionRepository $submissionRepository,
         private readonly NormalizerInterface $normalizer,
         private readonly SubmissionActions $action,
     ) {
     }
 
-    #[ApiRoute(
+    #[Route(
         path: '/api/submission/{submission}',
         name: 'api_submission_delete',
         methods: ['DELETE'],
-        documentation: 'Deletes a <code>Submission</code> entity',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully deleted'
-            ],
-            Response::HTTP_FORBIDDEN => [
-                'message' => 'Unauthorized access',
-            ],
-            Response::HTTP_BAD_REQUEST => [
-                'message' => 'Cannot delete'
-            ]
-        ]
+        // documentation: 'Deletes a <code>Submission</code> entity',
+        // responses: [
+        //     Response::HTTP_OK => [
+        //         'message' => 'Successfully deleted',
+        //     ],
+        //     Response::HTTP_FORBIDDEN => [
+        //         'message' => 'Unauthorized access',
+        //     ],
+        //     Response::HTTP_BAD_REQUEST => [
+        //         'message' => 'Cannot delete',
+        //     ],
+        // ]
     )]
     #[IsGranted('ROLE_USER')]
     public function delete(#[CurrentUser] User $user, Submission $submission): Response
@@ -69,35 +65,35 @@ class SubmissionController extends AbstractController
         return new Response(status: Response::HTTP_OK);
     }
 
-    #[ApiRoute(
+    #[Route(
         '/api/submission',
         name: 'api_submission_create',
         methods: ['POST'],
-        documentation: 'Creates a new <code>Submission</code> entity',
-        responses: [
-            Response::HTTP_CREATED => [
-                'message' => 'Submission created successfully',
-            ],
-            Response::HTTP_FORBIDDEN => [
-                'message' => 'Unauthorized access',
-            ],
-            Response::HTTP_BAD_REQUEST => [
-                'message' => 'Bad request ',
-                'response' => [
-                    'distance' => 'err_negative_value',
-                    'elevation' => 'err_zero_value'
-                ]
-            ],
-            Response::HTTP_INTERNAL_SERVER_ERROR => [
-                'message' => 'Error when processing image'
-            ]
-        ],
-        requestScheme: [
-            'distance' => 'integer',
-            'elevation' => 'integer',
-            'image' => 'file',
-            'activity' => 'integer'
-        ]
+        // documentation: 'Creates a new <code>Submission</code> entity',
+        // responses: [
+        //     Response::HTTP_CREATED => [
+        //         'message' => 'Submission created successfully',
+        //     ],
+        //     Response::HTTP_FORBIDDEN => [
+        //         'message' => 'Unauthorized access',
+        //     ],
+        //     Response::HTTP_BAD_REQUEST => [
+        //         'message' => 'Bad request ',
+        //         'response' => [
+        //             'distance' => 'err_negative_value',
+        //             'elevation' => 'err_zero_value',
+        //         ],
+        //     ],
+        //     Response::HTTP_INTERNAL_SERVER_ERROR => [
+        //         'message' => 'Error when processing image',
+        //     ],
+        // ],
+        // requestScheme: [
+        //     'distance' => 'integer',
+        //     'elevation' => 'integer',
+        //     'image' => 'file',
+        //     'activity' => 'integer',
+        // ]
     )]
     #[IsGranted('ROLE_USER')]
     public function create(
@@ -129,28 +125,27 @@ class SubmissionController extends AbstractController
         return new Response(status: Response::HTTP_CREATED);
     }
 
-    #[ApiRoute(
+    #[Route(
         '/api/submission/list/{season}/{page}',
         name: 'api_submission_list_season',
         methods: ['GET'],
-        documentation: 'Retrieves all submissions in given Season',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully retrieved all submissions',
-                'response' => [
-                    'pages' => 'integer',
-                    'submissions' => 'array',
-                ]
-            ]
-        ]
+        // documentation: 'Retrieves all submissions in given Season',
+        // responses: [
+        //     Response::HTTP_OK => [
+        //         'message' => 'Successfully retrieved all submissions',
+        //         'response' => [
+        //             'pages' => 'integer',
+        //             'submissions' => 'array',
+        //         ],
+        //     ],
+        // ]
     )]
     #[IsGranted('ROLE_STAFF')]
     public function listSeason(
         Season $season,
         Request $request,
         int $page = 1,
-    ): Response
-    {
+    ): Response {
         $limit = 50;
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
@@ -170,23 +165,23 @@ class SubmissionController extends AbstractController
                         'season' => fn (Season $object) => $object->getId(),
                         'activity' => fn (Activity $object) => $object->getId(),
                         'faculty' => fn (Faculty $object) => $object->getId(),
-                        'image' => fn (string $image) => $url . $image,
+                        'image' => fn (string $image) => $url.$image,
                     ],
                 ]
             )
         );
     }
 
-    #[ApiRoute(
+    #[Route(
         '/api/submission/user',
         name: 'api_submission_list',
         methods: ['GET'],
-        documentation: 'Retrieves all submissions for current user',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully retrieved all submissions'
-            ]
-        ]
+        // documentation: 'Retrieves all submissions for current user',
+        // responses: [
+        //     Response::HTTP_OK => [
+        //         'message' => 'Successfully retrieved all submissions',
+        //     ],
+        // ]
     )]
     public function list(
         #[CurrentUser] User $user,
@@ -197,23 +192,23 @@ class SubmissionController extends AbstractController
 
         $url = $this->getParameter('app_base');
 
-        foreach($submissions as &$submission) {
-            $submission['image'] = $url . $submission['image'];
+        foreach ($submissions as &$submission) {
+            $submission['image'] = $url.$submission['image'];
         }
 
         return $this->json($submissions);
     }
 
-    #[ApiRoute(
+    #[Route(
         '/api/submission/unresolved/{count}',
         name: 'api_submission_list_unresolved',
         methods: ['GET'],
-        documentation: 'Retrieves some unresolved submissions across all seasons',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully retrieved some unresolved submissions'
-            ]
-        ]
+        // documentation: 'Retrieves some unresolved submissions across all seasons',
+        // responses: [
+        //     Response::HTTP_OK => [
+        //         'message' => 'Successfully retrieved some unresolved submissions',
+        //     ],
+        // ]
     )]
     #[IsGranted('ROLE_STAFF')]
     public function unresolvedList(Request $request, int $count): Response
@@ -225,40 +220,40 @@ class SubmissionController extends AbstractController
                 return $object->getId();
             },
             AbstractNormalizer::GROUPS => ['fetchSubmission'],
-            AbstractNormalizer::CALLBACKS => ['image' => fn (string $image) => $url . $image]
+            AbstractNormalizer::CALLBACKS => ['image' => fn (string $image) => $url.$image],
         ]));
     }
 
-    #[ApiRoute(
+    #[Route(
         '/api/submission/{submission}',
         name: 'api_submission_edit',
         methods: ['PATCH'],
-        documentation: 'Edits a <code>Submission</code> entity',
-        responses: [
-            Response::HTTP_CREATED => [
-                'message' => 'Submission edited successfully',
-            ],
-            Response::HTTP_FORBIDDEN => [
-                'message' => 'Unauthorized access',
-            ],
-            Response::HTTP_BAD_REQUEST => [
-                'message' => 'Bad request ',
-                'response' => [
-                    'distance' => 'err_negative_value',
-                    'elevation' => 'err_zero_value'
-                ]
-            ],
-            Response::HTTP_INTERNAL_SERVER_ERROR => [
-                'message' => 'Error when processing image'
-            ]
-        ],
-        requestScheme: [
-            'distance' => 'integer',
-            'elevation' => 'integer',
-            'image' => 'file',
-            'activity' => 'integer',
-            'updated_at' => 'datetime'
-        ]
+        // documentation: 'Edits a <code>Submission</code> entity',
+        // responses: [
+        //     Response::HTTP_CREATED => [
+        //         'message' => 'Submission edited successfully',
+        //     ],
+        //     Response::HTTP_FORBIDDEN => [
+        //         'message' => 'Unauthorized access',
+        //     ],
+        //     Response::HTTP_BAD_REQUEST => [
+        //         'message' => 'Bad request ',
+        //         'response' => [
+        //             'distance' => 'err_negative_value',
+        //             'elevation' => 'err_zero_value',
+        //         ],
+        //     ],
+        //     Response::HTTP_INTERNAL_SERVER_ERROR => [
+        //         'message' => 'Error when processing image',
+        //     ],
+        // ],
+        // requestScheme: [
+        //     'distance' => 'integer',
+        //     'elevation' => 'integer',
+        //     'image' => 'file',
+        //     'activity' => 'integer',
+        //     'updated_at' => 'datetime',
+        // ]
     )]
     #[IsGranted('ROLE_USER')]
     public function edit(
@@ -266,7 +261,6 @@ class SubmissionController extends AbstractController
         Submission $submission,
         Request $request,
     ): Response {
-
         if ($submission->isAccepted()) {
             return $this->json(['submission' => ['accepted']], Response::HTTP_BAD_REQUEST);
         }
@@ -279,7 +273,7 @@ class SubmissionController extends AbstractController
         }
 
         $form = $this->createForm(SubmissionForm::class, null, [
-            'method' => $request->getMethod()
+            'method' => $request->getMethod(),
         ]);
 
         $form->submit($request->request->all() + $request->files->all());
@@ -300,28 +294,27 @@ class SubmissionController extends AbstractController
         return new Response(status: Response::HTTP_CREATED);
     }
 
-
-    #[ApiRoute(
+    #[Route(
         '/api/submission/{submission}/state',
         name: 'api_submission_state',
         methods: ['PATCH'],
-        documentation: 'Accepts/rejects a <code>Submission</code> entity',
-        responses: [
-            Response::HTTP_OK => [
-                'message' => 'Successfully changed state'
-            ],
-            Response::HTTP_FORBIDDEN => [
-                'message' => 'Unauthorized access',
-            ],
-            Response::HTTP_BAD_REQUEST => [
-                'message' => 'Cannot set state (invalid values sent)'
-            ]
-        ],
-        requestScheme: [
-            'updated_at' => 'datetime',
-            'state' => 'bool',
-            'message' => '?string'
-        ],
+        // documentation: 'Accepts/rejects a <code>Submission</code> entity',
+        // responses: [
+        //     Response::HTTP_OK => [
+        //         'message' => 'Successfully changed state',
+        //     ],
+        //     Response::HTTP_FORBIDDEN => [
+        //         'message' => 'Unauthorized access',
+        //     ],
+        //     Response::HTTP_BAD_REQUEST => [
+        //         'message' => 'Cannot set state (invalid values sent)',
+        //     ],
+        // ],
+        // requestScheme: [
+        //     'updated_at' => 'datetime',
+        //     'state' => 'bool',
+        //     'message' => '?string',
+        // ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function setState(Submission $submission, Request $request): Response
