@@ -7,7 +7,7 @@ use App\Notifications\EmailTemplate;
 
 class SubmissionRejectedEmailTemplate extends EmailTemplate
 {
-    public function __construct(Submission $submission, string $message) 
+    public function __construct(Submission $submission, string $message)
     {
         $this->context = [
             'submission' => $submission,

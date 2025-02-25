@@ -22,7 +22,7 @@ class UserEditFormType extends AbstractType
             ->add('email', EmailType::class, [
                 'constraints' => [
                     new Assert\Email(message: 'invalid'),
-                ]
+                ],
             ])
             ->add('first_name', TextType::class, [
                 'property_path' => 'firstName',

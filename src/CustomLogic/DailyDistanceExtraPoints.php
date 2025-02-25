@@ -10,7 +10,7 @@ class DailyDistanceExtraPoints implements ExtraPoints
     public function __construct(private readonly EntityManagerInterface $entityManagerInterface)
     {
     }
-    
+
     public static function getUniqueName(): string
     {
         return 'daily_distance';
@@ -20,7 +20,7 @@ class DailyDistanceExtraPoints implements ExtraPoints
     {
         return 2;
     }
-    
+
     public function calculate(Season $season): array
     {
         $query = $this->entityManagerInterface->getConnection()->prepare('

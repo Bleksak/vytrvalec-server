@@ -22,25 +22,25 @@ class UserCreateFormType extends AbstractType
                 'constraints' => [
                     new Assert\NotBlank(message: 'blank', allowNull: false),
                     new Assert\Email(message: 'invalid'),
-                ]
+                ],
             ])
             ->add('first_name', TextType::class, [
                 'property_path' => 'firstName',
                 'constraints' => [
                     new Assert\NotBlank(message: 'blank', allowNull: false),
-                ]
+                ],
             ])
             ->add('last_name', TextType::class, [
                 'property_path' => 'lastName',
                 'constraints' => [
                     new Assert\NotBlank(message: 'blank', allowNull: false),
-                ]
+                ],
             ])
             ->add('password', PasswordType::class, [
                 'constraints' => [
                     new Assert\NotBlank(message: 'blank', allowNull: false),
                     new Assert\PasswordStrength(message: 'weak', minScore: 1),
-                ]
+                ],
             ])
             ->add('faculty', EntityType::class, [
                 'class' => Faculty::class,
@@ -49,7 +49,7 @@ class UserCreateFormType extends AbstractType
                 'invalid_message' => 'invalid',
                 'constraints' => [
                     new Assert\NotBlank(message: 'invalid', allowNull: false),
-                ]
+                ],
             ]);
     }
 

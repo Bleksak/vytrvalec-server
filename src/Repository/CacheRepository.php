@@ -31,8 +31,8 @@ class CacheRepository extends ServiceEntityRepository
     }
 
     /**
-    * @return array<int, array<int, WeeklyResultDto>>
-    */
+     * @return array<int, array<int, WeeklyResultDto>>
+     */
     public function findLastN(int $n): array
     {
         return $this->createQueryBuilder('c')

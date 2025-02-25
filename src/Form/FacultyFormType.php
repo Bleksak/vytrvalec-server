@@ -26,7 +26,7 @@ class FacultyFormType extends AbstractType
             'constraints' => $required ? [
                 new Assert\NotNull(message: 'blank_name'),
                 new Assert\NotBlank(message: 'blank_name'),
-            ] : []
+            ] : [],
         ]);
 
         $builder->add('shortcut', TextType::class, [
@@ -34,7 +34,7 @@ class FacultyFormType extends AbstractType
             'constraints' => $required ? [
                 new Assert\NotNull(message: 'blank_shortcut'),
                 new Assert\NotBlank(message: 'blank_shortcut'),
-            ] : []
+            ] : [],
         ]);
 
         $builder->add('visible', HiddenType::class, [

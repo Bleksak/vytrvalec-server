@@ -2,7 +2,6 @@
 
 namespace App\Security;
 
-use Exception;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -28,28 +27,28 @@ class JWTAuthenticator extends AbstractAuthenticator
     public function supports(Request $request): ?bool
     {
         // if using isGranted properly, this is not a vulnerability
-        return ($request->headers->has('Authorization')) && $request->get('_route') !== 'api_user_login';
+        return $request->headers->has('Authorization') && $request->get('_route') !== 'api_user_login';
     }
 
-    private function getHeaderToken(Request $request) : string|null
+    private function getHeaderToken(Request $request): ?string
     {
         $authorization = $request->headers->get('Authorization', null);
 
-        if($authorization === null) {
+        if ($authorization === null) {
             return null;
         }
 
         // When auth token == "Bearer Bearer "
         // then "Bearer " is an invalid jwt token
-        $exploded = explode("Bearer ", $authorization);
+        $exploded = explode('Bearer ', $authorization);
 
-        if(count($exploded) != 2) {
+        if (count($exploded) != 2) {
             throw new CustomUserMessageAuthenticationException();
         }
 
         [, $token] = $exploded;
 
-        if(empty($token)) {
+        if (empty($token)) {
             return null;
         }
 
@@ -60,7 +59,7 @@ class JWTAuthenticator extends AbstractAuthenticator
     {
         $jwt = $this->getHeaderToken($request) ?? $request->cookies->get('jwt');
 
-        if($jwt === null) {
+        if ($jwt === null) {
             throw new CustomUserMessageAuthenticationException();
         }
 
@@ -69,18 +68,17 @@ class JWTAuthenticator extends AbstractAuthenticator
             $email = $payload->user;
 
             return new SelfValidatingPassport(
-                new UserBadge($email, function($email) {
+                new UserBadge($email, function ($email) {
                     return $this->userProvider->loadUserByIdentifier($email);
                 })
             );
-
-        } catch(ExpiredException) {
-            throw new CustomUserMessageAuthenticationException("session_expired");
-        } catch(SignatureInvalidException) {
+        } catch (ExpiredException) {
+            throw new CustomUserMessageAuthenticationException('session_expired');
+        } catch (SignatureInvalidException) {
             // delete the invalid token
             setcookie('jwt', '', time() - 1, path: '/', secure: $request->isSecure(), httponly: true);
-            throw new CustomUserMessageAuthenticationException("bad_token");
-        } catch(Exception) {
+            throw new CustomUserMessageAuthenticationException('bad_token');
+        } catch (\Exception) {
             throw new CustomUserMessageAuthenticationException();
         }
     }
@@ -93,9 +91,9 @@ class JWTAuthenticator extends AbstractAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         return null;
-//        return new JsonResponse([
-//            'success' => false,
-//            'error' => $exception->getMessageKey(),
-//        ], Response::HTTP_UNAUTHORIZED);
+        //        return new JsonResponse([
+        //            'success' => false,
+        //            'error' => $exception->getMessageKey(),
+        //        ], Response::HTTP_UNAUTHORIZED);
     }
 }

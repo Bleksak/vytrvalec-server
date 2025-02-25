@@ -3,8 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Season;
-use DateTime;
-use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -47,7 +45,7 @@ class SeasonRepository extends ServiceEntityRepository
             ->select('s')
             ->where('s.start <= :now')
             ->andWhere('s.end >= :now')
-            ->setParameter('now', new DateTimeImmutable())
+            ->setParameter('now', new \DateTimeImmutable())
             ->setMaxResults(1)
             ->getQuery()
         ;
@@ -73,6 +71,7 @@ class SeasonRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
     /**
      * @return Season[]
      */
@@ -82,15 +81,15 @@ class SeasonRepository extends ServiceEntityRepository
             ->select('s')
             ->where('s.end < :now')
             ->orderBy('s.start', 'DESC')
-            ->setParameter('now', new DateTimeImmutable())
+            ->setParameter('now', new \DateTimeImmutable())
             ->getQuery()
             ->getResult();
     }
 
-    public function findByStartMonth(?DateTime $dateTime): ?Season
+    public function findByStartMonth(?\DateTime $dateTime): ?Season
     {
-        $startDate = new DateTimeImmutable($dateTime->format('Y-m-01'));
-        $endDate = new DateTimeImmutable($dateTime->format('Y-m-t'));
+        $startDate = new \DateTimeImmutable($dateTime->format('Y-m-01'));
+        $endDate = new \DateTimeImmutable($dateTime->format('Y-m-t'));
 
         return $this->createQueryBuilder('s')
             ->select('s')

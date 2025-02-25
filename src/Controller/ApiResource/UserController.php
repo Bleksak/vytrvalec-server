@@ -3,12 +3,11 @@
 namespace App\Controller\ApiResource;
 
 use App\Action\UserActions;
-use App\Attributes\ApiResource;
 use App\Entity\User;
 use App\Form\PasswordResetFormType;
+use App\Form\UserAccountChangeFormType;
 use App\Form\UserCreateFormType;
 use App\Form\UserEditFormType;
-use App\Form\UserAccountChangeFormType;
 use App\Repository\UserRepository;
 use App\Validation\FormErrors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -131,7 +130,7 @@ final class UserController extends AbstractController
     public function currentUserData(#[CurrentUser] User $currentUser): Response
     {
         $filtered = $this->normalizer->normalize($currentUser, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'user']
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'user'],
         ]);
 
         return $this->json($filtered);
@@ -154,13 +153,13 @@ final class UserController extends AbstractController
     public function forgottenPasswordRequest(Request $request, string $lang = 'cs'): Response
     {
         $supportedLanguages = ['cs', 'en'];
-        if(!in_array($lang, $supportedLanguages)) {
+        if (!in_array($lang, $supportedLanguages)) {
             $lang = 'cs';
         }
 
         $email = $request->getPayload()->get('email');
 
-        if($email === null) {
+        if ($email === null) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
@@ -188,13 +187,13 @@ final class UserController extends AbstractController
         $form = $this->createForm(PasswordResetFormType::class);
         $form->submit($request->getPayload()->all());
 
-        if(!$form->isValid()) {
+        if (!$form->isValid()) {
             return $this->json(FormErrors::collect($form), Response::HTTP_BAD_REQUEST);
         }
 
         $errors = $this->action->forgottenPasswordReset($form->getData());
 
-        if(!empty($errors)) {
+        if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -300,7 +299,7 @@ final class UserController extends AbstractController
 
         $errors = FormErrors::collect($form);
 
-        if(!empty($errors)) {
+        if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -343,13 +342,13 @@ final class UserController extends AbstractController
 
         $errors = FormErrors::collect($form);
 
-        if(!empty($errors)) {
+        if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         $errors = $this->action->updateAccount($currentUser, $form->getData());
 
-        if(!empty($errors)) {
+        if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -381,14 +380,14 @@ final class UserController extends AbstractController
         // ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function update(Request $request, User $user = null): Response
+    public function update(Request $request, ?User $user = null): Response
     {
         $form = $this->createForm(UserEditFormType::class);
         $form->submit($request->getPayload()->all());
 
         $errors = FormErrors::collect($form);
 
-        if(!empty($errors)) {
+        if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 

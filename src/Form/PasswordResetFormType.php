@@ -19,13 +19,13 @@ class PasswordResetFormType extends AbstractType
                 'constraints' => [
                     new Assert\NotBlank(message: 'blank', allowNull: false),
                     new Assert\PasswordStrength(message: 'weak', minScore: 1),
-                ]
+                ],
             ])
             ->add('password_reset_token', TextType::class, [
                 'property_path' => 'passwordResetToken',
                 'constraints' => [
                     new Assert\NotBlank(message: 'blank', allowNull: false),
-                ]
+                ],
             ]);
     }
 

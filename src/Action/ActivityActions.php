@@ -10,8 +10,7 @@ class ActivityActions
 {
     public function __construct(
         private readonly ActivityRepository $activityRepository,
-    )
-    {
+    ) {
     }
 
     public function create(ActivityDto $dto): int
@@ -32,11 +31,12 @@ class ActivityActions
 
     public function delete(Activity $activity): bool
     {
-        if($this->activityRepository->submissionsCount($activity) === 0) {
+        if ($this->activityRepository->submissionsCount($activity) === 0) {
             return false;
         }
 
         $this->activityRepository->remove($activity, true);
+
         return true;
     }
 }

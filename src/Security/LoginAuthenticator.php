@@ -30,9 +30,10 @@ class LoginAuthenticator extends AbstractAuthenticator
         private readonly UserProviderInterface $userProvider,
         private readonly UserPasswordHasherInterface $hasher,
         private readonly NormalizerInterface $normalizer,
-        private readonly UserRepository $userRepository
+        private readonly UserRepository $userRepository,
     ) {
     }
+
     public function supports(Request $request): ?bool
     {
         return $request->get('_route') === 'api_user_login' && $request->isMethod('POST');
@@ -77,7 +78,7 @@ class LoginAuthenticator extends AbstractAuthenticator
         $response = new JsonResponse([
             'token' => $jwt,
             'user' => $this->normalizer->normalize($token->getUser(), null, [
-                AbstractNormalizer::GROUPS => ['fetchUser']
+                AbstractNormalizer::GROUPS => ['fetchUser'],
             ]),
         ]);
 

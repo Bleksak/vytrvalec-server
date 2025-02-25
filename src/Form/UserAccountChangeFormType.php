@@ -10,7 +10,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 class UserAccountChangeFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -20,13 +19,13 @@ class UserAccountChangeFormType extends AbstractType
             'property_path' => 'oldPassword',
             'constraints' => [
                 new Assert\NotBlank(message: 'blank', allowNull: false),
-            ]
+            ],
         ]);
         $builder->add('password', PasswordType::class, [
             'property_path' => 'password',
             'constraints' => [
                 new Assert\PasswordStrength(message: 'weak', minScore: 1),
-            ]
+            ],
         ]);
         $builder->add('email', EmailType::class, [
             'property_path' => 'email',

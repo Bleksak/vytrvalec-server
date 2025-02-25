@@ -15,8 +15,6 @@ use App\Notifications\VytrvalecNotification;
 use App\Repository\ProfileCacheRepository;
 use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SubmissionRepository;
-use Imagick;
-use ImagickException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -37,30 +35,30 @@ class SubmissionActions
 
     private function uploadImage(UploadedFile $image): ?string
     {
-        $dirname = $this->parameterBag->get('kernel.project_dir') . '/public';
+        $dirname = $this->parameterBag->get('kernel.project_dir').'/public';
 
         do {
-            $uniquePath = '/uploads/' . uniqid(more_entropy: true) . '.jpg';
-            $absolutePath = $dirname . $uniquePath;
+            $uniquePath = '/uploads/'.uniqid(more_entropy: true).'.jpg';
+            $absolutePath = $dirname.$uniquePath;
         } while ($this->fs->exists($absolutePath));
 
-        $tmpPath = $uniquePath . '.tmp';
+        $tmpPath = $uniquePath.'.tmp';
 
         $newFile = $image->move($dirname, $tmpPath);
 
         try {
-            $img = new Imagick($newFile->getRealPath());
-            $profiles = $img->getImageProfiles("icc");
+            $img = new \Imagick($newFile->getRealPath());
+            $profiles = $img->getImageProfiles('icc');
 
             $img->stripImage();
             if (!empty($profiles)) {
-                $img->profileImage("icc", $profiles['icc']);
+                $img->profileImage('icc', $profiles['icc']);
             }
 
             $img->setImageFormat('jpeg');
             $img->setImageCompressionQuality(90);
             $img->writeImage($absolutePath);
-        } catch (ImagickException) {
+        } catch (\ImagickException) {
             return null;
         } finally {
             $this->fs->remove($newFile);
@@ -85,6 +83,7 @@ class SubmissionActions
 
         return [];
     }
+
     /**
      * @return array<int,string>
      */
@@ -107,6 +106,7 @@ class SubmissionActions
 
         return [];
     }
+
     /**
      * @return array<int,string>
      */
@@ -119,12 +119,13 @@ class SubmissionActions
 
         $rejectedSubmission = $this->rejectedSubmissionMessageRepository->find($submission->getId());
 
-        if($rejectedSubmission !== null) {
+        if ($rejectedSubmission !== null) {
             $this->rejectedSubmissionMessageRepository->remove($rejectedSubmission);
         }
 
         $this->profileCacheRepository->addCache($submission, true);
     }
+
     /**
      * @return array<int,string>
      */
@@ -132,18 +133,18 @@ class SubmissionActions
     {
         $rejectedSubmission = $this->rejectedSubmissionMessageRepository->findOneBy(['submission' => $submission]);
 
-        if($rejectedSubmission !== null) {
+        if ($rejectedSubmission !== null) {
             $rejectedSubmission->setMessage($message);
             $this->rejectedSubmissionMessageRepository->save($rejectedSubmission, true);
         } else {
             $this->rejectedSubmissionMessageRepository->save(new RejectedSubmissionMessage($submission, $message));
         }
 
-        if($submission->isReviewed() && $submission->isAccepted()) {
+        if ($submission->isReviewed() && $submission->isAccepted()) {
             $this->profileCacheRepository->removeCache($submission, true);
         }
 
-        if($submission->getUser()->getToken() !== null) {
+        if ($submission->getUser()->getToken() !== null) {
             $this->firebase->send(new VytrvalecNotification($submission->getUser(), $message));
         }
 
@@ -155,7 +156,7 @@ class SubmissionActions
     {
         $rejectedSubmission = $this->rejectedSubmissionMessageRepository->findOneBy(['submission' => $submission]);
 
-        if($rejectedSubmission !== null) {
+        if ($rejectedSubmission !== null) {
             $this->rejectedSubmissionMessageRepository->remove($rejectedSubmission);
         }
 
@@ -194,7 +195,7 @@ class SubmissionActions
 
         $rejectedSubmission = $this->rejectedSubmissionMessageRepository->find($submission->getId());
 
-        if($rejectedSubmission !== null) {
+        if ($rejectedSubmission !== null) {
             $this->rejectedSubmissionMessageRepository->remove($rejectedSubmission);
         }
 

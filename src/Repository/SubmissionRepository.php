@@ -121,6 +121,7 @@ class SubmissionRepository extends ServiceEntityRepository
 
     /**
      * @param array<string,string> $filter
+     *
      * @return Paginator<Submission>
      */
     public function findBySeasonAndFilter(Season $season, array $filter, int $page, int $limit): Paginator
@@ -156,7 +157,7 @@ class SubmissionRepository extends ServiceEntityRepository
 
                 'user' => $queryBuilder
                     ->andWhere('u.email LIKE :userId')
-                    ->setParameter('userId', $value . '%'),
+                    ->setParameter('userId', $value.'%'),
 
                 'faculty' => $queryBuilder
                     ->andWhere('u.faculty = :facultyId')

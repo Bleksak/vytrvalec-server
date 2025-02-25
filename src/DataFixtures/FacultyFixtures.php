@@ -22,10 +22,10 @@ class FacultyFixtures extends Fixture
             new Faculty('Fakulta zdravotních studií', 'FZS', true),
         ];
 
-        foreach($faculties as $faculty) {
+        foreach ($faculties as $faculty) {
             $manager->persist($faculty);
         }
-        
+
         $manager->flush();
     }
 }

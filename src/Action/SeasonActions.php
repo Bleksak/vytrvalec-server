@@ -19,7 +19,7 @@ class SeasonActions
     {
         $existingSeason = $this->seasonRepository->findByStartMonth($seasonDto->start);
 
-        if($existingSeason !== null) {
+        if ($existingSeason !== null) {
             return -1;
         }
 

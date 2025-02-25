@@ -21,9 +21,8 @@ class FacultyTest extends BaseTest
         $this->client->request('POST', '/api/faculty', [
             'name' => 'Just A Weird Faculty Passing By',
             'shortcut' => 'JWFP',
-            'visible' => true
+            'visible' => true,
         ]);
-
 
         $this->assertResponseIsSuccessful();
     }

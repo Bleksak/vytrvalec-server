@@ -40,8 +40,8 @@ class CharityRepository extends ServiceEntityRepository
     }
 
     /**
-    * @return Charity[]
-    */
+     * @return Charity[]
+     */
     public function findSeasonsByCharity(Charity $charity): array
     {
         return $this->createQueryBuilder('c')

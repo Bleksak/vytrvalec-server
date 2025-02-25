@@ -10,8 +10,7 @@ class StatsActions
     public function __construct(
         private readonly SubmissionRepository $submissionRepository,
         private readonly UserRepository $userRepository,
-    )
-    {
+    ) {
     }
 
     /**
@@ -24,7 +23,7 @@ class StatsActions
 
         return [
             'users' => $users,
-            'activities' => $activities
+            'activities' => $activities,
         ];
     }
 }

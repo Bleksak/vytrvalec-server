@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\SeasonRepository;
 use DateTimeImmutable;
-use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -25,12 +24,12 @@ class Season
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
-    private ?DateTimeInterface $start = null;
+    private ?\DateTimeInterface $start = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
-    private ?DateTimeInterface $end = null;
+    private ?\DateTimeInterface $end = null;
 
     #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
@@ -43,7 +42,7 @@ class Season
     #[ORM\OneToMany(mappedBy: 'season', targetEntity: Submission::class)]
     private Collection $submissions;
 
-    public function __construct(DateTimeInterface $start, DateTimeInterface $end, Charity $charity)
+    public function __construct(\DateTimeInterface $start, \DateTimeInterface $end, Charity $charity)
     {
         $this->submissions = new ArrayCollection();
         $this->start = $start;
@@ -56,24 +55,24 @@ class Season
         return $this->id;
     }
 
-    public function getStart(): ?DateTimeInterface
+    public function getStart(): ?\DateTimeInterface
     {
         return $this->start;
     }
 
-    public function setStart(DateTimeInterface $start): self
+    public function setStart(\DateTimeInterface $start): self
     {
         $this->start = $start;
 
         return $this;
     }
 
-    public function getEnd(): ?DateTimeInterface
+    public function getEnd(): ?\DateTimeInterface
     {
         return $this->end;
     }
 
-    public function setEnd(DateTimeInterface $end): self
+    public function setEnd(\DateTimeInterface $end): self
     {
         $this->end = $end;
 
@@ -127,22 +126,23 @@ class Season
         return $this->getSubmissions()->isEmpty();
         // return $this->getStart() >= new DateTimeImmutable('now');
     }
-    
+
     public function isRunning(): bool
     {
-        $today = new DateTimeImmutable();
-        $start = DateTimeImmutable::createFromInterface($this->getStart());
-        $end = DateTimeImmutable::createFromInterface($this->getEnd());
+        $today = new \DateTimeImmutable();
+        $start = \DateTimeImmutable::createFromInterface($this->getStart());
+        $end = \DateTimeImmutable::createFromInterface($this->getEnd());
 
         return $today >= $start && $today < $end;
     }
 
     public function getWeekCount(): int
     {
-        $start = DateTimeImmutable::createFromInterface($this->getStart());
-        $end = DateTimeImmutable::createFromInterface($this->getEnd());
+        $start = \DateTimeImmutable::createFromInterface($this->getStart());
+        $end = \DateTimeImmutable::createFromInterface($this->getEnd());
 
         $weeks = intdiv($end->diff($start)->days + 1, 7);
+
         return $weeks === 0 ? 1 : $weeks;
     }
 }

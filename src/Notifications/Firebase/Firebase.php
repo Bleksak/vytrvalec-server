@@ -27,7 +27,7 @@ class Firebase
             ->title($notification->title())
         ;
 
-        if($notification->action() !== null) {
+        if ($notification->action() !== null) {
             $webNotification->clickAction($notification->action());
         }
 
@@ -37,7 +37,7 @@ class Firebase
 
         try {
             return $this->firebase->send($message);
-        } catch(TransportException) {
+        } catch (TransportException) {
             return null;
         }
     }

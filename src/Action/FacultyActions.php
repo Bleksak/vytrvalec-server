@@ -10,9 +10,7 @@ class FacultyActions
 {
     public function __construct(
         private readonly FacultyRepository $facultyRepository,
-    )
-    {
-        
+    ) {
     }
 
     public function create(FacultyDto $dto): int

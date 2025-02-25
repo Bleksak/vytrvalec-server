@@ -2,10 +2,10 @@
 
 namespace App\Action;
 
+use App\Dto\PasswordResetDto;
 use App\Dto\UserAccountChangeDto;
 use App\Dto\UserDto;
 use App\Dto\UserEditDto;
-use App\Dto\PasswordResetDto;
 use App\Entity\User;
 use App\Notifications\EmailTemplate\ForgottenPasswordEmailTemplate;
 use App\Notifications\EmailTemplate\RegisterEmailTemplate;
@@ -23,27 +23,27 @@ class UserActions
         private UserPasswordHasherInterface $hasher,
         private MailerInterface $mailer,
         private ParameterBagInterface $params,
-    )
-    {
+    ) {
     }
 
     /**
-    * @return array<int, string>
-    */
+     * @return array<int, string>
+     */
     public function create(UserDto $dto): array
     {
-        $user = new User($dto->email, $dto->firstName, $dto->lastName, $dto->faculty); 
+        $user = new User($dto->email, $dto->firstName, $dto->lastName, $dto->faculty);
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
 
         try {
             $this->userRepository->save($user, true);
             $this->mailer->send(new VytrvalecEmail($dto->email, new RegisterEmailTemplate()));
-        } catch(UniqueConstraintViolationException $e) {
+        } catch (UniqueConstraintViolationException $e) {
             return ['email' => ['not_unique']];
         }
 
         return [];
     }
+
     /**
      * @return array<string,array<int,string>>
      */
@@ -66,32 +66,33 @@ class UserActions
             $user->setFaculty($dto->faculty);
         }
 
-        if($dto->banned !== null) {
+        if ($dto->banned !== null) {
             $user->setBanned($dto->banned);
         }
 
-        if($dto->roles !== null && !empty($dto->roles)) {
+        if ($dto->roles !== null && !empty($dto->roles)) {
             $user->setRoles($dto->roles);
         }
 
         try {
             $this->userRepository->save($user, true);
-        } catch(UniqueConstraintViolationException $e) {
+        } catch (UniqueConstraintViolationException $e) {
             return ['email' => ['not_unique']];
         }
 
         return [];
     }
+
     /**
      * @return array<string, array<int, string>>
      */
     public function updateAccount(User $currentUser, UserAccountChangeDto $dto): array
     {
-        if($dto->email === null && $dto->password === null) {
+        if ($dto->email === null && $dto->password === null) {
             return ['email' => ['blank'], 'password' => ['blank']];
         }
 
-        if(!$this->hasher->isPasswordValid($currentUser, $dto->oldPassword)) {
+        if (!$this->hasher->isPasswordValid($currentUser, $dto->oldPassword)) {
             return ['old_password' => ['mismatch']];
         }
 
@@ -100,8 +101,7 @@ class UserActions
 
         try {
             $this->userRepository->save($currentUser, true);
-        }
-        catch(UniqueConstraintViolationException $e) {
+        } catch (UniqueConstraintViolationException $e) {
             return ['email' => ['not_unique']];
         }
 
@@ -116,7 +116,7 @@ class UserActions
         $this->userRepository->save($user, true);
 
         $mail = new ForgottenPasswordEmailTemplate();
-        $mail->setContext('password_reset_link', $this->params->get('client_url') . '/reset-password/' . $user->getPasswordResetToken());
+        $mail->setContext('password_reset_link', $this->params->get('client_url').'/reset-password/'.$user->getPasswordResetToken());
 
         $this->mailer->send(new VytrvalecEmail($email, $mail));
     }
@@ -128,7 +128,7 @@ class UserActions
     {
         $user = $this->userRepository->findOneBy(['passwordResetToken' => $dto->passwordResetToken]);
 
-        if($user === null) {
+        if ($user === null) {
             return ['user_not_found'];
         }
 

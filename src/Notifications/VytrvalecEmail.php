@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Entity\User;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 

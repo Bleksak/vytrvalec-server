@@ -16,8 +16,8 @@ class CharityFixtures extends Fixture
         $manager->persist($anickaJirik);
         $manager->persist($davidGolias);
 
-        $this->addReference("anickaJirik", $anickaJirik);
-        $this->addReference("davidGolias", $davidGolias);
+        $this->addReference('anickaJirik', $anickaJirik);
+        $this->addReference('davidGolias', $davidGolias);
 
         $manager->flush();
     }

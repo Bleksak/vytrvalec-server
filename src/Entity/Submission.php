@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\SubmissionRepository;
-use DateTimeImmutable;
-use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -58,18 +56,17 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private Activity $activity;
 
-
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Groups(['fetchSubmission'])]
-    private DateTimeInterface $date;
+    private \DateTimeInterface $date;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', updatable: false, insertable: false, generated: 'ALWAYS')]
     #[Groups(['fetchSubmission'])]
-    private DateTimeInterface $updatedAt;
+    private \DateTimeInterface $updatedAt;
 
     public function __construct(User $user, Activity $activity, Season $season, string $image, int $distance, int $elevation = 0)
     {
-        $this->date = new DateTimeImmutable();
+        $this->date = new \DateTimeImmutable();
 
         $this->user = $user;
         $this->activity = $activity;
@@ -182,12 +179,12 @@ class Submission
         return $this;
     }
 
-    public function getDate(): ?DateTimeInterface
+    public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(DateTimeInterface $date): self
+    public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
 
@@ -198,6 +195,7 @@ class Submission
     {
         $sub = $this->getDate()->diff($this->getSeason()->getStart());
         $this->week = intdiv($sub->days, 7);
+
         return $this->week;
     }
 
@@ -213,7 +211,7 @@ class Submission
         return $this;
     }
 
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
     }

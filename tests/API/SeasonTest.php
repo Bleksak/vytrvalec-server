@@ -32,7 +32,6 @@ class SeasonTest extends BaseTest
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
-
     }
 
     public function testCreateNotLoggedIn(): void
@@ -41,7 +40,7 @@ class SeasonTest extends BaseTest
             'start' => '2023-07-12',
             'end' => '2023-08-12',
             'charityName' => 'test',
-            'charityDescription' => 'test'
+            'charityDescription' => 'test',
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
@@ -84,7 +83,7 @@ class SeasonTest extends BaseTest
 
         $submissionRepository->save($sub1, false);
         $submissionRepository->save($sub2, true);
-        
+
         $seasonResult = $this->getContainer()->get(SeasonResult::class);
 
         $results = $seasonResult->calculate($season);

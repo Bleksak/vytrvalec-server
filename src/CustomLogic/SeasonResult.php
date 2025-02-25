@@ -18,6 +18,7 @@ class SeasonResult
         private readonly WeeklyElevationExtraPoints $weeklyElevationExtraPoints,
     ) {
     }
+
     /**
      * @return array<int,array<string,mixed>>
      */
@@ -66,7 +67,7 @@ class SeasonResult
                 $activityResult[$activityId] = new ActivityResultDto($activityId, $activity);
             }
 
-            if(!empty($activityResult)) {
+            if (!empty($activityResult)) {
                 $results[$i] = new WeeklyResultDto($i, $activityResult);
             }
         }

@@ -17,5 +17,6 @@ abstract class EmailTemplate
     }
 
     abstract public function getSubject(): string;
+
     abstract public function getTemplate(): string;
 }

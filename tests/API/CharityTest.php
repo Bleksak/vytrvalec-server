@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CharityTest extends BaseTest
 {
-
     public function testCreateNotLoggedIn(): void
     {
         $this->client->jsonRequest('POST', '/api/charity', [
@@ -17,7 +16,7 @@ class CharityTest extends BaseTest
 
         $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
     }
-    
+
     public function testCreateBasicUser(): void
     {
         $this->grantRole(['ROLE_USER']);
@@ -32,7 +31,7 @@ class CharityTest extends BaseTest
 
     public function testCreate(): void
     {
-        $this->grantRole(['ROLE_STAFF']); 
+        $this->grantRole(['ROLE_STAFF']);
 
         $this->client->jsonRequest('POST', '/api/charity', [
             'name' => 'CharityTest',

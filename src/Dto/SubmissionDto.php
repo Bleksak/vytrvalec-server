@@ -3,7 +3,6 @@
 namespace App\Dto;
 
 use App\Entity\Activity;
-use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class SubmissionDto
@@ -12,5 +11,5 @@ class SubmissionDto
     public ?int $distance = null;
     public ?UploadedFile $image = null;
     public ?Activity $activity = null;
-    public ?DateTimeImmutable $updatedAt = null;
+    public ?\DateTimeImmutable $updatedAt = null;
 }

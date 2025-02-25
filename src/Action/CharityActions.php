@@ -32,7 +32,7 @@ class CharityActions
     {
         $seasons = $this->charityRepository->findSeasonsByCharity($charity);
 
-        if(!empty($seasons)) {
+        if (!empty($seasons)) {
             return false;
         }
 

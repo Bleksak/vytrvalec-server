@@ -25,5 +25,4 @@ class ExtraPointsRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['name' => $name]);
     }
-
 }

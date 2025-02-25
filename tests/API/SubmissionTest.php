@@ -22,11 +22,11 @@ class SubmissionTest extends BaseTest
         $activities = $this->getEntityManager()->getRepository(Activity::class)->findAll();
 
         $this->client->request('POST', '/api/submission', [
-            "distance" => 100,
-            "elevation" => 100,
-            "activity" => $activities[0]->getId(),
+            'distance' => 100,
+            'elevation' => 100,
+            'activity' => $activities[0]->getId(),
         ], [
-            'image' => $uploadedFile
+            'image' => $uploadedFile,
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -43,11 +43,11 @@ class SubmissionTest extends BaseTest
         $activities = $this->getEntityManager()->getRepository(Activity::class)->findAll();
 
         $this->client->request('POST', '/api/submission', [
-            "distance" => 100,
-            "elevation" => 100,
-            "activity" => $activities[0]->getId(),
+            'distance' => 100,
+            'elevation' => 100,
+            'activity' => $activities[0]->getId(),
         ], [
-            'image' => $uploadedFile
+            'image' => $uploadedFile,
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -56,10 +56,10 @@ class SubmissionTest extends BaseTest
 
         $this->client->request(
             'PATCH',
-            '/api/submission/' . $submission->getId(),
+            '/api/submission/'.$submission->getId(),
             [
-                "distance" => 120,
-                "updated_at" => $submission->getUpdatedAt()->format('Y-m-d H:i:s')
+                'distance' => 120,
+                'updated_at' => $submission->getUpdatedAt()->format('Y-m-d H:i:s'),
             ]
         );
 
@@ -88,24 +88,23 @@ class SubmissionTest extends BaseTest
         $activities = $this->getEntityManager()->getRepository(Activity::class)->findAll();
 
         $this->client->request('POST', '/api/submission', [
-            "distance" => 100,
-            "elevation" => 100,
-            "activity" => $activities[0]->getId(),
+            'distance' => 100,
+            'elevation' => 100,
+            'activity' => $activities[0]->getId(),
         ], [
-            'image' => $uploadedFile
+            'image' => $uploadedFile,
         ]);
 
         $uploadedFile = $this->getUploadedFile('houba.jpg');
         sleep(1);
 
         $this->client->request('POST', '/api/submission', [
-            "distance" => 100,
-            "elevation" => 100,
-            "activity" => $activities[0]->getId(),
+            'distance' => 100,
+            'elevation' => 100,
+            'activity' => $activities[0]->getId(),
         ], [
-            'image' => $uploadedFile
+            'image' => $uploadedFile,
         ]);
-
 
         $currentSeason = $this->getEntityManager()->getRepository(Season::class)->getCurrent();
 

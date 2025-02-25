@@ -2,12 +2,9 @@
 
 namespace App\Repository;
 
-use App\Entity\Activity;
 use App\Entity\RejectedSubmissionMessage;
-use App\Entity\Submission;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**

@@ -39,20 +39,24 @@ class ProfileCache
     {
         return $this->activity;
     }
+
     /**
      * @param callable(): int $updateFn
      */
     public function updateDistance(callable $updateFn): ProfileCache
     {
         $this->setDistance(call_user_func($updateFn, $this->getDistance()));
+
         return $this;
     }
+
     /**
      * @param callable(): int $updateFn
      */
     public function updateElevation(callable $updateFn): ProfileCache
     {
         $this->setElevation(call_user_func($updateFn, $this->getElevation()));
+
         return $this;
     }
 

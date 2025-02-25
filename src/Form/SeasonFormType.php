@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Dto\SeasonDto;
 use App\Entity\Charity;
-use DateTime;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -23,7 +22,7 @@ class SeasonFormType extends AbstractType
             'PATCH' => false,
         };
 
-        $now = new DateTime();
+        $now = new \DateTime();
         $now->setTime(0, 0, 0);
 
         $builder->add('start', DateType::class, [
@@ -35,7 +34,7 @@ class SeasonFormType extends AbstractType
                 new Assert\NotBlank(message: 'blank_start'),
                 new Assert\NotNull(message: 'blank_start'),
             ] : []) + [
-                new Assert\GreaterThanOrEqual($now)
+                new Assert\GreaterThanOrEqual($now),
             ],
         ]);
         $builder->add('end', DateType::class, [
@@ -47,7 +46,7 @@ class SeasonFormType extends AbstractType
                 new Assert\NotBlank(message: 'blank_end'),
                 new Assert\NotNull(message: 'blank_end'),
             ] : []) + [
-                new Assert\GreaterThan(propertyPath: 'parent.all[start].data')
+                new Assert\GreaterThan(propertyPath: 'parent.all[start].data'),
             ],
         ]);
 
@@ -60,7 +59,7 @@ class SeasonFormType extends AbstractType
             'constraints' => ($required ? [
                 new Assert\NotBlank(message: 'blank_charity'),
                 new Assert\NotNull(message: 'blank_charity'),
-            ] : [])
+            ] : []),
         ]);
     }
 

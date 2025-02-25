@@ -8,18 +8,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserTest extends BaseTest
 {
-    const PASSWORD = 'Qwertaz!1231@pepega';
-    
+    public const PASSWORD = 'Qwertaz!1231@pepega';
+
     public function testRegister(): void
     {
         $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
 
         $this->client->request('POST', '/api/user', [
-            "email" => "aasdf@asdf.com",
-            "password" => self::PASSWORD,
-            "first_name" => "string",
-            "last_name" => "string",
-            "faculty" => $faculty->getId()
+            'email' => 'aasdf@asdf.com',
+            'password' => self::PASSWORD,
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'faculty' => $faculty->getId(),
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -30,19 +30,19 @@ class UserTest extends BaseTest
         $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
 
         $this->client->request('POST', '/api/user', [
-            "email" => "aasdf@asdf.com",
-            "password" => self::PASSWORD,
-            "first_name" => "string",
-            "last_name" => "string",
-            "faculty" => $faculty->getId()
+            'email' => 'aasdf@asdf.com',
+            'password' => self::PASSWORD,
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'faculty' => $faculty->getId(),
         ]);
 
         $this->client->request('POST', '/api/user', [
-            "email" => "aasdf@asdf.com",
-            "password" => self::PASSWORD,
-            "first_name" => "string",
-            "last_name" => "string",
-            "faculty" => $faculty->getId()
+            'email' => 'aasdf@asdf.com',
+            'password' => self::PASSWORD,
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'faculty' => $faculty->getId(),
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
@@ -51,11 +51,11 @@ class UserTest extends BaseTest
     public function testRegisterInvalidFaculty(): void
     {
         $this->client->request('POST', '/api/user', [
-            "email" => "aasdf@asdf.com",
-            "password" => self::PASSWORD,
-            "first_name" => "string",
-            "last_name" => "string",
-            "faculty" => -1,
+            'email' => 'aasdf@asdf.com',
+            'password' => self::PASSWORD,
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'faculty' => -1,
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
@@ -66,11 +66,11 @@ class UserTest extends BaseTest
         $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
 
         $this->client->request('POST', '/api/user', [
-            "email" => "aasdf@asdf",
-            "password" => self::PASSWORD,
-            "first_name" => "string",
-            "last_name" => "string",
-            "faculty" => $faculty->getId(),
+            'email' => 'aasdf@asdf',
+            'password' => self::PASSWORD,
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'faculty' => $faculty->getId(),
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
@@ -93,5 +93,4 @@ class UserTest extends BaseTest
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
     }
-
 }

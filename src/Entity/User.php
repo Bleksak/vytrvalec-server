@@ -61,10 +61,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $passwordResetToken = null;
+
     /**
      * @param array<int,string> $roles
      */
-    public function __construct(string $email, string $firstName, string $lastName, Faculty $faculty, array $roles = [], string $token = null)
+    public function __construct(string $email, string $firstName, string $lastName, Faculty $faculty, array $roles = [], ?string $token = null)
     {
         $this->submissions = new ArrayCollection();
         $this->profileCaches = new ArrayCollection();
@@ -90,6 +91,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 

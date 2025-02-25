@@ -5,8 +5,6 @@ namespace App\Test;
 use App\Entity\Charity;
 use App\Entity\Faculty;
 use App\Entity\User;
-use DateInterval;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -21,8 +19,9 @@ class BaseTest extends WebTestCase
 
     public function getUploadedFile(string $filename): UploadedFile
     {
-        copy(__DIR__ . '/' . $filename, __DIR__ . '/' . $filename . '.tmp');
-        $file = new UploadedFile(__DIR__ . '/' . $filename . '.tmp', $filename, test: true);
+        copy(__DIR__.'/'.$filename, __DIR__.'/'.$filename.'.tmp');
+        $file = new UploadedFile(__DIR__.'/'.$filename.'.tmp', $filename, test: true);
+
         return $file;
     }
 
@@ -42,6 +41,7 @@ class BaseTest extends WebTestCase
     {
         return $this->client->getContainer()->get(EntityManagerInterface::class);
     }
+
     /**
      * @param array<int,mixed> $roles
      */
@@ -50,11 +50,11 @@ class BaseTest extends WebTestCase
         $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
 
         $this->client->request('POST', '/api/user', [
-            "email" => $email,
-            "password" => $password,
-            "first_name" => 'string',
-            "last_name" => 'string',
-            "faculty" => $faculty->getId(),
+            'email' => $email,
+            'password' => $password,
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'faculty' => $faculty->getId(),
         ]);
 
         if (!empty($roles)) {
@@ -70,9 +70,10 @@ class BaseTest extends WebTestCase
     {
         $this->client->request('POST', '/api/user/login', [
             'email' => $email,
-            'password' => $password
+            'password' => $password,
         ]);
     }
+
     /**
      * @param array<int, string> $role
      */
@@ -99,10 +100,10 @@ class BaseTest extends WebTestCase
         $repository = $this->getEntityManager()->getRepository(Charity::class);
         $charity = $repository->findOneBy(['name' => 'CharityTest']);
 
-        $now = new DateTimeImmutable();
+        $now = new \DateTimeImmutable();
         $now = $now->setTime(0, 0, 0);
 
-        $end = $now->add(new DateInterval('P4W'));
+        $end = $now->add(new \DateInterval('P4W'));
 
         $this->client->jsonRequest('POST', '/api/season', [
             'start' => $now->format('Y-m-d'),
