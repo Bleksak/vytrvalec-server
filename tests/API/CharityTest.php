@@ -40,6 +40,4 @@ class CharityTest extends BaseTest
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
     }
-
-    // TODO: test for empty fields
 }
