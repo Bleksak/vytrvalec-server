@@ -2,7 +2,6 @@
 
 namespace App\Action;
 
-use App\CustomLogic\SeasonResult;
 use App\Dto\SeasonDto;
 use App\Entity\Season;
 use App\Repository\SeasonRepository;
@@ -11,7 +10,6 @@ class SeasonActions
 {
     public function __construct(
         private readonly SeasonRepository $seasonRepository,
-        private readonly SeasonResult $seasonResult,
     ) {
     }
 

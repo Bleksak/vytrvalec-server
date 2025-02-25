@@ -41,7 +41,7 @@ class SeasonResult
     }
 
     /**
-     * @return array<int,array<ActivityResultDto>>
+     * @return array<int, WeeklyResultDto>
      */
     public function calculate(Season $season): array
     {

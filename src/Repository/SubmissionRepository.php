@@ -101,7 +101,10 @@ class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<int,array<string,mixed>>
+     * @return array<int,array{
+     * name: string,
+     * distance: int
+     * }>
      */
     public function getTotalStatistics(): array
     {

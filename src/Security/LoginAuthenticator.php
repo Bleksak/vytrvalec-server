@@ -25,6 +25,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class LoginAuthenticator extends AbstractAuthenticator
 {
+    /**
+     * @param UserProviderInterface<User> $userProvider
+     */
     public function __construct(
         private readonly ParameterBagInterface $parameters,
         private readonly UserProviderInterface $userProvider,
@@ -65,8 +68,13 @@ class LoginAuthenticator extends AbstractAuthenticator
     {
         $expirationTime = time() + 10 * 365 * 24 * 60 * 60; // 10 years expiration
 
+        /**
+         * @var ?User $user
+         */
+        $user = $token->getUser();
+
         $payload = [
-            'kid' => $token->getUser()->getId(),
+            'kid' => $user?->getId(),
             'user' => $token->getUserIdentifier(),
             'exp' => $expirationTime,
         ];

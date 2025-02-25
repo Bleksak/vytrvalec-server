@@ -41,7 +41,7 @@ class ProfileCache
     }
 
     /**
-     * @param callable(): int $updateFn
+     * @param callable(int): int $updateFn
      */
     public function updateDistance(callable $updateFn): ProfileCache
     {
@@ -51,7 +51,7 @@ class ProfileCache
     }
 
     /**
-     * @param callable(): int $updateFn
+     * @param callable(int): int $updateFn
      */
     public function updateElevation(callable $updateFn): ProfileCache
     {

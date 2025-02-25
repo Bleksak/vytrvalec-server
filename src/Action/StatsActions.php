@@ -14,7 +14,13 @@ class StatsActions
     }
 
     /**
-     * @return array<string, array>
+     * @return array{
+     * users: int,
+     * activities: array<int, array{
+     * name: string,
+     * distance: int
+     * }>
+     * }
      */
     public function getTotalStatistics(): array
     {

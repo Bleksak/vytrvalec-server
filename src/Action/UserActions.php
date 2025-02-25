@@ -27,7 +27,7 @@ class UserActions
     }
 
     /**
-     * @return array<int, string>
+     * @return array<string, array<string>>
      */
     public function create(UserDto $dto): array
     {

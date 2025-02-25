@@ -4,8 +4,14 @@ namespace App\Notifications;
 
 abstract class EmailTemplate
 {
+    /**
+     * @var array<string, mixed>
+     */
     protected array $context = [];
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getContext(): array
     {
         return $this->context;

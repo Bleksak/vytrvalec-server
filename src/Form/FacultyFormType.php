@@ -19,6 +19,7 @@ class FacultyFormType extends AbstractType
         $required = match ($method) {
             'POST', 'PUT' => true,
             'PATCH' => false,
+            default => true,
         };
 
         $builder->add('name', TextType::class, [

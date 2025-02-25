@@ -50,12 +50,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?Faculty $faculty = null;
 
+    /**
+     * @var Collection<int, Submission>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class, orphanRemoval: true)]
     private ?Collection $submissions;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $token = null;
 
+    /**
+     * @var Collection<int, ProfileCache>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
     private Collection $profileCaches;
 

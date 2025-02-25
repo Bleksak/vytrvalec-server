@@ -40,6 +40,9 @@ class RejectedSubmissionMessageRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @return array<int,array<string,mixed>>
+     */
     public function findByUser(User $user): array
     {
         $query = $this->getEntityManager()->getConnection()->prepare('

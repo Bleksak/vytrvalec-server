@@ -5,7 +5,7 @@ namespace App\Notifications;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 
-class VytrvalecEmail extends TemplatedEmail
+final class VytrvalecEmail extends TemplatedEmail
 {
     public function __construct(string $recipient, EmailTemplate $template)
     {

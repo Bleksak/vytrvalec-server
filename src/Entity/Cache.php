@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Dto\ActivityResultDto;
+use App\Dto\WeeklyResultDto;
 use App\Repository\CacheRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,11 +18,14 @@ class Cache
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP')]
     private \DateTimeInterface $createdAt;
 
+    /**
+     * @var array<int, WeeklyResultDto> $data
+     */
     #[ORM\Column]
     private array $data;
 
     /**
-     * @param array<int, array<ActivityResultDto>> $data
+     * @param array<int, WeeklyResultDto> $data
      */
     public function __construct(Season $season, array $data)
     {
@@ -31,23 +34,21 @@ class Cache
         $this->data = $data;
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     public function getSeason(): Season
     {
         return $this->season;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getData(): array
     {
         return $this->data;
     }
 
     /**
-     * @param array<int, array<ActivityResultDto>> $data
+     * @param array<int, WeeklyResultDto> $data
      */
     public function setData(array $data): void
     {

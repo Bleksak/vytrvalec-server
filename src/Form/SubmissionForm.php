@@ -22,6 +22,7 @@ class SubmissionForm extends AbstractType
         $required = match ($method) {
             'POST' => true,
             'PATCH' => false,
+            default => true,
         };
 
         $builder->add('elevation', IntegerType::class, [

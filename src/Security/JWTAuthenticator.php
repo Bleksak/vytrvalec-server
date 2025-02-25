@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Entity\User;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -20,8 +21,13 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class JWTAuthenticator extends AbstractAuthenticator
 {
-    public function __construct(private readonly UserProviderInterface $userProvider, private readonly ParameterBagInterface $parameters)
-    {
+    /**
+     * @param UserProviderInterface<User> $userProvider
+     */
+    public function __construct(
+        private readonly UserProviderInterface $userProvider,
+        private readonly ParameterBagInterface $parameters,
+    ) {
     }
 
     public function supports(Request $request): ?bool

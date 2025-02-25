@@ -18,13 +18,11 @@ use App\Repository\SubmissionRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Mailer\MailerInterface;
 
 class SubmissionActions
 {
     public function __construct(
         private readonly Firebase $firebase,
-        private readonly MailerInterface $mailer,
         private readonly SubmissionRepository $submissionRepository,
         private readonly RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository,
         private readonly ProfileCacheRepository $profileCacheRepository,
@@ -67,11 +65,14 @@ class SubmissionActions
         return $uniquePath;
     }
 
-    /*
-    * @return array<int, string>
-    */
-    public function create(SubmissionDto $dto, User $user, Season $season): array
-    {
+    /**
+     * @return array<string>
+     */
+    public function create(
+        SubmissionDto $dto,
+        User $user,
+        Season $season,
+    ): array {
         $imagePath = $this->uploadImage($dto->image);
         if ($imagePath === null) {
             return ['image_error'];
@@ -107,9 +108,6 @@ class SubmissionActions
         return [];
     }
 
-    /**
-     * @return array<int,string>
-     */
     public function accept(Submission $submission): void
     {
         // noop when already accepted, otherwise profile cache would stack
@@ -126,9 +124,6 @@ class SubmissionActions
         $this->profileCacheRepository->addCache($submission, true);
     }
 
-    /**
-     * @return array<int,string>
-     */
     public function reject(Submission $submission, string $message): void
     {
         $rejectedSubmission = $this->rejectedSubmissionMessageRepository->findOneBy(['submission' => $submission]);

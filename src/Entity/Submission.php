@@ -62,6 +62,9 @@ class Submission
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', updatable: false, insertable: false, generated: 'ALWAYS')]
     #[Groups(['fetchSubmission'])]
+    /**
+     * @phpstan-ignore-next-line
+     */
     private \DateTimeInterface $updatedAt;
 
     public function __construct(User $user, Activity $activity, Season $season, string $image, int $distance, int $elevation = 0)
@@ -72,8 +75,8 @@ class Submission
         $this->activity = $activity;
         $this->season = $season;
         $this->image = $image;
-        $this->distance = $distance;
-        $this->elevation = $elevation;
+        $this->distance = (string) $distance;
+        $this->elevation = (string) $elevation;
 
         $this->calculateWeek();
     }
@@ -119,26 +122,26 @@ class Submission
         return $this;
     }
 
-    public function getElevation(): ?int
+    public function getElevation(): int
     {
-        return $this->elevation;
+        return (int) $this->elevation;
     }
 
     public function setElevation(int $elevation): self
     {
-        $this->elevation = $elevation;
+        $this->elevation = (string) $elevation;
 
         return $this;
     }
 
-    public function getDistance(): ?int
+    public function getDistance(): int
     {
-        return $this->distance;
+        return (int) $this->distance;
     }
 
     public function setDistance(int $distance): self
     {
-        $this->distance = $distance;
+        $this->distance = (string) $distance;
 
         return $this;
     }
@@ -211,7 +214,7 @@ class Submission
         return $this;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    public function getUpdatedAt(): \DateTimeInterface
     {
         return $this->updatedAt;
     }

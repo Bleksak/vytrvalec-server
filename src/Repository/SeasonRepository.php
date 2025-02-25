@@ -63,6 +63,9 @@ class SeasonRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @return array<Season>
+     */
     public function findOrdered(): array
     {
         return $this->createQueryBuilder('s')

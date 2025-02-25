@@ -20,6 +20,7 @@ class SeasonFormType extends AbstractType
         $required = match ($method) {
             'POST', 'PUT' => true,
             'PATCH' => false,
+            default => true,
         };
 
         $now = new \DateTime();
