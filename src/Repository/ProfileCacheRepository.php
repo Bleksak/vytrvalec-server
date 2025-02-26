@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\ProfileCache;
 use App\Entity\Submission;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -56,5 +57,40 @@ class ProfileCacheRepository extends ServiceEntityRepository
 
             $this->save($profileCache, $flush);
         }
+    }
+
+    // WARNING: This is used only to fix invalid entries, avoid using this in production code
+    public function fixCacheValues(User $user): void
+    {
+        $cachesByUser = $this->findBy(['user' => $user]);
+
+        if (empty($cachesByUser)) {
+            return;
+        }
+
+        foreach ($cachesByUser as $cache) {
+            $activity = $cache->getActivity();
+
+            /**
+             * @var SubmissionRepository
+             */
+            $submissionRepository = $this->getEntityManager()->getRepository(Submission::class);
+            $submissions = $submissionRepository->findBy(['activity' => $activity, 'user' => $user]);
+
+            $elevation = 0;
+            $distance = 0;
+
+            foreach ($submissions as $submission) {
+                $distance += $submission->getDistance();
+                $elevation += $submission->getElevation();
+            }
+
+            $cache->setDistance($distance);
+            $cache->setElevation($elevation);
+
+            $this->save($cache);
+        }
+
+        $this->getEntityManager()->flush();
     }
 }
