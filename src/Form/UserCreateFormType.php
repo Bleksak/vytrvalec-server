@@ -59,7 +59,6 @@ class UserCreateFormType extends AbstractType
                     new Assert\Type(type: 'bool', message: 'invalid'),
                 ],
             ]);
-        
     }
 
     public function configureOptions(OptionsResolver $resolver): void
