@@ -68,11 +68,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $passwordResetToken = null;
 
+    #[ORM\Column]
+    private ?bool $acceptedGdpr = false;
+
     /**
      * @param array<int,string> $roles
      */
-    public function __construct(string $email, string $firstName, string $lastName, Faculty $faculty, array $roles = [], ?string $token = null)
-    {
+    public function __construct(
+        string $email,
+        string $firstName,
+        string $lastName,
+        Faculty $faculty,
+        bool $acceptedGdpr,
+        array $roles = [],
+        ?string $token = null,
+    ) {
         $this->submissions = new ArrayCollection();
         $this->profileCaches = new ArrayCollection();
 
@@ -80,6 +90,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->faculty = $faculty;
+        $this->acceptedGdpr = $acceptedGdpr;
         $this->roles = $roles;
         $this->token = $token;
     }
@@ -99,6 +110,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $email;
 
         return $this;
+    }
+
+    public function setAcceptedGdpr(bool $value): self
+    {
+        $this->acceptedGdpr = $value;
+
+        return $this;
+    }
+
+    public function isAcceptedGdpr(): bool
+    {
+        return $this->acceptedGdpr;
     }
 
     /**

@@ -55,6 +55,7 @@ class BaseTest extends WebTestCase
             'first_name' => 'string',
             'last_name' => 'string',
             'faculty' => $faculty->getId(),
+            'gdpr' => true,
         ]);
 
         if (!empty($roles)) {

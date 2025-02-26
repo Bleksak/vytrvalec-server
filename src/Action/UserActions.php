@@ -31,7 +31,7 @@ class UserActions
      */
     public function create(UserDto $dto): array
     {
-        $user = new User($dto->email, $dto->firstName, $dto->lastName, $dto->faculty);
+        $user = new User($dto->email, $dto->firstName, $dto->lastName, $dto->faculty, $dto->gdpr);
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
 
         try {

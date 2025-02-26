@@ -6,6 +6,7 @@ use App\Dto\UserDto;
 use App\Entity\Faculty;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -50,7 +51,15 @@ class UserCreateFormType extends AbstractType
                 'constraints' => [
                     new Assert\NotBlank(message: 'invalid', allowNull: false),
                 ],
+            ])
+            ->add('gdpr', CheckboxType::class, [
+                'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank(message: 'invalid', allowNull: false),
+                    new Assert\Type(type: 'bool', message: 'invalid'),
+                ],
             ]);
+        
     }
 
     public function configureOptions(OptionsResolver $resolver): void
