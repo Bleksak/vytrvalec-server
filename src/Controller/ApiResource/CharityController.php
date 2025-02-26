@@ -3,10 +3,13 @@
 namespace App\Controller\ApiResource;
 
 use App\Action\CharityActions;
+use App\Dto\CharityDto;
 use App\Entity\Charity;
 use App\Form\CharityCreateFormType;
 use App\Repository\CharityRepository;
 use App\Validation\FormErrors;
+use Nelmio\ApiDocBundle\Attribute\Model;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +18,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
+#[OA\Tag(name: 'Charity')]
 final class CharityController extends AbstractController
 {
     public function __construct(
@@ -24,20 +28,43 @@ final class CharityController extends AbstractController
     ) {
     }
 
+    #[OA\Post(
+        description: 'Create a new Charity',
+        requestBody: new OA\RequestBody(
+            required: true,
+            description: 'The new charity object',
+            content: new OA\JsonContent(
+                ref: new Model(type: CharityDto::class)
+            ),
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_CREATED,
+                description: 'Charity created',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'id',
+                            type: 'integer',
+                            example: 1,
+                        ),
+                    ],
+                ),
+            ),
+            new OA\Response(
+                response: Response::HTTP_UNAUTHORIZED,
+                description: 'Unauthorized access',
+            ),
+            new OA\Response(
+                response: Response::HTTP_BAD_REQUEST,
+                description: 'Bad data',
+            ),
+        ]
+    )]
     #[Route(
         '/api/charity',
         'api_charity_create',
         methods: ['POST'],
-        // documentation: 'Create a new Charity entity',
-        // responses: [
-        //     Response::HTTP_BAD_REQUEST => ['message' => 'Bad data'],
-        //     Response::HTTP_UNAUTHORIZED => ['message' => 'Unauthorized access'],
-        //     Response::HTTP_CREATED => ['message' => 'Entity created'],
-        // ],
-        // requestScheme: [
-        //     'name' => 'string',
-        //     'description' => '?string',
-        // ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function create(Request $request): Response
@@ -56,14 +83,33 @@ final class CharityController extends AbstractController
         return $this->json(['id' => $id], Response::HTTP_CREATED);
     }
 
+    #[OA\Get(
+        description: 'Retrieve a Charity',
+        parameters: [
+            new OA\Parameter(
+                name: 'charity',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer'),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    ref: new Model(type: Charity::class)
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Charity with the given ID not found',
+            ),
+        ]
+    )]
     #[Route(
         '/api/charity/{charity}',
         'api_charity_get',
         methods: ['GET'],
-        // documentation: 'Get a charity entity',
-        // responses: [
-        //     Response::HTTP_OK => ['message' => 'Charity entity'],
-        // ],
     )]
     public function get(Charity $charity): Response
     {
@@ -72,14 +118,36 @@ final class CharityController extends AbstractController
         ]));
     }
 
+    #[OA\Patch(
+        description: 'Update a charity',
+        parameters: [
+            new OA\Parameter(
+                name: 'charity',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer'),
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: false,
+            content: new OA\JsonContent(
+                ref: new Model(type: CharityDto::class)
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Succesfully updated',
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Charity with given ID not found',
+            ),
+        ]
+    )]
     #[Route(
         '/api/charity/{charity}',
         'api_charity_patch',
         methods: ['PATCH'],
-        // documentation: 'Patch a charity entity',
-        // responses: [
-        //     Response::HTTP_OK => ['message' => 'Patched successfully'],
-        // ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function updatePatch(Charity $charity, Request $request): Response
@@ -98,17 +166,28 @@ final class CharityController extends AbstractController
 
         $this->action->update($charity, $form->getData());
 
-        return $this->json([]);
+        return new Response();
     }
 
+    #[OA\Get(
+        description: 'Retrieve a collection of charities',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Collection of charities',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: Charity::class),
+                    ),
+                ),
+            ),
+        ],
+    )]
     #[Route(
         '/api/charity',
         'api_charity_index',
         methods: ['GET'],
-        // documentation: 'List of charity entities',
-        // responses: [
-        //     Response::HTTP_OK => ['message' => 'List of charities'],
-        // ],
     )]
     public function index(): Response
     {
@@ -121,12 +200,6 @@ final class CharityController extends AbstractController
         '/api/charity/{charity}',
         'api_charity_delete',
         methods: ['DELETE'],
-        // documentation: 'Delete a <code>Charity</code> entity',
-        // responses: [
-        //     Response::HTTP_BAD_REQUEST => ['message' => 'Bad data'],
-        //     Response::HTTP_UNAUTHORIZED => ['message' => 'Unauthorized access'],
-        //     Response::HTTP_OK => ['message' => 'Entity removed'],
-        // ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function delete(Charity $charity): Response

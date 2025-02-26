@@ -12,3 +12,26 @@ api_user_login:
     path: /api/user/login
     methods: POST
 
+
+when@dev:
+    app.swagger_ui:
+        path: /api/doc
+        methods: GET
+        defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
+
+    # app.redocly:
+    #     path: /api/doc
+    #     methods: GET
+    #     defaults: { _controller: nelmio_api_doc.controller.redocly }
+    #    env: dev
+
+    # app.stoplight:
+    #     path: /api/doc
+    #     methods: GET
+    #     defaults: { _controller: nelmio_api_doc.controller.stoplight }
+    #     env: dev
+
+    app.swagger:
+        path: /api/doc.json
+        methods: GET
+        defaults: { _controller: nelmio_api_doc.controller.swagger }

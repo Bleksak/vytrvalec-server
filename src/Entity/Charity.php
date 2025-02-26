@@ -4,21 +4,25 @@ namespace App\Entity;
 
 use App\Repository\CharityRepository;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CharityRepository::class)]
 class Charity
 {
+    #[OA\Property]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
     private ?int $id = null;
 
+    #[OA\Property]
     #[ORM\Column(length: 255)]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
     private ?string $name = null;
 
+    #[OA\Property]
     #[ORM\Column(length: 10000)]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
     private ?string $description = null;
