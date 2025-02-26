@@ -4,25 +4,30 @@ namespace App\Entity;
 
 use App\Repository\FacultyRepository;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacultyRepository::class)]
 class Faculty
 {
+    #[OA\Property(example: 1)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(['fetchSubmission', 'fetchFacultySummary', 'fetchSeasonResult', 'fetchUser'])]
     private ?int $id = null;
 
+    #[OA\Property(example: 'Fakulta aplikovaných věd')]
     #[ORM\Column(length: 255)]
     #[Groups(['fetchSubmission', 'fetchFacultySummary', 'fetchSeasonResult', 'fetchUser'])]
     private ?string $name = null;
 
+    #[OA\Property(example: 'FAV')]
     #[ORM\Column(length: 10)]
     #[Groups(['fetchSubmission', 'fetchFacultySummary', 'fetchSeasonResult', 'fetchUser'])]
     private ?string $shortcut = null;
 
+    #[OA\Parameter(example: true)]
     #[ORM\Column]
     #[Groups(['fetchSubmission'])]
     private ?bool $visible = null;
