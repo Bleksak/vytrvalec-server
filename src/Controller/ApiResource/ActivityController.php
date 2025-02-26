@@ -3,10 +3,13 @@
 namespace App\Controller\ApiResource;
 
 use App\Action\ActivityActions;
+use App\Dto\ActivityDto;
 use App\Entity\Activity;
 use App\Form\ActivityFormType;
 use App\Repository\ActivityRepository;
 use App\Validation\FormErrors;
+use Nelmio\ApiDocBundle\Attribute\Model;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,16 +26,34 @@ final class ActivityController extends AbstractController
     ) {
     }
 
+    #[OA\Post(
+        description: 'Create new Activity',
+        requestBody: new OA\RequestBody(
+            description: 'The new activity',
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: ActivityDto::class)
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Activity created',
+            ),
+            new OA\Response(
+                response: Response::HTTP_FORBIDDEN,
+                description: 'Unauthorized access',
+            ),
+            new OA\Response(
+                response: Response::HTTP_BAD_REQUEST,
+                description: 'Bad request',
+            ),
+        ],
+    )]
     #[Route(
         '/api/activity',
         name: 'activity_create',
         methods: ['POST'],
-        // documentation: 'Create a new <code>Activity</code> entry',
-        // responses: [
-        //     Response::HTTP_OK => ['message' => 'Successfully created'],
-        //     Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
-        //     Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
-        // ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function create(Request $request): Response
@@ -51,16 +72,34 @@ final class ActivityController extends AbstractController
         return $this->json(['id' => $id], Response::HTTP_OK);
     }
 
+    #[OA\Delete(
+        description: 'Delete an activity',
+        parameters: [
+            new OA\Parameter(
+                name: 'activity',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer'),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Activity deleted',
+            ),
+            new OA\Response(
+                response: Response::HTTP_FORBIDDEN,
+                description: 'Unauthorized access',
+            ),
+            new OA\Response(
+                response: Response::HTTP_BAD_REQUEST,
+                description: 'Bad request',
+            ),
+        ]
+    )]
     #[Route(
         '/api/activity/{activity}',
         name: 'activity_delete',
         methods: ['DELETE'],
-        // documentation: 'Deletes an existing <code>Activity</code> entry',
-        // responses: [
-        //     Response::HTTP_OK => ['message' => 'Successfully deleted'],
-        //     Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
-        //     Response::HTTP_NOT_FOUND => ['message' => 'Not found'],
-        // ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function delete(Activity $activity): Response
@@ -74,15 +113,41 @@ final class ActivityController extends AbstractController
         return new Response(status: Response::HTTP_OK);
     }
 
+    #[OA\Patch(
+        description: 'Update activity',
+        parameters: [
+            new OA\Parameter(
+                name: 'activity',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer'),
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            description: 'The updated activity',
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: ActivityDto::class)
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Activity deleted',
+            ),
+            new OA\Response(
+                response: Response::HTTP_FORBIDDEN,
+                description: 'Unauthorized access',
+            ),
+            new OA\Response(
+                response: Response::HTTP_BAD_REQUEST,
+                description: 'Bad request',
+            ),
+        ]
+    )]
     #[Route(
         '/api/activity/{activity}',
         name: 'activity_patch',
         methods: ['PATCH'],
-        // documentation: 'Updates an <code>Activity</code> entry',
-        // responses: [
-        //     Response::HTTP_OK => ['message' => 'Successfully patched'],
-        //     Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
-        // ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function updatePatch(Request $request, Activity $activity): Response
@@ -104,15 +169,25 @@ final class ActivityController extends AbstractController
         return new Response(status: Response::HTTP_OK);
     }
 
+    #[OA\Get(
+        description: 'Retrieve all activities',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Collection of activites',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: Activity::class),
+                    ),
+                ),
+            ),
+        ],
+    )]
     #[Route(
         '/api/activity',
         name: 'activity_index',
         methods: ['GET'],
-        // documentation: 'Retrieve all <code>Activity</code> entries',
-        // responses: [
-        //     Response::HTTP_OK => ['message' => 'Successfully retrieved'],
-        //     Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access']
-        // ],
     )]
     public function activityList(NormalizerInterface $normalizer): Response
     {

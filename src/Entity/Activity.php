@@ -4,25 +4,30 @@ namespace App\Entity;
 
 use App\Repository\ActivityRepository;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 class Activity
 {
+    #[OA\Property(example: 1)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult', 'fetchActivity'])]
     private ?int $id = null;
 
+    #[OA\Property(example: 'Běh a chůze')]
     #[ORM\Column(length: 255)]
     #[Groups(['fetchSubmission', 'userProfile', 'fetchSeasonResult', 'fetchActivity'])]
     private string $name;
 
+    #[OA\Property(example: true)]
     #[ORM\Column]
     #[Groups(['fetchSubmission', 'userProfile', 'fetchActivity'])]
     private bool $active = true;
 
+    #[OA\Property(example: 1000)]
     #[ORM\Column]
     #[Groups(['fetchSubmission', 'userProfile', 'fetchActivity'])]
     private int $minElevation;
