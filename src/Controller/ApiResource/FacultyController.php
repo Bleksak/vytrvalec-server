@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[OA\Tag('Faculty')]
+#[OA\Tag(name: 'Faculty')]
 final class FacultyController extends AbstractController
 {
     public function __construct(

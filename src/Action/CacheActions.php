@@ -7,7 +7,7 @@ use App\Entity\Cache;
 use App\Entity\Season;
 use App\Repository\CacheRepository;
 
-class CacheActions
+final class CacheActions
 {
     public function __construct(
         private readonly CacheRepository $cacheRepository,
