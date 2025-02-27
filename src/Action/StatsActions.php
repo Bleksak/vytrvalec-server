@@ -2,6 +2,7 @@
 
 namespace App\Action;
 
+use App\Dto\TotalStatisticsDto;
 use App\Repository\SubmissionRepository;
 use App\Repository\UserRepository;
 
@@ -13,23 +14,14 @@ final class StatsActions
     ) {
     }
 
-    /**
-     * @return array{
-     * users: int,
-     * activities: array<int, array{
-     * name: string,
-     * distance: int
-     * }>
-     * }
-     */
-    public function getTotalStatistics(): array
+    public function getTotalStatistics(): TotalStatisticsDto
     {
         $users = $this->userRepository->getActiveUsersCount();
         $activities = $this->submissionRepository->getTotalStatistics();
 
-        return [
-            'users' => $users,
-            'activities' => $activities,
-        ];
+        return new TotalStatisticsDto(
+            $users,
+            $activities
+        );
     }
 }

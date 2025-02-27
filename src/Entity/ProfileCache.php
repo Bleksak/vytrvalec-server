@@ -4,28 +4,35 @@ namespace App\Entity;
 
 use App\Repository\ProfileCacheRepository;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: ProfileCacheRepository::class)]
 class ProfileCache
 {
+    #[OA\Property]
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'profileCaches')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user;
 
+    #[OA\Property]
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'profileCaches')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Activity $activity;
 
+    #[OA\Property]
     #[ORM\Column]
     private ?int $distance = 0;
 
+    #[OA\Property]
     #[ORM\Column]
     private ?int $elevation = 0;
 
-    public function __construct(User $user, Activity $activity)
-    {
+    public function __construct(
+        User $user,
+        Activity $activity,
+    ) {
         $this->user = $user;
         $this->activity = $activity;
     }

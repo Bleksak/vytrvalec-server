@@ -6,9 +6,11 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Attributes as OA;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -24,8 +26,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     /**
-     * @var string[]
+     * @var array<string>
      */
+    #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
     #[ORM\Column(type: 'json')]
     #[Groups(['fetchSubmission', 'fetchUser'])]
     private array $roles = [];
@@ -72,7 +75,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $acceptedGdpr = false;
 
     /**
-     * @param array<int,string> $roles
+     * @param array<string> $roles
      */
     public function __construct(
         string $email,
@@ -135,7 +138,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @see UserInterface
+     * @return array<string>
      */
     public function getRoles(): array
     {
@@ -146,6 +149,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
+    #[Ignore]
     public function hasRole(string $roleName): bool
     {
         return in_array($roleName, $this->getRoles(), true);

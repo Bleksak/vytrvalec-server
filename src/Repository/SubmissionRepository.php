@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Dto\ActivityStatisticsDto;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -101,10 +102,7 @@ final class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<int,array{
-     * name: string,
-     * distance: int
-     * }>
+     * @return array<ActivityStatisticsDto>
      */
     public function getTotalStatistics(): array
     {
@@ -119,7 +117,12 @@ final class SubmissionRepository extends ServiceEntityRepository
             INNER JOIN activity a ON a.id = sub.activity_id;
         ');
 
-        return $query->executeQuery()->fetchAllAssociative();
+        $data = $query->executeQuery()->fetchAllAssociative();
+
+        return array_map(
+            static fn ($row) => new ActivityStatisticsDto($row['activity'], $row['distance']),
+            $data
+        );
     }
 
     /**
