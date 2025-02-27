@@ -10,6 +10,7 @@ return (new PhpCsFixer\Config())
         '@Symfony' => true,
         'yoda_style' => false,
         'final_class' => true,
+        'return_to_yield_from' => true,
     ])
     ->setFinder($finder)
     ->setRiskyAllowed(true)
