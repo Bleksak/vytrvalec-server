@@ -3,10 +3,12 @@
 namespace App\Action;
 
 use App\Dto\TotalStatisticsDto;
+use App\Dto\UserCountByFacultyStatistics;
+use App\Entity\Season;
 use App\Repository\SubmissionRepository;
 use App\Repository\UserRepository;
 
-final class StatsActions
+final class StatisticsActions
 {
     public function __construct(
         private readonly SubmissionRepository $submissionRepository,
@@ -23,5 +25,13 @@ final class StatsActions
             $users,
             $activities
         );
+    }
+
+    /**
+     * @return array<UserCountByFacultyStatistics>
+     */
+    public function getUserCountByFaculties(Season $season): array
+    {
+        return $this->userRepository->countUserGroupedByFaculties($season);
     }
 }

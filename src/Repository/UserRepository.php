@@ -2,6 +2,9 @@
 
 namespace App\Repository;
 
+use App\Dto\UserCountByFacultyStatistics;
+use App\Entity\Season;
+use App\Entity\Submission;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -67,5 +70,32 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
         $result = $query->executeQuery()->fetchOne();
 
         return $result === false ? 0 : (int) $result;
+    }
+
+    /**
+     * @return array<UserCountByFacultyStatistics>
+     */
+    public function countUserGroupedByFaculties(Season $season): array
+    {
+        $queryBuilder = $this->createQueryBuilder('u');
+
+        $query = $queryBuilder
+            ->select('new App\Dto\UserCountByFacultyStatistics(f.id, count(u.id))')
+            ->where($queryBuilder->expr()->exists(
+                $this->getEntityManager()->createQueryBuilder()
+                    ->select('1')
+                    ->from(Submission::class, 's')
+                    ->where('s.user = u')
+                    ->andWhere('s.accepted = :accepted')
+                    ->andWhere('s.season = :season')
+                    ->getDQL()
+            ))
+            ->innerJoin('u.faculty', 'f')
+            ->groupBy('f.id')
+            ->setParameter('accepted', true)
+            ->setParameter('season', $season)
+            ->getQuery();
+
+        return $query->getResult();
     }
 }

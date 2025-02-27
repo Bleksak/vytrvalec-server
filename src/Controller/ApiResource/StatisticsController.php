@@ -2,9 +2,10 @@
 
 namespace App\Controller\ApiResource;
 
-use App\Action\StatsActions;
+use App\Action\StatisticsActions;
 use App\Dto\TotalStatisticsDto;
-use App\Entity\ProfileCache;
+use App\Dto\UserCountByFacultyStatistics;
+use App\Entity\Season;
 use App\Entity\User;
 use App\Schema\ProfileCacheSchema;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -16,10 +17,10 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[OA\Tag(name: 'Statistics')]
-final class StatsController extends AbstractController
+final class StatisticsController extends AbstractController
 {
     public function __construct(
-        private readonly StatsActions $action,
+        private readonly StatisticsActions $action,
         private readonly NormalizerInterface $normalizer,
     ) {
     }
@@ -44,6 +45,40 @@ final class StatsController extends AbstractController
     public function indexTotalStatistics(): Response
     {
         return $this->json($this->action->getTotalStatistics());
+    }
+
+    #[OA\Get(
+        description: 'Retrieve user count grouped by faculties',
+        parameters: [
+            new OA\Parameter(
+                name: 'season',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer'),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'User counts by faculties',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: UserCountByFacultyStatistics::class),
+                    ),
+                ),
+            ),
+        ]
+    )]
+    #[Route(
+        '/api/stats/faculties/{season}',
+        name: 'statistics_faculties_index',
+        methods: ['GET'],
+    )]
+    public function indexFacultyStatistics(Season $season): Response
+    {
+        return $this->json(
+            $this->action->getUserCountByFaculties($season)
+        );
     }
 
     #[OA\Get(
