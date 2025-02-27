@@ -70,7 +70,7 @@ final class StatisticsController extends AbstractController
         ]
     )]
     #[Route(
-        '/api/stats/faculties/{season}',
+        '/api/statistics/faculties/{season}',
         name: 'statistics_faculties_index',
         methods: ['GET'],
     )]
