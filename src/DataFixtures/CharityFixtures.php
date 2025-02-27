@@ -6,7 +6,7 @@ use App\Entity\Charity;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
-class CharityFixtures extends Fixture
+final class CharityFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {

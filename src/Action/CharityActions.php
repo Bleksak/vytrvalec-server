@@ -6,7 +6,7 @@ use App\Dto\CharityDto;
 use App\Entity\Charity;
 use App\Repository\CharityRepository;
 
-class CharityActions
+final class CharityActions
 {
     public function __construct(private readonly CharityRepository $charityRepository)
     {

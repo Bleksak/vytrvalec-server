@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Charity[]    findAll()
  * @method Charity[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CharityRepository extends ServiceEntityRepository
+final class CharityRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

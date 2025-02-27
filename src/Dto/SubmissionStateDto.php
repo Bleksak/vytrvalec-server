@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-class SubmissionStateDto
+final class SubmissionStateDto
 {
     public ?\DateTimeImmutable $updatedAt = null;
     public ?bool $state = null;

@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Cache[]    findAll()
  * @method Cache[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SeasonCacheRepository extends ServiceEntityRepository
+final class SeasonCacheRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

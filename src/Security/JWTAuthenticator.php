@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-class JWTAuthenticator extends AbstractAuthenticator
+final class JWTAuthenticator extends AbstractAuthenticator
 {
     /**
      * @param UserProviderInterface<User> $userProvider

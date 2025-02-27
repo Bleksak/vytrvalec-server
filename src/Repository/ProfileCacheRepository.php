@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ProfileCache[]    findAll()
  * @method ProfileCache[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ProfileCacheRepository extends ServiceEntityRepository
+final class ProfileCacheRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

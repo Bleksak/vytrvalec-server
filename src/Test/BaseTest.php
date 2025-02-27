@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class BaseTest extends WebTestCase
+final class BaseTest extends WebTestCase
 {
     protected static ?Application $application = null;
     protected KernelBrowser $client;

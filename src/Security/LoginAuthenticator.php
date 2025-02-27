@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class LoginAuthenticator extends AbstractAuthenticator
+final class LoginAuthenticator extends AbstractAuthenticator
 {
     /**
      * @param UserProviderInterface<User> $userProvider

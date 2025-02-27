@@ -5,7 +5,7 @@ namespace App\Action;
 use App\Repository\SubmissionRepository;
 use App\Repository\UserRepository;
 
-class StatsActions
+final class StatsActions
 {
     public function __construct(
         private readonly SubmissionRepository $submissionRepository,

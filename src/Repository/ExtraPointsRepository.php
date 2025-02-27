@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ExtraPoints[]    findAll()
  * @method ExtraPoints[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ExtraPointsRepository extends ServiceEntityRepository
+final class ExtraPointsRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

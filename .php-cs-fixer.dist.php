@@ -9,6 +9,8 @@ return (new PhpCsFixer\Config())
     ->setRules([
         '@Symfony' => true,
         'yoda_style' => false,
+        'final_class' => true,
     ])
     ->setFinder($finder)
+    ->setRiskyAllowed(true)
 ;

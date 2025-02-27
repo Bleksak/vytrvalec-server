@@ -15,7 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method RejectedSubmissionMessage[]    findAll()
  * @method RejectedSubmissionMessage[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class RejectedSubmissionMessageRepository extends ServiceEntityRepository
+final class RejectedSubmissionMessageRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

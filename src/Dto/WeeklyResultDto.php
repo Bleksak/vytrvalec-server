@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-class WeeklyResultDto
+final class WeeklyResultDto
 {
     /**
      * @param array<int,ActivityResultDto> $activities

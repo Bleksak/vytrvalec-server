@@ -5,7 +5,7 @@ namespace App\CustomLogic;
 use App\Entity\Season;
 use Doctrine\ORM\EntityManagerInterface;
 
-class WeeklyElevationExtraPoints implements ExtraPoints
+final class WeeklyElevationExtraPoints implements ExtraPoints
 {
     public function __construct(private readonly EntityManagerInterface $entityManagerInterface)
     {

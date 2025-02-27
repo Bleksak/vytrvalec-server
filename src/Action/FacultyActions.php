@@ -6,7 +6,7 @@ use App\Dto\FacultyDto;
 use App\Entity\Faculty;
 use App\Repository\FacultyRepository;
 
-class FacultyActions
+final class FacultyActions
 {
     public function __construct(
         private readonly FacultyRepository $facultyRepository,

@@ -6,7 +6,7 @@ use App\Entity\Faculty;
 use App\Test\BaseTest;
 use Symfony\Component\HttpFoundation\Response;
 
-class UserTest extends BaseTest
+final class UserTest extends BaseTest
 {
     public const PASSWORD = 'Qwertaz!1231@pepega';
 

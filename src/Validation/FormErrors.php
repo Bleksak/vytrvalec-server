@@ -4,7 +4,7 @@ namespace App\Validation;
 
 use Symfony\Component\Form\FormInterface;
 
-class FormErrors
+final class FormErrors
 {
     /**
      * @return array<string, array<int, string>>

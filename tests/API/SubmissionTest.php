@@ -9,7 +9,7 @@ use App\Test\BaseTest;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
-class SubmissionTest extends BaseTest
+final class SubmissionTest extends BaseTest
 {
     public function testUpload(): void
     {

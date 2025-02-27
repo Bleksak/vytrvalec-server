@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-class PasswordResetDto
+final class PasswordResetDto
 {
     public string $password;
     public string $passwordResetToken;

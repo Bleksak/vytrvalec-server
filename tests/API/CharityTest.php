@@ -5,7 +5,7 @@ namespace App\Tests\API;
 use App\Test\BaseTest;
 use Symfony\Component\HttpFoundation\Response;
 
-class CharityTest extends BaseTest
+final class CharityTest extends BaseTest
 {
     public function testCreateNotLoggedIn(): void
     {

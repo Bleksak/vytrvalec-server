@@ -4,7 +4,7 @@ namespace App\Dto;
 
 use App\Entity\Charity;
 
-class SeasonDto
+final class SeasonDto
 {
     public ?\DateTime $start;
     public ?\DateTime $end;

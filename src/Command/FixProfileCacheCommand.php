@@ -15,7 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'profile-cache:fix',
     description: 'Fixes a profile cache when user has negative distance or elevation',
 )]
-class FixProfileCacheCommand extends Command
+final class FixProfileCacheCommand extends Command
 {
     public function __construct(
         private readonly UserRepository $userRepository,

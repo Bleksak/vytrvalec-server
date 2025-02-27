@@ -4,7 +4,7 @@ namespace App\Tests\API;
 
 use App\Test\BaseTest;
 
-class FacultyTest extends BaseTest
+final class FacultyTest extends BaseTest
 {
     public function testFetch(): void
     {

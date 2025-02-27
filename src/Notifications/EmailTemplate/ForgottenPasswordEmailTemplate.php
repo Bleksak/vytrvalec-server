@@ -4,7 +4,7 @@ namespace App\Notifications\EmailTemplate;
 
 use App\Notifications\EmailTemplate;
 
-class ForgottenPasswordEmailTemplate extends EmailTemplate
+final class ForgottenPasswordEmailTemplate extends EmailTemplate
 {
     public function getSubject(): string
     {

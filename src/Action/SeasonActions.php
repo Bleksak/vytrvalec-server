@@ -6,7 +6,7 @@ use App\Dto\SeasonDto;
 use App\Entity\Season;
 use App\Repository\SeasonRepository;
 
-class SeasonActions
+final class SeasonActions
 {
     public function __construct(
         private readonly SeasonRepository $seasonRepository,

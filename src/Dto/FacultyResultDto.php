@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-class FacultyResultDto
+final class FacultyResultDto
 {
     public function __construct(
         public readonly int $faculty,

@@ -6,7 +6,7 @@ use App\Entity\ExtraPoints;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
-class ExtraPointsFixtures extends Fixture
+final class ExtraPointsFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {

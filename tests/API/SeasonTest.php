@@ -12,7 +12,7 @@ use App\Entity\User;
 use App\Test\BaseTest;
 use Symfony\Component\HttpFoundation\Response;
 
-class SeasonTest extends BaseTest
+final class SeasonTest extends BaseTest
 {
     public function testCreate(): void
     {

@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-class UserAccountChangeDto
+final class UserAccountChangeDto
 {
     public string $oldPassword;
     public ?string $password = null;

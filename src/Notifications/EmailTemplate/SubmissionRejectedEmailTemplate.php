@@ -5,7 +5,7 @@ namespace App\Notifications\EmailTemplate;
 use App\Entity\Submission;
 use App\Notifications\EmailTemplate;
 
-class SubmissionRejectedEmailTemplate extends EmailTemplate
+final class SubmissionRejectedEmailTemplate extends EmailTemplate
 {
     public function __construct(Submission $submission, string $message)
     {

@@ -4,7 +4,7 @@ namespace App\Notifications\EmailTemplate;
 
 use App\Notifications\EmailTemplate;
 
-class RegisterEmailTemplate extends EmailTemplate
+final class RegisterEmailTemplate extends EmailTemplate
 {
     public function getSubject(): string
     {

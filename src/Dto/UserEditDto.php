@@ -4,7 +4,7 @@ namespace App\Dto;
 
 use App\Entity\Faculty;
 
-class UserEditDto
+final class UserEditDto
 {
     public ?string $email = null;
     public ?string $firstName = null;

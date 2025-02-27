@@ -9,7 +9,7 @@ use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use Doctrine\ORM\EntityManagerInterface;
 
-class SeasonResult
+final class SeasonResult
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManagerInterface,

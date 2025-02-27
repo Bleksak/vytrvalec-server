@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-class ActivityResultDto
+final class ActivityResultDto
 {
     /**
      * @var ExtraPointsDto[]

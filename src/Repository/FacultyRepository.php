@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Faculty[]    findAll()
  * @method Faculty[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class FacultyRepository extends ServiceEntityRepository
+final class FacultyRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

@@ -6,7 +6,7 @@ use App\Dto\ActivityDto;
 use App\Entity\Activity;
 use App\Repository\ActivityRepository;
 
-class ActivityActions
+final class ActivityActions
 {
     public function __construct(
         private readonly ActivityRepository $activityRepository,

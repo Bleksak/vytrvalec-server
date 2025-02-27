@@ -11,7 +11,7 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\Dsn;
 
-class Firebase
+final class Firebase
 {
     private FirebaseTransport $firebase;
 

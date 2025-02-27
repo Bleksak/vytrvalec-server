@@ -5,7 +5,7 @@ namespace App\Dto;
 use App\Entity\Activity;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class SubmissionDto
+final class SubmissionDto
 {
     public ?int $elevation = null;
     public ?int $distance = null;

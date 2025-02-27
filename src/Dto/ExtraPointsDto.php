@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-class ExtraPointsDto
+final class ExtraPointsDto
 {
     public function __construct(
         public readonly int $user,

@@ -17,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Submission[]    findAll()
  * @method Submission[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SubmissionRepository extends ServiceEntityRepository
+final class SubmissionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
