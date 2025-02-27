@@ -8,7 +8,7 @@ use App\Entity\Activity;
 use App\Entity\Faculty;
 use App\Entity\Season;
 use App\Form\SeasonFormType;
-use App\Repository\CacheRepository;
+use App\Repository\SeasonCacheRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Validation\FormErrors;
@@ -178,7 +178,7 @@ final class SeasonController extends AbstractController
         //     Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
         // ],
     )]
-    public function result(Season $season, SeasonResult $result, CacheRepository $cacheRepository): Response
+    public function result(Season $season, SeasonResult $result, SeasonCacheRepository $cacheRepository): Response
     {
         $cache = $cacheRepository->findOneBy(['season' => $season->getId()]);
 

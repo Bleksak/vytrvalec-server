@@ -5,12 +5,12 @@ namespace App\Action;
 use App\CustomLogic\SeasonResult;
 use App\Entity\Cache;
 use App\Entity\Season;
-use App\Repository\CacheRepository;
+use App\Repository\SeasonCacheRepository;
 
-final class CacheActions
+final class SeasonCacheActions
 {
     public function __construct(
-        private readonly CacheRepository $cacheRepository,
+        private readonly SeasonCacheRepository $cacheRepository,
         private readonly SeasonResult $seasonResult,
     ) {
     }

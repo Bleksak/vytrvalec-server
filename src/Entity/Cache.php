@@ -3,11 +3,11 @@
 namespace App\Entity;
 
 use App\Dto\WeeklyResultDto;
-use App\Repository\CacheRepository;
+use App\Repository\SeasonCacheRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CacheRepository::class)]
+#[ORM\Entity(repositoryClass: SeasonCacheRepository::class)]
 class Cache
 {
     #[ORM\Id]
