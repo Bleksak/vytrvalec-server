@@ -4,7 +4,6 @@ namespace App\Action;
 
 use App\Dto\SubmissionDto;
 use App\Dto\SubmissionStateDto;
-use App\Entity\RejectedSubmissionMessage;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -13,7 +12,6 @@ use App\Notifications\Firebase\Firebase;
 use App\Notifications\VytrvalecEmail;
 use App\Notifications\VytrvalecNotification;
 use App\Repository\ProfileCacheRepository;
-use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SubmissionRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -24,7 +22,6 @@ final class SubmissionActions
     public function __construct(
         private readonly Firebase $firebase,
         private readonly SubmissionRepository $submissionRepository,
-        private readonly RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository,
         private readonly ProfileCacheRepository $profileCacheRepository,
         private readonly ParameterBagInterface $parameterBag,
         private readonly Filesystem $fs,
@@ -94,10 +91,24 @@ final class SubmissionActions
             return ['mismatch_updated_at'];
         }
 
+        $submission->setMessage($dto->message);
+
         if ($dto->state) {
-            $this->accept($submission);
+            // noop when already accepted, otherwise profile cache would stack
+            if (!$submission->isReviewed() || !$submission->isAccepted()) {
+                $this->profileCacheRepository->addCache($submission, true);
+            }
         } else {
-            $this->reject($submission, $dto->message);
+            if ($submission->isReviewed() && $submission->isAccepted()) {
+                $this->profileCacheRepository->removeCache($submission, true);
+            }
+
+            if ($submission->getUser()->getToken() !== null) {
+                $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));
+            }
+
+            // TODO: send mail when it's styled
+            // $this->mailer->send(new VytrvalecEmail($submission->getUser(), new SubmissionRejectedEmailTemplate($submission, $message)));
         }
 
         $submission->setReviewed(true);
@@ -108,53 +119,8 @@ final class SubmissionActions
         return [];
     }
 
-    public function accept(Submission $submission): void
-    {
-        // noop when already accepted, otherwise profile cache would stack
-        if ($submission->isReviewed() && $submission->isAccepted()) {
-            return;
-        }
-
-        $rejectedSubmission = $this->rejectedSubmissionMessageRepository->find($submission->getId());
-
-        if ($rejectedSubmission !== null) {
-            $this->rejectedSubmissionMessageRepository->remove($rejectedSubmission);
-        }
-
-        $this->profileCacheRepository->addCache($submission, true);
-    }
-
-    public function reject(Submission $submission, string $message): void
-    {
-        $rejectedSubmission = $this->rejectedSubmissionMessageRepository->findOneBy(['submission' => $submission]);
-
-        if ($rejectedSubmission !== null) {
-            $rejectedSubmission->setMessage($message);
-            $this->rejectedSubmissionMessageRepository->save($rejectedSubmission, true);
-        } else {
-            $this->rejectedSubmissionMessageRepository->save(new RejectedSubmissionMessage($submission, $message));
-        }
-
-        if ($submission->isReviewed() && $submission->isAccepted()) {
-            $this->profileCacheRepository->removeCache($submission, true);
-        }
-
-        if ($submission->getUser()->getToken() !== null) {
-            $this->firebase->send(new VytrvalecNotification($submission->getUser(), $message));
-        }
-
-        // TODO: send mail when it's styled
-        // $this->mailer->send(new VytrvalecEmail($submission->getUser(), new SubmissionRejectedEmailTemplate($submission, $message)));
-    }
-
     public function delete(Submission $submission): void
     {
-        $rejectedSubmission = $this->rejectedSubmissionMessageRepository->findOneBy(['submission' => $submission]);
-
-        if ($rejectedSubmission !== null) {
-            $this->rejectedSubmissionMessageRepository->remove($rejectedSubmission);
-        }
-
         $this->submissionRepository->remove($submission, true);
     }
 
@@ -186,12 +152,6 @@ final class SubmissionActions
 
         if ($dto->activity !== null) {
             $submission->setActivity($dto->activity);
-        }
-
-        $rejectedSubmission = $this->rejectedSubmissionMessageRepository->find($submission->getId());
-
-        if ($rejectedSubmission !== null) {
-            $this->rejectedSubmissionMessageRepository->remove($rejectedSubmission);
         }
 
         $submission->setReviewed(false);

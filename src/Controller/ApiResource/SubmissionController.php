@@ -10,10 +10,10 @@ use App\Entity\Submission;
 use App\Entity\User;
 use App\Form\SubmissionForm;
 use App\Form\SubmissionStateFormType;
-use App\Repository\RejectedSubmissionMessageRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Validation\FormErrors;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +23,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
+#[OA\Tag(name: 'Submission')]
 final class SubmissionController extends AbstractController
 {
     public function __construct(
@@ -185,18 +186,28 @@ final class SubmissionController extends AbstractController
     )]
     public function list(
         #[CurrentUser] User $user,
-        RejectedSubmissionMessageRepository $rejectedSubmissionMessageRepository,
         Request $request,
     ): Response {
-        $submissions = $rejectedSubmissionMessageRepository->findByUser($user);
-
+        $submissions = $this->submissionRepository->findAllByUser($user, 1, 5000);
         $url = $this->getParameter('app_base');
 
-        foreach ($submissions as &$submission) {
-            $submission['image'] = $url.$submission['image'];
-        }
-
-        return $this->json($submissions);
+        return $this->json(
+            $this->normalizer->normalize(
+                $submissions,
+                null,
+                [
+                    AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
+                        return $object->getId();
+                    },
+                    AbstractNormalizer::GROUPS => ['fetchSubmission'],
+                    AbstractNormalizer::CALLBACKS => [
+                        'image' => fn (string $image) => $url.$image,
+                        'activity' => fn (Activity $activity) => $activity->getId(),
+                    ],
+                    AbstractNormalizer::IGNORED_ATTRIBUTES => ['user', 'season'],
+                ],
+            )
+        );
     }
 
     #[Route(

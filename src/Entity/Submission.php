@@ -67,8 +67,19 @@ class Submission
      */
     private \DateTimeInterface $updatedAt;
 
-    public function __construct(User $user, Activity $activity, Season $season, string $image, int $distance, int $elevation = 0)
-    {
+    #[ORM\Column(length: 512)]
+    #[Groups(['fetchSubmission'])]
+    private string $message;
+
+    public function __construct(
+        User $user,
+        Activity $activity,
+        Season $season,
+        string $image,
+        int $distance,
+        int $elevation = 0,
+        string $message = '',
+    ) {
         $this->date = new \DateTimeImmutable();
 
         $this->user = $user;
@@ -77,6 +88,7 @@ class Submission
         $this->image = $image;
         $this->distance = (string) $distance;
         $this->elevation = (string) $elevation;
+        $this->message = $message;
 
         $this->calculateWeek();
     }
@@ -210,6 +222,18 @@ class Submission
     public function setWeek(int $week): static
     {
         $this->week = $week;
+
+        return $this;
+    }
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    public function setMessage(string $message): static
+    {
+        $this->message = $message;
 
         return $this;
     }
