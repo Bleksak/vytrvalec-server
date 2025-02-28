@@ -36,7 +36,7 @@ COPY . .
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN npm install && npm run build
-RUN composer install --no-interaction && composer dump
+RUN composer install --no-interaction --no-dev && composer dump
 
 RUN { \
         echo 'APP_ENV=prod'; \
