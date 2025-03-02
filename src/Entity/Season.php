@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -15,22 +16,26 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['start'], name: 'date_index')]
 class Season
 {
+    #[OA\Property(example: 1)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
     private ?int $id = null;
 
+    #[OA\Property(example: '2025-04-01')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
     private ?\DateTimeInterface $start = null;
 
+    #[OA\Property(example: '2025-05-01')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
     private ?\DateTimeInterface $end = null;
 
+    #[OA\Property]
     #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]

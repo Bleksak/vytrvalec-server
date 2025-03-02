@@ -4,14 +4,20 @@ namespace App\Controller\ApiResource;
 
 use App\Action\SeasonActions;
 use App\CustomLogic\SeasonResult;
+use App\Dto\SeasonDto;
+use App\Dto\WeeklyResultDto;
 use App\Entity\Activity;
 use App\Entity\Faculty;
 use App\Entity\Season;
+use App\Entity\Submission;
 use App\Form\SeasonFormType;
 use App\Repository\SeasonCacheRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
+use App\Schema\SeasonWithoutSubmissionsSchema;
 use App\Validation\FormErrors;
+use Nelmio\ApiDocBundle\Attribute\Model;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +26,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
+#[OA\Tag(name: 'Season')]
 final class SeasonController extends AbstractController
 {
     public function __construct(
@@ -29,32 +36,34 @@ final class SeasonController extends AbstractController
     ) {
     }
 
+    #[OA\Post(
+        description: 'Create a new Season',
+        requestBody: new OA\RequestBody(
+            description: 'The new Season',
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: SeasonDto::class),
+            ),
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Season created',
+            ),
+            new OA\Response(
+                response: Response::HTTP_FORBIDDEN,
+                description: 'Unauthorized access',
+            ),
+            new OA\Response(
+                response: Response::HTTP_BAD_REQUEST,
+                description: 'Bad request',
+            ),
+        ],
+    )]
     #[Route(
         '/api/season',
         name: 'api_season_create',
         methods: ['POST'],
-        // documentation: 'Creates a new <code>Season</code> entity',
-        // responses: [
-        //     Response::HTTP_CREATED => [
-        //         'message' => 'Successfully created a new Season entity',
-        //     ],
-        //     Response::HTTP_UNAUTHORIZED => [
-        //         'message' => 'Unauthorized access',
-        //     ],
-        //     Response::HTTP_BAD_REQUEST => [
-        //         'message' => 'Bad request',
-        //         'response' => [
-        //             'start' => 'invalid_date',
-        //             'end' => 'before_start',
-        //         ]
-        //     ]
-        // ],
-        // requestScheme: [
-        //     'start' => 'date',
-        //     'end' => 'date',
-        //     'charityName' => 'string',
-        //     'charityDescription' => 'string'
-        // ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function create(Request $request): Response
@@ -77,26 +86,26 @@ final class SeasonController extends AbstractController
         return $this->json(['id' => $id], Response::HTTP_CREATED);
     }
 
+    #[OA\Get(
+        description: 'Retrieve currently running season',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'The running season',
+                content: new OA\JsonContent(
+                    ref: new Model(type: SeasonWithoutSubmissionsSchema::class),
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Season is currently not running',
+            ),
+        ],
+    )]
     #[Route(
         '/api/season/current',
         name: 'api_season_current',
         methods: ['GET'],
-        // documentation: 'Get the currently running <code>Season</code>',
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Successfully retrieved the currently running season',
-        //         'response' => [
-        //             'id' => 'integer',
-        //             'start' => 'date',
-        //             'end' => 'date',
-        //             'charity' => [
-        //                 'name' => 'string',
-        //                 'description' => 'string'
-        //             ],
-        //         ]
-        //     ],
-        //     Response::HTTP_NOT_FOUND => ['message' => 'Current season has not been found']
-        // ],
     )]
     public function current(): Response
     {
@@ -116,22 +125,38 @@ final class SeasonController extends AbstractController
         );
     }
 
+    #[OA\Delete(
+        description: 'Delete a non running Season, if the Season is running, this request will fail.',
+        parameters: [
+            new OA\Parameter(
+                name: 'season',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer', example: 1),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Season successfully deleted',
+            ),
+            new OA\Response(
+                response: Response::HTTP_BAD_REQUEST,
+                description: 'Season is already running and cannot be deleted.',
+            ),
+            new OA\Response(
+                response: Response::HTTP_FORBIDDEN,
+                description: 'Unauthorized access.',
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Provided Season does not exist.',
+            ),
+        ],
+    )]
     #[Route(
         '/api/season/{season}',
         name: 'api_season_delete',
         methods: ['DELETE'],
-        // documentation: 'Retrieves a <code>Season</code> entity',
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Successfully deleted a season entity',
-        //     ],
-        //     Response::HTTP_BAD_REQUEST => [
-        //         'message' => 'Bad request',
-        //     ],
-        //     Response::HTTP_FORBIDDEN => [
-        //         'message' => 'Unauthorized access',
-        //     ]
-        // ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function delete(Season $season): Response
@@ -145,38 +170,33 @@ final class SeasonController extends AbstractController
         return new Response(status: Response::HTTP_OK);
     }
 
+    #[OA\Get(
+        description: 'Retrieve Season results',
+        parameters: [
+            new OA\Parameter(
+                name: 'season',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer', example: 1),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'The Season results',
+                content: new OA\JsonContent(
+                    ref: new Model(type: WeeklyResultDto::class),
+                ),
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Season does not exist',
+            ),
+        ],
+    )]
     #[Route(
         '/api/season/{season}/results',
         name: 'api_season_results',
         methods: ['GET'],
-        // documentation: "Retrieves a <code>Season</code>'s results",
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Successfully calculated results',
-        //         'response' => [
-        //             [
-        //                 'weekId' => [
-        //                     'activityId' => [
-        //                         'facultyId' => [
-        //                             'distance' => 'int',
-        //                             'elevation' => 'int',
-        //                         ],
-        //                         'extras' => [
-        //                             'weekId' => [
-        //                                 'name' => 'weekly_distance|daily_distance|weekly_elevation',
-        //                                 'user_id' => 'int',
-        //                                 'distance|elevation' => 'int',
-        //                                 'faculty' => 'int',
-        //                                 'reward' => 'int',
-        //                             ]
-        //                         ]
-        //                     ]
-        //                 ]
-        //             ]
-        //         ]
-        //     ],
-        //     Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
-        // ],
     )]
     public function result(Season $season, SeasonResult $result, SeasonCacheRepository $cacheRepository): Response
     {
@@ -189,18 +209,33 @@ final class SeasonController extends AbstractController
         return $this->json($result->calculate($season));
     }
 
+    #[OA\Get(
+        description: 'Retrieve all submissions from a given Season entity and query filter',
+        parameters: [
+            new OA\Parameter(
+                name: 'season',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer', example: 1),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Season successfully deleted',
+                content: new OA\JsonContent(
+                    ref: new Model(type: Submission::class),
+                ),
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Provided Season does not exist.',
+            ),
+        ],
+    )]
     #[Route(
         '/api/season/{season}/submissions',
         name: 'api_season_submissions',
         methods: ['GET'],
-        // documentation: 'Retrieves all submissions from a given <code>Season</code> entity',
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Successfully retrieved a season entity',
-        //         'response' => []
-        //     ],
-        //     Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
-        // ],
     )]
     #[IsGranted('ROLE_STAFF')]
     public function submissions(SubmissionRepository $submissionRepository, Season $season, Request $request): Response
@@ -245,26 +280,25 @@ final class SeasonController extends AbstractController
         );
     }
 
+    #[OA\Get(
+        description: 'Retrieve all past seasons',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'The running season',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: SeasonWithoutSubmissionsSchema::class),
+                    ),
+                )
+            ),
+        ],
+    )]
     #[Route(
         '/api/season/past',
         name: 'api_season_index_past',
         methods: ['GET'],
-        // documentation: 'Retrieves all past <code>Season</code> entities',
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Successfully retrieved entities',
-        //         'response' => [
-        //             'id' => 'integer',
-        //             'start' => 'date',
-        //             'end' => 'date',
-        //             'charity' => [
-        //                 'name' => 'string',
-        //                 'description' => 'string'
-        //             ],
-        //         ]
-        //     ],
-        //     Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
-        // ],
     )]
     public function indexPast(): Response
     {
@@ -279,23 +313,33 @@ final class SeasonController extends AbstractController
         return $this->json($seasons);
     }
 
+    #[OA\Get(
+        description: 'Retrieve a Season by ID',
+        parameters: [
+            new OA\Parameter(
+                name: 'season',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer', example: 1),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'The Season',
+                content: new OA\JsonContent(
+                    ref: new Model(type: SeasonWithoutSubmissionsSchema::class),
+                ),
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Provided Season does not exist.',
+            ),
+        ],
+    )]
     #[Route(
         '/api/season/{season}',
         name: 'api_season',
         methods: ['GET'],
-        // documentation: 'Retrieves a <code>Season</code> entity',
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Successfully retrieved a season entity',
-        //         'response' => [
-        //             'id' => 'integer',
-        //             'start' => 'date',
-        //             'end' => 'date',
-        //             'charity' => 'integer',
-        //         ]
-        //     ],
-        //     Response::HTTP_BAD_REQUEST => ['message' => 'Bad request']
-        // ],
     )]
     public function season(Season $season): Response
     {
@@ -311,24 +355,25 @@ final class SeasonController extends AbstractController
         return $this->json($season);
     }
 
+    #[OA\Get(
+        description: 'Retrieve all Seasons',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'All Seasons',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: SeasonWithoutSubmissionsSchema::class),
+                    ),
+                ),
+            ),
+        ],
+    )]
     #[Route(
         '/api/season',
         name: 'api_season_index',
         methods: ['GET'],
-        // documentation: 'Get all seasons',
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Successfully retrieved all seasons',
-        //         'response' => [
-        //             [
-        //                 'id' => 'integer',
-        //                 'start' => 'date',
-        //                 'end' => 'date',
-        //                 'charity' => 'number',
-        //             ]
-        //         ]
-        //     ]
-        // ],
     )]
     public function seasonList(): Response
     {
