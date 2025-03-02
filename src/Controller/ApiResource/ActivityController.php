@@ -30,7 +30,7 @@ final class ActivityController extends AbstractController
     #[OA\Post(
         description: 'Create new Activity',
         requestBody: new OA\RequestBody(
-            description: 'The new activity',
+            description: 'The new Activity',
             required: true,
             content: new OA\JsonContent(
                 ref: new Model(type: ActivityDto::class)
