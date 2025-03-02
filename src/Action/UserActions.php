@@ -139,4 +139,10 @@ final class UserActions
 
         return [];
     }
+
+    public function updateGdpr(User $user, bool $gdprValue): void
+    {
+        $user->setAcceptedGdpr($gdprValue);
+        $this->userRepository->save($user, true);
+    }
 }

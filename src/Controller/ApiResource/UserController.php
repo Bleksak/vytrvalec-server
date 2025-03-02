@@ -356,6 +356,20 @@ final class UserController extends AbstractController
     }
 
     #[Route(
+        '/api/user/gdpr',
+        methods: ['POST'],
+    )]
+    public function setAccountGdpr(
+        #[CurrentUser] User $user,
+        Request $request,
+    ): Response {
+        $gdprValue = $request->getPayload()->get('gdpr', false);
+        $this->action->updateGdpr($user, $gdprValue);
+
+        return new Response();
+    }
+
+    #[Route(
         '/api/user/{user}',
         name: 'api_user_patch',
         methods: ['PATCH'],
