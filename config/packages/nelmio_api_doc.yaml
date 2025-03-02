@@ -14,6 +14,8 @@ nelmio_api_doc:
                     scheme: bearer
                     bearerFormat: JWT
                     in: header
+        security:
+            - Bearer: []
     areas: # to filter documented areas
         disable_default_routes: true
         path_patterns:
