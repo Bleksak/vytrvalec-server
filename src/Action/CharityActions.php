@@ -8,8 +8,9 @@ use App\Repository\CharityRepository;
 
 final class CharityActions
 {
-    public function __construct(private readonly CharityRepository $charityRepository)
-    {
+    public function __construct(
+        private readonly CharityRepository $charityRepository,
+    ) {
     }
 
     public function create(CharityDto $dto): int

@@ -7,8 +7,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class WeeklyDistanceExtraPoints implements ExtraPoints
 {
-    public function __construct(private readonly EntityManagerInterface $entityManagerInterface)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManagerInterface,
+    ) {
     }
 
     public static function getWeek(): int

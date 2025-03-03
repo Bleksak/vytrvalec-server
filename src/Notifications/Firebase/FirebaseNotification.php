@@ -4,8 +4,12 @@ namespace App\Notifications\Firebase;
 
 abstract class FirebaseNotification
 {
-    public function __construct(private readonly string $to, private readonly string $title, private readonly string $message, private readonly ?string $action = null)
-    {
+    public function __construct(
+        private readonly string $to,
+        private readonly string $title,
+        private readonly string $message,
+        private readonly ?string $action = null,
+    ) {
     }
 
     public function to(): string

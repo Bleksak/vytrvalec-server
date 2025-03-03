@@ -360,7 +360,8 @@ final class UserController extends AbstractController
         methods: ['POST'],
     )]
     public function setAccountGdpr(
-        #[CurrentUser] User $user,
+        #[CurrentUser]
+        User $user,
         Request $request,
     ): Response {
         $gdprValue = $request->getPayload()->get('gdpr', false);

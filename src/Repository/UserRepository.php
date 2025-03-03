@@ -61,7 +61,9 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
 
     public function getActiveUsersCount(): int
     {
-        $query = $this->getEntityManager()->getConnection()->prepare('
+        $query = $this->getEntityManager()
+            ->getConnection()
+            ->prepare('
             SELECT COUNT(*) FROM user u WHERE EXISTS (
                 SELECT id FROM submission s WHERE s.user_id = u.id AND s.accepted = 1
             );
@@ -82,7 +84,8 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
         $query = $queryBuilder
             ->select('new App\Dto\UserCountByFacultyStatistics(f.id, count(u.id))')
             ->where($queryBuilder->expr()->exists(
-                $this->getEntityManager()->createQueryBuilder()
+                $this->getEntityManager()
+                    ->createQueryBuilder()
                     ->select('1')
                     ->from(Submission::class, 's')
                     ->where('s.user = u')

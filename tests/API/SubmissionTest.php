@@ -19,7 +19,9 @@ final class SubmissionTest extends BaseTest
 
         // $uploadedFile = new UploadedFile(__DIR__ . '/houba.jpg', 'huba.jpg');
         $uploadedFile = $this->getUploadedFile('houba.jpg');
-        $activities = $this->getEntityManager()->getRepository(Activity::class)->findAll();
+        $activities = $this->getEntityManager()
+            ->getRepository(Activity::class)
+            ->findAll();
 
         $this->client->request('POST', '/api/submission', [
             'distance' => 100,
@@ -40,7 +42,9 @@ final class SubmissionTest extends BaseTest
 
         $uploadedFile = $this->getUploadedFile('houba.jpg');
 
-        $activities = $this->getEntityManager()->getRepository(Activity::class)->findAll();
+        $activities = $this->getEntityManager()
+            ->getRepository(Activity::class)
+            ->findAll();
 
         $this->client->request('POST', '/api/submission', [
             'distance' => 100,
@@ -52,7 +56,9 @@ final class SubmissionTest extends BaseTest
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
-        $submission = $this->getEntityManager()->getRepository(Submission::class)->findOneBy(['activity' => $activities[0], 'distance' => 100, 'elevation' => 100]);
+        $submission = $this->getEntityManager()
+            ->getRepository(Submission::class)
+            ->findOneBy(['activity' => $activities[0], 'distance' => 100, 'elevation' => 100]);
 
         $this->client->request(
             'PATCH',
@@ -85,7 +91,9 @@ final class SubmissionTest extends BaseTest
         $this->makeSeason();
 
         $uploadedFile = $this->getUploadedFile('houba.jpg');
-        $activities = $this->getEntityManager()->getRepository(Activity::class)->findAll();
+        $activities = $this->getEntityManager()
+            ->getRepository(Activity::class)
+            ->findAll();
 
         $this->client->request('POST', '/api/submission', [
             'distance' => 100,
@@ -106,7 +114,9 @@ final class SubmissionTest extends BaseTest
             'image' => $uploadedFile,
         ]);
 
-        $currentSeason = $this->getEntityManager()->getRepository(Season::class)->getCurrent();
+        $currentSeason = $this->getEntityManager()
+            ->getRepository(Season::class)
+            ->getCurrent();
 
         $this->client->request('GET', '/api/submission/list/'.$currentSeason->getId().'/1');
         $response = json_decode($this->client->getResponse()->getContent())->submissions;

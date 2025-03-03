@@ -98,7 +98,8 @@ final class SubmissionController extends AbstractController
     )]
     #[IsGranted('ROLE_USER')]
     public function create(
-        #[CurrentUser] User $user,
+        #[CurrentUser]
+        User $user,
         SeasonRepository $seasonRepository,
         Request $request,
     ): Response {
@@ -185,7 +186,8 @@ final class SubmissionController extends AbstractController
         // ]
     )]
     public function list(
-        #[CurrentUser] User $user,
+        #[CurrentUser]
+        User $user,
         Request $request,
     ): Response {
         $submissions = $this->submissionRepository->findAllByUser($user, 1, 5000);
@@ -268,7 +270,8 @@ final class SubmissionController extends AbstractController
     )]
     #[IsGranted('ROLE_USER')]
     public function edit(
-        #[CurrentUser] User $user,
+        #[CurrentUser]
+        User $user,
         Submission $submission,
         Request $request,
     ): Response {

@@ -7,8 +7,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class WeeklyElevationExtraPoints implements ExtraPoints
 {
-    public function __construct(private readonly EntityManagerInterface $entityManagerInterface)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManagerInterface,
+    ) {
     }
 
     public static function getUniqueName(): string

@@ -12,7 +12,9 @@ final class UserTest extends BaseTest
 
     public function testRegister(): void
     {
-        $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
+        $faculty = $this->getEntityManager()
+            ->getRepository(Faculty::class)
+            ->findOneBy(['shortcut' => 'FAV']);
 
         $this->client->request('POST', '/api/user', [
             'email' => 'aasdf@asdf.com',
@@ -27,7 +29,9 @@ final class UserTest extends BaseTest
 
     public function testRegisterDuplicate(): void
     {
-        $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
+        $faculty = $this->getEntityManager()
+            ->getRepository(Faculty::class)
+            ->findOneBy(['shortcut' => 'FAV']);
 
         $this->client->request('POST', '/api/user', [
             'email' => 'aasdf@asdf.com',
@@ -63,7 +67,9 @@ final class UserTest extends BaseTest
 
     public function testRegisterInvalidEmail(): void
     {
-        $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
+        $faculty = $this->getEntityManager()
+            ->getRepository(Faculty::class)
+            ->findOneBy(['shortcut' => 'FAV']);
 
         $this->client->request('POST', '/api/user', [
             'email' => 'aasdf@asdf',

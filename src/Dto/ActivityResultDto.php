@@ -19,7 +19,6 @@ final class ActivityResultDto
     public function __construct(
         #[OA\Property(example: 1)]
         public readonly int $activity,
-
         #[OA\Property(type: 'array', items: new OA\Items(ref: new Model(type: FacultyResultDto::class)))]
         public readonly array $results,
     ) {

@@ -47,7 +47,9 @@ final class BaseTest extends WebTestCase
      */
     protected function createUser(string $email, string $password, array $roles = []): void
     {
-        $faculty = $this->getEntityManager()->getRepository(Faculty::class)->findOneBy(['shortcut' => 'FAV']);
+        $faculty = $this->getEntityManager()
+            ->getRepository(Faculty::class)
+            ->findOneBy(['shortcut' => 'FAV']);
 
         $this->client->request('POST', '/api/user', [
             'email' => $email,
@@ -59,7 +61,9 @@ final class BaseTest extends WebTestCase
         ]);
 
         if (!empty($roles)) {
-            $user = $this->getEntityManager()->getRepository(User::class)->findOneBy(['email' => $email]);
+            $user = $this->getEntityManager()
+                ->getRepository(User::class)
+                ->findOneBy(['email' => $email]);
             $user->setRoles($roles);
 
             $this->getEntityManager()->persist($user);

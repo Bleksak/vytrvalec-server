@@ -78,6 +78,7 @@
   "require-dev": {
     "doctrine/doctrine-fixtures-bundle": "^3.4",
     "friendsofphp/php-cs-fixer": "*",
+    "kubawerlos/php-cs-fixer-custom-fixers": "^3.23",
     "phpstan/phpstan": "^1.10",
     "phpunit/phpunit": "^9.5",
     "symfony/browser-kit": "7.2.*",

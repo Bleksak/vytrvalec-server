@@ -13,8 +13,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[OA\Tag(name: 'Season Cache')]
 final class SeasonCacheController extends AbstractController
 {
-    public function __construct(private readonly SeasonCacheActions $action)
-    {
+    public function __construct(
+        private readonly SeasonCacheActions $action,
+    ) {
     }
 
     #[OA\Get(

@@ -19,7 +19,9 @@ final class SeasonTest extends BaseTest
         $this->grantRole(['ROLE_STAFF']);
         $this->makeCharity();
 
-        $charity = $this->getEntityManager()->getRepository(Charity::class)->findOneBy(['name' => 'CharityTest']);
+        $charity = $this->getEntityManager()
+            ->getRepository(Charity::class)
+            ->findOneBy(['name' => 'CharityTest']);
 
         $today = new \DateTimeImmutable();
         $beginDate = $today->add(new \DateInterval('P1W'));

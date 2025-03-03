@@ -13,7 +13,6 @@ final class WeeklyResultDto
     public function __construct(
         #[OA\Property(example: 2)]
         public readonly int $week,
-
         #[OA\Property(type: 'array', items: new OA\Items(ref: new Model(type: ActivityResultDto::class)))]
         public array $activities,
     ) {

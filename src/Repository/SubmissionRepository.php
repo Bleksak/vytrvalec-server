@@ -106,7 +106,9 @@ final class SubmissionRepository extends ServiceEntityRepository
      */
     public function getTotalStatistics(): array
     {
-        $query = $this->getEntityManager()->getConnection()->prepare('
+        $query = $this->getEntityManager()
+            ->getConnection()
+            ->prepare('
             SELECT a.name as activity, sub.distance as distance
             FROM (
                 SELECT s.activity_id as activity_id, SUM(s.distance) as distance
