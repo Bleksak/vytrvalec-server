@@ -18,17 +18,15 @@ final class Version20250303123232 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $table = $schema->getTable('faculty');
-        $table->addColumn('parent', Types::INTEGER)
+        $table->addColumn('parent_id', Types::INTEGER)
             ->setNotnull(false);
 
         $table->addForeignKeyConstraint(
             $table,
-            ['parent'],
+            ['parent_id'],
             ['id'],
-            [
-                'onUpdate' => 'CASCADE',
-            ],
-            'parent'
+            ['onUpdate' => 'CASCADE'],
+            'parent_id'
         );
     }
 
