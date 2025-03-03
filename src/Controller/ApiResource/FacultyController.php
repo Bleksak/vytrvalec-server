@@ -10,9 +10,11 @@ use App\Repository\FacultyRepository;
 use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
+use ReflectionProperty;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -113,6 +115,7 @@ final class FacultyController extends AbstractController
                         'name' => 'not_unique',
                         'shortcut' => 'not_unique',
                         'visible' => 'invalid_value',
+                        'parent' => 'invalid_value',
                     ]
                 )
             ),
@@ -124,21 +127,16 @@ final class FacultyController extends AbstractController
         methods: ['PATCH'],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function updatePatch(Request $request, Faculty $faculty): Response
-    {
-        $form = $this->createForm(FacultyFormType::class, null, [
-            'method' => $request->getMethod(),
-        ]);
-
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
+    public function updatePatch(
+        #[MapRequestPayload]
+        FacultyDto $facultyDto,
+        Faculty $faculty,
+    ): Response {
+        $errors = $this->action->update($faculty, $facultyDto);
 
         if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
-
-        $this->action->update($faculty, $form->getData());
 
         return $this->json([], Response::HTTP_OK);
     }
