@@ -32,8 +32,14 @@ class Faculty
     #[Groups(['fetchSubmission'])]
     private ?bool $visible = null;
 
-    public function __construct(string $name, string $shortcut, bool $visible)
-    {
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
+    private ?self $parent = null;
+
+    public function __construct(
+        string $name,
+        string $shortcut,
+        bool $visible,
+    ) {
         $this->name = $name;
         $this->shortcut = $shortcut;
         $this->visible = $visible;
@@ -76,6 +82,18 @@ class Faculty
     public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
+        return $this;
+    }
+
+    public function getParent(): ?self
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?self $parent): static
+    {
+        $this->parent = $parent;
 
         return $this;
     }
