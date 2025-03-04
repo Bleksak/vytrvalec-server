@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Dto\ActivityStatisticsDto;
+use App\Dto\WeeklySubmissionSum;
+use App\Entity\Faculty;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -182,5 +184,32 @@ final class SubmissionRepository extends ServiceEntityRepository
         $paginator = new Paginator($queryBuilder->getQuery());
 
         return $paginator;
+    }
+
+    /**
+     * @return array<WeeklySubmissionSum>
+     */
+    public function getResultsForWeek(Season $season, int $week): array
+    {
+        $result = $this->createQueryBuilder('s')
+            ->select('sum(s.distance) as distance, COALESCE(IDENTITY(f.parent), IDENTITY(u.faculty)) as faculty, IDENTITY(s.activity) as activity')
+            ->innerJoin('s.user', 'u')
+            ->innerJoin('u.faculty', 'f')
+            ->where('s.week = :week')
+            ->andWhere('s.accepted = 1')
+            ->andWhere('s.season = :season')
+            ->groupBy('activity')
+            ->addGroupBy('faculty')
+            ->orderBy('activity', 'asc')
+            ->addOrderBy('distance', 'desc')
+            ->setParameter('week', $week)
+            ->setParameter('season', $season)
+            ->getQuery()
+            ->getResult();
+
+        return array_map(
+            fn ($row) => new WeeklySubmissionSum($row['distance'], $row['faculty'], $row['activity']),
+            $result,
+        );
     }
 }
