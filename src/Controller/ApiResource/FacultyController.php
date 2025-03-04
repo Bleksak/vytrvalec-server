@@ -10,13 +10,14 @@ use App\Repository\FacultyRepository;
 use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
-use ReflectionProperty;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[OA\Tag(name: 'Faculty')]
 final class FacultyController extends AbstractController
@@ -24,6 +25,7 @@ final class FacultyController extends AbstractController
     public function __construct(
         private readonly FacultyActions $action,
         private readonly FacultyRepository $facultyRepository,
+        private readonly NormalizerInterface $normalizer,
     ) {
     }
 
@@ -192,6 +194,16 @@ final class FacultyController extends AbstractController
     )]
     public function facultyList(): Response
     {
-        return $this->json($this->facultyRepository->findAll());
+        $data = $this->normalizer->normalize(
+            $this->facultyRepository->findAll(),
+            null,
+            [
+                AbstractNormalizer::CALLBACKS => [
+                    'parent' => fn (Faculty $faculty) => $faculty->getId(),
+                ],
+            ]
+        );
+
+        return $this->json($data);
     }
 }
