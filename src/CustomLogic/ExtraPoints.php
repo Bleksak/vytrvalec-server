@@ -10,6 +10,8 @@ interface ExtraPoints
 
     public static function reward(): int;
 
+    public static function getWeek(): int;
+
     /**
      * @return array<int, mixed>
      */
