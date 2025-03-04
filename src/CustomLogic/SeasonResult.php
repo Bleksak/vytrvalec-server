@@ -14,7 +14,6 @@ final class SeasonResult
 {
     public function __construct(
         private readonly SubmissionRepository $submissionRepository,
-        private readonly EntityManagerInterface $entityManagerInterface,
         private readonly DailyDistanceExtraPoints $dailyDistanceExtraPoints,
         private readonly WeeklyDistanceExtraPoints $weeklyDistanceExtraPoints,
         private readonly WeeklyElevationExtraPoints $weeklyElevationExtraPoints,
