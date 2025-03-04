@@ -196,6 +196,22 @@ final class CharityController extends AbstractController
         ]));
     }
 
+    #[OA\Delete(
+        description: 'Retrieve a collection of charities',
+        parameters: [
+            new OA\Parameter(
+                name: 'charity',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer'),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Succesfully removed given Charity',
+            ),
+        ],
+    )]
     #[Route(
         '/api/charity/{charity}',
         'api_charity_delete',
