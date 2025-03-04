@@ -199,7 +199,7 @@ final class FacultyController extends AbstractController
             null,
             [
                 AbstractNormalizer::CALLBACKS => [
-                    'parent' => fn (Faculty $faculty) => $faculty->getId(),
+                    'parent' => fn (?Faculty $faculty) => $faculty?->getId(),
                 ],
             ]
         );
