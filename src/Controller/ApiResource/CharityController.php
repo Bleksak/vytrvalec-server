@@ -197,7 +197,7 @@ final class CharityController extends AbstractController
     }
 
     #[OA\Delete(
-        description: 'Retrieve a collection of charities',
+        description: 'Delete the given Charity',
         parameters: [
             new OA\Parameter(
                 name: 'charity',
@@ -208,7 +208,7 @@ final class CharityController extends AbstractController
         responses: [
             new OA\Response(
                 response: Response::HTTP_OK,
-                description: 'Succesfully removed given Charity',
+                description: 'Succesfully deleted given Charity',
             ),
         ],
     )]

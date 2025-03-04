@@ -206,4 +206,33 @@ final class FacultyController extends AbstractController
 
         return $this->json($data);
     }
+
+    #[OA\Delete(
+        description: 'Delete the given Faculty',
+        parameters: [
+            new OA\Parameter(
+                name: 'faculty',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer'),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Succesfully deleted the given Faculty',
+            ),
+        ],
+    )]
+    #[Route(
+        '/api/faculty/{faculty}',
+        'api_faculty_delete',
+        methods: ['DELETE'],
+    )]
+    #[IsGranted('ROLE_STAFF')]
+    public function delete(Faculty $faculty): Response
+    {
+        $this->facultyRepository->remove($faculty, true);
+
+        return new Response(status: Response::HTTP_OK);
+    }
 }
