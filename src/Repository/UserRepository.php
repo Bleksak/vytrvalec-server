@@ -101,4 +101,34 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
 
         return $query->getResult();
     }
+
+    /**
+     * @param array<int> $ids
+     *
+     * @return array<User>
+     */
+    public function findByIds(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('u');
+
+        $results = $qb
+            ->select('u')
+            ->where($qb->expr()->in('u.id', ':ids'))
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+
+        $orderMap = array_flip($ids);
+
+        usort(
+            $results,
+            fn ($a, $b) => $orderMap[$a->getId()] <=> $orderMap[$b->getId()]
+        );
+
+        return $results;
+    }
 }

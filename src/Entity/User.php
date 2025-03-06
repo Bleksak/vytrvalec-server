@@ -122,7 +122,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isAcceptedGdpr(): bool
+    public function hasAcceptedGdpr(): ?bool
     {
         return $this->acceptedGdpr;
     }

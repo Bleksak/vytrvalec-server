@@ -9,7 +9,10 @@ use App\Form\UserAccountChangeFormType;
 use App\Form\UserCreateFormType;
 use App\Form\UserEditFormType;
 use App\Repository\UserRepository;
+use App\Services\AnonymizerService;
 use App\Validation\FormErrors;
+use Nelmio\ApiDocBundle\Attribute\Model;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,11 +21,14 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
+#[OA\Tag(name: 'User')]
 final class UserController extends AbstractController
 {
     public function __construct(
         private readonly NormalizerInterface $normalizer,
+        private readonly SerializerInterface $serializer,
         private readonly UserRepository $userRepository,
         private readonly UserActions $action,
     ) {
@@ -368,6 +374,60 @@ final class UserController extends AbstractController
         $this->action->updateGdpr($user, $gdprValue);
 
         return new Response();
+    }
+
+    #[OA\Get(
+        description: 'Retrive an anonymized list of Users by given ids.',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'The list of Users',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: User::class),
+                    )
+                )
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            description: 'The list of User IDs',
+            required: true,
+            content: new OA\JsonContent(
+                type: 'array',
+                items: new OA\Items(
+                    type: 'integer',
+                ),
+            ),
+        ),
+    )]
+    #[Route(
+        '/api/user/list',
+        name: 'api_user_list_by_ids',
+        methods: ['POST'],
+    )]
+    public function listByIds(
+        Request $request,
+        AnonymizerService $anonymizer,
+    ): Response {
+        $ids = $request->getPayload()->all();
+
+        foreach ($ids as $id) {
+            if (!is_int($id)) {
+                return new Response(status: Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        }
+
+        $users = array_map(
+            fn (User $user) => $anonymizer->tryAnonymize($user),
+            $this->userRepository->findByIds($ids)
+        );
+
+        $filtered = $this->normalizer->normalize($users, null, [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
+        ]);
+
+        return $this->json($filtered);
     }
 
     #[Route(
