@@ -81,8 +81,8 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
     {
         $queryBuilder = $this->createQueryBuilder('u');
 
-        $query = $queryBuilder
-            ->select('new App\Dto\UserCountByFacultyStatistics(f.id, count(u.id))')
+        $rows = $queryBuilder
+            ->select('f.id as id, count(u.id) as count')
             ->where($queryBuilder->expr()->exists(
                 $this->getEntityManager()
                     ->createQueryBuilder()
@@ -95,11 +95,16 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
             ))
             ->innerJoin('u.faculty', 'f')
             ->groupBy('f.id')
+            ->orderBy('count', 'desc')
             ->setParameter('accepted', true)
             ->setParameter('season', $season)
-            ->getQuery();
+            ->getQuery()
+            ->getResult();
 
-        return $query->getResult();
+        return array_map(
+            fn ($row) => new UserCountByFacultyStatistics($row['id'], $row['count']),
+            $rows,
+        );
     }
 
     /**

@@ -7,8 +7,8 @@ use OpenApi\Attributes as OA;
 final class ExtraPointsDto
 {
     public function __construct(
-        #[OA\Property(example: 1)]
-        public readonly int $user,
+        #[OA\Property]
+        public readonly AnonymizedUser $user,
         #[OA\Property(example: 1)]
         public readonly int $faculty,
         #[OA\Property(example: 'daily_distance')]

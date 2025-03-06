@@ -3,6 +3,7 @@
 namespace App\CustomLogic;
 
 use App\Dto\ActivityResultDto;
+use App\Dto\AnonymizedUserCandidate;
 use App\Dto\ExtraPointsDto;
 use App\Dto\FacultyResultDto;
 use App\Dto\WeeklyResultDto;
@@ -71,8 +72,14 @@ final class SeasonResult
         foreach ($extraPointsClasses as $cls) {
             $extras = $cls->calculate($season);
             foreach ($extras as $extra) {
+                $user = new AnonymizedUserCandidate(
+                    $extra['first_name'],
+                    $extra['last_name'],
+                    $extra['accepted_gdpr']
+                );
+
                 $results[$cls->getWeek()]->activities[$extra['activity_id']]->extras[] = new ExtraPointsDto(
-                    $extra['user_id'],
+                    $user->anonymize(),
                     $extra['faculty_id'],
                     $cls->getUniqueName(),
                     $extra['value'],
