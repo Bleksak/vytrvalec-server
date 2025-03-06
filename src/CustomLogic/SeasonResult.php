@@ -8,7 +8,6 @@ use App\Dto\FacultyResultDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use App\Repository\SubmissionRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
 final class SeasonResult
 {
