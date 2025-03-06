@@ -55,7 +55,7 @@ final class UserCreateFormType extends AbstractType
             ->add('gdpr', CheckboxType::class, [
                 'required' => true,
                 'constraints' => [
-                    new Assert\NotBlank(message: 'invalid', allowNull: false),
+                    new Assert\NotNull(message: 'blank'),
                     new Assert\Type(type: 'bool', message: 'invalid'),
                 ],
             ]);
