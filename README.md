@@ -27,7 +27,7 @@
 - `php bin/console doctrine:database:create`
 - `php bin/console doctrine:fixtures:load`
 
-## Run in IntelliJ Idea
+## How to start the server
 - Install  symfony-cli - `paru -S xdebug symfony-cli`
 - Run with `symfony server:start {..args}`
 
