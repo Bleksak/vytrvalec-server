@@ -30,7 +30,7 @@
 ## Run in IntelliJ Idea
 - Install  symfony-cli - `paru -S xdebug symfony-cli`
 - Run with `symfony server:start {..args}`
-- 
+
 ### ZČU VPN connection
 - On Linux, install NetworkManager - `paru -S networkmanager-openconnect`
 - In your VPN client create VPN Cisco AnyConnect connection
