@@ -53,4 +53,14 @@ final class SeasonCacheRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    public function findBySeason(Season $season): ?Cache
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c')
+            ->where('c.season = :season')
+            ->setParameter('season', $season)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

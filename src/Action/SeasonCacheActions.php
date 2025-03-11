@@ -17,7 +17,7 @@ final class SeasonCacheActions
 
     public function cacheSeason(Season $season): void
     {
-        $cache = $this->cacheRepository->findOneBy(['season' => $season->getId()]);
+        $cache = $this->cacheRepository->findBySeason($season);
         $result = $this->seasonResult->calculate($season);
 
         if ($cache !== null) {

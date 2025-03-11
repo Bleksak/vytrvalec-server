@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Dto\SeasonResultDto;
 use App\Repository\SeasonCacheRepository;
+use App\Types\SeasonResultType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -18,7 +19,7 @@ class Cache
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP')]
     private \DateTimeInterface $createdAt;
 
-    #[ORM\Column(type: Types::JSON)]
+    #[ORM\Column(type: SeasonResultType::NAME)]
     private SeasonResultDto $data;
 
     public function __construct(Season $season, SeasonResultDto $data)
@@ -38,9 +39,11 @@ class Cache
         return $this->data;
     }
 
-    public function setData(SeasonResultDto $data): void
+    public function setData(SeasonResultDto $data): self
     {
         $this->data = $data;
+
+        return $this;
     }
 
     public function getCreatedAt(): \DateTimeInterface
