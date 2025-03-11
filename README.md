@@ -1,11 +1,11 @@
-# Vytrvalec Server
+# Měsíční Vytrvalec server
 
 ## Requirements:
-- PHP 8.2
-- NodeJS 21.2.0
+- PHP 8.2+
+- NodeJS 21.2.0+
 
 ## Prerequisties
-- Install composer (ex. ```paru -S composer```)
+- Install composer (ex. `paru -S composer`)
 - Install PHP required extensions - php-imagick, php-xsl, php-ffi, php-iconv
 - Inside php.ini enable extensions:
 
@@ -17,28 +17,30 @@
        extension=xsl
        extension=pdo_mysql (For MySQL database)
     
-## How to setup
-- ```cp .env .env.local```
+## Setup
+- Create submission images upload folder `mkdir public/uploads` - Otherwise you will not be able to upload images
+- `cp .env .env.local`
 - Fill .env.local with your local environment variables (database, jwt token, smtp, firebase token)
-- ```composer install```
-- ```npm ci```
-- ```php bin/console doctrine:database:create```
-- ```php bin/console doctrine:migrations:migrate```
-- ```php bin/console doctrine:fixtures:load```
+- `composer install`
+- `npm ci`
+- `php bin/console doctrine:migrations:migrate`
+- `php bin/console doctrine:database:create`
+- `php bin/console doctrine:fixtures:load`
 
-## Debug in IntelliJ Idea 
-To be done
-
+## Run in IntelliJ Idea
+- Install  symfony-cli - `paru -S xdebug symfony-cli`
+- Run with `symfony server:start {..args}`
+- 
 ### ZČU VPN connection
-- On Linux, install NetworkManager - ```paru -S networkmanager-openconnect```
+- On Linux, install NetworkManager - `paru -S networkmanager-openconnect`
 - In your VPN client create VPN Cisco AnyConnect connection
-- Set gateway as ```vpn.zcu.cz```
+- Set gateway as `vpn.zcu.cz`
 - Username and password is your orion login
 
 ### Kubernetes
-- Install kubectl ```paru -S kubectl```
+- Install kubectl `paru -S kubectl`
 - You can follow this [instructions](https://helpdesk.zcu.cz/index.php/Kubernetes) or continue as in this readme
-- Create config file in ```$HOME/.kube/config``` as below 
+- Create config file in `$HOME/.kube/config` as below 
 ```
   apiVersion: v1
   clusters:
@@ -61,16 +63,16 @@ To be done
     user:
       token: <token for gitlab-vytrvalec-kts>
   ```
-- Replace ```<token for gitlab-vytrvalec-kts>``` with token obtained from [Kubernetes Dashboard](https://dashboard.kube.zcu.cz/#/workloads?namespace=default) under vytrvalec-kts workspace -> config and storage -> secrets -> gitlab-vytrvalec-kts-token 
+- Replace `<token for gitlab-vytrvalec-kts>` with token obtained from [Kubernetes Dashboard](https://dashboard.kube.zcu.cz/#/workloads?namespace=default) under vytrvalec-kts workspace -> config and storage -> secrets -> gitlab-vytrvalec-kts-token 
   
   ![img.png](readme/img.png)
 
-- Now you can run commands like ```kubectl exec ...```
+- Now you can run commands like `kubectl exec ...`
 
 
 ### Run before push 
-- ```vendor/bin/phpstan analyze``` - Static analysis
-- ```vendor/bin/php-cs-fixer fix``` - Formatting
+- `vendor/bin/phpstan analyze` - Static analysis
+- `vendor/bin/php-cs-fixer fix` - Formatting
 
 
 
