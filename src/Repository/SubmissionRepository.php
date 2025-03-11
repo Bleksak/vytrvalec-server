@@ -242,6 +242,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             INNER JOIN user u ON u.id = s.user_id
             INNER JOIN faculty f ON u.faculty_id = f.id
             WHERE s.row_num <= 3
+            ORDER BY value DESC
         ');
 
         $query->bindValue(1, true);
