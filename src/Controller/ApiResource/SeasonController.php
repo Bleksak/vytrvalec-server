@@ -3,7 +3,7 @@
 namespace App\Controller\ApiResource;
 
 use App\Action\SeasonActions;
-use App\CustomLogic\SeasonResult;
+use App\CustomLogic\SeasonResultCalculator;
 use App\Dto\SeasonDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Activity;
@@ -198,7 +198,7 @@ final class SeasonController extends AbstractController
         name: 'api_season_results',
         methods: ['GET'],
     )]
-    public function result(Season $season, SeasonResult $result, SeasonCacheRepository $cacheRepository): Response
+    public function result(Season $season, SeasonResultCalculator $result, SeasonCacheRepository $cacheRepository): Response
     {
         $cache = $cacheRepository->findOneBy(['season' => $season->getId()]);
 

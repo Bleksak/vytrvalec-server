@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Dto\ActivityStatisticsDto;
+use App\Dto\AnonymizedUserCandidate;
+use App\Dto\OutlierActivity;
+use App\Dto\OutlierResult;
 use App\Dto\WeeklySubmissionSum;
-use App\Entity\Faculty;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -211,5 +213,69 @@ final class SubmissionRepository extends ServiceEntityRepository
             fn ($row) => new WeeklySubmissionSum($row['distance'], $row['faculty'], $row['activity']),
             $result,
         );
+    }
+
+    /**
+     * @return array<OutlierActivity>
+     */
+    public function findOutliers(Season $season, int $n = 3): array
+    {
+        $query = $this->getEntityManager()->getConnection()->prepare('
+            WITH
+                sub AS (
+                    SELECT MAX(s.distance) as value, s.activity_id as activity_id, s.user_id as user_id
+                    FROM submission s
+                    INNER JOIN activity a ON s.activity_id = a.id
+                    WHERE s.accepted = ? AND s.season_id = ?
+                    GROUP BY s.user_id, s.activity_id
+                ),
+                sorted AS (
+                    SELECT *, ROW_NUMBER() OVER (
+                    PARTITION BY activity_id
+                        ORDER BY value DESC
+                    )
+                    AS row_num
+                    FROM sub
+                )
+            SELECT value, activity_id, user_id, COALESCE(f.parent_id, u.faculty_id) AS faculty_id, u.first_name, u.last_name, u.accepted_gdpr
+            FROM sorted s
+            INNER JOIN user u ON u.id = s.user_id
+            INNER JOIN faculty f ON u.faculty_id = f.id
+            WHERE s.row_num <= 3
+        ');
+
+        $query->bindValue(1, true);
+        $query->bindValue(2, $season->getId());
+
+        $result = $query->executeQuery()->fetchAllAssociative();
+
+        $activities = [];
+
+        foreach ($result as $row) {
+            if (!array_key_exists($row['activity_id'], $activities)) {
+                $activities[$row['activity_id']] = [];
+            }
+
+            $activities[$row['activity_id']][] = new OutlierResult(
+                (new AnonymizedUserCandidate(
+                    $row['first_name'],
+                    $row['last_name'],
+                    $row['accepted_gdpr'],
+                ))->anonymize(),
+                $row['faculty_id'],
+                $row['value'],
+            );
+        }
+
+        $outlierActivity = [];
+
+        foreach ($activities as $id => $results) {
+            $outlierActivity[] = new OutlierActivity(
+                $id,
+                $results
+            );
+        }
+
+        return $outlierActivity;
     }
 }

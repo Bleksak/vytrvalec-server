@@ -2,7 +2,7 @@
 
 namespace App\Action;
 
-use App\CustomLogic\SeasonResult;
+use App\CustomLogic\SeasonResultCalculator;
 use App\Entity\Cache;
 use App\Entity\Season;
 use App\Repository\SeasonCacheRepository;
@@ -11,7 +11,7 @@ final class SeasonCacheActions
 {
     public function __construct(
         private readonly SeasonCacheRepository $cacheRepository,
-        private readonly SeasonResult $seasonResult,
+        private readonly SeasonResultCalculator $seasonResult,
     ) {
     }
 

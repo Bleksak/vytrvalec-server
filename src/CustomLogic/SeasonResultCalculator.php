@@ -6,11 +6,12 @@ use App\Dto\ActivityResultDto;
 use App\Dto\AnonymizedUserCandidate;
 use App\Dto\ExtraPointsDto;
 use App\Dto\FacultyResultDto;
+use App\Dto\SeasonResultDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use App\Repository\SubmissionRepository;
 
-final class SeasonResult
+final class SeasonResultCalculator
 {
     public function __construct(
         private readonly SubmissionRepository $submissionRepository,
@@ -20,10 +21,7 @@ final class SeasonResult
     ) {
     }
 
-    /**
-     * @return array<int, WeeklyResultDto>
-     */
-    public function calculate(Season $season): array
+    public function calculate(Season $season): SeasonResultDto
     {
         $weeks = $season->getWeekCount();
         $results = [];
@@ -90,10 +88,15 @@ final class SeasonResult
 
         $results = array_values($results);
 
+        $topThree = $this->submissionRepository->findOutliers($season);
+
         foreach ($results as $key => $result) {
             $result->activities = array_values($result->activities);
         }
 
-        return $results;
+        return new SeasonResultDto(
+            $results,
+            $topThree,
+        );
     }
 }

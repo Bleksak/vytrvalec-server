@@ -2,7 +2,7 @@
 
 namespace App\Tests\API;
 
-use App\CustomLogic\SeasonResult;
+use App\CustomLogic\SeasonResultCalculator;
 use App\Entity\Activity;
 use App\Entity\Charity;
 use App\Entity\Faculty;
@@ -86,7 +86,7 @@ final class SeasonTest extends BaseTest
         $submissionRepository->save($sub1, false);
         $submissionRepository->save($sub2, true);
 
-        $seasonResult = $this->getContainer()->get(SeasonResult::class);
+        $seasonResult = $this->getContainer()->get(SeasonResultCalculator::class);
 
         $results = $seasonResult->calculate($season);
 
