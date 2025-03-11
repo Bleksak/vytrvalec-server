@@ -1,5 +1,10 @@
 doctrine:
     dbal:
+        charset: utf8mb4
+        default_table_options:
+            charset: utfmb4
+            collation: utf8mb4_unicode_ci
+
         url: '%env(resolve:DATABASE_URL)%'
         options:
         # 1002: 'SET sql_mode=(SELECT REPLACE(@@sql_mode, "ONLY_FULL_GROUP_BY", ""))'
