@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Cache;
+use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -41,5 +42,15 @@ final class SeasonCacheRepository extends ServiceEntityRepository
             ->setMaxResults($n)
             ->getQuery()
             ->getResult();
+    }
+
+    public function isCached(Season $season): bool
+    {
+        return (bool) $this->createQueryBuilder('c')
+            ->select('CASE WHEN COUNT(c.season) > 0 THEN 1 ELSE 0 END')
+            ->where('c.season = :season')
+            ->setParameter('season', $season)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

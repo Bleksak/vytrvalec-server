@@ -20,15 +20,16 @@ final class SeasonCacheActions
         $cache = $this->cacheRepository->findOneBy(['season' => $season->getId()]);
         $result = $this->seasonResult->calculate($season);
 
-        if (empty($result)) {
-            return;
-        }
-
         if ($cache !== null) {
             $cache->setData($result);
             $this->cacheRepository->save($cache, true);
         } else {
             $this->cacheRepository->save(new Cache($season, $result), true);
         }
+    }
+
+    public function isCached(Season $season): bool
+    {
+        return $this->cacheRepository->isCached($season);
     }
 }
