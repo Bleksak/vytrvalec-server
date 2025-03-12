@@ -16,6 +16,7 @@ use App\Repository\SubmissionRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mailer\MailerInterface;
 
 final class SubmissionActions
 {
@@ -25,6 +26,7 @@ final class SubmissionActions
         private readonly ProfileCacheRepository $profileCacheRepository,
         private readonly ParameterBagInterface $parameterBag,
         private readonly Filesystem $fs,
+        private readonly MailerInterface $mailer,
     ) {
     }
 
@@ -107,8 +109,12 @@ final class SubmissionActions
                 $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));
             }
 
-            // TODO: send mail when it's styled
-            // $this->mailer->send(new VytrvalecEmail($submission->getUser(), new SubmissionRejectedEmailTemplate($submission, $message)));
+            $emailAddress = $submission->getUser()->getEmail();
+            $now = new \DateTimeImmutable();
+
+            if ($emailAddress !== null && $submission->getDate()->diff($now)->m < 2) {
+                $this->mailer->send(new VytrvalecEmail($emailAddress, new SubmissionRejectedEmailTemplate($submission, $dto->message)));
+            }
         }
 
         $submission->setReviewed(true);

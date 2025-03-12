@@ -1,0 +1,26 @@
+{% extends "emails/template.twig" %}
+
+{% block content %}
+<container>
+    <row>
+        <columns>
+        <p>
+            Vážený uživateli,
+        </p>
+
+        <p>
+          Vaše aktivita na portálu Měsíčního Vytrvalce byla zamítnuta z následujícího důvodu:
+        </p>
+
+        <p>
+          {{ message }}
+        </p>
+
+        <p>
+            Děkujeme za účast,<br />
+            Katedra tělesné výchovy a sportu
+        </p>
+        </columns>
+    </row>
+</container>
+{% endblock %}
