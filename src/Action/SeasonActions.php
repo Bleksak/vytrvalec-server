@@ -4,12 +4,17 @@ namespace App\Action;
 
 use App\Dto\SeasonDto;
 use App\Entity\Season;
+use App\Messages\SeasonEndMessage;
+use App\Messages\SeasonStartMessage;
 use App\Repository\SeasonRepository;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 final class SeasonActions
 {
     public function __construct(
         private readonly SeasonRepository $seasonRepository,
+        private readonly MessageBusInterface $messageBus,
     ) {
     }
 
@@ -24,6 +29,16 @@ final class SeasonActions
         $season = new Season($seasonDto->start, $seasonDto->end, $seasonDto->charity);
 
         $this->seasonRepository->save($season, true);
+
+        $this->messageBus->dispatch(
+            new SeasonStartMessage($season),
+            [DelayStamp::delayUntil($seasonDto->start)],
+        );
+
+        $this->messageBus->dispatch(
+            new SeasonEndMessage($season),
+            [DelayStamp::delayUntil($seasonDto->end)]
+        );
 
         return $season->getId();
     }
