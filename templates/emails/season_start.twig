@@ -1,0 +1,14 @@
+{% extends "emails/template.twig" %}
+{% block content %}
+    <container>
+    <row>
+    <columns>
+    <p>Sportovci a sportovkyně,</p>
+    <p>
+        Vyhlašujeme novou sezónu Měsíčního Vytrvalce, která začíná {{ season.start|date('d.m.Y') }}. Budeme se těšit na vaše výkony.
+    </p>
+    <p>Ústav tělesné výchovy a sportu</p>
+    </columns>
+    </row>
+    </container>
+{% endblock %}
