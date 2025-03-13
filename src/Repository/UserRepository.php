@@ -136,4 +136,16 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
 
         return $results;
     }
+
+    /**
+     * @return array<User>
+     */
+    public function findAllForMailing(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u')
+            ->where('u.mailing = 1')
+            ->getQuery()
+            ->getResult();
+    }
 }
