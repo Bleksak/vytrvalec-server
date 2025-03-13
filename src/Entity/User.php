@@ -40,6 +40,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?bool $banned = false;
 
+    #[ORM\Column]
+    private ?bool $mailing = true;
+
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?string $firstName = null;
@@ -197,6 +200,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setBanned(bool $banned): self
     {
         $this->banned = $banned;
+
+        return $this;
+    }
+
+    public function hasMailing(): ?bool
+    {
+        return $this->mailing;
+    }
+
+    public function setMailing(bool $mailing): self
+    {
+        $this->mailing = $mailing;
 
         return $this;
     }
