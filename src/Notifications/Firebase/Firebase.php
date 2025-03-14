@@ -2,43 +2,35 @@
 
 namespace App\Notifications\Firebase;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransport;
-use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
-use Symfony\Component\Notifier\Bridge\Firebase\Notification\WebNotification;
-use Symfony\Component\Notifier\Exception\TransportException;
-use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\SentMessage;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Kreait\Firebase\Contract\Messaging;
+use Kreait\Firebase\Messaging\MessageData;
+use Kreait\Firebase\Messaging\Notification;
 
 final class Firebase
 {
-    private FirebaseTransport $firebase;
-
-    public function __construct(ParameterBagInterface $parameterBag)
-    {
-        $this->firebase = (new FirebaseTransportFactory())
-            ->create(new Dsn($parameterBag->get('firebase_dsn')));
+    public function __construct(
+        private readonly Messaging $messaging,
+    ) {
     }
 
-    public function send(FirebaseNotification $notification): ?SentMessage
+    public function send(FirebaseNotification $notification): void
     {
-        $webNotification = (new WebNotification($notification->to(), []))
-            ->title($notification->title())
-        ;
-
-        if ($notification->action() !== null) {
-            $webNotification->clickAction($notification->action());
-        }
-
-        $message = (new ChatMessage($notification->message()))
-            ->options($webNotification)
-        ;
-
         try {
-            return $this->firebase->send($message);
-        } catch (TransportException) {
-            return null;
+            $this->messaging->send([
+                'token' => $notification->to(),
+                // 'topic' => null,
+                // 'condition' => null,
+                'data' => MessageData::fromArray([
+                    'notification_type' => 'sugondese',
+                ]),
+                'notification' => Notification::create($notification->title(), $notification->message(), null), // ?: Notification|NotificationShape,
+                // 'android' => null, // ?: AndroidConfigShape,
+                // 'apns' => null, // ?: ApnsConfig|ApnsConfigShape,
+                // 'webpush' => null, // ?: WebPushConfig|WebPushConfigShape,
+                // 'fcm_options' => null, // ?: FcmOptions|FcmOptionsShape
+            ], false);
+        } catch (\Throwable $e) {
+            dd($e);
         }
     }
 }

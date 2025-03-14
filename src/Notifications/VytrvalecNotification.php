@@ -4,14 +4,28 @@ namespace App\Notifications;
 
 use App\Entity\User;
 use App\Notifications\Firebase\FirebaseNotification;
+use Kreait\Firebase\Messaging\Message;
 
-final class VytrvalecNotification extends FirebaseNotification
+final class VytrvalecNotification extends FirebaseNotification implements Message
 {
     public function __construct(
-        User $recipient,
+        string|User $recipient,
         string $message,
         ?string $action = null,
     ) {
-        parent::__construct($recipient->getToken(), 'Měsíční vytrvalec', $message, $action);
+        if ($recipient instanceof User) {
+            $recipient = $recipient->getToken();
+        }
+
+        parent::__construct($recipient, 'Měsíční vytrvalec', $message, $action);
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'to' => $this->to(),
+            'message' => $this->message(),
+            'action' => $this->action(),
+        ];
     }
 }

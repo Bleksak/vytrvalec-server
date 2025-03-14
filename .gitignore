@@ -25,6 +25,8 @@ npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
+google-service-account.json
+
 .idea
 .vscode
 .helix
