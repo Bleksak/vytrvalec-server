@@ -6,9 +6,10 @@
 
 ## Prerequisties
 - Install composer (ex. `paru -S composer`)
-- Install PHP required extensions - php-imagick, php-xsl, php-ffi, php-iconv
+- Install PHP required extensions - php-imagick, php-xsl, php-ffi, php-iconv, php-sodium, php-amqp
 - Inside php.ini enable extensions:
 
+       extension=amqp
        extension=ffi
        extension=gd
        extension=gettext
@@ -16,6 +17,7 @@
        extension=imagick
        extension=xsl
        extension=pdo_mysql (For MySQL database)
+       extension=sodium
     
 ## Setup
 - Create submission images upload folder `mkdir public/uploads` - Otherwise you will not be able to upload images
@@ -26,6 +28,7 @@
 - `php bin/console doctrine:migrations:migrate`
 - `php bin/console doctrine:database:create`
 - `php bin/console doctrine:fixtures:load`
+- Place `google-service-account.json` into the root of the project. Obtain this file from firebase console. It is json of your service account.
 
 ## How to start the server
 - Install  symfony-cli - `paru -S xdebug symfony-cli`
