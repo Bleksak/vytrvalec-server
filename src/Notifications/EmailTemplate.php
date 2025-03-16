@@ -22,11 +22,6 @@ abstract class EmailTemplate
         $this->context[$name] = $value;
     }
 
-    public function __construct(string $appUrl)
-    {
-        $this->context['app_url'] = $appUrl;
-    }
-
     abstract public function getSubject(): string;
 
     abstract public function getTemplate(): string;

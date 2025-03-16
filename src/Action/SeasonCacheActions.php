@@ -17,6 +17,12 @@ final class SeasonCacheActions
 
     public function cacheSeason(Season $season): void
     {
+        $now = new \DateTimeImmutable();
+
+        if ($season->getEnd() > $now) {
+            return;
+        }
+
         $cache = $this->cacheRepository->findBySeason($season);
         $result = $this->seasonResult->calculate($season);
 
