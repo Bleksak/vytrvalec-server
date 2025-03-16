@@ -17,6 +17,9 @@ spec:
         - name: shared-files
           emptyDir: {}
 
+        - name: rmq-config
+          emptyDir: {}
+
         - name: nginx-config-volume
           configMap:
             name: nginx-config
@@ -45,6 +48,18 @@ spec:
           - name: upload-pv
             mountPath: /var/www/vytrvalec/public/uploads
 
+      - name: vytrvalec-rmq
+        imagePullPolicy: IfNotPresent
+        image: heidiks/rabbitmq-delayed-message-exchange:4.0.2-management
+        env:
+          - name: RABBITMQ_DEFAULT_USER
+            value: guest
+          - name: RABBITMQ_DEFAULT_PASS
+            value: guest
+        ports:
+          - containerPort: 5672
+          - containerPort: 15672
+
       - name: vytrvalec-web
         imagePullPolicy: Always
         image: ipmil.civ.zcu.cz:4567/kiv/vytrvalec-server/app:${CI_COMMIT_SHORT_SHA}
@@ -57,7 +72,7 @@ spec:
         lifecycle:
           postStart:
             exec:
-                command: ["/bin/sh", "-c", "cp -r /app/. /var/www/vytrvalec && chown -R www-data:www-data /var/www/vytrvalec && supervisord -c /etc/supervisor/supervisord.conf"]
+                command: ["/bin/sh", "-c", "cp -r /app/. /var/www/vytrvalec && chown -R www-data:www-data /var/www/vytrvalec"]
 ---
 apiVersion: v1
 kind: Service
