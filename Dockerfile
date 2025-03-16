@@ -32,7 +32,7 @@ RUN { \
   echo 'DATABASE_URL="mysql://db:db@db/db?serverVersion=8.3.0&charset=utf8"'; \
   echo 'MAILER_DSN=smtp://${SMTP_USER}:${SMTP_PASSWORD}@${SMTP_HOST}:${SMTP_PORT}'; \
   echo 'CORS_ALLOW_ORIGIN="vytrvalec.kts.zcu.cz"'; \
-  echo 'MESSENGER_TRANSPORT_DSN=amqp://guest:guest@vytrvalec-rmq:5672/%2f/messages' \
+  echo 'MESSENGER_TRANSPORT_DSN=amqp://guest:guest@vytrvalec-rmq:5672/%2f/messages'; \
   } > .env
 
 RUN mkdir -p /etc/supervisor.d/
