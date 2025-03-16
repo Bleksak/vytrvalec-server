@@ -4,28 +4,26 @@ variables:
   K8S_VERSION: v1.22.5
   APP: ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_SHORT_SHA}
   KUSTOMIZE: kustomization/kustomize.yaml
+  SECURE_FILES_DOWNLOAD_PATH: './'
 
-# build docker images
 build application image:
   stage: build
   image:
-    name: papko26/kaniko_envsubst
+    name: pernodricard/kaniko-alpine:latest
     entrypoint: [""]
-  # comment this out on production
-  when: manual
   environment: production
+  before_script:
+    - apk --update add curl bash gettext && apk upgrade
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - cat Dockerfile | envsubst | tee Dockerfile
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile Dockerfile --destination $APP --verbosity info --force
 
-# deploy test to kubernetes
-deploy test:
+deploy:
   stage: deploy
   environment: production
-  #only:
-  #  - /^test/
   when: manual
   script:
     - wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$K8S_VERSION/bin/linux/amd64/kubectl
