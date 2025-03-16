@@ -18,11 +18,14 @@ final class VytrvalecEmail extends TemplatedEmail
             $recipient = [$recipient];
         }
 
+        $to = count($recipient) === 1 ? new Address($recipient[0]) : new Address('vytrvale@ntis.zcu.cz', 'Měsíční Vytrvalec');
+        $bcc = count($recipient) === 1 ? [] : $recipient;
+
         // TODO: use env for the mail
         $this
             ->from(new Address('vytrvale@ntis.zcu.cz', 'Měsíční Vytrvalec'))
-            ->to(new Address('vytrvale@ntis.zcu.cz', 'Měsíční Vytrvalec'))
-            ->bcc(...$recipient)
+            ->to($to)
+            ->bcc(...$bcc)
             ->subject($template->getSubject())
             ->htmlTemplate($template->getTemplate())
             ->context($template->getContext())
