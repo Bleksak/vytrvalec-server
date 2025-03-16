@@ -7,6 +7,7 @@ use App\Entity\Season;
 use App\Messages\SeasonEndMessage;
 use App\Messages\SeasonStartMessage;
 use App\Repository\SeasonRepository;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
@@ -28,16 +29,32 @@ final class SeasonActions
 
         $season = new Season($seasonDto->start, $seasonDto->end, $seasonDto->charity);
 
-        $this->seasonRepository->save($season, true);
+        // $this->seasonRepository->save($season, true);
+        $stamps = [];
+
+        $today = (new \DateTimeImmutable())->setTime(0, 0);
+        $diff = $season->getStart()->diff($today)->days;
+
+        if ($diff > 0) {
+            $stamps[] = DelayStamp::delayUntil($seasonDto->start);
+        }
 
         $this->messageBus->dispatch(
-            new SeasonStartMessage($season),
-            [DelayStamp::delayUntil($seasonDto->start)],
+            new Envelope(
+                new SeasonStartMessage($season->getId()),
+                $stamps,
+            )
         );
 
+        $stamps = [
+            DelayStamp::delayUntil($seasonDto->end),
+        ];
+
         $this->messageBus->dispatch(
-            new SeasonEndMessage($season),
-            [DelayStamp::delayUntil($seasonDto->end)]
+            new Envelope(
+                new SeasonEndMessage($season->getId()),
+                $stamps,
+            )
         );
 
         return $season->getId();

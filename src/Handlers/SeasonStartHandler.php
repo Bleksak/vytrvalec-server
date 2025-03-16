@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Messages\SeasonStartMessage;
 use App\Notifications\EmailTemplate\SeasonStartTemplate;
 use App\Notifications\VytrvalecEmail;
+use App\Repository\SeasonRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -14,6 +15,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final class SeasonStartHandler
 {
     public function __construct(
+        private readonly SeasonRepository $seasonRepository,
         private readonly UserRepository $userRepository,
         private readonly MailerInterface $mailer,
     ) {
@@ -21,13 +23,19 @@ final class SeasonStartHandler
 
     public function __invoke(SeasonStartMessage $seasonStartMessage): void
     {
-        $now = new \DateTimeImmutable();
+        $season = $this->seasonRepository->find($seasonStartMessage->seasonId);
 
-        if ($seasonStartMessage->season->getStart()->diff($now)->days !== 0) {
+        if ($season === null) {
             return;
         }
 
-        $template = new SeasonStartTemplate($seasonStartMessage->season);
+        $now = new \DateTimeImmutable();
+
+        if ($season->getStart()->diff($now)->days !== 0) {
+            return;
+        }
+
+        $template = new SeasonStartTemplate($season);
 
         $emails = array_map(
             fn (User $user) => $user->getEmail(),

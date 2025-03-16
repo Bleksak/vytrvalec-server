@@ -16,7 +16,7 @@ final class SeasonStartTemplate extends EmailTemplate
 
     public function getSubject(): string
     {
-        return 'Měsíční Vytrvalec - Nová sezóna';
+        return 'Měsíční Vytrvalec - Zahájení nové sezóny';
     }
 
     public function getTemplate(): string

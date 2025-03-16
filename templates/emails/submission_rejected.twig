@@ -1,26 +1,24 @@
 {% extends "emails/template.twig" %}
-
 {% block content %}
-<container>
+    <container>
     <row>
-        <columns>
-        <p>
-            Vážený uživateli,
+    <columns>
+    <p>Vážený uživateli,</p>
+    <p>
+        Vaše aktivita na portálu Měsíčního Vytrvalce byla zamítnuta
+        {% if message is not empty %}
+            z následujícího důvodu:
         </p>
-
         <p>
-          Vaše aktivita na portálu Měsíčního Vytrvalce byla zamítnuta z následujícího důvodu:
-        </p>
-
-        <p>
-          {{ message }}
-        </p>
-
-        <p>
-            Děkujeme za účast,<br />
-            Ústav tělesné výchovy a sportu
-        </p>
-        </columns>
+            {{ message }}
+        {% endif %}
+    </p>
+    <p>
+        Děkujeme za účast,
+        <br />
+        Ústav tělesné výchovy a sportu
+    </p>
+    </columns>
     </row>
-</container>
+    </container>
 {% endblock %}
