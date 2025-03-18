@@ -15,7 +15,7 @@ final class FacultyDto
     #[OA\Property(example: 'FAV')]
     public ?string $shortcut;
 
-    #[Assert\NotBlank(allowNull: false)]
+    #[Assert\NotNull]
     #[OA\Property(example: true)]
     public ?bool $visible;
 
