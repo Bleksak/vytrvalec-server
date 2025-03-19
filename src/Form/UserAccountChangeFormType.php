@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Dto\UserAccountChangeDto;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -29,6 +30,13 @@ final class UserAccountChangeFormType extends AbstractType
         ]);
         $builder->add('email', EmailType::class, [
             'property_path' => 'email',
+        ]);
+
+        $builder->add('mailing', CheckboxType::class, [
+            'constraints' => [
+                new Assert\NotNull(),
+                new Assert\Type(type: 'bool'),
+            ],
         ]);
     }
 
