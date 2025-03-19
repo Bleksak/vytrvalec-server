@@ -9,14 +9,13 @@ use App\Entity\Submission;
 use App\Entity\User;
 use App\Notifications\EmailTemplate\SubmissionRejectedEmailTemplate;
 use App\Notifications\Firebase\Firebase;
-use App\Notifications\VytrvalecEmail;
 use App\Notifications\VytrvalecNotification;
 use App\Repository\ProfileCacheRepository;
 use App\Repository\SubmissionRepository;
+use App\Services\VytrvalecMailer;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Mailer\MailerInterface;
 
 final class SubmissionActions
 {
@@ -26,7 +25,7 @@ final class SubmissionActions
         private readonly ProfileCacheRepository $profileCacheRepository,
         private readonly ParameterBagInterface $parameterBag,
         private readonly Filesystem $fs,
-        private readonly MailerInterface $mailer,
+        private readonly VytrvalecMailer $mailer,
     ) {
     }
 
@@ -109,11 +108,10 @@ final class SubmissionActions
                 $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));
             }
 
-            $emailAddress = $submission->getUser()->getEmail();
             $now = new \DateTimeImmutable();
 
-            if ($emailAddress !== null && $submission->getDate()->diff($now)->m < 2) {
-                $this->mailer->send(new VytrvalecEmail($emailAddress, new SubmissionRejectedEmailTemplate($submission, $dto->message)));
+            if ($submission->getDate()->diff($now)->m < 2) {
+                $this->mailer->send($submission->getUser(), new SubmissionRejectedEmailTemplate($submission, $dto->message));
             }
         }
 

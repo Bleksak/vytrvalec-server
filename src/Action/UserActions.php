@@ -9,20 +9,19 @@ use App\Dto\UserEditDto;
 use App\Entity\User;
 use App\Notifications\EmailTemplate\ForgottenPasswordEmailTemplate;
 use App\Notifications\EmailTemplate\RegisterEmailTemplate;
-use App\Notifications\VytrvalecEmail;
 use App\Repository\UserRepository;
+use App\Services\VytrvalecMailer;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class UserActions
 {
     public function __construct(
-        private UserRepository $userRepository,
-        private UserPasswordHasherInterface $hasher,
-        private MailerInterface $mailer,
-        private ParameterBagInterface $params,
+        private readonly UserRepository $userRepository,
+        private readonly UserPasswordHasherInterface $hasher,
+        private readonly VytrvalecMailer $mailer,
+        private readonly ParameterBagInterface $params,
     ) {
     }
 
@@ -36,7 +35,7 @@ final class UserActions
 
         try {
             $this->userRepository->save($user, true);
-            $this->mailer->send(new VytrvalecEmail($dto->email, new RegisterEmailTemplate()));
+            $this->mailer->send($user, new RegisterEmailTemplate());
         } catch (UniqueConstraintViolationException $e) {
             return ['email' => ['not_unique']];
         }
@@ -118,7 +117,7 @@ final class UserActions
         $mail = new ForgottenPasswordEmailTemplate();
         $mail->setContext('password_reset_link', $this->params->get('client_url').'/reset-password/'.$user->getPasswordResetToken());
 
-        $this->mailer->send(new VytrvalecEmail($email, $mail));
+        $this->mailer->send($user, $mail, true);
     }
 
     /**
