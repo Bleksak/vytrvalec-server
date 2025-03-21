@@ -26,6 +26,9 @@ spec:
         - name: upload-pv
           persistentVolumeClaim:
             claimName: upload-pv
+        - name: rabbitmq-pv
+          persistentVolumeClaim:
+            claimName: rabbitmq-pv
 
       imagePullSecrets:
         - name: server-deploy-token
@@ -59,6 +62,9 @@ spec:
         ports:
           - containerPort: 5672
           - containerPort: 15672
+        volumeMounts:
+          - name: rabbitmq-pv
+            mountPath: /var/lib/rabbitmq/
 
       - name: vytrvalec-web
         imagePullPolicy: Always
@@ -99,3 +105,15 @@ spec:
   resources:
     requests:
       storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-pv
+spec:
+  storageClassName: csi-rbd-synergia
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
