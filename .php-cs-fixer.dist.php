@@ -21,6 +21,7 @@ return (new PhpCsFixer\Config())
         ],
         PhpCsFixerCustomFixers\Fixer\StringableInterfaceFixer::name() => true,
         'method_chaining_indentation' => true,
+        'declare_strict_types' => true,
     ])
     ->setLineEnding("\n")
     ->setIndent('    ')
