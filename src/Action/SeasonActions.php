@@ -29,7 +29,7 @@ final class SeasonActions
 
         $season = new Season($seasonDto->start, $seasonDto->end, $seasonDto->charity);
 
-        // $this->seasonRepository->save($season, true);
+        $this->seasonRepository->save($season, true);
         $stamps = [];
 
         $today = (new \DateTimeImmutable())->setTime(0, 0);
