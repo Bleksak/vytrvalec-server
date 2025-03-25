@@ -9,9 +9,7 @@ final class SeasonStartTemplate extends EmailTemplate
 {
     public function __construct(Season $season)
     {
-        $this->context = [
-            'season' => $season,
-        ];
+        $this->setContext('season', $season);
     }
 
     public function getSubject(): string

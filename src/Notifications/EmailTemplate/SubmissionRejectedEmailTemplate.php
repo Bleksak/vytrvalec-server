@@ -9,10 +9,10 @@ final class SubmissionRejectedEmailTemplate extends EmailTemplate
 {
     public function __construct(Submission $submission, string $message)
     {
-        $this->context = [
+        $this->mergeContext([
             'submission' => $submission,
             'message' => $message,
-        ];
+        ]);
     }
 
     public function getSubject(): string
