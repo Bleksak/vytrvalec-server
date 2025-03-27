@@ -18,7 +18,10 @@ final class StatisticsActions
 
     public function getTotalStatistics(): TotalStatisticsDto
     {
-        $users = $this->userRepository->getActiveUsersCount();
+        $usersFrom2020 = 1024;
+        $usersFrom2021 = 357;
+
+        $users = $usersFrom2020 + $usersFrom2021 + $this->submissionRepository->sumCountUserGroupedByFaculties();
         $activities = $this->submissionRepository->getTotalStatistics();
 
         return new TotalStatisticsDto(

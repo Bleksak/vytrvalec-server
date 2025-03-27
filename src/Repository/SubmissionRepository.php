@@ -279,4 +279,21 @@ final class SubmissionRepository extends ServiceEntityRepository
 
         return $outlierActivity;
     }
+
+    public function sumCountUserGroupedByFaculties(): int
+    {
+        $queryBuilder = $this->createQueryBuilder('s');
+
+        $sql = '
+            select sum(count) as count
+            from (
+                SELECT count(distinct s.user_id) as count
+                from submission s
+                where s.accepted = 1
+                group by s.season_id
+            ) subquery;
+        ';
+
+        return $this->getEntityManager()->getConnection()->prepare($sql)->execute()->fetchOne();
+    }
 }
