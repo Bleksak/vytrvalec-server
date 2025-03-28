@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Action;
 
 use App\Dto\FacultyDto;
@@ -35,6 +37,10 @@ final class FacultyActions
             if ($dto->parent === null) {
                 $faculty->setParent(null);
             } else {
+                if ($dto->parent === $faculty->getId()) {
+                    return ['parent' => 'invalid_value'];
+                }
+
                 $parent = $this->facultyRepository->find($dto->parent);
                 if ($parent === null || $parent->getParent() !== null) {
                     return ['parent' => 'invalid_value'];
