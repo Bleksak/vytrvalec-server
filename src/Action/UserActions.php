@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Action;
 
 use App\Dto\PasswordResetDto;
@@ -143,5 +145,19 @@ final class UserActions
     {
         $user->setAcceptedGdpr($gdprValue);
         $this->userRepository->save($user, true);
+    }
+
+    public function disableMailing(string $unsubscribeHash): bool
+    {
+        $user = $this->userRepository->findByUnsubscribeHash($unsubscribeHash);
+        if ($user === null) {
+            return false;
+        }
+
+        $user->setMailing(false);
+
+        $this->userRepository->save($user, true);
+
+        return true;
     }
 }

@@ -148,4 +148,9 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
             ->getQuery()
             ->getResult();
     }
+
+    public function findByUnsubscribeHash(string $unsubscribeHash): ?User
+    {
+        return $this->findOneBy(['emailUnsubscribeHash' => $unsubscribeHash]);
+    }
 }

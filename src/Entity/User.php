@@ -77,6 +77,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $acceptedGdpr = false;
 
+    #[ORM\Column(length: 255)]
+    private ?string $emailUnsubscribeHash = null;
+
     /**
      * @param array<string> $roles
      */
@@ -99,6 +102,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->acceptedGdpr = $acceptedGdpr;
         $this->roles = $roles;
         $this->token = $token;
+        $this->emailUnsubscribeHash = bin2hex(random_bytes(90));
     }
 
     public function getId(): ?int
@@ -280,6 +284,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPasswordResetToken(?string $passwordResetToken): static
     {
         $this->passwordResetToken = $passwordResetToken;
+
+        return $this;
+    }
+
+    public function getEmailUnsubscribeHash(): ?string
+    {
+        return $this->emailUnsubscribeHash;
+    }
+
+    public function setEmailUnsubscribeHash(string $emailUnsubscribeHash): static
+    {
+        $this->emailUnsubscribeHash = $emailUnsubscribeHash;
 
         return $this;
     }

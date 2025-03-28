@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\ApiResource;
 
 use App\Action\UserActions;
@@ -21,14 +23,12 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[OA\Tag(name: 'User')]
 final class UserController extends AbstractController
 {
     public function __construct(
         private readonly NormalizerInterface $normalizer,
-        private readonly SerializerInterface $serializer,
         private readonly UserRepository $userRepository,
         private readonly UserActions $action,
     ) {
@@ -372,6 +372,36 @@ final class UserController extends AbstractController
     ): Response {
         $gdprValue = $request->getPayload()->get('gdpr', false);
         $this->action->updateGdpr($user, $gdprValue);
+
+        return new Response();
+    }
+
+    #[OA\Get(
+        description: 'Retrieve currently running season',
+        parameters: [
+            new OA\Parameter(
+                name: 'unsubscribe_hash',
+                in: 'path',
+                schema: new OA\Schema(type: 'string', example: '4a7c7a836adcaf51eea0515028d3a3d45fb6bde835a0d25c442f1e9b27d25e6479985a8d6b6d5c20a7350b54e3e1cbac93a1'),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Successfully unsubscribed from all future e-mails',
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'User with given hash not found',
+            ),
+        ],
+    )]
+    #[Route('/api/unsubscribe/{unsubscribeHash}', name: 'api_email_unsubscribe', methods: ['GET'])]
+    public function unsubscribe(string $unsubscribeHash): Response
+    {
+        if (!$this->action->disableMailing($unsubscribeHash)) {
+            return new Response(status: Response::HTTP_NOT_FOUND);
+        }
 
         return new Response();
     }

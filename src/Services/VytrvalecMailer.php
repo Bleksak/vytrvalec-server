@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Entity\User;
@@ -26,6 +28,11 @@ final class VytrvalecMailer
         ];
     }
 
+    private function constructUnsubscribeLink(User $user): string
+    {
+        return sprintf('%s/unsubscribe/%s', $this->parameterBag->get('client_url'), $user->getEmailUnsubscribeHash());
+    }
+
     /**
      * @param User|array<User> $recipient
      */
@@ -36,16 +43,14 @@ final class VytrvalecMailer
             $recipient = [$recipient];
         }
 
-        $emailAddresses = [];
-
-        foreach ($recipient as $user) {
-            if ($user->hasMailing() && !$forceSend) {
-                $emailAddresses[] = $user->getEmail();
-            }
-        }
-
         $template->mergeContext($this->getContext());
 
-        $this->mailer->send(new VytrvalecEmail($emailAddresses, $template));
+        foreach ($recipient as $user) {
+            if ($user->hasMailing() || $forceSend) {
+                $template->setContext('unsubscribe_link', $this->constructUnsubscribeLink($user));
+
+                $this->mailer->send(new VytrvalecEmail($user->getEmail(), $template));
+            }
+        }
     }
 }
