@@ -155,6 +155,7 @@ final class UserActions
         }
 
         $user->setMailing(false);
+        $user->setEmailUnsubscribeHash(null);
 
         $this->userRepository->save($user, true);
 

@@ -377,7 +377,7 @@ final class UserController extends AbstractController
     }
 
     #[OA\Get(
-        description: 'Retrieve currently running season',
+        description: 'Unsubscribes user from e-mail delivery.',
         parameters: [
             new OA\Parameter(
                 name: 'unsubscribe_hash',
@@ -397,8 +397,9 @@ final class UserController extends AbstractController
         ],
     )]
     #[Route('/api/unsubscribe/{unsubscribeHash}', name: 'api_email_unsubscribe', methods: ['GET'])]
-    public function unsubscribe(string $unsubscribeHash): Response
-    {
+    public function unsubscribe(
+        ?string $unsubscribeHash = null,
+    ): Response {
         if (!$this->action->disableMailing($unsubscribeHash)) {
             return new Response(status: Response::HTTP_NOT_FOUND);
         }

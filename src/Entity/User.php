@@ -293,7 +293,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->emailUnsubscribeHash;
     }
 
-    public function setEmailUnsubscribeHash(string $emailUnsubscribeHash): static
+    public function setEmailUnsubscribeHash(?string $emailUnsubscribeHash): static
     {
         $this->emailUnsubscribeHash = $emailUnsubscribeHash;
 
