@@ -223,7 +223,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $query = $this->getEntityManager()->getConnection()->prepare('
             WITH
                 sub AS (
-                    SELECT MAX(s.distance) as value, s.activity_id as activity_id, s.user_id as user_id
+                    SELECT SUM(s.distance) as value, s.activity_id as activity_id, s.user_id as user_id
                     FROM submission s
                     INNER JOIN activity a ON s.activity_id = a.id
                     WHERE s.accepted = ? AND s.season_id = ?
