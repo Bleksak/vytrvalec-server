@@ -294,6 +294,6 @@ final class SubmissionRepository extends ServiceEntityRepository
             ) subquery;
         ';
 
-        return $this->getEntityManager()->getConnection()->prepare($sql)->execute()->fetchOne();
+        return $this->getEntityManager()->getConnection()->prepare($sql)->executeQuery()->fetchOne();
     }
 }
