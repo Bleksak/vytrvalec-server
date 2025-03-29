@@ -5,19 +5,18 @@ declare(strict_types=1);
 namespace App\Controller\ApiResource;
 
 use App\Action\UserActions;
+use App\Dto\UserAccountChangeDto;
+use App\Dto\UserDto;
 use App\Entity\User;
 use App\Form\PasswordResetFormType;
-use App\Form\UserAccountChangeFormType;
-use App\Form\UserCreateFormType;
 use App\Form\UserEditFormType;
 use App\Repository\UserRepository;
-use App\Services\AnonymizerService;
 use App\Validation\FormErrors;
-use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -159,7 +158,7 @@ final class UserController extends AbstractController
     public function forgottenPasswordRequest(Request $request, string $lang = 'cs'): Response
     {
         $supportedLanguages = ['cs', 'en'];
-        if (!in_array($lang, $supportedLanguages)) {
+        if (!in_array($lang, $supportedLanguages, true)) {
             $lang = 'cs';
         }
 
@@ -294,22 +293,13 @@ final class UserController extends AbstractController
         //     'faculty' => 'integer'
         // ],
     )]
-    public function register(Request $request): Response
+    public function register(#[MapRequestPayload] UserDto $dto): Response
     {
         if ($this->isGranted('ROLE_USER')) {
             return $this->json(['auth' => ['logged_in']], Response::HTTP_BAD_REQUEST);
         }
 
-        $form = $this->createForm(UserCreateFormType::class);
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $errors = $this->action->create($form->getData());
+        $errors = $this->action->create($dto);
 
         if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
@@ -341,18 +331,13 @@ final class UserController extends AbstractController
         // ],
     )]
     #[IsGranted('ROLE_USER')]
-    public function updateAccount(Request $request, #[CurrentUser] User $currentUser): Response
-    {
-        $form = $this->createForm(UserAccountChangeFormType::class);
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $errors = $this->action->updateAccount($currentUser, $form->getData());
+    public function updateAccount(
+        #[MapRequestPayload]
+        UserAccountChangeDto $dto,
+        #[CurrentUser]
+        User $currentUser,
+    ): Response {
+        $errors = $this->action->updateAccount($currentUser, $dto);
 
         if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
@@ -405,60 +390,6 @@ final class UserController extends AbstractController
         }
 
         return new Response();
-    }
-
-    #[OA\Get(
-        description: 'Retrive an anonymized list of Users by given ids.',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'The list of Users',
-                content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: User::class),
-                    )
-                )
-            ),
-        ],
-        requestBody: new OA\RequestBody(
-            description: 'The list of User IDs',
-            required: true,
-            content: new OA\JsonContent(
-                type: 'array',
-                items: new OA\Items(
-                    type: 'integer',
-                ),
-            ),
-        ),
-    )]
-    #[Route(
-        '/api/user/list',
-        name: 'api_user_list_by_ids',
-        methods: ['POST'],
-    )]
-    public function listByIds(
-        Request $request,
-        AnonymizerService $anonymizer,
-    ): Response {
-        $ids = $request->getPayload()->all();
-
-        foreach ($ids as $id) {
-            if (!is_int($id)) {
-                return new Response(status: Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-        }
-
-        $users = array_map(
-            fn (User $user) => $anonymizer->tryAnonymize($user),
-            $this->userRepository->findByIds($ids)
-        );
-
-        $filtered = $this->normalizer->normalize($users, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'userSummaries'],
-        ]);
-
-        return $this->json($filtered);
     }
 
     #[Route(

@@ -11,19 +11,21 @@ use App\Dto\UserEditDto;
 use App\Entity\User;
 use App\Notifications\EmailTemplate\ForgottenPasswordEmailTemplate;
 use App\Notifications\EmailTemplate\RegisterEmailTemplate;
+use App\Repository\FacultyRepository;
 use App\Repository\UserRepository;
 use App\Services\VytrvalecMailer;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-final class UserActions
+final readonly class UserActions
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly UserPasswordHasherInterface $hasher,
-        private readonly VytrvalecMailer $mailer,
-        private readonly ParameterBagInterface $params,
+        private UserRepository $userRepository,
+        private FacultyRepository $facultyRepository,
+        private UserPasswordHasherInterface $hasher,
+        private VytrvalecMailer $mailer,
+        private ParameterBagInterface $params,
     ) {
     }
 
@@ -32,7 +34,13 @@ final class UserActions
      */
     public function create(UserDto $dto): array
     {
-        $user = new User($dto->email, $dto->firstName, $dto->lastName, $dto->faculty, $dto->gdpr);
+        $faculty = $this->facultyRepository->find($dto->faculty);
+
+        if ($faculty === null) {
+            return ['faculty' => ['invalid']];
+        }
+
+        $user = new User($dto->email, $dto->firstName, $dto->lastName, $faculty, $dto->gdpr);
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
 
         try {
@@ -89,22 +97,24 @@ final class UserActions
      */
     public function updateAccount(User $currentUser, UserAccountChangeDto $dto): array
     {
-        if ($dto->email === null && $dto->password === null) {
-            return ['email' => ['blank'], 'password' => ['blank']];
+        if ($dto->password === null) {
+            return [];
         }
 
         if (!$this->hasher->isPasswordValid($currentUser, $dto->oldPassword)) {
             return ['old_password' => ['mismatch']];
         }
 
-        $hashedPassword = $this->hasher->hashPassword($currentUser, $dto->password);
-        $currentUser->setPassword($hashedPassword);
-
-        try {
-            $this->userRepository->save($currentUser, true);
-        } catch (UniqueConstraintViolationException $e) {
-            return ['email' => ['not_unique']];
+        if ($dto->password !== null) {
+            $hashedPassword = $this->hasher->hashPassword($currentUser, $dto->password);
+            $currentUser->setPassword($hashedPassword);
         }
+
+        if ($dto->mailing !== null) {
+            $currentUser->setMailing($dto->mailing);
+        }
+
+        $this->userRepository->save($currentUser, true);
 
         return [];
     }
