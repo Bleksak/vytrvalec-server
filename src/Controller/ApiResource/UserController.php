@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Controller\ApiResource;
 
 use App\Action\UserActions;
-use App\Dto\UserAccountChangeDto;
+use App\Dto\EmailingChangeDto;
+use App\Dto\PasswordChangeDto;
+use App\Dto\PasswordChangeRequestDto;
 use App\Dto\UserDto;
 use App\Entity\User;
 use App\Form\PasswordResetFormType;
 use App\Form\UserEditFormType;
 use App\Repository\UserRepository;
 use App\Validation\FormErrors;
+use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -141,34 +144,49 @@ final class UserController extends AbstractController
         return $this->json($filtered);
     }
 
+    #[OA\Get(
+        description: 'Request a password change',
+        parameters: [
+            new OA\Parameter(
+                name: 'lang',
+                in: 'path',
+                schema: new OA\Schema(type: 'string'),
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            description: 'Contains the e-mail address of the request',
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: PasswordChangeRequestDto::class),
+            ),
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Succesfully updated',
+            ),
+            new OA\Response(
+                response: Response::HTTP_BAD_REQUEST,
+                description: 'Invalid data',
+            ),
+        ]
+    )]
     #[Route(
         '/api/user/password/{lang}',
         name: 'api_user_forgotten_password_request',
         methods: ['POST'],
-        // documentation: 'Sends an email with a link to reset your password',
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Password reset email sent',
-        //     ],
-        //     Response::HTTP_BAD_REQUEST => [
-        //         'message' => 'Bad request',
-        //     ]
-        // ]
     )]
-    public function forgottenPasswordRequest(Request $request, string $lang = 'cs'): Response
-    {
+    public function forgottenPasswordRequest(
+        #[MapRequestPayload]
+        PasswordChangeRequestDto $passwordChangeRequestDto,
+        string $lang = 'cs',
+    ): Response {
         $supportedLanguages = ['cs', 'en'];
         if (!in_array($lang, $supportedLanguages, true)) {
             $lang = 'cs';
         }
 
-        $email = $request->getPayload()->get('email');
-
-        if ($email === null) {
-            return new Response(status: Response::HTTP_BAD_REQUEST);
-        }
-
-        $this->action->forgottenPasswordRequest($email, $lang);
+        $this->action->forgottenPasswordRequest($passwordChangeRequestDto->email, $lang);
 
         return new Response(status: Response::HTTP_OK);
     }
@@ -308,36 +326,32 @@ final class UserController extends AbstractController
         return new Response(status: Response::HTTP_CREATED);
     }
 
+    #[OA\Patch(
+        description: 'Update a user\'s password',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Succesfully updated',
+            ),
+            new OA\Response(
+                response: Response::HTTP_BAD_REQUEST,
+                description: 'Invalid data',
+            ),
+        ]
+    )]
     #[Route(
         '/api/user/change',
         name: 'api_user_update_password',
         methods: ['PATCH'],
-        // documentation: 'Set a user\'s password',
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Password changed successfully',
-        //     ],
-        //     Response::HTTP_BAD_REQUEST => [
-        //         'message' => 'Bad request',
-        //     ],
-        //     Response::HTTP_FORBIDDEN => [
-        //         'message' => 'Forbidden access',
-        //     ],
-        // ],
-        // requestScheme: [
-        //     'email?' => 'string',
-        //     'password?' => 'string',
-        //     'old_password' => 'string',
-        // ],
     )]
     #[IsGranted('ROLE_USER')]
-    public function updateAccount(
+    public function updatePassword(
         #[MapRequestPayload]
-        UserAccountChangeDto $dto,
+        PasswordChangeDto $dto,
         #[CurrentUser]
         User $currentUser,
     ): Response {
-        $errors = $this->action->updateAccount($currentUser, $dto);
+        $errors = $this->action->updatePassword($currentUser, $dto);
 
         if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
@@ -388,6 +402,27 @@ final class UserController extends AbstractController
         if (!$this->action->disableMailing($unsubscribeHash)) {
             return new Response(status: Response::HTTP_NOT_FOUND);
         }
+
+        return new Response();
+    }
+
+    #[OA\Patch(
+        description: 'Toggles user\'s e-mail delivery.',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Successfully toggled e-mailing',
+            ),
+        ],
+    )]
+    #[Route('/api/emailing', name: 'api_email_set_user', methods: ['PATCH'])]
+    public function setMailing(
+        #[CurrentUser]
+        User $user,
+        #[MapRequestPayload]
+        EmailingChangeDto $emailingChangeDto,
+    ): Response {
+        $this->action->toggleMailing($user, $emailingChangeDto);
 
         return new Response();
     }

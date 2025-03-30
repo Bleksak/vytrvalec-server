@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Action;
 
+use App\Dto\EmailingChangeDto;
+use App\Dto\PasswordChangeDto;
 use App\Dto\PasswordResetDto;
-use App\Dto\UserAccountChangeDto;
 use App\Dto\UserDto;
 use App\Dto\UserEditDto;
 use App\Entity\User;
@@ -95,12 +96,8 @@ final readonly class UserActions
     /**
      * @return array<string, array<int, string>>
      */
-    public function updateAccount(User $currentUser, UserAccountChangeDto $dto): array
+    public function updatePassword(User $currentUser, PasswordChangeDto $dto): array
     {
-        if ($dto->password === null) {
-            return [];
-        }
-
         if (!$this->hasher->isPasswordValid($currentUser, $dto->oldPassword)) {
             return ['old_password' => ['mismatch']];
         }
@@ -108,10 +105,6 @@ final readonly class UserActions
         if ($dto->password !== null) {
             $hashedPassword = $this->hasher->hashPassword($currentUser, $dto->password);
             $currentUser->setPassword($hashedPassword);
-        }
-
-        if ($dto->mailing !== null) {
-            $currentUser->setMailing($dto->mailing);
         }
 
         $this->userRepository->save($currentUser, true);
@@ -122,6 +115,11 @@ final readonly class UserActions
     public function forgottenPasswordRequest(string $email, string $lang): void
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
+
+        if ($user === null) {
+            return;
+        }
+
         $user->setPasswordResetToken(bin2hex(random_bytes(90)));
 
         $this->userRepository->save($user, true);
@@ -170,5 +168,22 @@ final readonly class UserActions
         $this->userRepository->save($user, true);
 
         return true;
+    }
+
+    public function toggleMailing(User $user, EmailingChangeDto $dto): void
+    {
+        if ($user->hasMailing() === $dto->mailing) {
+            return;
+        }
+
+        $user->setMailing($dto->mailing);
+
+        $user->setEmailUnsubscribeHash(
+            $user->hasMailing()
+                ? bin2hex(random_bytes(90))
+                : null
+        );
+
+        $this->userRepository->save($user, true);
     }
 }
