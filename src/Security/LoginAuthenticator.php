@@ -86,7 +86,7 @@ final class LoginAuthenticator extends AbstractAuthenticator
         $response = new JsonResponse([
             'token' => $jwt,
             'user' => $this->normalizer->normalize($token->getUser(), null, [
-                AbstractNormalizer::GROUPS => ['fetchUser'],
+                AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'user'],
             ]),
         ]);
 
