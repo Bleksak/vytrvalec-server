@@ -186,4 +186,12 @@ final readonly class UserActions
 
         $this->userRepository->save($user, true);
     }
+
+    /**
+     * This doesn't actually delete the User, only anonymizes it, so we can keep the submissions and results.
+     */
+    public function delete(User $user): void
+    {
+        $this->userRepository->save($user->anonymize(), true);
+    }
 }

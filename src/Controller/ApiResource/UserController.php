@@ -467,4 +467,21 @@ final class UserController extends AbstractController
 
         return new Response(status: Response::HTTP_OK);
     }
+
+    #[OA\Delete(
+        description: 'Deletes (anonymizes) the current user',
+    )]
+    #[Route(
+        '/api/user',
+        name: 'api_user_delete',
+        methods: ['DELETE']
+    )]
+    public function delete(
+        #[CurrentUser]
+        User $user,
+    ): Response {
+        $this->action->delete($user);
+
+        return new Response();
+    }
 }

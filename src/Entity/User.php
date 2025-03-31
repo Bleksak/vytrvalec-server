@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\UserRepository;
@@ -296,6 +298,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmailUnsubscribeHash(?string $emailUnsubscribeHash): static
     {
         $this->emailUnsubscribeHash = $emailUnsubscribeHash;
+
+        return $this;
+    }
+
+    public function anonymize(): static
+    {
+        $this
+            ->setLastName('')
+            ->setMailing(false)
+            ->setAcceptedGdpr(false)
+            ->setEmailUnsubscribeHash(null)
+            ->setToken(null)
+            ->setPasswordResetToken(null);
+
+        $this->email = null;
 
         return $this;
     }

@@ -46,10 +46,16 @@ final class VytrvalecMailer
         $template->mergeContext($this->getContext());
 
         foreach ($recipient as $user) {
+            $email = $user->getEmail();
+
+            if ($email === null) {
+                continue;
+            }
+
             if ($user->hasMailing() || $forceSend) {
                 $template->setContext('unsubscribe_link', $this->constructUnsubscribeLink($user));
 
-                $this->mailer->send(new VytrvalecEmail($user->getEmail(), $template));
+                $this->mailer->send(new VytrvalecEmail($email, $template));
             }
         }
     }
