@@ -41,6 +41,10 @@ spec:
 
         - name: MYSQL_DATABASE
           value: db
+
+        - name: TZ
+          value: Europe/Prague
+
         ports:
         - containerPort: 3306
           name: vytrvalec-db
