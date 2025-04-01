@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\ApiResource;
 
 use App\Action\SubmissionActions;
@@ -277,6 +279,14 @@ final class SubmissionController extends AbstractController
     ): Response {
         if ($submission->isAccepted()) {
             return $this->json(['submission' => ['accepted']], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Uzivatel posle v roce 2024 submission a dostane reject,
+        // v roce 2025 se ji pokusi upravit -> zobrazi se v submission pageru
+        // -> neni mozne zjistit jestli je z roku 2024/2025
+        // -> acceptne se -> zmeni vysledky z predchozich let
+        if (!$submission->getSeason()->isRunning()) {
+            return $this->json(['season' => ['no_season']], Response::HTTP_BAD_REQUEST);
         }
 
         // 1. uzivatel da edit, admin vidi starou verzi
