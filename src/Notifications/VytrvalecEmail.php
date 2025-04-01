@@ -15,7 +15,7 @@ final class VytrvalecEmail extends TemplatedEmail
         $this
             ->from(new Address('vytrvale@ntis.zcu.cz', 'Měsíční Vytrvalec'))
             ->to(new Address($recipient))
-            ->bcc('vytrvale@ntis.zcu.cz')
+            // ->bcc('vytrvale@ntis.zcu.cz')
             ->subject($template->getSubject())
             ->htmlTemplate($template->getTemplate())
             ->context($template->getContext())
