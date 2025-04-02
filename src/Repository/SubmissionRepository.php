@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Dto\ActivityStatisticsDto;
 use App\Dto\AnonymizedUserCandidate;
+use App\Dto\Extract\ExtractSubmissionDto;
 use App\Dto\OutlierActivity;
 use App\Dto\OutlierResult;
 use App\Dto\WeeklySubmissionSum;
@@ -295,5 +298,40 @@ final class SubmissionRepository extends ServiceEntityRepository
         ';
 
         return $this->getEntityManager()->getConnection()->prepare($sql)->executeQuery()->fetchOne();
+    }
+
+    /**
+     * @param array<int>|null $seasons
+     *
+     * @return array<ExtractSubmissionDto>
+     */
+    public function extractBySeasons(
+        string $appUrl,
+        ?array $seasons,
+    ): array {
+        $qb = $this->createQueryBuilder('ss')
+            ->select('ss.accepted, identity(ss.season) as season_id, identity(ss.activity) as activity_id, ss.distance, ss.elevation, ss.image')
+            ->where('ss.reviewed = 1')
+            ->andWhere('ss.image != \'\'')
+            ->orderBy('ss.season');
+
+        if ($seasons !== null) {
+            $qb->where('ss.season IN (:seasons)')
+                ->setParameter('seasons', $seasons);
+        }
+
+        $result = $qb->getQuery()->getResult();
+
+        return array_map(
+            static fn ($row) => new ExtractSubmissionDto(
+                $row['activity_id'],
+                $row['season_id'],
+                $row['accepted'],
+                (int) $row['distance'],
+                (int) $row['elevation'],
+                $appUrl.$row['image']
+            ),
+            $result
+        );
     }
 }

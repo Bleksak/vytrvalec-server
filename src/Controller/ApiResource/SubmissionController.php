@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\ApiResource;
 
 use App\Action\SubmissionActions;
+use App\Dto\SeasonIDList;
 use App\Entity\Activity;
 use App\Entity\Faculty;
 use App\Entity\Season;
@@ -14,11 +15,14 @@ use App\Form\SubmissionForm;
 use App\Form\SubmissionStateFormType;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
+use App\Utils\FeatureFlag;
 use App\Validation\FormErrors;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -359,5 +363,27 @@ final class SubmissionController extends AbstractController
         }
 
         return $this->json($submission->getUpdatedAt());
+    }
+
+    #[OA\Get(
+        description: 'Extract submission for given seasons',
+    )]
+    #[Route('/api/extract/submissions', 'api_extract_submissions', methods: ['GET'])]
+    public function extractReviewedSubmissionForSeasons(
+        ParameterBagInterface $parameterBag,
+        #[CurrentUser]
+        User $user,
+        #[MapQueryString]
+        ?SeasonIDList $seasons,
+    ): Response {
+        if (!$user->canAccess(FeatureFlag::ROLE_STAFF) && !$user->canAccess(FeatureFlag::FEATURE_EXPORT_SUBMISSIONS)) {
+            return new Response(status: Response::HTTP_UNAUTHORIZED);
+        }
+
+        $url = $parameterBag->get('app_base');
+
+        $extractedData = $this->submissionRepository->extractBySeasons($url, $seasons?->seasons);
+
+        return $this->json($extractedData);
     }
 }
