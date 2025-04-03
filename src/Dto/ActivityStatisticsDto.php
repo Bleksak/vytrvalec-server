@@ -10,7 +10,7 @@ final class ActivityStatisticsDto
         #[OA\Property(example: 'Běh a chůze')]
         public string $activity,
         #[OA\Property(example: '900')]
-        public int $distance,
+        public string $distance,
     ) {
     }
 }
