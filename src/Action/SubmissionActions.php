@@ -158,6 +158,7 @@ final class SubmissionActions
             $submission->setActivity($dto->activity);
         }
 
+        $submission->setMessage('');
         $submission->setReviewed(false);
 
         $this->submissionRepository->save($submission, true);
