@@ -129,7 +129,10 @@ final class SubmissionRepository extends ServiceEntityRepository
         $data = $query->executeQuery()->fetchAllAssociative();
 
         return array_map(
-            static fn ($row) => new ActivityStatisticsDto($row['activity'], $row['distance']),
+            static fn ($row) => new ActivityStatisticsDto(
+                $row['activity'],
+                (int) $row['distance']
+            ),
             $data
         );
     }
@@ -213,7 +216,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->getResult();
 
         return array_map(
-            fn ($row) => new WeeklySubmissionSum($row['distance'], $row['faculty'], $row['activity']),
+            fn ($row) => new WeeklySubmissionSum((int) $row['distance'], $row['faculty'], $row['activity']),
             $result,
         );
     }
@@ -267,7 +270,7 @@ final class SubmissionRepository extends ServiceEntityRepository
                     $row['accepted_gdpr'],
                 ))->anonymize(),
                 $row['faculty_id'],
-                $row['value'],
+                (int) $row['value'],
             );
         }
 
@@ -297,7 +300,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             ) subquery;
         ';
 
-        return $this->getEntityManager()->getConnection()->prepare($sql)->executeQuery()->fetchOne();
+        return (int) $this->getEntityManager()->getConnection()->prepare($sql)->executeQuery()->fetchOne();
     }
 
     /**
