@@ -60,7 +60,7 @@ final class DailyDistanceExtraPoints implements ExtraPoints
                 (new AnonymizedUserCandidate(
                     $row['first_name'],
                     $row['last_name'],
-                    $row['accepted_gdpr']
+                    $row['accepted_gdpr'] === null ? null : (bool) $row['accepted_gdpr'],
                 ))->anonymize(),
                 $row['activity_id'],
                 $row['faculty_id'],

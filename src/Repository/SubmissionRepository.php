@@ -267,7 +267,7 @@ final class SubmissionRepository extends ServiceEntityRepository
                 (new AnonymizedUserCandidate(
                     $row['first_name'],
                     $row['last_name'],
-                    $row['accepted_gdpr'],
+                    $row['accepted_gdpr'] === null ? null : (bool) $row['accepted_gdpr'],
                 ))->anonymize(),
                 $row['faculty_id'],
                 (int) $row['value'],
