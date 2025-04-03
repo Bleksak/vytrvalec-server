@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\CustomLogic;
 
+use App\Dto\ExtraPointsResultDto;
 use App\Entity\Season;
 
 interface ExtraPoints
@@ -13,7 +16,7 @@ interface ExtraPoints
     public static function getWeek(): int;
 
     /**
-     * @return array<int, mixed>
+     * @return array<int, ExtraPointsResultDto>
      */
     public function calculate(Season $season): array;
 }

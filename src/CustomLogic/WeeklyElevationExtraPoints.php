@@ -2,6 +2,8 @@
 
 namespace App\CustomLogic;
 
+use App\Dto\AnonymizedUserCandidate;
+use App\Dto\ExtraPointsResultDto;
 use App\Entity\Season;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -53,7 +55,19 @@ final class WeeklyElevationExtraPoints implements ExtraPoints
         $query->bindValue(2, true);
         $query->bindValue(3, $season->getId());
 
-        return $query->executeQuery()->fetchAllAssociative();
+        return array_map(
+            static fn ($row) => new ExtraPointsResultDto(
+                (new AnonymizedUserCandidate(
+                    $row['first_name'],
+                    $row['last_name'],
+                    $row['accepted_gdpr']
+                ))->anonymize(),
+                $row['activity_id'],
+                $row['faculty_id'],
+                (int) $row['value'],
+            ),
+            $query->executeQuery()->fetchAllAssociative()
+        );
     }
 
     public static function reward(): int
