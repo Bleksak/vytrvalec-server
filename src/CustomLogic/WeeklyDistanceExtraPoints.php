@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\CustomLogic;
 
-use App\Dto\AnonymizedUserCandidate;
+use App\Dto\AnonymizedUser;
 use App\Dto\ExtraPointsResultDto;
 use App\Entity\Season;
 use Doctrine\ORM\EntityManagerInterface;
@@ -52,11 +52,11 @@ final class WeeklyDistanceExtraPoints implements ExtraPoints
 
         return array_map(
             static fn ($row) => new ExtraPointsResultDto(
-                (new AnonymizedUserCandidate(
+                new AnonymizedUser(
                     $row['first_name'],
                     $row['last_name'],
                     $row['accepted_gdpr'],
-                ))->anonymize(),
+                ),
                 $row['activity_id'],
                 $row['faculty_id'],
                 (int) $row['value'],

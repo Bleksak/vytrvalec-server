@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Dto\ActivityStatisticsDto;
-use App\Dto\AnonymizedUserCandidate;
+use App\Dto\AnonymizedUser;
 use App\Dto\Extract\ExtractSubmissionDto;
 use App\Dto\OutlierActivity;
 use App\Dto\OutlierResult;
@@ -264,11 +264,11 @@ final class SubmissionRepository extends ServiceEntityRepository
             }
 
             $activities[$row['activity_id']][] = new OutlierResult(
-                (new AnonymizedUserCandidate(
+                new AnonymizedUser(
                     $row['first_name'],
                     $row['last_name'],
                     $row['accepted_gdpr'],
-                ))->anonymize(),
+                ),
                 $row['faculty_id'],
                 (int) $row['value'],
             );
