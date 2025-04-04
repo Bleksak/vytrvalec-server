@@ -41,7 +41,7 @@ final class SeasonController extends AbstractController
         name: 'troll',
         methods: ['GET'],
     )]
-    public function current(): Response
+    public function troll(): Response
     {
         return $this->json([
             'troll' => true
