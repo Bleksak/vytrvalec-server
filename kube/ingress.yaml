@@ -6,6 +6,10 @@ metadata:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/proxy-body-size: 100M
     nginx.ingress.kubernetes.io/proxy-buffer-size: 16k
+    nginx.org/server-snippets: |
+      location / {
+          return 404;
+      }
 spec:
   tls:
     - hosts:
@@ -27,3 +31,69 @@ spec:
                 name: vytrvalec-nginx
                 port:
                   number: 80
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-config
+data:
+  default.conf: |
+    server {
+        root /var/www/vytrvalec/public;
+        server_name vytrvalec.kts.zcu.cz;
+        
+        client_max_body_size 256M;
+        
+        location / {
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-NginX-Proxy true;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_pass http://client:3000;
+            proxy_redirect off;
+            
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+
+            proxy_busy_buffers_size 512k;
+            proxy_buffers 4 512k;
+            proxy_buffer_size 256k;
+
+            
+            error_page 502 = @static;
+        }
+
+        location ~ ^/api/ {
+            try_files $uri /index.php$is_args$args;
+        }
+        
+        location /uploads/ {
+            try_files $uri $uri/ /index.php$is_args$args;
+        }
+
+        location ~ ^/index\.php(/|$) {
+            fastcgi_pass 127.0.0.1:9000;
+
+            fastcgi_split_path_info ^(.+\.php)(/.*)$;
+            include fastcgi_params;
+
+            fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+            fastcgi_param DOCUMENT_ROOT $realpath_root;
+            internal;
+        }
+
+        location ~ \.php$ {
+            return 404;
+        }
+        
+        location @static {
+          try_files $uri /index.html =502;
+        }
+
+        error_log /var/log/nginx/project_error.log warn;
+        access_log /var/log/nginx/project_access.log;
+    }
