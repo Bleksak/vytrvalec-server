@@ -36,18 +36,6 @@ final class SeasonController extends AbstractController
     ) {
     }
 
-    #[Route(
-        '/api/troll',
-        name: 'troll',
-        methods: ['GET'],
-    )]
-    public function troll(): Response
-    {
-        return $this->json([
-            'troll' => true
-        ]);
-    }
-
     #[OA\Post(
         description: 'Create a new Season',
         requestBody: new OA\RequestBody(
