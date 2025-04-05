@@ -285,7 +285,7 @@ final class UserController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function userList(): Response
     {
-        return $this->json($this->normalizer->normalize($this->userRepository->findAll(), null, [
+        return $this->json($this->normalizer->normalize($this->userRepository->findAllNotDeleted(), null, [
             AbstractNormalizer::GROUPS => ['fetchUser'],
         ]));
     }

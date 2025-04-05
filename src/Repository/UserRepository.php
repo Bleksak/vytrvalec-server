@@ -153,4 +153,15 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
     {
         return $this->findOneBy(['emailUnsubscribeHash' => $unsubscribeHash]);
     }
+
+    /**
+     * @return array<User>
+     */
+    public function findAllNotDeleted(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.email IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+    }
 }
