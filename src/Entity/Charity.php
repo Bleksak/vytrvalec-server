@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\CharityRepository;
@@ -27,10 +29,26 @@ class Charity
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
     private ?string $description = null;
 
-    public function __construct(string $name, string $description)
-    {
+    #[OA\Property]
+    #[ORM\Column(length: 512)]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
+    private ?string $image = null;
+
+    #[OA\Property]
+    #[ORM\Column(length: 512)]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
+    private ?string $website = null;
+
+    public function __construct(
+        string $name,
+        string $description,
+        ?string $image = null,
+        ?string $website = null,
+    ) {
         $this->name = $name;
         $this->description = $description;
+        $this->image = $image;
+        $this->website = $website;
     }
 
     public function getId(): ?int
@@ -58,6 +76,30 @@ class Charity
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): self
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    public function getWebsite(): ?string
+    {
+        return $this->website;
+    }
+
+    public function setWebsite(string $website): self
+    {
+        $this->website = $website;
 
         return $this;
     }
