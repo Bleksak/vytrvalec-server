@@ -11,6 +11,8 @@ stages:
   - deploy
 
 build application image:
+  only:
+      - master
   stage: build
   image:
     name: pernodricard/kaniko-alpine:latest
@@ -27,6 +29,8 @@ build application image:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile Dockerfile --destination $APP --verbosity info
 
 deploy:
+  only:
+      - master
   stage: deploy
   environment: production
   when: manual
