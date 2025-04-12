@@ -2,7 +2,7 @@ nelmio_api_doc:
 
     documentation:
         servers:
-            - url: '%env(APP_URL)%'
+            - url: '%env(APP_BASE_URL)%'
         info:
             title: Měsíční Vytrvalec
             description: Měsíční Vytrvalec
