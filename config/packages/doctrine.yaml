@@ -2,7 +2,7 @@ doctrine:
     dbal:
         charset: utf8mb4
         default_table_options:
-            charset: utfmb4
+            charset: utf8mb4
             collation: utf8mb4_unicode_ci
 
         url: '%env(resolve:DATABASE_URL)%'
