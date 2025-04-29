@@ -1,22 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\ApiResource;
 
 use App\Action\CharityActions;
-use App\Dto\CharityDto;
+use App\Dto\Charity\CharityCreateDto;
+use App\Dto\Charity\CharityEditDto;
+use App\Dto\Charity\Response\CharityCreateResponseDto;
+use App\Dto\Charity\Response\CharityGetResponseDto;
+use App\Dto\Charity\Response\CharityIndexResponseDto;
 use App\Entity\Charity;
-use App\Form\CharityCreateFormType;
 use App\Repository\CharityRepository;
-use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[OA\Tag(name: 'Charity')]
 final class CharityController extends AbstractController
@@ -24,7 +27,7 @@ final class CharityController extends AbstractController
     public function __construct(
         private readonly CharityActions $action,
         private readonly CharityRepository $charityRepository,
-        private readonly NormalizerInterface $normalizer,
+        private readonly ParameterBagInterface $parameterBag,
     ) {
     }
 
@@ -34,7 +37,7 @@ final class CharityController extends AbstractController
             required: true,
             description: 'The new charity object',
             content: new OA\JsonContent(
-                ref: new Model(type: CharityDto::class)
+                ref: new Model(type: CharityCreateDto::class)
             ),
         ),
         responses: [
@@ -67,20 +70,26 @@ final class CharityController extends AbstractController
         methods: ['POST'],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function create(Request $request): Response
-    {
-        $form = $this->createForm(CharityCreateFormType::class);
-        $form->submit($request->getPayload()->all());
+    public function create(
+        #[MapRequestPayload]
+        CharityCreateDto $charityCreateDto,
+    ): Response {
+        $charity = $this->action->create($charityCreateDto);
 
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        if (is_array($charity)) {
+            return $this->json($charity, Response::HTTP_BAD_REQUEST);
         }
 
-        $id = $this->action->create($form->getData());
-
-        return $this->json(['id' => $id], Response::HTTP_CREATED);
+        return $this->json(
+            new CharityCreateResponseDto(
+                $charity->getId(),
+                $charity->getName(),
+                $charity->getDescription(),
+                $charity->getImage() === null ? null : $this->parameterBag->get('app_base').$charity->getImage()->getPath(),
+                $charity->getWebsite(),
+            ),
+            Response::HTTP_CREATED
+        );
     }
 
     #[OA\Get(
@@ -111,11 +120,18 @@ final class CharityController extends AbstractController
         'api_charity_get',
         methods: ['GET'],
     )]
-    public function get(Charity $charity): Response
-    {
-        return $this->json($this->normalizer->normalize($charity, null, [
-            AbstractNormalizer::GROUPS => ['fetchCharity'],
-        ]));
+    public function get(
+        Charity $charity,
+    ): Response {
+        return $this->json(
+            new CharityGetResponseDto(
+                $charity->getId(),
+                $charity->getName(),
+                $charity->getDescription(),
+                $charity->getImage() === null ? null : $this->parameterBag->get('app_base').$charity->getImage()->getPath(),
+                $charity->getWebsite(),
+            ),
+        );
     }
 
     #[OA\Patch(
@@ -130,7 +146,7 @@ final class CharityController extends AbstractController
         requestBody: new OA\RequestBody(
             required: false,
             content: new OA\JsonContent(
-                ref: new Model(type: CharityDto::class)
+                ref: new Model(type: CharityEditDto::class)
             )
         ),
         responses: [
@@ -150,21 +166,12 @@ final class CharityController extends AbstractController
         methods: ['PATCH'],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function updatePatch(Charity $charity, Request $request): Response
-    {
-        $form = $this->createForm(CharityCreateFormType::class, null, [
-            'method' => $request->getMethod(),
-        ]);
-
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $this->action->update($charity, $form->getData());
+    public function updatePatch(
+        Charity $charity,
+        #[MapRequestPayload]
+        CharityEditDto $charityEditDto,
+    ): Response {
+        $this->action->update($charity, $charityEditDto);
 
         return new Response();
     }
@@ -189,11 +196,21 @@ final class CharityController extends AbstractController
         'api_charity_index',
         methods: ['GET'],
     )]
-    public function index(): Response
-    {
-        return $this->json($this->normalizer->normalize($this->charityRepository->findAll(), null, [
-            AbstractNormalizer::GROUPS => ['fetchCharity'],
-        ]));
+    public function index(
+        ParameterBagInterface $bag,
+    ): Response {
+        return $this->json(
+            array_map(
+                fn (Charity $charity) => new CharityIndexResponseDto(
+                    $charity->getId(),
+                    $charity->getName(),
+                    $charity->getDescription(),
+                    $charity->getImage() === null ? null : $this->parameterBag->get('app_base').$charity->getImage()->getPath(),
+                    $charity->getWebsite(),
+                ),
+                $this->charityRepository->findAll(),
+            )
+        );
     }
 
     #[OA\Delete(

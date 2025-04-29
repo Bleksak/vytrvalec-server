@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\SubmissionRepository;
@@ -51,10 +53,11 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private bool $reviewed = false;
 
-    #[OA\Property(example: 'http://localhost:8000/images/image.png')]
-    #[ORM\Column(length: 255)]
+    #[OA\Property]
+    #[ORM\ManyToOne(fetch: 'EAGER')]
+    #[ORM\JoinColumn(nullable: true, referencedColumnName: 'uuid', name: 'image_uuid')]
     #[Groups(['fetchSubmission'])]
-    private string $image;
+    private ?Image $image;
 
     #[OA\Property(example: 2)]
     #[ORM\Column]
@@ -72,7 +75,7 @@ class Submission
     #[Groups(['fetchSubmission'])]
     private \DateTimeInterface $date;
 
-    #[OA\Property(type: 'integer', example: 1)]
+    #[OA\Property(type: 'datetime', example: 1)]
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', updatable: false, insertable: false, generated: 'ALWAYS')]
     #[Groups(['fetchSubmission'])]
     /**
@@ -89,7 +92,7 @@ class Submission
         User $user,
         Activity $activity,
         Season $season,
-        string $image,
+        Image $image,
         int $distance,
         int $elevation = 0,
         string $message = '',
@@ -184,12 +187,12 @@ class Submission
         return $this;
     }
 
-    public function getImage(): ?string
+    public function getImage(): ?Image
     {
         return $this->image;
     }
 
-    public function setImage(string $image): self
+    public function setImage(Image $image): self
     {
         $this->image = $image;
 

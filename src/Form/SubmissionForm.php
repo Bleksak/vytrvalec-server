@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
-use App\Dto\SubmissionDto;
+use App\Dto\Submission\SubmissionEditDto;
 use App\Entity\Activity;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -74,7 +76,7 @@ final class SubmissionForm extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', SubmissionDto::class);
+        $resolver->setDefault('data_class', SubmissionEditDto::class);
         $resolver->setDefault('csrf_protection', false);
     }
 }

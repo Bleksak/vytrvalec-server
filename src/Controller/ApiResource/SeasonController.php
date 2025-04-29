@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\ApiResource;
 
 use App\Action\SeasonActions;
@@ -8,6 +10,7 @@ use App\Dto\SeasonDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Activity;
 use App\Entity\Faculty;
+use App\Entity\Image;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Form\SeasonFormType;
@@ -126,7 +129,7 @@ final class SeasonController extends AbstractController
     }
 
     #[OA\Delete(
-        description: 'Delete a non running Season, if the Season is running, this request will fail.',
+        description: 'Delete a non running Season. This request will fail if the Season is running or contains any submissions.',
         parameters: [
             new OA\Parameter(
                 name: 'season',
@@ -264,19 +267,18 @@ final class SeasonController extends AbstractController
         $results = $submissionRepository->findBySeasonAndFilter($season, $queryFilter, $request->get('page', 1), 25);
 
         return $this->json(
-            $this->normalizer->normalize(
-                $results,
-                null,
-                [
-                    AbstractNormalizer::GROUPS => ['fetchSubmission'],
-                    AbstractNormalizer::CALLBACKS => [
-                        'image' => fn (string $image) => $url.$image,
-                        'activity' => fn (Activity $activity) => $activity->getId(),
-                        'faculty' => fn (Faculty $faculty) => $faculty->getId(),
-                    ],
-                    AbstractNormalizer::IGNORED_ATTRIBUTES => ['season'],
-                ]
-            )
+            $results,
+            200,
+            [],
+            [
+                AbstractNormalizer::GROUPS => ['fetchSubmission'],
+                AbstractNormalizer::CALLBACKS => [
+                    'image' => fn (Image $image) => $url.$image->getPath(),
+                    'activity' => fn (Activity $activity) => $activity->getId(),
+                    'faculty' => fn (Faculty $faculty) => $faculty->getId(),
+                ],
+                AbstractNormalizer::IGNORED_ATTRIBUTES => ['season'],
+            ]
         );
     }
 
