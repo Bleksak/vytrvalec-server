@@ -1,30 +1,58 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Action;
 
-use App\Dto\CharityDto;
+use App\Dto\Charity\CharityCreateDto;
+use App\Dto\Charity\CharityEditDto;
 use App\Entity\Charity;
 use App\Repository\CharityRepository;
+use App\Repository\ImageRepository;
 
 final class CharityActions
 {
     public function __construct(
         private readonly CharityRepository $charityRepository,
+        private readonly ImageRepository $imageRepository,
     ) {
     }
 
-    public function create(CharityDto $dto): int
+    /**
+     * @return Charity|array<string, string>
+     */
+    public function create(CharityCreateDto $dto): Charity|array
     {
-        $charity = new Charity($dto->name, $dto->description);
+        $image = null;
+
+        if ($dto->imageUuid !== null) {
+            $image = $this->imageRepository->find($dto->imageUuid);
+
+            if ($image === null) {
+                return ['image' => 'invalid'];
+            }
+        }
+
+        $charity = new Charity($dto->name, $dto->description, $image, $dto->website);
         $this->charityRepository->save($charity, true);
 
-        return $charity->getId();
+        return $charity;
     }
 
-    public function update(Charity $charity, CharityDto $dto): void
+    public function update(Charity $charity, CharityEditDto $dto): void
     {
         $charity->setName($dto->name ?? $charity->getName());
         $charity->setDescription($dto->description ?? $charity->getDescription());
+
+        if ($dto->imageUuid !== null) {
+            $image = $this->imageRepository->find($dto->imageUuid);
+
+            if ($image) {
+                $charity->setImage($image);
+            }
+        }
+
+        $charity->setWebsite($dto->website ?? $charity->getWebsite());
 
         $this->charityRepository->save($charity, true);
     }

@@ -16,33 +16,34 @@ class Charity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
     private ?int $id = null;
 
     #[OA\Property]
     #[ORM\Column(length: 255)]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
     private ?string $name = null;
 
     #[OA\Property]
     #[ORM\Column(length: 10000)]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
     private ?string $description = null;
 
     #[OA\Property]
-    #[ORM\Column(length: 512)]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
-    private ?string $image = null;
+    #[ORM\ManyToOne(fetch: 'EAGER')]
+    #[ORM\JoinColumn(nullable: true, referencedColumnName: 'uuid', name: 'image_uuid')]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
+    private ?Image $image = null;
 
     #[OA\Property]
     #[ORM\Column(length: 512)]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult', 'fetchCharity'])]
+    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
     private ?string $website = null;
 
     public function __construct(
         string $name,
         string $description,
-        ?string $image = null,
+        ?Image $image = null,
         ?string $website = null,
     ) {
         $this->name = $name;
@@ -80,12 +81,12 @@ class Charity
         return $this;
     }
 
-    public function getImage(): ?string
+    public function getImage(): ?Image
     {
         return $this->image;
     }
 
-    public function setImage(string $image): self
+    public function setImage(Image $image): self
     {
         $this->image = $image;
 

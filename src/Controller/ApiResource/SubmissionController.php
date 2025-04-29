@@ -6,12 +6,14 @@ namespace App\Controller\ApiResource;
 
 use App\Action\SubmissionActions;
 use App\Dto\SeasonIDList;
+use App\Dto\Submission\SubmissionCreateDto;
+use App\Dto\Submission\SubmissionEditDto;
 use App\Entity\Activity;
 use App\Entity\Faculty;
+use App\Entity\Image;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
-use App\Form\SubmissionForm;
 use App\Form\SubmissionStateFormType;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
@@ -23,6 +25,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -76,38 +79,14 @@ final class SubmissionController extends AbstractController
         '/api/submission',
         name: 'api_submission_create',
         methods: ['POST'],
-        // documentation: 'Creates a new <code>Submission</code> entity',
-        // responses: [
-        //     Response::HTTP_CREATED => [
-        //         'message' => 'Submission created successfully',
-        //     ],
-        //     Response::HTTP_FORBIDDEN => [
-        //         'message' => 'Unauthorized access',
-        //     ],
-        //     Response::HTTP_BAD_REQUEST => [
-        //         'message' => 'Bad request ',
-        //         'response' => [
-        //             'distance' => 'err_negative_value',
-        //             'elevation' => 'err_zero_value',
-        //         ],
-        //     ],
-        //     Response::HTTP_INTERNAL_SERVER_ERROR => [
-        //         'message' => 'Error when processing image',
-        //     ],
-        // ],
-        // requestScheme: [
-        //     'distance' => 'integer',
-        //     'elevation' => 'integer',
-        //     'image' => 'file',
-        //     'activity' => 'integer',
-        // ]
     )]
     #[IsGranted('ROLE_USER')]
     public function create(
         #[CurrentUser]
         User $user,
         SeasonRepository $seasonRepository,
-        Request $request,
+        #[MapRequestPayload]
+        SubmissionCreateDto $submissionCreateDto,
     ): Response {
         $season = $seasonRepository->getCurrent();
 
@@ -115,16 +94,7 @@ final class SubmissionController extends AbstractController
             return $this->json(['season' => ['no_season']], Response::HTTP_BAD_REQUEST);
         }
 
-        $form = $this->createForm(SubmissionForm::class);
-        $form->submit($request->request->all() + $request->files->all());
-
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $errors = $this->action->create($form->getData(), $user, $season);
+        $errors = $this->action->create($submissionCreateDto, $user, $season);
 
         if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
@@ -173,7 +143,7 @@ final class SubmissionController extends AbstractController
                         'season' => fn (Season $object) => $object->getId(),
                         'activity' => fn (Activity $object) => $object->getId(),
                         'faculty' => fn (Faculty $object) => $object->getId(),
-                        'image' => fn (string $image) => $url.$image,
+                        'image' => fn (Image $image) => $url.$image->getPath(),
                     ],
                 ]
             )
@@ -200,21 +170,18 @@ final class SubmissionController extends AbstractController
         $url = $this->getParameter('app_base');
 
         return $this->json(
-            $this->normalizer->normalize(
-                $submissions,
-                null,
-                [
-                    AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
-                        return $object->getId();
-                    },
-                    AbstractNormalizer::GROUPS => ['fetchSubmission'],
-                    AbstractNormalizer::CALLBACKS => [
-                        'image' => fn (string $image) => $url.$image,
-                        'activity' => fn (Activity $activity) => $activity->getId(),
-                    ],
-                    AbstractNormalizer::IGNORED_ATTRIBUTES => ['user', 'season'],
+            $submissions,
+            200,
+            [],
+            [
+                AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn ($object) => $object->getId(),
+                AbstractNormalizer::GROUPS => ['fetchSubmission'],
+                AbstractNormalizer::CALLBACKS => [
+                    'image' => fn (Image $image) => $url.$image->getPath(),
+                    'activity' => fn (Activity $activity) => $activity->getId(),
                 ],
-            )
+                AbstractNormalizer::IGNORED_ATTRIBUTES => ['user', 'season'],
+            ],
         );
     }
 
@@ -233,14 +200,19 @@ final class SubmissionController extends AbstractController
     public function unresolvedList(Request $request, int $count): Response
     {
         $url = $this->getParameter('app_base');
+        $submissions = $this->submissionRepository->findUnreviewed($count);
 
-        return $this->json($this->normalizer->normalize($this->submissionRepository->findUnreviewed($count), null, [
-            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
-                return $object->getId();
-            },
-            AbstractNormalizer::GROUPS => ['fetchSubmission'],
-            AbstractNormalizer::CALLBACKS => ['image' => fn (string $image) => $url.$image],
-        ]));
+        return $this->json(
+            $submissions,
+            200,
+            [],
+            [
+                AbstractNormalizer::GROUPS => ['fetchSubmission'],
+                AbstractNormalizer::IGNORED_ATTRIBUTES => ['charity', 'season'],
+                AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn ($object) => $object->getId(),
+                AbstractNormalizer::CALLBACKS => ['image' => fn (Image $image) => $url.$image->getPath()],
+            ]
+        );
     }
 
     #[Route(
@@ -279,7 +251,8 @@ final class SubmissionController extends AbstractController
         #[CurrentUser]
         User $user,
         Submission $submission,
-        Request $request,
+        #[MapRequestPayload]
+        SubmissionEditDto $submissionEditDto,
     ): Response {
         if ($submission->isAccepted()) {
             return $this->json(['submission' => ['accepted']], Response::HTTP_BAD_REQUEST);
@@ -300,21 +273,8 @@ final class SubmissionController extends AbstractController
             return $this->json([], Response::HTTP_NOT_FOUND);
         }
 
-        $form = $this->createForm(SubmissionForm::class, null, [
-            'method' => $request->getMethod(),
-        ]);
+        $errors = $this->action->update($submission, $submissionEditDto);
 
-        $form->submit($request->request->all() + $request->files->all());
-
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $dto = $form->getData();
-
-        $errors = $this->action->update($submission, $dto);
         if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }

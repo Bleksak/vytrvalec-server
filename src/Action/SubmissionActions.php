@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Action;
 
-use App\Dto\SubmissionDto;
+use App\Dto\Submission\SubmissionCreateDto;
+use App\Dto\Submission\SubmissionEditDto;
 use App\Dto\SubmissionStateDto;
 use App\Entity\Season;
 use App\Entity\Submission;
@@ -10,12 +13,11 @@ use App\Entity\User;
 use App\Notifications\EmailTemplate\SubmissionRejectedEmailTemplate;
 use App\Notifications\Firebase\Firebase;
 use App\Notifications\VytrvalecNotification;
+use App\Repository\ActivityRepository;
+use App\Repository\ImageRepository;
 use App\Repository\ProfileCacheRepository;
 use App\Repository\SubmissionRepository;
 use App\Services\VytrvalecMailer;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class SubmissionActions
 {
@@ -23,60 +25,40 @@ final class SubmissionActions
         private readonly Firebase $firebase,
         private readonly SubmissionRepository $submissionRepository,
         private readonly ProfileCacheRepository $profileCacheRepository,
-        private readonly ParameterBagInterface $parameterBag,
-        private readonly Filesystem $fs,
         private readonly VytrvalecMailer $mailer,
+        private readonly ImageRepository $imageRepository,
+        private readonly ActivityRepository $activityRepository,
     ) {
     }
 
-    private function uploadImage(UploadedFile $image): ?string
-    {
-        $dirname = $this->parameterBag->get('kernel.project_dir').'/public';
-
-        do {
-            $uniquePath = '/uploads/'.uniqid(more_entropy: true).'.jpg';
-            $absolutePath = $dirname.$uniquePath;
-        } while ($this->fs->exists($absolutePath));
-
-        $tmpPath = $uniquePath.'.tmp';
-
-        $newFile = $image->move($dirname, $tmpPath);
-
-        try {
-            $img = new \Imagick($newFile->getRealPath());
-            $profiles = $img->getImageProfiles('icc');
-
-            $img->stripImage();
-            if (!empty($profiles)) {
-                $img->profileImage('icc', $profiles['icc']);
-            }
-
-            $img->setImageFormat('jpeg');
-            $img->setImageCompressionQuality(90);
-            $img->writeImage($absolutePath);
-        } catch (\ImagickException) {
-            return null;
-        } finally {
-            $this->fs->remove($newFile);
-        }
-
-        return $uniquePath;
-    }
-
     /**
-     * @return array<string>
+     * @return array<string, string>
      */
     public function create(
-        SubmissionDto $dto,
+        SubmissionCreateDto $dto,
         User $user,
         Season $season,
     ): array {
-        $imagePath = $this->uploadImage($dto->image);
-        if ($imagePath === null) {
-            return ['image_error'];
+        $activity = $this->activityRepository->find($dto->activityId);
+
+        if ($activity === null) {
+            return ['activity_id' => 'invalid'];
         }
 
-        $submission = new Submission($user, $dto->activity, $season, $imagePath, $dto->distance, $dto->elevation ?? 0);
+        $image = $this->imageRepository->find($dto->imageUuid);
+
+        if ($image === null || $image->getUsedAt() !== null) {
+            return ['image' => 'invalid'];
+        }
+
+        $submission = new Submission(
+            $user,
+            $activity,
+            $season,
+            $image,
+            $dto->distance,
+            $dto->elevation ?? 0
+        );
 
         $this->submissionRepository->save($submission, true);
 
@@ -129,21 +111,22 @@ final class SubmissionActions
     }
 
     /**
-     * @return array<int,string>
+     * @return array<string,string>
      */
-    public function update(Submission $submission, SubmissionDto $dto): array
+    public function update(Submission $submission, SubmissionEditDto $dto): array
     {
         if ($submission->getUpdatedAt() != $dto->updatedAt) {
-            return ['mismatch_updated_at'];
+            return ['updated_at' => 'mismatch'];
         }
 
-        if ($dto->image !== null) {
-            $imagePath = $this->uploadImage($dto->image);
-            if ($imagePath === null) {
-                return ['image_error'];
+        if ($dto->imageUuid !== null) {
+            $image = $this->imageRepository->find($dto->imageUuid);
+
+            if ($image === null || $image->getUsedAt() !== null) {
+                return ['image' => 'invalid'];
             }
 
-            $submission->setImage($imagePath);
+            $submission->setImage($image);
         }
 
         if ($dto->distance !== null) {
@@ -154,8 +137,14 @@ final class SubmissionActions
             $submission->setElevation($dto->elevation);
         }
 
-        if ($dto->activity !== null) {
-            $submission->setActivity($dto->activity);
+        if ($dto->activityId !== null) {
+            $activity = $this->activityRepository->find($dto->activityId);
+
+            if ($activity === null) {
+                return ['activity_id' => 'invalid'];
+            }
+
+            $submission->setActivity($activity);
         }
 
         $submission->setMessage('');

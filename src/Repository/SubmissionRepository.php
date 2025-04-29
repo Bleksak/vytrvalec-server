@@ -58,6 +58,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $query = $this
             ->createQueryBuilder('s')
             ->select('s')
+            ->join('s.image', 'i')
             ->where('s.user = :userId')
             ->addOrderBy('s.date', 'DESC')
             ->setParameter('userId', $user->getId());
@@ -79,6 +80,8 @@ final class SubmissionRepository extends ServiceEntityRepository
         $query = $this
             ->createQueryBuilder('s')
             ->select('s')
+            ->join('s.image', 'i')
+            ->addSelect('i.path as image')
             ->where('s.season = :seasonId')
             ->orderBy('s.date', 'DESC')
             ->setParameter('seasonId', $season->getId());
@@ -99,7 +102,8 @@ final class SubmissionRepository extends ServiceEntityRepository
     {
         return $this
             ->createQueryBuilder('s')
-            ->select('s')
+            ->select('s, i')
+            ->join('s.image', 'i')
             ->andWhere('s.reviewed = :reviewed')
             ->setParameter('reviewed', false)
             ->orderBy('s.date', 'ASC')
@@ -147,6 +151,8 @@ final class SubmissionRepository extends ServiceEntityRepository
         $queryBuilder = $this
             ->createQueryBuilder('s')
             ->select('s')
+            ->join('s.image', 'i')
+            // ->addSelect('coalesce(i.path, \'\') as image')
             ->where('s.season = :seasonId')
             ->join('s.user', 'u')
             ->setParameter('seasonId', $season->getId())
@@ -313,7 +319,8 @@ final class SubmissionRepository extends ServiceEntityRepository
         ?array $seasons,
     ): array {
         $qb = $this->createQueryBuilder('ss')
-            ->select('ss.accepted, identity(ss.season) as season_id, identity(ss.activity) as activity_id, ss.distance, ss.elevation, ss.image')
+            ->select('ss.accepted, identity(ss.season) as season_id, identity(ss.activity) as activity_id, ss.distance, ss.elevation, i.image as image')
+            ->join('ss.image', 'i')
             ->where('ss.reviewed = 1')
             ->andWhere('ss.image != \'\'')
             ->orderBy('ss.season');

@@ -65,6 +65,7 @@
     "symfony/translation": "7.2.*",
     "symfony/twig-bridge": "7.2.*",
     "symfony/twig-bundle": "7.2.*",
+    "symfony/uid": "7.2.*",
     "symfony/validator": "7.2.*",
     "symfony/var-dumper": "7.2.*",
     "symfony/var-exporter": "7.2.*",
