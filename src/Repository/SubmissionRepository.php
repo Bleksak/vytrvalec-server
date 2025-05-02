@@ -230,7 +230,7 @@ final class SubmissionRepository extends ServiceEntityRepository
     /**
      * @return array<OutlierActivity>
      */
-    public function findOutliers(Season $season, int $n = 3): array
+    public function findOutliers(Season $season, int $n = 3, bool $anonymize = true): array
     {
         $query = $this->getEntityManager()->getConnection()->prepare('
             WITH
@@ -269,11 +269,13 @@ final class SubmissionRepository extends ServiceEntityRepository
                 $activities[$row['activity_id']] = [];
             }
 
+            $acceptedGdpr = $anonymize ? $row['accepted_gdpr'] : true;
+
             $activities[$row['activity_id']][] = new OutlierResult(
                 new AnonymizedUser(
                     $row['first_name'],
                     $row['last_name'],
-                    $row['accepted_gdpr'],
+                    $acceptedGdpr,
                 ),
                 $row['faculty_id'],
                 (int) $row['value'],
