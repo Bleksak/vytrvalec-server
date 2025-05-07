@@ -86,7 +86,7 @@ class Submission
     #[OA\Property(example: 'Dobrej vykon lil bro')]
     #[ORM\Column(length: 512)]
     #[Groups(['fetchSubmission'])]
-    private string $message;
+    private string $message = '';
 
     public function __construct(
         User $user,

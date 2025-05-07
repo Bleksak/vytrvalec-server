@@ -32,7 +32,7 @@ class Faculty
     #[Groups(['fetchSubmission'])]
     private ?bool $visible = null;
 
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
+    #[ORM\ManyToOne(targetEntity: self::class)]
     private ?self $parent = null;
 
     public function __construct(

@@ -17,7 +17,7 @@ class ProfileCache
 
     #[OA\Property]
     #[ORM\Id]
-    #[ORM\ManyToOne(inversedBy: 'profileCaches')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Activity $activity;
 
