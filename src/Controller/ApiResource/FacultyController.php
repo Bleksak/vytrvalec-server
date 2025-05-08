@@ -7,7 +7,6 @@ namespace App\Controller\ApiResource;
 use App\Action\FacultyActions;
 use App\Dto\Faculty\FacultyCreateDto;
 use App\Dto\Faculty\FacultyUpdateDto;
-use App\Dto\FacultyDto;
 use App\Entity\Faculty;
 use App\Repository\FacultyRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;

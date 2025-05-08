@@ -7,7 +7,6 @@ namespace App\Controller\ApiResource;
 use App\Action\ActivityActions;
 use App\Dto\Activity\ActivityCreateDto;
 use App\Dto\Activity\ActivityUpdateDto;
-use App\Dto\ActivityDto;
 use App\Entity\Activity;
 use App\Repository\ActivityRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
