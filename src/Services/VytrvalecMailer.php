@@ -12,10 +12,13 @@ use Symfony\Component\Mailer\MailerInterface;
 
 final class VytrvalecMailer
 {
+    private readonly string $clientUrl;
+
     public function __construct(
         private readonly MailerInterface $mailer,
         private readonly ParameterBagInterface $parameterBag,
     ) {
+        $this->clientUrl = $parameterBag->get('client_url');
     }
 
     /**
@@ -30,7 +33,7 @@ final class VytrvalecMailer
 
     private function constructUnsubscribeLink(User $user): string
     {
-        return sprintf('%s/unsubscribe/%s', $this->parameterBag->get('client_url'), $user->getEmailUnsubscribeHash());
+        return sprintf('%s/unsubscribe/%s', $this->clientUrl, $user->getEmailUnsubscribeHash());
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
 use App\Entity\User;
@@ -15,6 +17,10 @@ final class VytrvalecNotification extends FirebaseNotification implements Messag
     ) {
         if ($recipient instanceof User) {
             $recipient = $recipient->getToken();
+        }
+
+        if ($recipient === null) {
+            return;
         }
 
         parent::__construct($recipient, 'Měsíční vytrvalec', $message, $action);

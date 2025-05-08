@@ -6,9 +6,9 @@ namespace App\Action;
 
 use App\Dto\EmailingChangeDto;
 use App\Dto\PasswordChangeDto;
-use App\Dto\PasswordResetDto;
+use App\Dto\User\PasswordResetDto;
+use App\Dto\User\UserEditDto;
 use App\Dto\UserDto;
-use App\Dto\UserEditDto;
 use App\Entity\User;
 use App\Notifications\EmailTemplate\ForgottenPasswordEmailTemplate;
 use App\Notifications\EmailTemplate\RegisterEmailTemplate;
@@ -72,8 +72,12 @@ final readonly class UserActions
             $user->setLastName($dto->lastName);
         }
 
-        if ($dto->faculty !== null) {
-            $user->setFaculty($dto->faculty);
+        if ($dto->facultyId !== null) {
+            $faculty = $this->facultyRepository->find($dto->facultyId);
+
+            if ($faculty !== null) {
+                $user->setFaculty($faculty);
+            }
         }
 
         if ($dto->banned !== null) {
@@ -102,10 +106,8 @@ final readonly class UserActions
             return ['old_password' => ['mismatch']];
         }
 
-        if ($dto->password !== null) {
-            $hashedPassword = $this->hasher->hashPassword($currentUser, $dto->password);
-            $currentUser->setPassword($hashedPassword);
-        }
+        $hashedPassword = $this->hasher->hashPassword($currentUser, $dto->password);
+        $currentUser->setPassword($hashedPassword);
 
         $this->userRepository->save($currentUser, true);
 

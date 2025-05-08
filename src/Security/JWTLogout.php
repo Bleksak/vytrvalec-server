@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Security;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -11,11 +13,18 @@ final class JWTLogout
     {
         $response = $logoutEvent->getResponse();
 
+        if (!$response) {
+            return;
+        }
+
         $response->headers->clearCookie('jwt');
         $response->headers->set('Content-Type', 'text/json');
         $response->setStatusCode(Response::HTTP_OK);
-        $response->setContent(json_encode([
+
+        $responseData = json_encode([
             'success' => true,
-        ]));
+        ]);
+
+        $response->setContent($responseData === false ? null : $responseData);
     }
 }

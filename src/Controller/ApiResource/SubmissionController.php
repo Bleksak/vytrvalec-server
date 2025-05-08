@@ -8,17 +8,16 @@ use App\Action\SubmissionActions;
 use App\Dto\SeasonIDList;
 use App\Dto\Submission\SubmissionCreateDto;
 use App\Dto\Submission\SubmissionEditDto;
+use App\Dto\Submission\SubmissionStateDto;
 use App\Entity\Activity;
 use App\Entity\Faculty;
 use App\Entity\Image;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
-use App\Form\SubmissionStateFormType;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Utils\FeatureFlag;
-use App\Validation\FormErrors;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -305,18 +304,12 @@ final class SubmissionController extends AbstractController
         // ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function setState(Submission $submission, Request $request): Response
-    {
-        $form = $this->createForm(SubmissionStateFormType::class);
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $errors = $this->action->setState($submission, $form->getData());
+    public function setState(
+        #[MapRequestPayload]
+        SubmissionStateDto $dto,
+        Submission $submission,
+    ): Response {
+        $errors = $this->action->setState($submission, $dto);
 
         if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);

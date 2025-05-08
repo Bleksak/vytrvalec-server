@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Activity;
@@ -11,9 +13,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Activity>
  *
  * @method Activity|null find($id, $lockMode = null, $lockVersion = null)
- * @method Activity|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Activity|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method Activity[]    findAll()
- * @method Activity[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Activity[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
  */
 final class ActivityRepository extends ServiceEntityRepository
 {
@@ -42,12 +44,12 @@ final class ActivityRepository extends ServiceEntityRepository
 
     public function submissionsCount(Activity $activity): int
     {
-        return $this->createQueryBuilder('a')
+        return intval($this->createQueryBuilder('a')
             ->select('COUNT(*)')
             ->from(Submission::class, 's')
             ->where(['s.activity = :activity'])
             ->setParameter('activity', $activity->getId())
             ->getQuery()
-            ->execute();
+            ->getSingleScalarResult());
     }
 }

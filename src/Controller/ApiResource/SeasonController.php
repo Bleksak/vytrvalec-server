@@ -6,24 +6,23 @@ namespace App\Controller\ApiResource;
 
 use App\Action\SeasonActions;
 use App\CustomLogic\SeasonResultCalculator;
-use App\Dto\SeasonDto;
+use App\Dto\Season\SeasonCreateDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Activity;
 use App\Entity\Faculty;
 use App\Entity\Image;
 use App\Entity\Season;
 use App\Entity\Submission;
-use App\Form\SeasonFormType;
 use App\Repository\SeasonCacheRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Schema\SeasonWithoutSubmissionsSchema;
-use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -45,7 +44,7 @@ final class SeasonController extends AbstractController
             description: 'The new Season',
             required: true,
             content: new OA\JsonContent(
-                ref: new Model(type: SeasonDto::class),
+                ref: new Model(type: SeasonCreateDto::class),
             ),
         ),
         responses: [
@@ -69,18 +68,11 @@ final class SeasonController extends AbstractController
         methods: ['POST'],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function create(Request $request): Response
-    {
-        $form = $this->createForm(SeasonFormType::class);
-
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $id = $this->action->create($form->getData());
+    public function create(
+        #[MapRequestPayload]
+        SeasonCreateDto $dto,
+    ): Response {
+        $id = $this->action->create($dto);
 
         if ($id === -1) {
             return $this->json(['season' => 'season_exists'], Response::HTTP_BAD_REQUEST);
@@ -255,16 +247,30 @@ final class SeasonController extends AbstractController
             'activity',
         ];
 
+        /**
+         * @var array<string, string|int> $queryFilter
+         */
         $queryFilter = [];
         foreach ($queryFilterKeys as $key) {
             $data = $request->get($key, null);
 
-            if ($data !== null) {
+            if ($data !== null && (is_string($data) || is_int($data))) {
                 $queryFilter[$key] = $data;
             }
         }
 
-        $results = $submissionRepository->findBySeasonAndFilter($season, $queryFilter, $request->get('page', 1), 25);
+        $currentPage = $request->get('page', 1);
+
+        if (!is_int($currentPage)) {
+            $currentPage = 1;
+        }
+
+        $results = $submissionRepository->findBySeasonAndFilter(
+            $season,
+            $queryFilter,
+            $currentPage,
+            25
+        );
 
         return $this->json(
             $results,

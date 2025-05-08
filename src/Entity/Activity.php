@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\ActivityRepository;
@@ -38,12 +40,12 @@ class Activity
         $this->minElevation = $minElevation;
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
-        return $this->id;
+        return $this->id ?? 0;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -55,7 +57,7 @@ class Activity
         return $this;
     }
 
-    public function isActive(): ?bool
+    public function isActive(): bool
     {
         return $this->active;
     }
@@ -67,7 +69,7 @@ class Activity
         return $this;
     }
 
-    public function getMinElevation(): ?int
+    public function getMinElevation(): int
     {
         return $this->minElevation;
     }

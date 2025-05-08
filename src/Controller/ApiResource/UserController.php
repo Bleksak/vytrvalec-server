@@ -7,13 +7,12 @@ namespace App\Controller\ApiResource;
 use App\Action\UserActions;
 use App\Dto\EmailingChangeDto;
 use App\Dto\PasswordChangeDto;
-use App\Dto\PasswordChangeRequestDto;
+use App\Dto\User\PasswordResetDto;
+use App\Dto\User\PasswordResetRequestDto;
+use App\Dto\User\UserEditDto;
 use App\Dto\UserDto;
 use App\Entity\User;
-use App\Form\PasswordResetFormType;
-use App\Form\UserEditFormType;
 use App\Repository\UserRepository;
-use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -157,7 +156,7 @@ final class UserController extends AbstractController
             description: 'Contains the e-mail address of the request',
             required: true,
             content: new OA\JsonContent(
-                ref: new Model(type: PasswordChangeRequestDto::class),
+                ref: new Model(type: PasswordResetDto::class),
             ),
         ),
         responses: [
@@ -178,7 +177,7 @@ final class UserController extends AbstractController
     )]
     public function forgottenPasswordRequest(
         #[MapRequestPayload]
-        PasswordChangeRequestDto $passwordChangeRequestDto,
+        PasswordResetRequestDto $dto,
         string $lang = 'cs',
     ): Response {
         $supportedLanguages = ['cs', 'en'];
@@ -186,7 +185,7 @@ final class UserController extends AbstractController
             $lang = 'cs';
         }
 
-        $this->action->forgottenPasswordRequest($passwordChangeRequestDto->email, $lang);
+        $this->action->forgottenPasswordRequest($dto->email, $lang);
 
         return new Response(status: Response::HTTP_OK);
     }
@@ -205,16 +204,11 @@ final class UserController extends AbstractController
         //     ]
         // ]
     )]
-    public function forgottenPasswordReset(Request $request): Response
-    {
-        $form = $this->createForm(PasswordResetFormType::class);
-        $form->submit($request->getPayload()->all());
-
-        if (!$form->isValid()) {
-            return $this->json(FormErrors::collect($form), Response::HTTP_BAD_REQUEST);
-        }
-
-        $errors = $this->action->forgottenPasswordReset($form->getData());
+    public function forgottenPasswordReset(
+        #[MapRequestPayload]
+        PasswordResetDto $dto,
+    ): Response {
+        $errors = $this->action->forgottenPasswordReset($dto);
 
         if (!empty($errors)) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
@@ -369,7 +363,7 @@ final class UserController extends AbstractController
         User $user,
         Request $request,
     ): Response {
-        $gdprValue = $request->getPayload()->get('gdpr', false);
+        $gdprValue = boolval($request->getPayload()->get('gdpr', false));
         $this->action->updateGdpr($user, $gdprValue);
 
         return new Response();
@@ -397,7 +391,7 @@ final class UserController extends AbstractController
     )]
     #[Route('/api/unsubscribe/{unsubscribeHash}', name: 'api_email_unsubscribe', methods: ['GET'])]
     public function unsubscribe(
-        ?string $unsubscribeHash = null,
+        string $unsubscribeHash,
     ): Response {
         if (!$this->action->disableMailing($unsubscribeHash)) {
             return new Response(status: Response::HTTP_NOT_FOUND);
@@ -452,18 +446,12 @@ final class UserController extends AbstractController
         // ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function update(Request $request, ?User $user = null): Response
-    {
-        $form = $this->createForm(UserEditFormType::class);
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $this->action->update($user, $form->getData());
+    public function update(
+        #[MapRequestPayload]
+        UserEditDto $dto,
+        User $user,
+    ): Response {
+        $this->action->update($user, $dto);
 
         return new Response(status: Response::HTTP_OK);
     }

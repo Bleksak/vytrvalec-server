@@ -57,6 +57,11 @@ final class WeeklyElevationExtraPoints implements ExtraPoints
         $query->bindValue(2, true);
         $query->bindValue(3, $season->getId());
 
+        /**
+         * @var array<array{first_name: string, last_name: string, accepted_gdpr: bool|null, activity_id: int, faculty_id: int, value: string}> $result
+         */
+        $result = $query->executeQuery()->fetchAllAssociative();
+
         return array_map(
             static fn ($row) => new ExtraPointsResultDto(
                 new AnonymizedUser(
@@ -68,7 +73,7 @@ final class WeeklyElevationExtraPoints implements ExtraPoints
                 $row['faculty_id'],
                 (int) $row['value'],
             ),
-            $query->executeQuery()->fetchAllAssociative()
+            $result,
         );
     }
 

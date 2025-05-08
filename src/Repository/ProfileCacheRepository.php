@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\ProfileCache;
@@ -12,9 +14,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<ProfileCache>
  *
  * @method ProfileCache|null find($id, $lockMode = null, $lockVersion = null)
- * @method ProfileCache|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ProfileCache|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method ProfileCache[]    findAll()
- * @method ProfileCache[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ProfileCache[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
  */
 final class ProfileCacheRepository extends ServiceEntityRepository
 {

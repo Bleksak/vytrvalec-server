@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Action;
 
-use App\Dto\ActivityDto;
+use App\Dto\Activity\ActivityCreateDto;
+use App\Dto\Activity\ActivityUpdateDto;
 use App\Entity\Activity;
 use App\Repository\ActivityRepository;
 
@@ -13,7 +16,7 @@ final class ActivityActions
     ) {
     }
 
-    public function create(ActivityDto $dto): int
+    public function create(ActivityCreateDto $dto): int
     {
         $activity = new Activity($dto->name, $dto->minElevation);
         $this->activityRepository->save($activity, true);
@@ -21,7 +24,7 @@ final class ActivityActions
         return $activity->getId();
     }
 
-    public function update(Activity $activity, ActivityDto $dto): void
+    public function update(Activity $activity, ActivityUpdateDto $dto): void
     {
         $activity->setName($dto->name ?? $activity->getName());
         $activity->setMinElevation($dto->minElevation ?? $activity->getMinElevation());

@@ -22,7 +22,7 @@ class Submission
     private ?int $id = null;
 
     #[OA\Property(example: true)]
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     #[Groups(['fetchSubmission'])]
     private bool $accepted = false;
 
@@ -71,7 +71,7 @@ class Submission
     private Activity $activity;
 
     #[OA\Property(type: 'date', example: '2025-04-11')]
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Groups(['fetchSubmission'])]
     private \DateTimeInterface $date;
 
@@ -127,24 +127,24 @@ class Submission
         return $this;
     }
 
-    public function getSeason(): ?Season
+    public function getSeason(): Season
     {
         return $this->season;
     }
 
-    public function setSeason(?Season $season): self
+    public function setSeason(Season $season): self
     {
         $this->season = $season;
 
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -199,19 +199,19 @@ class Submission
         return $this;
     }
 
-    public function getActivity(): ?Activity
+    public function getActivity(): Activity
     {
         return $this->activity;
     }
 
-    public function setActivity(?Activity $activity): self
+    public function setActivity(Activity $activity): self
     {
         $this->activity = $activity;
 
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): \DateTimeInterface
     {
         return $this->date;
     }
@@ -226,7 +226,13 @@ class Submission
     public function calculateWeek(): int
     {
         $sub = $this->getDate()->diff($this->getSeason()->getStart());
-        $this->week = intdiv($sub->days, 7);
+        $days = $sub->days;
+
+        if ($days === false) {
+            $days = 0;
+        }
+
+        $this->week = intdiv($days, 7);
 
         return $this->week;
     }

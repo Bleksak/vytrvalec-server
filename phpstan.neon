@@ -1,4 +1,15 @@
 parameters:
-	level: 6
+	level: 9
 	paths:
 		- src
+		- config/
+		- public/
+		# - tests/
+
+	scanDirectories:
+		- var/cache/dev/Symfony/Config
+	symfony:
+		containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+
+	scanFiles:
+		- vendor/symfony/dependency-injection/Loader/Configurator/ContainerConfigurator.php

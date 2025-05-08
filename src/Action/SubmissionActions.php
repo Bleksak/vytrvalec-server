@@ -6,7 +6,7 @@ namespace App\Action;
 
 use App\Dto\Submission\SubmissionCreateDto;
 use App\Dto\Submission\SubmissionEditDto;
-use App\Dto\SubmissionStateDto;
+use App\Dto\Submission\SubmissionStateDto;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;

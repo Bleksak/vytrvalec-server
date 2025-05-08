@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Action;
 
-use App\Dto\SeasonDto;
+use App\Dto\Season\SeasonCreateDto;
 use App\Entity\Season;
 use App\Messages\SeasonEndMessage;
 use App\Messages\SeasonStartMessage;
@@ -19,7 +21,7 @@ final class SeasonActions
     ) {
     }
 
-    public function create(SeasonDto $seasonDto): int
+    public function create(SeasonCreateDto $seasonDto): int
     {
         $existingSeason = $this->seasonRepository->findByStartMonth($seasonDto->start);
 

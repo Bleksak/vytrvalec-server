@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Season;
@@ -10,9 +12,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Season>
  *
  * @method Season|null find($id, $lockMode = null, $lockVersion = null)
- * @method Season|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Season|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method Season[]    findAll()
- * @method Season[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Season[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
  */
 final class SeasonRepository extends ServiceEntityRepository
 {
@@ -89,7 +91,7 @@ final class SeasonRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByStartMonth(?\DateTime $dateTime): ?Season
+    public function findByStartMonth(\DateTime $dateTime): ?Season
     {
         $startDate = new \DateTimeImmutable($dateTime->format('Y-m-01'));
         $endDate = new \DateTimeImmutable($dateTime->format('Y-m-t'));

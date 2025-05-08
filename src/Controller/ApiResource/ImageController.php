@@ -59,6 +59,7 @@ final class ImageController extends AbstractController
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
+        // @phpstan-ignore-next-line
         $image = $this->imageUploader->uploadImage($form->getData()->image);
 
         if ($image === null) {

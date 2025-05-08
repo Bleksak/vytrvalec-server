@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Dto\SeasonResultDto;
@@ -16,7 +18,7 @@ class Cache
     #[ORM\JoinColumn(nullable: false)]
     private Season $season;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP')]
     private \DateTimeInterface $createdAt;
 
     #[ORM\Column(type: SeasonResultType::NAME)]

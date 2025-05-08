@@ -21,9 +21,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Submission>
  *
  * @method Submission|null find($id, $lockMode = null, $lockVersion = null)
- * @method Submission|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Submission|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method Submission[]    findAll()
- * @method Submission[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Submission[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
  */
 final class SubmissionRepository extends ServiceEntityRepository
 {
@@ -53,8 +53,11 @@ final class SubmissionRepository extends ServiceEntityRepository
     /**
      * @return Paginator<Submission>
      */
-    public function findAllByUser(User $user, int $page, int $limit): Paginator
-    {
+    public function findAllByUser(
+        User $user,
+        int $page,
+        int $limit,
+    ): Paginator {
         $query = $this
             ->createQueryBuilder('s')
             ->select('s')
@@ -63,6 +66,9 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->addOrderBy('s.date', 'DESC')
             ->setParameter('userId', $user->getId());
 
+        /**
+         * @var Paginator<Submission>
+         */
         $paginator = new Paginator($query);
         $paginator
             ->getQuery()
@@ -86,6 +92,9 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->orderBy('s.date', 'DESC')
             ->setParameter('seasonId', $season->getId());
 
+        /**
+         * @var Paginator<Submission>
+         */
         $paginator = new Paginator($query);
         $paginator
             ->getQuery()
@@ -130,6 +139,9 @@ final class SubmissionRepository extends ServiceEntityRepository
             INNER JOIN activity a ON a.id = sub.activity_id;
         ');
 
+        /**
+         * @var array<array{activity: string, distance: string}> $data
+         */
         $data = $query->executeQuery()->fetchAllAssociative();
 
         return array_map(
@@ -142,7 +154,7 @@ final class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param array<string,string> $filter
+     * @param array<string,string|int> $filter
      *
      * @return Paginator<Submission>
      */
@@ -195,6 +207,9 @@ final class SubmissionRepository extends ServiceEntityRepository
             };
         }
 
+        /**
+         * @var Paginator<Submission>
+         */
         $paginator = new Paginator($queryBuilder->getQuery());
 
         return $paginator;
@@ -260,6 +275,9 @@ final class SubmissionRepository extends ServiceEntityRepository
         $query->bindValue(1, true);
         $query->bindValue(2, $season->getId());
 
+        /**
+         * @var array<array{activity_id: int, accepted_gdpr: bool, first_name: string, last_name: string, faculty_id: int, value: string}> $result
+         */
         $result = $query->executeQuery()->fetchAllAssociative();
 
         $activities = [];
@@ -296,19 +314,14 @@ final class SubmissionRepository extends ServiceEntityRepository
 
     public function sumCountUserGroupedByFaculties(): int
     {
-        $queryBuilder = $this->createQueryBuilder('s');
+        $innerQuery = $this->createQueryBuilder('s')
+            ->select('count(distinct s.user) as count')
+            ->where('s.accepted = 1')
+            ->groupBy('s.season')
+            ->getQuery()
+            ->getScalarResult();
 
-        $sql = '
-            select sum(count) as count
-            from (
-                SELECT count(distinct s.user_id) as count
-                from submission s
-                where s.accepted = 1
-                group by s.season_id
-            ) subquery;
-        ';
-
-        return (int) $this->getEntityManager()->getConnection()->prepare($sql)->executeQuery()->fetchOne();
+        return array_sum(array_column($innerQuery, 'count'));
     }
 
     /**

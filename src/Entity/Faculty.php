@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\FacultyRepository;
@@ -20,20 +22,20 @@ class Faculty
     #[OA\Property(example: 'Fakulta aplikovaných věd')]
     #[ORM\Column(length: 255)]
     #[Groups(['fetchSubmission', 'fetchFacultySummary', 'fetchSeasonResult', 'fetchUser'])]
-    private ?string $name = null;
+    private string $name;
 
     #[OA\Property(example: 'FAV')]
     #[ORM\Column(length: 10)]
     #[Groups(['fetchSubmission', 'fetchFacultySummary', 'fetchSeasonResult', 'fetchUser'])]
-    private ?string $shortcut = null;
+    private string $shortcut;
 
     #[OA\Parameter(example: true)]
     #[ORM\Column]
     #[Groups(['fetchSubmission'])]
-    private ?bool $visible = null;
+    private bool $visible;
 
     #[ORM\ManyToOne(targetEntity: self::class)]
-    private ?self $parent = null;
+    private ?Faculty $parent = null;
 
     public function __construct(
         string $name,
@@ -45,12 +47,12 @@ class Faculty
         $this->visible = $visible;
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
-        return $this->id;
+        return $this->id ?? 0;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -62,7 +64,7 @@ class Faculty
         return $this;
     }
 
-    public function getShortcut(): ?string
+    public function getShortcut(): string
     {
         return $this->shortcut;
     }
@@ -74,7 +76,7 @@ class Faculty
         return $this;
     }
 
-    public function isVisible(): ?bool
+    public function isVisible(): bool
     {
         return $this->visible;
     }
@@ -91,7 +93,7 @@ class Faculty
         return $this->parent;
     }
 
-    public function setParent(?self $parent): static
+    public function setParent(?Faculty $parent): static
     {
         $this->parent = $parent;
 

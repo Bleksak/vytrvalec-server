@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\ExtraPointsRepository;
@@ -17,18 +19,21 @@ class ExtraPoints
 
     #[ORM\Column(length: 255)]
     #[Groups(['fetchSeasonResult'])]
-    private ?string $name = null;
+    private string $name;
 
     #[ORM\Column]
     #[Groups(['fetchSeasonResult'])]
-    private ?int $points = null;
+    private int $points;
 
     #[ORM\Column]
     #[Groups(['fetchSeasonResult'])]
-    private ?int $week = null;
+    private int $week;
 
-    public function __construct(string $name, int $points, int $week)
-    {
+    public function __construct(
+        string $name,
+        int $points,
+        int $week,
+    ) {
         $this->name = $name;
         $this->points = $points;
         $this->week = $week;

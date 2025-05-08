@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\Charity;
@@ -12,11 +14,22 @@ final class SeasonFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $start = \DateTimeImmutable::createFromFormat('Y-m-d', '2020-10-01');
+
+        if (!$start) {
+            return;
+        }
+
         $end = $start->add(new \DateInterval('P4W'));
+
         $oct2020 = new Season($start, $end, $this->getReference('anickaJirik', Charity::class));
 
         $start = \DateTimeImmutable::createFromFormat('Y-m-d', '2021-10-01');
+        if (!$start) {
+            return;
+        }
+
         $end = $start->add(new \DateInterval('P4W'));
+
         $oct2021 = new Season($start, $end, $this->getReference('davidGolias', Charity::class));
 
         $manager->persist($oct2020);

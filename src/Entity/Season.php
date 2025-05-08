@@ -29,19 +29,19 @@ class Season
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
-    private ?\DateTimeInterface $start = null;
+    private \DateTimeInterface $start;
 
     #[OA\Property(example: '2025-05-01')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
-    private ?\DateTimeInterface $end = null;
+    private \DateTimeInterface $end;
 
     #[OA\Property]
     #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchFacultySummary', 'fetchSeasonResult'])]
-    private ?Charity $charity = null;
+    private Charity $charity;
 
     /**
      * @var Collection<int, Submission>
@@ -57,12 +57,12 @@ class Season
         $this->charity = $charity;
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
-        return $this->id;
+        return $this->id ?? 0;
     }
 
-    public function getStart(): ?\DateTimeInterface
+    public function getStart(): \DateTimeInterface
     {
         return $this->start;
     }
@@ -74,7 +74,7 @@ class Season
         return $this;
     }
 
-    public function getEnd(): ?\DateTimeInterface
+    public function getEnd(): \DateTimeInterface
     {
         return $this->end;
     }
@@ -86,7 +86,7 @@ class Season
         return $this;
     }
 
-    public function getCharity(): ?Charity
+    public function getCharity(): Charity
     {
         return $this->charity;
     }
@@ -118,12 +118,7 @@ class Season
 
     public function removeSubmission(Submission $submission): self
     {
-        if ($this->submissions->removeElement($submission)) {
-            // set the owning side to null (unless already changed)
-            if ($submission->getSeason() === $this) {
-                $submission->setSeason(null);
-            }
-        }
+        $this->submissions->removeElement($submission);
 
         return $this;
     }

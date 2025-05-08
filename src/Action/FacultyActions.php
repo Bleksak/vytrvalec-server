@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Action;
 
-use App\Dto\FacultyDto;
+use App\Dto\Faculty\FacultyCreateDto;
+use App\Dto\Faculty\FacultyUpdateDto;
 use App\Entity\Faculty;
 use App\Repository\FacultyRepository;
 use App\Utils\Property;
@@ -16,7 +17,7 @@ final class FacultyActions
     ) {
     }
 
-    public function create(FacultyDto $dto): int
+    public function create(FacultyCreateDto $dto): int
     {
         $faculty = new Faculty($dto->name, $dto->shortcut, $dto->visible);
         $this->facultyRepository->save($faculty, true);
@@ -27,7 +28,7 @@ final class FacultyActions
     /**
      * @return array<string>
      */
-    public function update(Faculty $faculty, FacultyDto $dto): array
+    public function update(Faculty $faculty, FacultyUpdateDto $dto): array
     {
         $faculty->setName($dto->name ?? $faculty->getName());
         $faculty->setShortcut($dto->shortcut ?? $faculty->getShortcut());

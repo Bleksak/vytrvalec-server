@@ -24,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(length: 180, unique: true, nullable: true)]
     #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?string $email = null;
 
@@ -37,33 +37,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [];
 
     #[ORM\Column]
-    private ?string $password = null;
+    private string $password;
 
     #[ORM\Column]
     #[Groups(['fetchSubmission', 'fetchUser'])]
-    private ?bool $banned = false;
+    private bool $banned = false;
 
     #[ORM\Column]
-    private ?bool $mailing = true;
+    private bool $mailing = true;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['fetchSubmission', 'fetchUser'])]
-    private ?string $firstName = null;
+    private string $firstName;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['fetchSubmission', 'fetchUser'])]
-    private ?string $lastName = null;
+    private string $lastName;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'], fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['fetchSubmission', 'fetchUser'])]
-    private ?Faculty $faculty = null;
+    private Faculty $faculty;
 
     /**
      * @var Collection<int, Submission>
      */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class, orphanRemoval: true)]
-    private ?Collection $submissions;
+    private Collection $submissions;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $token = null;
@@ -77,10 +77,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $passwordResetToken = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?bool $acceptedGdpr = false;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $emailUnsubscribeHash = null;
 
     /**
@@ -144,7 +144,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        // @phpstan-ignore-next-line
+        return $this->email ?? 'null';
     }
 
     /**

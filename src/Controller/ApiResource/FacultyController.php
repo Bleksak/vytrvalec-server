@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\ApiResource;
 
 use App\Action\FacultyActions;
+use App\Dto\Faculty\FacultyCreateDto;
+use App\Dto\Faculty\FacultyUpdateDto;
 use App\Dto\FacultyDto;
 use App\Entity\Faculty;
-use App\Form\FacultyFormType;
 use App\Repository\FacultyRepository;
-use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
@@ -35,7 +36,7 @@ final class FacultyController extends AbstractController
             description: 'The new faculty',
             required: true,
             content: new OA\JsonContent(
-                ref: new Model(type: FacultyDto::class),
+                ref: new Model(type: FacultyCreateDto::class),
             ),
         ),
         responses: [
@@ -67,18 +68,11 @@ final class FacultyController extends AbstractController
         methods: ['POST'],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function create(Request $request): Response
-    {
-        $form = $this->createForm(FacultyFormType::class);
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $id = $this->action->create($form->getData());
+    public function create(
+        #[MapRequestPayload]
+        FacultyCreateDto $dto,
+    ): Response {
+        $id = $this->action->create($dto);
 
         return $this->json(['id' => $id], Response::HTTP_CREATED);
     }
@@ -96,7 +90,7 @@ final class FacultyController extends AbstractController
             description: 'The updated Faculty',
             required: true,
             content: new OA\JsonContent(
-                ref: new Model(type: FacultyDto::class),
+                ref: new Model(type: FacultyUpdateDto::class),
             ),
         ),
         responses: [
@@ -131,7 +125,7 @@ final class FacultyController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function updatePatch(
         #[MapRequestPayload]
-        FacultyDto $facultyDto,
+        FacultyUpdateDto $facultyDto,
         Faculty $faculty,
     ): Response {
         $errors = $this->action->update($faculty, $facultyDto);

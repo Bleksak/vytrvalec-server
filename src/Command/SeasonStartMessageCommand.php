@@ -47,7 +47,11 @@ final class SeasonStartMessageCommand extends Command
             return -1;
         }
 
-        $seasonId = (int) $seasonId;
+        if (!is_string($seasonId) && !is_int($seasonId)) {
+            return -1;
+        }
+
+        $seasonId = intval($seasonId);
 
         $this->messageBus->dispatch(
             new SeasonStartMessage($seasonId)

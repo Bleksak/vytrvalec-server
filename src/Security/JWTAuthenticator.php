@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Security;
 
 use App\Entity\User;
@@ -30,14 +32,16 @@ final class JWTAuthenticator extends AbstractAuthenticator
     ) {
     }
 
-    public function supports(Request $request): ?bool
-    {
+    public function supports(
+        Request $request,
+    ): bool {
         // if using isGranted properly, this is not a vulnerability
         return $request->headers->has('Authorization') && $request->get('_route') !== 'api_user_login';
     }
 
-    private function getHeaderToken(Request $request): ?string
-    {
+    private function getHeaderToken(
+        Request $request,
+    ): ?string {
         $authorization = $request->headers->get('Authorization', null);
 
         if ($authorization === null) {
@@ -61,8 +65,9 @@ final class JWTAuthenticator extends AbstractAuthenticator
         return $token;
     }
 
-    public function authenticate(Request $request): Passport
-    {
+    public function authenticate(
+        Request $request,
+    ): Passport {
         $jwt = $this->getHeaderToken($request) ?? $request->cookies->get('jwt');
 
         if ($jwt === null) {
@@ -89,13 +94,18 @@ final class JWTAuthenticator extends AbstractAuthenticator
         }
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
+    public function onAuthenticationSuccess(
+        Request $request,
+        TokenInterface $token,
+        string $firewallName,
+    ): ?Response {
         return null;
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-    {
+    public function onAuthenticationFailure(
+        Request $request,
+        AuthenticationException $exception,
+    ): ?Response {
         return null;
         //        return new JsonResponse([
         //            'success' => false,

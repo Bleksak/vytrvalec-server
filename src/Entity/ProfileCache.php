@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\ProfileCacheRepository;
@@ -13,21 +15,21 @@ class ProfileCache
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'profileCaches')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user;
+    private User $user;
 
     #[OA\Property]
     #[ORM\Id]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Activity $activity;
+    private Activity $activity;
 
     #[OA\Property]
     #[ORM\Column]
-    private ?int $distance = 0;
+    private int $distance = 0;
 
     #[OA\Property]
     #[ORM\Column]
-    private ?int $elevation = 0;
+    private int $elevation = 0;
 
     public function __construct(
         User $user,
@@ -37,12 +39,12 @@ class ProfileCache
         $this->activity = $activity;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
 
-    public function getActivity(): ?Activity
+    public function getActivity(): Activity
     {
         return $this->activity;
     }
@@ -67,7 +69,7 @@ class ProfileCache
         return $this;
     }
 
-    public function getDistance(): ?int
+    public function getDistance(): int
     {
         return $this->distance;
     }
@@ -79,7 +81,7 @@ class ProfileCache
         return $this;
     }
 
-    public function getElevation(): ?int
+    public function getElevation(): int
     {
         return $this->elevation;
     }

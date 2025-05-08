@@ -22,12 +22,12 @@ class Charity
     #[OA\Property]
     #[ORM\Column(length: 255)]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
-    private ?string $name = null;
+    private string $name;
 
     #[OA\Property]
     #[ORM\Column(length: 10000)]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
-    private ?string $description = null;
+    private string $description;
 
     #[OA\Property]
     #[ORM\ManyToOne(fetch: 'EAGER')]
@@ -36,7 +36,7 @@ class Charity
     private ?Image $image = null;
 
     #[OA\Property]
-    #[ORM\Column(length: 512)]
+    #[ORM\Column(length: 512, nullable: true)]
     #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
     private ?string $website = null;
 
@@ -52,12 +52,12 @@ class Charity
         $this->website = $website;
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
-        return $this->id;
+        return $this->id ?? 0;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -69,7 +69,7 @@ class Charity
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -98,7 +98,7 @@ class Charity
         return $this->website;
     }
 
-    public function setWebsite(string $website): self
+    public function setWebsite(?string $website): self
     {
         $this->website = $website;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Security;
 
 use App\Entity\User;
@@ -37,13 +39,15 @@ final class LoginAuthenticator extends AbstractAuthenticator
     ) {
     }
 
-    public function supports(Request $request): ?bool
-    {
+    public function supports(
+        Request $request,
+    ): bool {
         return $request->get('_route') === 'api_user_login' && $request->isMethod('POST');
     }
 
-    public function authenticate(Request $request): Passport
-    {
+    public function authenticate(
+        Request $request,
+    ): Passport {
         $email = $request->getPayload()->get('email');
         $password = $request->getPayload()->get('password');
 
@@ -52,10 +56,10 @@ final class LoginAuthenticator extends AbstractAuthenticator
         }
 
         return new SelfValidatingPassport(
-            new UserBadge($email, function ($email) use ($password) {
+            new UserBadge((string) $email, function ($email) use ($password) {
                 $user = $this->userProvider->loadUserByIdentifier($email);
 
-                if (!$this->hasher->isPasswordValid($user, $password)) {
+                if (!$this->hasher->isPasswordValid($user, (string) $password)) {
                     throw new UserNotFoundException();
                 }
 
@@ -64,8 +68,11 @@ final class LoginAuthenticator extends AbstractAuthenticator
         );
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
+    public function onAuthenticationSuccess(
+        Request $request,
+        TokenInterface $token,
+        string $firewallName,
+    ): Response {
         $expirationTime = time() + 10 * 365 * 24 * 60 * 60; // 10 years expiration
 
         /**
@@ -96,15 +103,17 @@ final class LoginAuthenticator extends AbstractAuthenticator
         $user = $token->getUser();
 
         if ($firebaseToken !== null && $user instanceof User) {
-            $user->setToken($firebaseToken);
+            $user->setToken((string) $firebaseToken);
             $this->userRepository->save($user, true);
         }
 
         return $response;
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-    {
+    public function onAuthenticationFailure(
+        Request $request,
+        AuthenticationException $exception,
+    ): Response {
         return new JsonResponse([
             'auth' => ['invalid_credentials'],
         ], Response::HTTP_BAD_REQUEST);

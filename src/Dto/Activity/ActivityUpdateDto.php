@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Dto;
+declare(strict_types=1);
+
+namespace App\Dto\Activity;
 
 use OpenApi\Attributes as OA;
 
-final class ActivityDto
+final class ActivityUpdateDto
 {
     #[OA\Property(example: 'Běh a chůze')]
     public ?string $name;

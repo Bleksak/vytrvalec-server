@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\ExtraPoints;
@@ -10,9 +12,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<ExtraPoints>
  *
  * @method ExtraPoints|null find($id, $lockMode = null, $lockVersion = null)
- * @method ExtraPoints|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ExtraPoints|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method ExtraPoints[]    findAll()
- * @method ExtraPoints[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ExtraPoints[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
  */
 final class ExtraPointsRepository extends ServiceEntityRepository
 {

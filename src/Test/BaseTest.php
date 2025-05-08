@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Test;
 
 use App\Entity\Charity;
@@ -39,11 +41,16 @@ final class BaseTest extends WebTestCase
 
     protected function getEntityManager(): EntityManagerInterface
     {
-        return $this->client->getContainer()->get(EntityManagerInterface::class);
+        /**
+         * @var EntityManagerInterface $em
+         */
+        $em = $this->client->getContainer()->get(EntityManagerInterface::class);
+
+        return $em;
     }
 
     /**
-     * @param array<int,mixed> $roles
+     * @param array<string> $roles
      */
     protected function createUser(string $email, string $password, array $roles = []): void
     {
@@ -56,7 +63,7 @@ final class BaseTest extends WebTestCase
             'password' => $password,
             'first_name' => 'string',
             'last_name' => 'string',
-            'faculty' => $faculty->getId(),
+            'faculty' => $faculty?->getId(),
             'gdpr' => true,
         ]);
 
@@ -64,9 +71,11 @@ final class BaseTest extends WebTestCase
             $user = $this->getEntityManager()
                 ->getRepository(User::class)
                 ->findOneBy(['email' => $email]);
-            $user->setRoles($roles);
+            $user?->setRoles($roles);
 
-            $this->getEntityManager()->persist($user);
+            if ($user) {
+                $this->getEntityManager()->persist($user);
+            }
             $this->getEntityManager()->flush();
         }
     }
@@ -113,7 +122,7 @@ final class BaseTest extends WebTestCase
         $this->client->jsonRequest('POST', '/api/season', [
             'start' => $now->format('Y-m-d'),
             'end' => $end->format('Y-m-d'),
-            'charity' => $charity->getId(),
+            'charity' => $charity?->getId(),
         ]);
     }
 
@@ -126,7 +135,7 @@ final class BaseTest extends WebTestCase
         self::getApplication()->run(new StringInput($command));
     }
 
-    protected static function getApplication(): ?Application
+    protected static function getApplication(): Application
     {
         if (self::$application === null) {
             self::$application = new Application(self::createKernel([]));

@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\ApiResource;
 
 use App\Action\ActivityActions;
+use App\Dto\Activity\ActivityCreateDto;
+use App\Dto\Activity\ActivityUpdateDto;
 use App\Dto\ActivityDto;
 use App\Entity\Activity;
-use App\Form\ActivityFormType;
 use App\Repository\ActivityRepository;
-use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -33,7 +35,7 @@ final class ActivityController extends AbstractController
             description: 'The new Activity',
             required: true,
             content: new OA\JsonContent(
-                ref: new Model(type: ActivityDto::class)
+                ref: new Model(type: ActivityCreateDto::class)
             )
         ),
         responses: [
@@ -57,18 +59,11 @@ final class ActivityController extends AbstractController
         methods: ['POST'],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function create(Request $request): Response
-    {
-        $form = $this->createForm(ActivityFormType::class);
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $id = $this->action->create($form->getData());
+    public function create(
+        #[MapRequestPayload]
+        ActivityCreateDto $dto,
+    ): Response {
+        $id = $this->action->create($dto);
 
         return $this->json(['id' => $id], Response::HTTP_OK);
     }
@@ -127,13 +122,13 @@ final class ActivityController extends AbstractController
             description: 'The updated activity',
             required: true,
             content: new OA\JsonContent(
-                ref: new Model(type: ActivityDto::class)
+                ref: new Model(type: ActivityUpdateDto::class)
             )
         ),
         responses: [
             new OA\Response(
                 response: Response::HTTP_OK,
-                description: 'Activity deleted',
+                description: 'Activity updated',
             ),
             new OA\Response(
                 response: Response::HTTP_FORBIDDEN,
@@ -143,7 +138,7 @@ final class ActivityController extends AbstractController
                 response: Response::HTTP_BAD_REQUEST,
                 description: 'Bad request',
             ),
-        ]
+        ],
     )]
     #[Route(
         '/api/activity/{activity}',
@@ -151,21 +146,12 @@ final class ActivityController extends AbstractController
         methods: ['PATCH'],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function updatePatch(Request $request, Activity $activity): Response
-    {
-        $form = $this->createForm(ActivityFormType::class, null, [
-            'method' => $request->getMethod(),
-        ]);
-
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $this->action->update($activity, $form->getData());
+    public function updatePatch(
+        #[MapRequestPayload]
+        ActivityUpdateDto $dto,
+        Activity $activity,
+    ): Response {
+        $this->action->update($activity, $dto);
 
         return new Response(status: Response::HTTP_OK);
     }
