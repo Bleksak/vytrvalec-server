@@ -10,11 +10,11 @@ use App\Entity\Charity;
 use App\Repository\CharityRepository;
 use App\Repository\ImageRepository;
 
-final class CharityActions
+final readonly class CharityActions
 {
     public function __construct(
-        private readonly CharityRepository $charityRepository,
-        private readonly ImageRepository $imageRepository,
+        private CharityRepository $charityRepository,
+        private ImageRepository $imageRepository,
     ) {
     }
 
@@ -61,7 +61,7 @@ final class CharityActions
     {
         $seasons = $this->charityRepository->findSeasonsByCharity($charity);
 
-        if (!empty($seasons)) {
+        if (count($seasons) !== 0) {
             return false;
         }
 

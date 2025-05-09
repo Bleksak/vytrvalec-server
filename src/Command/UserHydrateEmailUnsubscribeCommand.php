@@ -24,10 +24,7 @@ final class UserHydrateEmailUnsubscribeCommand extends Command
         parent::__construct();
     }
 
-    protected function configure(): void
-    {
-    }
-
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         foreach ($this->userRepository->findAll() as $user) {

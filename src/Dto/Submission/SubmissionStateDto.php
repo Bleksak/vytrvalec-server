@@ -11,7 +11,7 @@ final class SubmissionStateDto
 {
     #[OA\Property]
     #[Assert\NotBlank(message: 'blank', allowNull: false)]
-    public ?\DateTimeImmutable $updatedAt = null;
+    public ?\DateTime $updatedAt = null;
 
     #[OA\Property]
     #[Assert\NotBlank(message: 'blank', allowNull: false)]

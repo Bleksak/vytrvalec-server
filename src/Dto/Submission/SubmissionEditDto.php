@@ -25,5 +25,5 @@ final class SubmissionEditDto
     public ?int $activityId = null;
 
     #[Assert\NotBlank(message: 'blank', allowNull: false)]
-    public \DateTimeImmutable $updatedAt;
+    public \DateTime $updatedAt;
 }

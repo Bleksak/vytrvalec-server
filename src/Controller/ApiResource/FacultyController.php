@@ -129,7 +129,7 @@ final class FacultyController extends AbstractController
     ): Response {
         $errors = $this->action->update($faculty, $facultyDto);
 
-        if (!empty($errors)) {
+        if (count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -192,7 +192,7 @@ final class FacultyController extends AbstractController
             null,
             [
                 AbstractNormalizer::CALLBACKS => [
-                    'parent' => fn (?Faculty $faculty) => $faculty?->getId(),
+                    'parent' => fn (?Faculty $faculty): ?int => $faculty?->getId(),
                 ],
             ]
         );

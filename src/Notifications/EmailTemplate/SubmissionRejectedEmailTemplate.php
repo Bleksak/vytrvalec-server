@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Notifications\EmailTemplate;
 
 use App\Entity\Submission;
-use App\Notifications\EmailTemplate;
+use App\Notifications\AbstractEmailTemplate;
 
-final class SubmissionRejectedEmailTemplate extends EmailTemplate
+final class SubmissionRejectedEmailTemplate extends AbstractEmailTemplate
 {
     public function __construct(Submission $submission, string $message)
     {
@@ -17,11 +17,13 @@ final class SubmissionRejectedEmailTemplate extends EmailTemplate
         ]);
     }
 
+    #[\Override]
     public function getSubject(): string
     {
         return 'Měsíční Vytrvalec - Zamítnutí příspěvku';
     }
 
+    #[\Override]
     public function getTemplate(): string
     {
         return 'emails/submission_rejected.twig';

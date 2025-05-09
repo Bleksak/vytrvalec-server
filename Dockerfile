@@ -6,4 +6,4 @@ WORKDIR /app
 COPY . .
 
 RUN npm install && npm run build
-RUN composer install --no-interaction && composer dump
+RUN composer install --no-interaction && composer dump -o

@@ -47,9 +47,7 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
         }
     }
 
-    /**
-     * Used to upgrade (rehash) the user's password automatically over time.
-     */
+    #[\Override]
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         if (!$user instanceof User) {
@@ -89,7 +87,7 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
             ->getResult();
 
         return array_map(
-            fn ($row) => new UserCountByFacultyStatistics($row['id'], $row['count']),
+            fn (array $row): UserCountByFacultyStatistics => new UserCountByFacultyStatistics($row['id'], $row['count']),
             $rows,
         );
     }
@@ -101,7 +99,7 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
      */
     public function findByIds(array $ids): array
     {
-        if (empty($ids)) {
+        if (count($ids) === 0) {
             return [];
         }
 
@@ -118,7 +116,7 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
 
         usort(
             $results,
-            fn ($a, $b) => $orderMap[$a->getId()] <=> $orderMap[$b->getId()]
+            fn (User $a, User $b): int => $orderMap[$a->getId()] <=> $orderMap[$b->getId()]
         );
 
         return $results;

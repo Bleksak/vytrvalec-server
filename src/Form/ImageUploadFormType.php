@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 final class ImageUploadFormType extends AbstractType
 {
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -28,6 +29,7 @@ final class ImageUploadFormType extends AbstractType
         ;
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

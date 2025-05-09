@@ -10,11 +10,11 @@ use App\Entity\Season;
 use App\Repository\SubmissionRepository;
 use App\Repository\UserRepository;
 
-final class StatisticsActions
+final readonly class StatisticsActions
 {
     public function __construct(
-        private readonly SubmissionRepository $submissionRepository,
-        private readonly UserRepository $userRepository,
+        private SubmissionRepository $submissionRepository,
+        private UserRepository $userRepository,
     ) {
     }
 

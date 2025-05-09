@@ -41,7 +41,7 @@ final readonly class UserActions
             return ['faculty' => ['invalid']];
         }
 
-        $user = new User($dto->email, $dto->firstName, $dto->lastName, $faculty, $dto->gdpr);
+        $user = new User($dto->email, $dto->firstName, $dto->lastName, $faculty, $dto->anonymize);
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
 
         try {
@@ -84,7 +84,7 @@ final readonly class UserActions
             $user->setBanned($dto->banned);
         }
 
-        if ($dto->roles !== null && !empty($dto->roles)) {
+        if ($dto->roles !== null && count($dto->roles) !== 0) {
             $user->setRoles($dto->roles);
         }
 
@@ -151,9 +151,9 @@ final readonly class UserActions
         return [];
     }
 
-    public function updateGdpr(User $user, bool $gdprValue): void
+    public function updateAnonymization(User $user, bool $anonymize): void
     {
-        $user->setAcceptedGdpr($gdprValue);
+        $user->setAnonymization($anonymize);
         $this->userRepository->save($user, true);
     }
 
@@ -180,11 +180,12 @@ final readonly class UserActions
 
         $user->setMailing($dto->mailing);
 
-        $user->setEmailUnsubscribeHash(
-            $user->hasMailing()
-                ? bin2hex(random_bytes(90))
-                : null
-        );
+        $unsubscribeHash = null;
+        if ($user->hasMailing()) {
+            $unsubscribeHash = bin2hex(random_bytes(90));
+        }
+
+        $user->setEmailUnsubscribeHash($unsubscribeHash);
 
         $this->userRepository->save($user, true);
     }

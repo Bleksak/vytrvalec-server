@@ -76,12 +76,9 @@ class Submission
     private \DateTimeInterface $date;
 
     #[OA\Property(type: 'datetime', example: 1)]
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', updatable: false, insertable: false, generated: 'ALWAYS')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', updatable: false, insertable: false, generated: 'ALWAYS')]
     #[Groups(['fetchSubmission'])]
-    /**
-     * @phpstan-ignore-next-line
-     */
-    private \DateTimeInterface $updatedAt;
+    private \DateTime $updatedAt;
 
     #[OA\Property(example: 'Dobrej vykon lil bro')]
     #[ORM\Column(length: 512)]
@@ -261,7 +258,7 @@ class Submission
         return $this;
     }
 
-    public function getUpdatedAt(): \DateTimeInterface
+    public function getUpdatedAt(): \DateTime
     {
         return $this->updatedAt;
     }

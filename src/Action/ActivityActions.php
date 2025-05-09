@@ -9,10 +9,10 @@ use App\Dto\Activity\ActivityUpdateDto;
 use App\Entity\Activity;
 use App\Repository\ActivityRepository;
 
-final class ActivityActions
+final readonly class ActivityActions
 {
     public function __construct(
-        private readonly ActivityRepository $activityRepository,
+        private ActivityRepository $activityRepository,
     ) {
     }
 

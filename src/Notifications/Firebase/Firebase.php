@@ -8,15 +8,16 @@ use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Messaging\MessageData;
 use Kreait\Firebase\Messaging\Notification;
 
-final class Firebase
+final readonly class Firebase
 {
     public function __construct(
-        private readonly Messaging $messaging,
+        private Messaging $messaging,
     ) {
     }
 
-    public function send(FirebaseNotification $notification): void
-    {
+    public function send(
+        AbstractFirebaseNotification $notification,
+    ): bool {
         try {
             // @phpstan-ignore-next-line
             $this->messaging->send([
@@ -33,7 +34,9 @@ final class Firebase
                 // 'fcm_options' => null, // ?: FcmOptions|FcmOptionsShape
             ], false);
         } catch (\Throwable $e) {
-            // dd($e);
+            return false;
         }
+
+        return true;
     }
 }

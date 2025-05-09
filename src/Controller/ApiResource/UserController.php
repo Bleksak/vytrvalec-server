@@ -136,11 +136,7 @@ final class UserController extends AbstractController
     )]
     public function currentUserData(#[CurrentUser] User $currentUser): Response
     {
-        $filtered = $this->normalizer->normalize($currentUser, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'user'],
-        ]);
-
-        return $this->json($filtered);
+        return $this->json($currentUser->toResponseObject());
     }
 
     #[OA\Get(
@@ -210,7 +206,7 @@ final class UserController extends AbstractController
     ): Response {
         $errors = $this->action->forgottenPasswordReset($dto);
 
-        if (!empty($errors)) {
+        if (count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -313,7 +309,7 @@ final class UserController extends AbstractController
 
         $errors = $this->action->create($dto);
 
-        if (!empty($errors)) {
+        if (count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -347,7 +343,7 @@ final class UserController extends AbstractController
     ): Response {
         $errors = $this->action->updatePassword($currentUser, $dto);
 
-        if (!empty($errors)) {
+        if (count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -355,16 +351,16 @@ final class UserController extends AbstractController
     }
 
     #[Route(
-        '/api/user/gdpr',
+        '/api/user/anonymize',
         methods: ['POST'],
     )]
-    public function setAccountGdpr(
+    public function setAccountAnonymization(
         #[CurrentUser]
         User $user,
         Request $request,
     ): Response {
-        $gdprValue = boolval($request->getPayload()->get('gdpr', false));
-        $this->action->updateGdpr($user, $gdprValue);
+        $anonymizeValue = boolval($request->getPayload()->get('anonymize', false));
+        $this->action->updateAnonymization($user, $anonymizeValue);
 
         return new Response();
     }

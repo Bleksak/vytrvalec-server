@@ -11,6 +11,7 @@ use Doctrine\Persistence\ObjectManager;
 
 final class SeasonFixtures extends Fixture
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $start = \DateTimeImmutable::createFromFormat('Y-m-d', '2020-10-01');

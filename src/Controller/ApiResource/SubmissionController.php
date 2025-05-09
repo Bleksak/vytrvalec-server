@@ -95,7 +95,7 @@ final class SubmissionController extends AbstractController
 
         $errors = $this->action->create($submissionCreateDto, $user, $season);
 
-        if (!empty($errors)) {
+        if (count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -139,10 +139,10 @@ final class SubmissionController extends AbstractController
                 [
                     AbstractNormalizer::GROUPS => ['fetchSubmission'],
                     AbstractNormalizer::CALLBACKS => [
-                        'season' => fn (Season $object) => $object->getId(),
-                        'activity' => fn (Activity $object) => $object->getId(),
-                        'faculty' => fn (Faculty $object) => $object->getId(),
-                        'image' => fn (Image $image) => $url.$image->getPath(),
+                        'season' => fn (Season $object): int => $object->getId(),
+                        'activity' => fn (Activity $object): int => $object->getId(),
+                        'faculty' => fn (Faculty $object): int => $object->getId(),
+                        'image' => fn (Image $image): string => $url.$image->getPath(),
                     ],
                 ]
             )
@@ -163,7 +163,6 @@ final class SubmissionController extends AbstractController
     public function list(
         #[CurrentUser]
         User $user,
-        Request $request,
     ): Response {
         $submissions = $this->submissionRepository->findAllByUser($user, 1, 5000);
         $url = $this->getParameter('app_base');
@@ -173,11 +172,12 @@ final class SubmissionController extends AbstractController
             200,
             [],
             [
-                AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn ($object) => $object->getId(),
+                // @phpstan-ignore-next-line
+                AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (mixed $object): int => $object->getId(),
                 AbstractNormalizer::GROUPS => ['fetchSubmission'],
                 AbstractNormalizer::CALLBACKS => [
-                    'image' => fn (Image $image) => $url.$image->getPath(),
-                    'activity' => fn (Activity $activity) => $activity->getId(),
+                    'image' => fn (Image $image): string => $url.$image->getPath(),
+                    'activity' => fn (Activity $activity): int => $activity->getId(),
                 ],
                 AbstractNormalizer::IGNORED_ATTRIBUTES => ['user', 'season'],
             ],
@@ -208,8 +208,9 @@ final class SubmissionController extends AbstractController
             [
                 AbstractNormalizer::GROUPS => ['fetchSubmission'],
                 AbstractNormalizer::IGNORED_ATTRIBUTES => ['charity', 'season'],
-                AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn ($object) => $object->getId(),
-                AbstractNormalizer::CALLBACKS => ['image' => fn (Image $image) => $url.$image->getPath()],
+                // @phpstan-ignore-next-line
+                AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (mixed $object): int => $object->getId(),
+                AbstractNormalizer::CALLBACKS => ['image' => fn (Image $image): string => $url.$image->getPath()],
             ]
         );
     }
@@ -274,7 +275,7 @@ final class SubmissionController extends AbstractController
 
         $errors = $this->action->update($submission, $submissionEditDto);
 
-        if (!empty($errors)) {
+        if (count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -311,7 +312,7 @@ final class SubmissionController extends AbstractController
     ): Response {
         $errors = $this->action->setState($submission, $dto);
 
-        if (!empty($errors)) {
+        if (count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 

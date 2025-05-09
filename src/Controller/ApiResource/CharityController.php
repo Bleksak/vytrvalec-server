@@ -196,12 +196,11 @@ final class CharityController extends AbstractController
         'api_charity_index',
         methods: ['GET'],
     )]
-    public function index(
-        ParameterBagInterface $bag,
-    ): Response {
+    public function index(): Response
+    {
         return $this->json(
             array_map(
-                fn (Charity $charity) => new CharityIndexResponseDto(
+                fn (Charity $charity): CharityIndexResponseDto => new CharityIndexResponseDto(
                     $charity->getId(),
                     $charity->getName(),
                     $charity->getDescription(),

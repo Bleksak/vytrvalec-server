@@ -17,13 +17,12 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class LoginAuthenticator extends AbstractAuthenticator
 {
@@ -34,17 +33,18 @@ final class LoginAuthenticator extends AbstractAuthenticator
         private readonly ParameterBagInterface $parameters,
         private readonly UserProviderInterface $userProvider,
         private readonly UserPasswordHasherInterface $hasher,
-        private readonly NormalizerInterface $normalizer,
         private readonly UserRepository $userRepository,
     ) {
     }
 
+    #[\Override]
     public function supports(
         Request $request,
     ): bool {
         return $request->get('_route') === 'api_user_login' && $request->isMethod('POST');
     }
 
+    #[\Override]
     public function authenticate(
         Request $request,
     ): Passport {
@@ -56,7 +56,7 @@ final class LoginAuthenticator extends AbstractAuthenticator
         }
 
         return new SelfValidatingPassport(
-            new UserBadge((string) $email, function ($email) use ($password) {
+            new UserBadge((string) $email, function (string $email) use ($password): UserInterface {
                 $user = $this->userProvider->loadUserByIdentifier($email);
 
                 if (!$this->hasher->isPasswordValid($user, (string) $password)) {
@@ -68,6 +68,7 @@ final class LoginAuthenticator extends AbstractAuthenticator
         );
     }
 
+    #[\Override]
     public function onAuthenticationSuccess(
         Request $request,
         TokenInterface $token,
@@ -90,11 +91,14 @@ final class LoginAuthenticator extends AbstractAuthenticator
 
         $jwt = JWT::encode($payload, $key, 'HS256');
 
+        /**
+         * @var User $user
+         */
+        $user = $token->getUser();
+
         $response = new JsonResponse([
             'token' => $jwt,
-            'user' => $this->normalizer->normalize($token->getUser(), null, [
-                AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'submissions', 'user'],
-            ]),
+            'user' => $user->toResponseObject(),
         ]);
 
         // $response->headers->setCookie(new Cookie('jwt', $jwt, $expirationTime, secure: $request->isSecure(), httpOnly: true));
@@ -110,6 +114,7 @@ final class LoginAuthenticator extends AbstractAuthenticator
         return $response;
     }
 
+    #[\Override]
     public function onAuthenticationFailure(
         Request $request,
         AuthenticationException $exception,

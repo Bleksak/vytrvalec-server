@@ -39,5 +39,5 @@ final class UserDto
     #[OA\Property]
     #[Assert\NotNull(message: 'blank')]
     #[Assert\Type(type: 'bool', message: 'invalid')]
-    public bool $gdpr;
+    public bool $anonymize;
 }

@@ -10,6 +10,7 @@ use Doctrine\Persistence\ObjectManager;
 
 final class ExtraPointsFixtures extends Fixture
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $dailyDistanceExtraPoints = new ExtraPoints('daily_distance', 1, 2);

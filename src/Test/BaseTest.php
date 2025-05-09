@@ -30,6 +30,7 @@ final class BaseTest extends WebTestCase
     /**
      * @throws \Exception
      */
+    #[\Override]
     public function setUp(): void
     {
         self::runCommand('doctrine:database:create');
@@ -64,10 +65,10 @@ final class BaseTest extends WebTestCase
             'first_name' => 'string',
             'last_name' => 'string',
             'faculty' => $faculty?->getId(),
-            'gdpr' => true,
+            'anonymize' => true,
         ]);
 
-        if (!empty($roles)) {
+        if (count($roles) === 0) {
             $user = $this->getEntityManager()
                 ->getRepository(User::class)
                 ->findOneBy(['email' => $email]);
@@ -94,10 +95,10 @@ final class BaseTest extends WebTestCase
     protected function grantRole(array $role = []): void
     {
         $testUser = 'TestUser@TestUser.com';
-        $testPassword = 'TestingPassword45511';
+        $testPw = 'TestingPassword45511';
 
-        $this->createUser($testUser, $testPassword, $role);
-        $this->loginUser($testUser, $testPassword);
+        $this->createUser($testUser, $testPw, $role);
+        $this->loginUser($testUser, $testPw);
     }
 
     protected function makeCharity(): void

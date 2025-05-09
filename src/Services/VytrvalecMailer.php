@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\User;
-use App\Notifications\EmailTemplate;
+use App\Notifications\AbstractEmailTemplate;
 use App\Notifications\VytrvalecEmail;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
 
-final class VytrvalecMailer
+final readonly class VytrvalecMailer
 {
-    private readonly string $clientUrl;
+    private string $clientUrl;
 
     public function __construct(
-        private readonly MailerInterface $mailer,
-        private readonly ParameterBagInterface $parameterBag,
+        private MailerInterface $mailer,
+        private ParameterBagInterface $parameterBag,
     ) {
         $this->clientUrl = $parameterBag->get('client_url');
     }
@@ -39,7 +39,7 @@ final class VytrvalecMailer
     /**
      * @param User|array<User> $recipient
      */
-    public function send(User|array $recipient, EmailTemplate $template, bool $forceSend = false): void
+    public function send(User|array $recipient, AbstractEmailTemplate $template, bool $forceSend = false): void
     {
         if (!is_array($recipient)) {
             /** @var array<User> $recipient */

@@ -17,6 +17,7 @@ final class Schedule implements ScheduleProviderInterface
     ) {
     }
 
+    #[\Override]
     public function getSchedule(): SymfonySchedule
     {
         return (new SymfonySchedule())

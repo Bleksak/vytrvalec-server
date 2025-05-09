@@ -10,6 +10,7 @@ use Doctrine\Persistence\ObjectManager;
 
 final class CharityFixtures extends Fixture
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $anickaJirik = new Charity('Anička a Jiřík', '');

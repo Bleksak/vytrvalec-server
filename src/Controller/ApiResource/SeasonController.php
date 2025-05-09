@@ -9,6 +9,7 @@ use App\CustomLogic\SeasonResultCalculator;
 use App\Dto\Season\SeasonCreateDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Activity;
+use App\Entity\Charity;
 use App\Entity\Faculty;
 use App\Entity\Image;
 use App\Entity\Season;
@@ -279,9 +280,9 @@ final class SeasonController extends AbstractController
             [
                 AbstractNormalizer::GROUPS => ['fetchSubmission'],
                 AbstractNormalizer::CALLBACKS => [
-                    'image' => fn (Image $image) => $url.$image->getPath(),
-                    'activity' => fn (Activity $activity) => $activity->getId(),
-                    'faculty' => fn (Faculty $faculty) => $faculty->getId(),
+                    'image' => fn (Image $image): string => $url.$image->getPath(),
+                    'activity' => fn (Activity $activity): int => $activity->getId(),
+                    'faculty' => fn (Faculty $faculty): int => $faculty->getId(),
                 ],
                 AbstractNormalizer::IGNORED_ATTRIBUTES => ['season'],
             ]
@@ -356,7 +357,7 @@ final class SeasonController extends AbstractController
             null,
             [
                 AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
-                AbstractNormalizer::CALLBACKS => ['charity' => fn ($charity) => $charity->getId()],
+                AbstractNormalizer::CALLBACKS => ['charity' => fn (Charity $charity): int => $charity->getId()],
             ]
         );
 
@@ -390,7 +391,7 @@ final class SeasonController extends AbstractController
             null,
             [
                 AbstractNormalizer::IGNORED_ATTRIBUTES => ['submissions'],
-                AbstractNormalizer::CALLBACKS => ['charity' => fn ($charity) => $charity->getId()],
+                AbstractNormalizer::CALLBACKS => ['charity' => fn (Charity $charity): int => $charity->getId()],
             ]
         );
 

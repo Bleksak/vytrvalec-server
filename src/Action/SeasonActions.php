@@ -13,11 +13,11 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
-final class SeasonActions
+final readonly class SeasonActions
 {
     public function __construct(
-        private readonly SeasonRepository $seasonRepository,
-        private readonly MessageBusInterface $messageBus,
+        private SeasonRepository $seasonRepository,
+        private MessageBusInterface $messageBus,
     ) {
     }
 

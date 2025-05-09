@@ -19,15 +19,14 @@ use App\Repository\ProfileCacheRepository;
 use App\Repository\SubmissionRepository;
 use App\Services\VytrvalecMailer;
 
-final class SubmissionActions
+final readonly class SubmissionActions
 {
     public function __construct(
-        private readonly Firebase $firebase,
-        private readonly SubmissionRepository $submissionRepository,
-        private readonly ProfileCacheRepository $profileCacheRepository,
-        private readonly VytrvalecMailer $mailer,
-        private readonly ImageRepository $imageRepository,
-        private readonly ActivityRepository $activityRepository,
+        private SubmissionRepository $submissionRepository,
+        private ProfileCacheRepository $profileCacheRepository,
+        private VytrvalecMailer $mailer,
+        private ImageRepository $imageRepository,
+        private ActivityRepository $activityRepository,
     ) {
     }
 
@@ -70,7 +69,7 @@ final class SubmissionActions
      */
     public function setState(Submission $submission, SubmissionStateDto $dto): array
     {
-        if ($dto->updatedAt != $submission->getUpdatedAt()) {
+        if ($dto->updatedAt !== $submission->getUpdatedAt()) {
             return ['mismatch_updated_at'];
         }
 
@@ -79,16 +78,16 @@ final class SubmissionActions
         if ($dto->state) {
             // noop when already accepted, otherwise profile cache would stack
             if (!$submission->isReviewed() || !$submission->isAccepted()) {
-                $this->profileCacheRepository->addCache($submission, true);
+                $this->profileCacheRepository->addCache($submission);
             }
         } else {
             if ($submission->isReviewed() && $submission->isAccepted()) {
-                $this->profileCacheRepository->removeCache($submission, true);
+                $this->profileCacheRepository->removeCache($submission);
             }
 
-            if ($submission->getUser()->getToken() !== null) {
-                $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));
-            }
+            // if ($submission->getUser()->getToken() !== null) {
+            //     $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));
+            // }
 
             $now = new \DateTimeImmutable();
 
@@ -115,7 +114,7 @@ final class SubmissionActions
      */
     public function update(Submission $submission, SubmissionEditDto $dto): array
     {
-        if ($submission->getUpdatedAt() != $dto->updatedAt) {
+        if ($submission->getUpdatedAt() !== $dto->updatedAt) {
             return ['updated_at' => 'mismatch'];
         }
 

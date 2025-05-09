@@ -10,6 +10,7 @@ use Doctrine\Persistence\ObjectManager;
 
 final class ActivityFixtures extends Fixture
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $biking = new Activity('Kolo/Koloběžka', 1500);

@@ -145,7 +145,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $data = $query->executeQuery()->fetchAllAssociative();
 
         return array_map(
-            static fn ($row) => new ActivityStatisticsDto(
+            static fn (array $row): ActivityStatisticsDto => new ActivityStatisticsDto(
                 $row['activity'],
                 (int) $row['distance']
             ),
@@ -237,7 +237,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->getResult();
 
         return array_map(
-            fn ($row) => new WeeklySubmissionSum((int) $row['distance'], $row['faculty'], $row['activity']),
+            fn (array $row): WeeklySubmissionSum => new WeeklySubmissionSum((int) $row['distance'], $row['faculty'], $row['activity']),
             $result,
         );
     }
@@ -245,7 +245,7 @@ final class SubmissionRepository extends ServiceEntityRepository
     /**
      * @return array<OutlierActivity>
      */
-    public function findOutliers(Season $season, int $n = 3, bool $anonymize = true): array
+    public function findOutliers(Season $season, int $n = 3, bool $shouldAnonymize = true): array
     {
         $query = $this->getEntityManager()->getConnection()->prepare('
             WITH
@@ -264,7 +264,7 @@ final class SubmissionRepository extends ServiceEntityRepository
                     AS row_num
                     FROM sub
                 )
-            SELECT value, activity_id, user_id, COALESCE(f.parent_id, u.faculty_id) AS faculty_id, u.first_name, u.last_name, u.accepted_gdpr
+            SELECT value, activity_id, user_id, COALESCE(f.parent_id, u.faculty_id) AS faculty_id, u.first_name, u.last_name, u.anonymize
             FROM sorted s
             INNER JOIN user u ON u.id = s.user_id
             INNER JOIN faculty f ON u.faculty_id = f.id
@@ -276,7 +276,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $query->bindValue(2, $season->getId());
 
         /**
-         * @var array<array{activity_id: int, accepted_gdpr: bool, first_name: string, last_name: string, faculty_id: int, value: string}> $result
+         * @var array<array{activity_id: int, anonymize: bool, first_name: string, last_name: string, faculty_id: int, value: string}> $result
          */
         $result = $query->executeQuery()->fetchAllAssociative();
 
@@ -287,13 +287,13 @@ final class SubmissionRepository extends ServiceEntityRepository
                 $activities[$row['activity_id']] = [];
             }
 
-            $acceptedGdpr = $anonymize ? $row['accepted_gdpr'] : true;
+            $anonymize = $shouldAnonymize ? $row['anonymize'] : false;
 
             $activities[$row['activity_id']][] = new OutlierResult(
                 new AnonymizedUser(
                     $row['first_name'],
                     $row['last_name'],
-                    $acceptedGdpr,
+                    $anonymize,
                 ),
                 $row['faculty_id'],
                 (int) $row['value'],
@@ -348,7 +348,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $result = $qb->getQuery()->getResult();
 
         return array_map(
-            static fn ($row) => new ExtractSubmissionDto(
+            static fn (array $row): ExtractSubmissionDto => new ExtractSubmissionDto(
                 $row['activity_id'],
                 $row['season_id'],
                 $row['accepted'],

@@ -12,13 +12,13 @@ use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use App\Repository\SubmissionRepository;
 
-final class SeasonResultCalculator
+final readonly class SeasonResultCalculator
 {
     public function __construct(
-        private readonly SubmissionRepository $submissionRepository,
-        private readonly DailyDistanceExtraPoints $dailyDistanceExtraPoints,
-        private readonly WeeklyDistanceExtraPoints $weeklyDistanceExtraPoints,
-        private readonly WeeklyElevationExtraPoints $weeklyElevationExtraPoints,
+        private SubmissionRepository $submissionRepository,
+        private DailyDistanceExtraPoints $dailyDistanceExtraPoints,
+        private WeeklyDistanceExtraPoints $weeklyDistanceExtraPoints,
+        private WeeklyElevationExtraPoints $weeklyElevationExtraPoints,
     ) {
     }
 
@@ -28,7 +28,7 @@ final class SeasonResultCalculator
         $results = [];
 
         /**
-         * @var array<ExtraPoints>
+         * @var array<ExtraPointsInterface>
          */
         $extraPointsClasses = [
             $this->dailyDistanceExtraPoints,
@@ -60,7 +60,7 @@ final class SeasonResultCalculator
                 );
             }
 
-            if (!empty($activityResult)) {
+            if (count($activityResult) !== 0) {
                 $results[$i] = new WeeklyResultDto(
                     $i,
                     $activityResult

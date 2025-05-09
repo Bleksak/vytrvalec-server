@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -32,6 +33,7 @@ final class JWTAuthenticator extends AbstractAuthenticator
     ) {
     }
 
+    #[\Override]
     public function supports(
         Request $request,
     ): bool {
@@ -52,19 +54,20 @@ final class JWTAuthenticator extends AbstractAuthenticator
         // then "Bearer " is an invalid jwt token
         $exploded = explode('Bearer ', $authorization);
 
-        if (count($exploded) != 2) {
+        if (count($exploded) !== 2) {
             throw new CustomUserMessageAuthenticationException();
         }
 
         [, $token] = $exploded;
 
-        if (empty($token)) {
+        if ($token === '') {
             return null;
         }
 
         return $token;
     }
 
+    #[\Override]
     public function authenticate(
         Request $request,
     ): Passport {
@@ -79,9 +82,7 @@ final class JWTAuthenticator extends AbstractAuthenticator
             $email = $payload->user;
 
             return new SelfValidatingPassport(
-                new UserBadge($email, function ($email) {
-                    return $this->userProvider->loadUserByIdentifier($email);
-                })
+                new UserBadge($email, fn (string $email): UserInterface => $this->userProvider->loadUserByIdentifier($email))
             );
         } catch (ExpiredException) {
             throw new CustomUserMessageAuthenticationException('session_expired');
@@ -94,6 +95,7 @@ final class JWTAuthenticator extends AbstractAuthenticator
         }
     }
 
+    #[\Override]
     public function onAuthenticationSuccess(
         Request $request,
         TokenInterface $token,
@@ -102,6 +104,7 @@ final class JWTAuthenticator extends AbstractAuthenticator
         return null;
     }
 
+    #[\Override]
     public function onAuthenticationFailure(
         Request $request,
         AuthenticationException $exception,

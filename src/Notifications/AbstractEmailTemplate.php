@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
-abstract class EmailTemplate
+abstract class AbstractEmailTemplate
 {
     /**
      * @var array<string, mixed>

@@ -9,11 +9,11 @@ use Symfony\Component\Mime\Address;
 
 final class VytrvalecEmail extends TemplatedEmail
 {
-    public function __construct(string $recipient, EmailTemplate $template)
+    public function __construct(string $recipient, AbstractEmailTemplate $template)
     {
         parent::__construct();
 
-        // TODO: use env for the mail
+        // TODO(@jvelek): use env for the mail
         $this
             ->from(new Address('vytrvale@ntis.zcu.cz', 'Měsíční Vytrvalec'))
             ->to(new Address($recipient))

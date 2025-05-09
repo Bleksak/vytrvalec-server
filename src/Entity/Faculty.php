@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\Faculty\Response\FacultyResponseDto;
 use App\Repository\FacultyRepository;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
@@ -98,5 +99,16 @@ class Faculty
         $this->parent = $parent;
 
         return $this;
+    }
+
+    public function toResponseObject(): FacultyResponseDto
+    {
+        return new FacultyResponseDto(
+            $this->getId(),
+            $this->getName(),
+            $this->getShortcut(),
+            $this->isVisible(),
+            $this->getParent()?->getId(),
+        );
     }
 }

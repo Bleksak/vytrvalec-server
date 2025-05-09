@@ -10,12 +10,12 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-final class ImageUploader
+final readonly class ImageUploader
 {
     public function __construct(
-        private readonly Filesystem $fs,
-        private readonly ParameterBagInterface $parameterBag,
-        private readonly ImageRepository $imageRepository,
+        private Filesystem $fs,
+        private ParameterBagInterface $parameterBag,
+        private ImageRepository $imageRepository,
     ) {
     }
 
@@ -37,7 +37,7 @@ final class ImageUploader
             $profiles = $img->getImageProfiles('icc');
 
             $img->stripImage();
-            if (!empty($profiles)) {
+            if (count($profiles) !== 0) {
                 $img->profileImage('icc', $profiles['icc']);
             }
 

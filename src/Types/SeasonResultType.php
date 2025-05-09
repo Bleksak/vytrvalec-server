@@ -11,18 +11,21 @@ use Doctrine\DBAL\Types\Type;
 
 final class SeasonResultType extends Type
 {
-    public const NAME = 'season_result';
+    public const string NAME = 'season_result';
 
+    #[\Override]
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
         return $platform->getJsonTypeDeclarationSQL($column);
     }
 
+    #[\Override]
     public function getName(): string
     {
         return self::NAME;
     }
 
+    #[\Override]
     public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
         if (!is_string($value)) {
@@ -44,6 +47,7 @@ final class SeasonResultType extends Type
         );
     }
 
+    #[\Override]
     public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
         return json_encode($value, JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION);

@@ -40,21 +40,21 @@ final class ProfileCacheRepository extends ServiceEntityRepository
         $profileCache = $profileCache ?? new ProfileCache($submission->getUser(), $submission->getActivity());
 
         $profileCache
-            ->updateDistance(fn (int $oldDistance) => $oldDistance + $submission->getDistance())
-            ->updateElevation(fn (int $oldElevation) => $oldElevation + $submission->getElevation())
+            ->updateDistance(fn (int $oldDistance): int => $oldDistance + $submission->getDistance())
+            ->updateElevation(fn (int $oldElevation): int => $oldElevation + $submission->getElevation())
         ;
 
         $this->save($profileCache, $flush);
     }
 
-    public function removeCache(Submission $submission, bool $flush): void
+    public function removeCache(Submission $submission, bool $flush = false): void
     {
         $profileCache = $this->findOneBy(['user' => $submission->getUser(), 'activity' => $submission->getActivity()]);
 
         if ($profileCache !== null) {
             $profileCache
-                ->updateDistance(fn (int $oldDistance) => $oldDistance - $submission->getDistance())
-                ->updateElevation(fn (int $oldElevation) => $oldElevation - $submission->getElevation())
+                ->updateDistance(fn (int $oldDistance): int => $oldDistance - $submission->getDistance())
+                ->updateElevation(fn (int $oldElevation): int => $oldElevation - $submission->getElevation())
             ;
 
             $this->save($profileCache, $flush);
@@ -66,7 +66,7 @@ final class ProfileCacheRepository extends ServiceEntityRepository
     {
         $cachesByUser = $this->findBy(['user' => $user]);
 
-        if (empty($cachesByUser)) {
+        if (count($cachesByUser) === 0) {
             return;
         }
 

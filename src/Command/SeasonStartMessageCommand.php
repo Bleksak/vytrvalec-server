@@ -25,6 +25,7 @@ final class SeasonStartMessageCommand extends Command
         parent::__construct();
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -33,6 +34,7 @@ final class SeasonStartMessageCommand extends Command
         ;
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $send = $input->getOption('send');

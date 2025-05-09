@@ -55,7 +55,7 @@ final class ImageController extends AbstractController
 
         $errors = FormErrors::collect($form);
 
-        if (!empty($errors)) {
+        if (count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 

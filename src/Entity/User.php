@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\User\Response\UserResponseDto;
 use App\Repository\UserRepository;
 use App\Utils\FeatureFlag;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -78,7 +79,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $passwordResetToken = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $acceptedGdpr = false;
+    private ?bool $anonymize = false;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $emailUnsubscribeHash = null;
@@ -91,7 +92,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         string $firstName,
         string $lastName,
         Faculty $faculty,
-        bool $acceptedGdpr,
+        bool $anonymize,
         array $roles = [],
         ?string $token = null,
     ) {
@@ -102,15 +103,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->faculty = $faculty;
-        $this->acceptedGdpr = $acceptedGdpr;
+        $this->anonymize = $anonymize;
         $this->roles = $roles;
         $this->token = $token;
         $this->emailUnsubscribeHash = bin2hex(random_bytes(90));
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
-        return $this->id;
+        return $this->id ?? 0;
     }
 
     public function getEmail(): ?string
@@ -125,16 +126,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function setAcceptedGdpr(bool $value): self
+    public function setAnonymization(bool $value): self
     {
-        $this->acceptedGdpr = $value;
+        $this->anonymize = $value;
 
         return $this;
     }
 
-    public function hasAcceptedGdpr(): ?bool
+    public function shouldAnonymize(): ?bool
     {
-        return $this->acceptedGdpr;
+        return $this->anonymize;
     }
 
     /**
@@ -142,6 +143,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @see UserInterface
      */
+    #[\Override]
     public function getUserIdentifier(): string
     {
         // @phpstan-ignore-next-line
@@ -151,6 +153,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return array<string>
      */
+    #[\Override]
     public function getRoles(): array
     {
         $roles = $this->roles;
@@ -176,6 +179,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[\Override]
     public function getPassword(): string
     {
         return $this->password;
@@ -188,7 +192,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getFaculty(): ?Faculty
+    public function getFaculty(): Faculty
     {
         return $this->faculty;
     }
@@ -200,7 +204,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isBanned(): ?bool
+    public function isBanned(): bool
     {
         return $this->banned;
     }
@@ -212,7 +216,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function hasMailing(): ?bool
+    public function hasMailing(): bool
     {
         return $this->mailing;
     }
@@ -224,7 +228,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getFirstName(): ?string
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
@@ -236,7 +240,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getLastName(): ?string
+    public function getLastName(): string
     {
         return $this->lastName;
     }
@@ -276,6 +280,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->profileCaches;
     }
 
+    #[\Override]
     public function eraseCredentials(): void
     {
     }
@@ -309,7 +314,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this
             ->setLastName('')
             ->setMailing(false)
-            ->setAcceptedGdpr(false)
+            ->setAnonymization(true)
             ->setEmailUnsubscribeHash(null)
             ->setToken(null)
             ->setPasswordResetToken(null);
@@ -322,5 +327,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function canAccess(FeatureFlag $featureFlag): bool
     {
         return \in_array($featureFlag->value, $this->roles, true);
+    }
+
+    public function toResponseObject(): UserResponseDto
+    {
+        return new UserResponseDto(
+            $this->getId(),
+            $this->getEmail(),
+            $this->getRoles(),
+            $this->isBanned(),
+            $this->hasMailing(),
+            $this->getFirstName(),
+            $this->getLastName(),
+            $this->getFaculty()->toResponseObject(),
+            $this->shouldAnonymize(),
+        );
     }
 }

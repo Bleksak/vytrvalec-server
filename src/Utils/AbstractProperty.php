@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Utils;
 
-abstract class Property
+abstract class AbstractProperty
 {
     public static function isInitialized(object $class, string $field): bool
     {

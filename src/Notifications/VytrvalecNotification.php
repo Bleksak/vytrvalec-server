@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Notifications;
 
 use App\Entity\User;
-use App\Notifications\Firebase\FirebaseNotification;
+use App\Notifications\Firebase\AbstractFirebaseNotification;
 use Kreait\Firebase\Messaging\Message;
 
-final class VytrvalecNotification extends FirebaseNotification implements Message
+final class VytrvalecNotification extends AbstractFirebaseNotification implements Message
 {
     public function __construct(
         string|User $recipient,
@@ -26,6 +26,7 @@ final class VytrvalecNotification extends FirebaseNotification implements Messag
         parent::__construct($recipient, 'Měsíční vytrvalec', $message, $action);
     }
 
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         return [

@@ -26,6 +26,7 @@ final class ResultsFindOutliersCommand extends Command
         parent::__construct();
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -33,6 +34,7 @@ final class ResultsFindOutliersCommand extends Command
         ;
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -46,7 +48,7 @@ final class ResultsFindOutliersCommand extends Command
             return Command::FAILURE;
         }
 
-        $topThree = $this->submissionRepository->findOutliers($season, anonymize: false);
+        $topThree = $this->submissionRepository->findOutliers($season, shouldAnonymize: false);
 
         foreach ($topThree as $outlier) {
             $io->writeln('Aktivita ID: '.$outlier->activityId);

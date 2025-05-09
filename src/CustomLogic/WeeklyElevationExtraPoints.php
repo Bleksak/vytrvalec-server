@@ -9,23 +9,26 @@ use App\Dto\ExtraPointsResultDto;
 use App\Entity\Season;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class WeeklyElevationExtraPoints implements ExtraPoints
+final readonly class WeeklyElevationExtraPoints implements ExtraPointsInterface
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManagerInterface,
+        private EntityManagerInterface $entityManagerInterface,
     ) {
     }
 
+    #[\Override]
     public static function getUniqueName(): string
     {
         return 'weekly_elevation';
     }
 
+    #[\Override]
     public static function getWeek(): int
     {
         return 3;
     }
 
+    #[\Override]
     public function calculate(Season $season): array
     {
         $query = $this->entityManagerInterface->getConnection()->prepare('
@@ -46,7 +49,7 @@ final class WeeklyElevationExtraPoints implements ExtraPoints
                     AS row_num
                     FROM sub
                 )
-            SELECT value, activity_id, user_id, COALESCE(f.parent_id, u.faculty_id) AS faculty_id, u.first_name, u.last_name, u.accepted_gdpr
+            SELECT value, activity_id, user_id, COALESCE(f.parent_id, u.faculty_id) AS faculty_id, u.first_name, u.last_name, u.anonymize
             FROM sorted s
             INNER JOIN user u ON u.id = s.user_id
             INNER JOIN faculty f ON u.faculty_id = f.id
@@ -58,16 +61,16 @@ final class WeeklyElevationExtraPoints implements ExtraPoints
         $query->bindValue(3, $season->getId());
 
         /**
-         * @var array<array{first_name: string, last_name: string, accepted_gdpr: bool|null, activity_id: int, faculty_id: int, value: string}> $result
+         * @var array<array{first_name: string, last_name: string, anonymize: bool|null, activity_id: int, faculty_id: int, value: string}> $result
          */
         $result = $query->executeQuery()->fetchAllAssociative();
 
         return array_map(
-            static fn ($row) => new ExtraPointsResultDto(
+            static fn (array $row): ExtraPointsResultDto => new ExtraPointsResultDto(
                 new AnonymizedUser(
                     $row['first_name'],
                     $row['last_name'],
-                    $row['accepted_gdpr'],
+                    $row['anonymize'],
                 ),
                 $row['activity_id'],
                 $row['faculty_id'],
@@ -77,6 +80,7 @@ final class WeeklyElevationExtraPoints implements ExtraPoints
         );
     }
 
+    #[\Override]
     public static function reward(): int
     {
         return 1;

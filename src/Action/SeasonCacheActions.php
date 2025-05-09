@@ -9,11 +9,11 @@ use App\Entity\Cache;
 use App\Entity\Season;
 use App\Repository\SeasonCacheRepository;
 
-final class SeasonCacheActions
+final readonly class SeasonCacheActions
 {
     public function __construct(
-        private readonly SeasonCacheRepository $cacheRepository,
-        private readonly SeasonResultCalculator $seasonResult,
+        private SeasonCacheRepository $cacheRepository,
+        private SeasonResultCalculator $seasonResult,
     ) {
     }
 

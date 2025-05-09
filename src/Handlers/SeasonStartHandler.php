@@ -12,12 +12,12 @@ use App\Services\VytrvalecMailer;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class SeasonStartHandler
+final readonly class SeasonStartHandler
 {
     public function __construct(
-        private readonly SeasonRepository $seasonRepository,
-        private readonly UserRepository $userRepository,
-        private readonly VytrvalecMailer $mailer,
+        private SeasonRepository $seasonRepository,
+        private UserRepository $userRepository,
+        private VytrvalecMailer $mailer,
     ) {
     }
 
