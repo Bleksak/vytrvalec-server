@@ -8,6 +8,7 @@ use App\Dto\Season\SeasonCreateDto;
 use App\Entity\Season;
 use App\Messages\SeasonEndMessage;
 use App\Messages\SeasonStartMessage;
+use App\Repository\CharityRepository;
 use App\Repository\SeasonRepository;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -17,19 +18,26 @@ final readonly class SeasonActions
 {
     public function __construct(
         private SeasonRepository $seasonRepository,
+        private CharityRepository $charityRepository,
         private MessageBusInterface $messageBus,
     ) {
     }
 
-    public function create(SeasonCreateDto $seasonDto): int
+    public function create(SeasonCreateDto $dto): int
     {
-        $existingSeason = $this->seasonRepository->findByStartMonth($seasonDto->start);
+        $existingSeason = $this->seasonRepository->findByStartMonth($dto->start);
 
         if ($existingSeason !== null) {
             return -1;
         }
 
-        $season = new Season($seasonDto->start, $seasonDto->end, $seasonDto->charity);
+        $charity = $this->charityRepository->find($dto->charityId);
+
+        if ($charity === null) {
+            return -1;
+        }
+
+        $season = new Season($dto->start, $dto->end, $charity);
 
         $this->seasonRepository->save($season, true);
         $stamps = [];
@@ -38,7 +46,7 @@ final readonly class SeasonActions
         $diff = $season->getStart()->diff($today)->days;
 
         if ($diff > 0) {
-            $stamps[] = DelayStamp::delayUntil($seasonDto->start);
+            $stamps[] = DelayStamp::delayUntil($dto->start);
         }
 
         $this->messageBus->dispatch(
@@ -49,7 +57,7 @@ final readonly class SeasonActions
         );
 
         $stamps = [
-            DelayStamp::delayUntil($seasonDto->end),
+            DelayStamp::delayUntil($dto->end),
         ];
 
         $this->messageBus->dispatch(

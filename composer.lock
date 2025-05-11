@@ -1914,28 +1914,28 @@
         },
         {
             "name": "google/cloud-core",
-            "version": "v1.62.1",
+            "version": "v1.62.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-core.git",
-                "reference": "824a617d5c2b1b571673d1111856f5c2f064a0fd"
+                "reference": "506b69e9e13eaac1656edd0bfc7ea5d81cf870d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/824a617d5c2b1b571673d1111856f5c2f064a0fd",
-                "reference": "824a617d5c2b1b571673d1111856f5c2f064a0fd",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/506b69e9e13eaac1656edd0bfc7ea5d81cf870d9",
+                "reference": "506b69e9e13eaac1656edd0bfc7ea5d81cf870d9",
                 "shasum": ""
             },
             "require": {
                 "google/auth": "^1.34",
                 "google/gax": "^1.36.0",
-                "guzzlehttp/guzzle": "^6.5.8|^7.4.4",
+                "guzzlehttp/guzzle": "^6.5.8||^7.4.4",
                 "guzzlehttp/promises": "^1.4||^2.0",
                 "guzzlehttp/psr7": "^2.6",
-                "monolog/monolog": "^2.9|^3.0",
+                "monolog/monolog": "^2.9||^3.0",
                 "php": "^8.0",
-                "psr/http-message": "^1.0|^2.0",
-                "rize/uri-template": "~0.3"
+                "psr/http-message": "^1.0||^2.0",
+                "rize/uri-template": "~0.3||~0.4"
             },
             "require-dev": {
                 "erusev/parsedown": "^1.6",
@@ -1974,9 +1974,9 @@
             ],
             "description": "Google Cloud PHP shared dependency, providing functionality useful to all components.",
             "support": {
-                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.62.1"
+                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.62.2"
             },
-            "time": "2025-02-22T00:57:16+00:00"
+            "time": "2025-05-09T21:18:44+00:00"
         },
         {
             "name": "google/cloud-storage",
@@ -6052,16 +6052,16 @@
         },
         {
             "name": "symfony/flex",
-            "version": "v2.5.0",
+            "version": "v2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/flex.git",
-                "reference": "8ce1acd9842abe0e9b4c4a0bd3f259859516c018"
+                "reference": "62d5c38c7af6280d8605b725364680838b475641"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/flex/zipball/8ce1acd9842abe0e9b4c4a0bd3f259859516c018",
-                "reference": "8ce1acd9842abe0e9b4c4a0bd3f259859516c018",
+                "url": "https://api.github.com/repos/symfony/flex/zipball/62d5c38c7af6280d8605b725364680838b475641",
+                "reference": "62d5c38c7af6280d8605b725364680838b475641",
                 "shasum": ""
             },
             "require": {
@@ -6100,7 +6100,7 @@
             "description": "Composer plugin for Symfony",
             "support": {
                 "issues": "https://github.com/symfony/flex/issues",
-                "source": "https://github.com/symfony/flex/tree/v2.5.0"
+                "source": "https://github.com/symfony/flex/tree/v2.5.1"
             },
             "funding": [
                 {
@@ -6116,7 +6116,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-03-03T07:50:46+00:00"
+            "time": "2025-05-10T14:05:03+00:00"
         },
         {
             "name": "symfony/form",
@@ -11614,16 +11614,16 @@
         },
         {
             "name": "kubawerlos/php-cs-fixer-custom-fixers",
-            "version": "v3.24.0",
+            "version": "v3.25.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kubawerlos/php-cs-fixer-custom-fixers.git",
-                "reference": "93222100a91399314c3726857e249e76c4a7d760"
+                "reference": "50e070e5457ca4570e032207d201b3874aaff942"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kubawerlos/php-cs-fixer-custom-fixers/zipball/93222100a91399314c3726857e249e76c4a7d760",
-                "reference": "93222100a91399314c3726857e249e76c4a7d760",
+                "url": "https://api.github.com/repos/kubawerlos/php-cs-fixer-custom-fixers/zipball/50e070e5457ca4570e032207d201b3874aaff942",
+                "reference": "50e070e5457ca4570e032207d201b3874aaff942",
                 "shasum": ""
             },
             "require": {
@@ -11654,9 +11654,9 @@
             "description": "A set of custom fixers for PHP CS Fixer",
             "support": {
                 "issues": "https://github.com/kubawerlos/php-cs-fixer-custom-fixers/issues",
-                "source": "https://github.com/kubawerlos/php-cs-fixer-custom-fixers/tree/v3.24.0"
+                "source": "https://github.com/kubawerlos/php-cs-fixer-custom-fixers/tree/v3.25.0"
             },
-            "time": "2025-03-22T16:51:39+00:00"
+            "time": "2025-05-06T20:12:43+00:00"
         },
         {
             "name": "myclabs/deep-copy",

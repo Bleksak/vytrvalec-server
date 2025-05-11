@@ -9,13 +9,17 @@ use App\Dto\EmailingChangeDto;
 use App\Dto\PasswordChangeDto;
 use App\Dto\User\PasswordResetDto;
 use App\Dto\User\PasswordResetRequestDto;
+use App\Dto\User\Response\UserLoginResponseDto;
 use App\Dto\User\UserEditDto;
+use App\Dto\User\UserLoginDto;
 use App\Dto\UserDto;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Firebase\JWT\JWT;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -36,9 +40,9 @@ final class UserController extends AbstractController
     }
 
     #[Route(
-        '/api/unused/login',
+        '/api/user/login',
+        name: 'api_user_login',
         methods: ['POST'],
-        env: 'dev',
         // documentation: 'Creates a JWT cookie, returns a JWT token',
         // responses: [
         //     Response::HTTP_OK => [
@@ -66,33 +70,61 @@ final class UserController extends AbstractController
         //     'password' => 'string',
         //     'firebase_token' => 'string',
         // ],
-        // fakeName: 'api_user_login',
-        // fakePath: '/api/user/login',
     )]
-    public function login(): Response
-    {
-        return new Response(status: Response::HTTP_NOT_FOUND);
+    public function login(
+        #[MapRequestPayload]
+        UserLoginDto $dto,
+        ParameterBagInterface $bag,
+    ): Response {
+        $user = $this->action->login($dto);
+
+        if ($user === null) {
+            return new Response(status: 404);
+        }
+
+        $expirationTime = time() + 10 * 365 * 24 * 60 * 60; // 10 years expiration
+
+        $payload = [
+            'kid' => $user->getId(),
+            'user' => $user->getUserIdentifier(),
+            'exp' => $expirationTime,
+        ];
+
+        $key = $bag->get('jwt_secret');
+
+        $jwt = JWT::encode($payload, $key, 'HS256');
+
+        return $this->json(
+            new UserLoginResponseDto(
+                $user->toResponseObject(),
+                $jwt
+            )
+        );
+
+        // $response->headers->setCookie(new Cookie('jwt', $jwt, $expirationTime, secure: $request->isSecure(), httpOnly: true));
     }
 
+    #[OA\Get(
+        description: 'Clears the JWT cookie. If user is not logged in, just no-op.',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Succesfully logged out',
+            ),
+        ],
+    )]
     #[Route(
-        '/api/unused/logout',
+        '/api/user/logout',
+        name: 'api_user_logout',
         methods: ['GET'],
         env: 'dev',
-        // documentation: 'Clears the JWT cookie, this endpoint has no effect if using HTTP authentication',
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Cookie successfully cleared',
-        //     ],
-        //     Response::HTTP_UNAUTHORIZED => [
-        //         'message' => 'Unauthorized access',
-        //     ],
-        // ],
-        // fakeName: 'api_user_logout',
-        // fakePath: '/api/user/logout',
     )]
     public function logout(): Response
     {
-        return new Response(status: Response::HTTP_NOT_FOUND);
+        $response = new Response(status: Response::HTTP_OK);
+        $response->headers->clearCookie('jwt');
+
+        return $response;
     }
 
     #[Route(

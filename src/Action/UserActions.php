@@ -8,6 +8,7 @@ use App\Dto\EmailingChangeDto;
 use App\Dto\PasswordChangeDto;
 use App\Dto\User\PasswordResetDto;
 use App\Dto\User\UserEditDto;
+use App\Dto\User\UserLoginDto;
 use App\Dto\UserDto;
 use App\Entity\User;
 use App\Notifications\EmailTemplate\ForgottenPasswordEmailTemplate;
@@ -196,5 +197,25 @@ final readonly class UserActions
     public function delete(User $user): void
     {
         $this->userRepository->save($user->anonymize(), true);
+    }
+
+    public function login(
+        UserLoginDto $dto,
+    ): ?User {
+        $user = $this->userRepository->findOneBy(['email' => $dto->email]);
+        if ($user === null) {
+            return null;
+        }
+
+        if (!$this->hasher->isPasswordValid($user, $dto->password)) {
+            return null;
+        }
+
+        if ($dto->firebaseToken !== null) {
+            $user->setToken($dto->firebaseToken);
+            $this->userRepository->save($user, true);
+        }
+
+        return $user;
     }
 }
