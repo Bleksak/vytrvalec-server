@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Repository\SubmissionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -73,7 +74,7 @@ class Submission
     #[OA\Property(type: 'date', example: '2025-04-11')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Groups(['fetchSubmission'])]
-    private \DateTimeInterface $date;
+    private \DateTime $date;
 
     #[OA\Property(type: 'datetime', example: 1)]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', updatable: false, insertable: false, generated: 'ALWAYS')]
@@ -94,7 +95,7 @@ class Submission
         int $elevation = 0,
         string $message = '',
     ) {
-        $this->date = new \DateTimeImmutable();
+        $this->date = new \DateTime();
 
         $this->user = $user;
         $this->activity = $activity;
@@ -107,12 +108,12 @@ class Submission
         $this->calculateWeek();
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
-        return $this->id;
+        return $this->id ?? 0;
     }
 
-    public function isAccepted(): ?bool
+    public function isAccepted(): bool
     {
         return $this->accepted;
     }
@@ -172,7 +173,7 @@ class Submission
         return $this;
     }
 
-    public function isReviewed(): ?bool
+    public function isReviewed(): bool
     {
         return $this->reviewed;
     }
@@ -208,16 +209,9 @@ class Submission
         return $this;
     }
 
-    public function getDate(): \DateTimeInterface
+    public function getDate(): \DateTime
     {
         return $this->date;
-    }
-
-    public function setDate(\DateTimeInterface $date): self
-    {
-        $this->date = $date;
-
-        return $this;
     }
 
     public function calculateWeek(): int
@@ -234,7 +228,7 @@ class Submission
         return $this->week;
     }
 
-    public function getWeek(): ?int
+    public function getWeek(): int
     {
         return $this->week;
     }
@@ -261,5 +255,24 @@ class Submission
     public function getUpdatedAt(): \DateTime
     {
         return $this->updatedAt;
+    }
+
+    public function toResponseObject(): SubmissionResponseDto
+    {
+        return new SubmissionResponseDto(
+            $this->getId(),
+            $this->isAccepted(),
+            $this->getSeason()->getId(),
+            $this->getUser()->getId(),
+            $this->getElevation(),
+            $this->getDistance(),
+            $this->isReviewed(),
+            $this->getImage()?->getPath(),
+            $this->getWeek(),
+            $this->getActivity()->getId(),
+            $this->getDate(),
+            $this->getUpdatedAt(),
+            $this->getMessage(),
+        );
     }
 }

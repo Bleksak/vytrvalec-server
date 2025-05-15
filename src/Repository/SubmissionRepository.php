@@ -111,8 +111,9 @@ final class SubmissionRepository extends ServiceEntityRepository
     {
         return $this
             ->createQueryBuilder('s')
-            ->select('s, i')
+            ->select('s, i, u')
             ->join('s.image', 'i')
+            ->join('s.user', 'u')
             ->andWhere('s.reviewed = :reviewed')
             ->setParameter('reviewed', false)
             ->orderBy('s.date', 'ASC')

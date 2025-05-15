@@ -6,6 +6,7 @@ namespace App\Controller\ApiResource;
 
 use App\Action\SubmissionActions;
 use App\Dto\SeasonIDList;
+use App\Dto\Submission\Response\UnreviewedSubmissionResponseDto;
 use App\Dto\Submission\SubmissionCreateDto;
 use App\Dto\Submission\SubmissionEditDto;
 use App\Dto\Submission\SubmissionStateDto;
@@ -201,17 +202,25 @@ final class SubmissionController extends AbstractController
         $url = $this->getParameter('app_base');
         $submissions = $this->submissionRepository->findUnreviewed($count);
 
+        $userResponse = [];
+        $submissionResponse = [];
+
+        foreach ($submissions as $submission) {
+            $submissionResponse[] = $submission->toResponseObject();
+            $user = $submission->getUser();
+
+            $userId = $user->getId();
+
+            if (!isset($userResponse[$userId])) {
+                $userResponse[$userId] = $user->toResponseObject();
+            }
+        }
+
         return $this->json(
-            $submissions,
-            200,
-            [],
-            [
-                AbstractNormalizer::GROUPS => ['fetchSubmission'],
-                AbstractNormalizer::IGNORED_ATTRIBUTES => ['charity', 'season'],
-                // @phpstan-ignore-next-line
-                AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (mixed $object): int => $object->getId(),
-                AbstractNormalizer::CALLBACKS => ['image' => fn (Image $image): string => $url.$image->getPath()],
-            ]
+            new UnreviewedSubmissionResponseDto(
+                $submissionResponse,
+                $userResponse,
+            )
         );
     }
 
