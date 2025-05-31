@@ -109,17 +109,27 @@ final class SubmissionRepository extends ServiceEntityRepository
      */
     public function findUnreviewed(int $limit): array
     {
-        return $this
+        /**
+         * @var array<Submission>
+         */
+        $result = $this
             ->createQueryBuilder('s')
             ->select('s, i, u')
             ->join('s.image', 'i')
             ->join('s.user', 'u')
-            ->andWhere('s.reviewed = :reviewed')
-            ->setParameter('reviewed', false)
+            ->andWhere('s.reviewed = 0')
             ->orderBy('s.date', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+
+        $indexed = [];
+
+        foreach ($result as $row) {
+            $indexed[$row->getId()] = $row;
+        }
+
+        return $indexed;
     }
 
     /**

@@ -34,6 +34,9 @@
 - Install  symfony-cli - `paru -S xdebug symfony-cli`
 - Run with `symfony server:start {..args}`
 
+## Starting the Websocket server
+- php bin/console mv:ws-submission-producer
+
 ### ZČU VPN connection
 - On Linux, install NetworkManager - `paru -S networkmanager-openconnect`
 - In your VPN client create VPN Cisco AnyConnect connection

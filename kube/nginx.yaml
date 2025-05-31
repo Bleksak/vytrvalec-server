@@ -97,6 +97,10 @@ spec:
       protocol: TCP
       targetPort: 80
       name: http
+    - port: 1337
+      protocol: TCP
+      targetPort: 1337
+      name: ws
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

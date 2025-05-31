@@ -29,7 +29,6 @@ final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
 
             return new UserBadge($payload->user);
         } catch (\Throwable) {
-            setcookie('jwt', '', time() - 1, path: '/', httponly: true);
             throw new BadCredentialsException();
         }
     }

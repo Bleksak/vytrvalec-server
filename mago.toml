@@ -25,6 +25,18 @@ name = "maintainability/too-many-properties"
 level = "off"
 
 [[linter.rules]]
+name = "best-practices/literal-named-argument"
+level = "off"
+
+[[linter.rules]]
+name = "strictness/no-assignment-in-condition"
+level = "off"
+
+[[linter.rules]]
+name = "maintainability/halstead"
+level = "off"
+
+[[linter.rules]]
 name = "best-practices/no-boolean-flag-parameter"
 level = "off"
 
