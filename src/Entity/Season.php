@@ -135,7 +135,7 @@ class Season
         $start = \DateTimeImmutable::createFromInterface($this->getStart());
         $end = \DateTimeImmutable::createFromInterface($this->getEnd());
 
-        return $today >= $start && $today < $end;
+        return $today >= $start && $today <= $end;
     }
 
     public function getWeekCount(): int
