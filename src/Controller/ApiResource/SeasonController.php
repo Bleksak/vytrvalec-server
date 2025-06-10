@@ -18,6 +18,7 @@ use App\Repository\SeasonCacheRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Schema\SeasonWithoutSubmissionsSchema;
+use App\Services\ImagePath;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,6 +37,7 @@ final class SeasonController extends AbstractController
         private readonly SeasonRepository $seasonRepository,
         private readonly NormalizerInterface $normalizer,
         private readonly SeasonActions $action,
+        private readonly ImagePath $imagePath,
     ) {
     }
 
@@ -236,8 +238,6 @@ final class SeasonController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function submissions(SubmissionRepository $submissionRepository, Season $season, Request $request): Response
     {
-        $url = $this->getParameter('app_base');
-
         $queryFilterKeys = [
             'date',
             'week',
@@ -280,7 +280,7 @@ final class SeasonController extends AbstractController
             [
                 AbstractNormalizer::GROUPS => ['fetchSubmission'],
                 AbstractNormalizer::CALLBACKS => [
-                    'image' => fn (Image $image): string => $url.$image->getPath(),
+                    'image' => fn (Image $image): string => $this->imagePath->fullPath($image),
                     'activity' => fn (Activity $activity): int => $activity->getId(),
                     'faculty' => fn (Faculty $faculty): int => $faculty->getId(),
                 ],

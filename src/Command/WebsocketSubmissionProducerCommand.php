@@ -13,6 +13,7 @@ use Amp\Websocket\Server\Websocket;
 use App\Repository\SubmissionRepository;
 use App\Repository\UserRepository;
 use App\Security\AccessTokenHandler;
+use App\Services\ImagePath;
 use App\Websocket\SubmissionProducer\SubmissionProducerClientHandler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -40,14 +41,15 @@ final class WebsocketSubmissionProducerCommand extends Command
         private readonly AccessTokenHandler $accessTokenHandler,
         private readonly SerializerInterface $serializer,
         private readonly DenormalizerInterface $denormalizer,
+        private readonly ImagePath $imagePath,
         ParameterBagInterface $parameters,
     ) {
         parent::__construct();
 
         $port = $parameters->get('port') ?? 1337;
-        assert(is_int($port));
-        assert($port >= 0);
-        assert($port <= 65535);
+        assert(is_int($port), 'Port must be an integer');
+        assert($port >= 0, 'Port must be greater than 0');
+        assert($port <= 65535, 'Port must be less than or equal to 65535');
 
         $this->port = $port;
     }
@@ -76,6 +78,7 @@ final class WebsocketSubmissionProducerCommand extends Command
             $this->accessTokenHandler,
             $this->serializer,
             $this->denormalizer,
+            $this->imagePath,
         );
 
         $websocket = new Websocket($server, $this->logger, $acceptor, $clientHandler);

@@ -13,6 +13,7 @@ use App\Dto\WeeklySubmissionSum;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
+use App\Services\ImagePath;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -341,7 +342,7 @@ final class SubmissionRepository extends ServiceEntityRepository
      * @return array<ExtractSubmissionDto>
      */
     public function extractBySeasons(
-        string $appUrl,
+        ImagePath $imagePath,
         ?array $seasons,
     ): array {
         $qb = $this->createQueryBuilder('ss')
@@ -365,7 +366,7 @@ final class SubmissionRepository extends ServiceEntityRepository
                 $row['accepted'],
                 (int) $row['distance'],
                 (int) $row['elevation'],
-                $appUrl.$row['image']
+                $imagePath->fullPath($row['image']),
             ),
             $result
         );

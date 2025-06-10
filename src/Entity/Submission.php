@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Repository\SubmissionRepository;
+use App\Services\ImagePath;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
@@ -257,7 +258,7 @@ class Submission
         return $this->updatedAt;
     }
 
-    public function toResponseObject(): SubmissionResponseDto
+    public function toResponseObject(?ImagePath $imagePath): SubmissionResponseDto
     {
         return new SubmissionResponseDto(
             $this->getId(),
@@ -267,7 +268,7 @@ class Submission
             $this->getElevation(),
             $this->getDistance(),
             $this->isReviewed(),
-            $this->getImage()?->getPath(),
+            $this->getImage()?->getPath($imagePath),
             $this->getWeek(),
             $this->getActivity()->getId(),
             $this->getDate(),

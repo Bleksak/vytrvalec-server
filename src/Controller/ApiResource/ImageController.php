@@ -7,6 +7,7 @@ namespace App\Controller\ApiResource;
 use App\Dto\Image\ImageUploadDto;
 use App\Dto\Image\Response\ImageCreateResponseDto;
 use App\Form\ImageUploadFormType;
+use App\Services\ImagePath;
 use App\Services\ImageUploader;
 use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -22,6 +23,7 @@ final class ImageController extends AbstractController
 {
     public function __construct(
         private readonly ImageUploader $imageUploader,
+        private readonly ImagePath $imagePath,
     ) {
     }
 
@@ -69,7 +71,7 @@ final class ImageController extends AbstractController
         return $this->json(
             new ImageCreateResponseDto(
                 $image->getUuid(),
-                $image->getPath(),
+                $image->getPath($this->imagePath),
                 $image->getUploadedAt(),
                 $image->getUsedAt()
             )

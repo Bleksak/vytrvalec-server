@@ -14,6 +14,7 @@ use App\Entity\Submission;
 use App\Repository\SubmissionRepository;
 use App\Repository\UserRepository;
 use App\Security\AccessTokenHandler;
+use App\Services\ImagePath;
 use App\Sync\ReentrantMutex;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -48,6 +49,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
         private readonly AccessTokenHandler $accessTokenHandler,
         private readonly SerializerInterface $serializer,
         private readonly DenormalizerInterface $denormalizer,
+        private readonly ImagePath $imagePath,
     ) {
         $this->submissionsMutex = new ReentrantMutex();
         $this->freeListMutex = new ReentrantMutex();
@@ -216,7 +218,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
                             SubmissionProducerMessageType::Success,
                             SubmissionProducerMessageType::SubmissionRequest,
                             [
-                                'submission' => $submission->toResponseObject(),
+                                'submission' => $submission->toResponseObject($this->imagePath),
                                 'user' => $user->toResponseObject(),
                             ],
                         );

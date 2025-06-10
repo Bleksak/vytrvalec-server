@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\ImageRepository;
+use App\Services\ImagePath;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -46,9 +47,13 @@ class Image
         return $this;
     }
 
-    public function getPath(): string
+    public function getPath(?ImagePath $imagePath = null): string
     {
-        return $this->path;
+        if ($imagePath === null) {
+            return $this->path;
+        }
+
+        return $imagePath->fullPath($this->path);
     }
 
     public function setPath(string $path): static

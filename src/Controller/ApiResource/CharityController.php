@@ -12,10 +12,10 @@ use App\Dto\Charity\Response\CharityGetResponseDto;
 use App\Dto\Charity\Response\CharityIndexResponseDto;
 use App\Entity\Charity;
 use App\Repository\CharityRepository;
+use App\Services\ImagePath;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
@@ -27,7 +27,7 @@ final class CharityController extends AbstractController
     public function __construct(
         private readonly CharityActions $action,
         private readonly CharityRepository $charityRepository,
-        private readonly ParameterBagInterface $parameterBag,
+        private readonly ImagePath $imagePath,
     ) {
     }
 
@@ -85,7 +85,7 @@ final class CharityController extends AbstractController
                 $charity->getId(),
                 $charity->getName(),
                 $charity->getDescription(),
-                $charity->getImage() === null ? null : $this->parameterBag->get('app_base').$charity->getImage()->getPath(),
+                $charity->getImage() === null ? null : $charity->getImage()->getPath($this->imagePath),
                 $charity->getWebsite(),
             ),
             Response::HTTP_CREATED
@@ -128,7 +128,7 @@ final class CharityController extends AbstractController
                 $charity->getId(),
                 $charity->getName(),
                 $charity->getDescription(),
-                $charity->getImage() === null ? null : $this->parameterBag->get('app_base').$charity->getImage()->getPath(),
+                $charity->getImage() === null ? null : $charity->getImage()->getPath($this->imagePath),
                 $charity->getWebsite(),
             ),
         );
@@ -204,7 +204,7 @@ final class CharityController extends AbstractController
                     $charity->getId(),
                     $charity->getName(),
                     $charity->getDescription(),
-                    $charity->getImage() === null ? null : $this->parameterBag->get('app_base').$charity->getImage()->getPath(),
+                    $charity->getImage() === null ? null : $charity->getImage()->getPath($this->imagePath),
                     $charity->getWebsite(),
                 ),
                 $this->charityRepository->findAll(),

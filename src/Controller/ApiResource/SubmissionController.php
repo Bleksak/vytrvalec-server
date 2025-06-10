@@ -18,6 +18,7 @@ use App\Entity\Submission;
 use App\Entity\User;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
+use App\Services\ImagePath;
 use App\Utils\FeatureFlag;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -39,6 +40,7 @@ final class SubmissionController extends AbstractController
         private readonly SubmissionRepository $submissionRepository,
         private readonly NormalizerInterface $normalizer,
         private readonly SubmissionActions $action,
+        private readonly ImagePath $imagePath,
     ) {
     }
 
@@ -128,8 +130,6 @@ final class SubmissionController extends AbstractController
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
 
-        $url = $this->getParameter('app_base');
-
         return $this->json(
             $this->normalizer->normalize(
                 [
@@ -143,7 +143,7 @@ final class SubmissionController extends AbstractController
                         'season' => fn (Season $object): int => $object->getId(),
                         'activity' => fn (Activity $object): int => $object->getId(),
                         'faculty' => fn (Faculty $object): int => $object->getId(),
-                        'image' => fn (Image $image): string => $url.$image->getPath(),
+                        'image' => fn (Image $image): string => $this->imagePath->fullPath($image),
                     ],
                 ]
             )
@@ -177,7 +177,7 @@ final class SubmissionController extends AbstractController
                 AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (mixed $object): int => $object->getId(),
                 AbstractNormalizer::GROUPS => ['fetchSubmission'],
                 AbstractNormalizer::CALLBACKS => [
-                    'image' => fn (Image $image): string => $url.$image->getPath(),
+                    'image' => fn (Image $image): string => $this->imagePath->fullPath($image),
                     'activity' => fn (Activity $activity): int => $activity->getId(),
                 ],
                 AbstractNormalizer::IGNORED_ATTRIBUTES => ['user', 'season'],
@@ -206,7 +206,7 @@ final class SubmissionController extends AbstractController
         $submissionResponse = [];
 
         foreach ($submissions as $submission) {
-            $submissionResponse[] = $submission->toResponseObject();
+            $submissionResponse[] = $submission->toResponseObject($this->imagePath);
             $user = $submission->getUser();
 
             $userId = $user->getId();
@@ -343,9 +343,7 @@ final class SubmissionController extends AbstractController
             return new Response(status: Response::HTTP_UNAUTHORIZED);
         }
 
-        $url = $parameterBag->get('app_base');
-
-        $extractedData = $this->submissionRepository->extractBySeasons($url, $seasons?->seasons);
+        $extractedData = $this->submissionRepository->extractBySeasons($this->imagePath, $seasons?->seasons);
 
         return $this->json($extractedData);
     }
