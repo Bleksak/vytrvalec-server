@@ -31,4 +31,29 @@ final class ImageRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function remove(Image $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * @return array<Image>
+     */
+    public function findUnusedImagesForRemoval(): array
+    {
+        $weekAgo = new \DateTime()->sub(new \DateInterval('P1W'));
+
+        return $this->createQueryBuilder('i')
+            ->select('i')
+            ->where('i.usedAt IS NULL')
+            ->andWhere('i.uploadedAt <= :weekAgo')
+            ->setParameter('weekAgo', $weekAgo)
+            ->getQuery()
+            ->getResult();
+    }
 }
