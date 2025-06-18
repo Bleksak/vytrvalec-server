@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
+#[ORM\Index(columns: ['used_at'], name: 'idx_used_at')]
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
 class Image
 {
@@ -80,7 +81,7 @@ class Image
         return $this->usedAt;
     }
 
-    public function setUsedAt(\DateTimeImmutable $usedAt): static
+    public function setUsedAt(?\DateTimeImmutable $usedAt): static
     {
         $this->usedAt = $usedAt;
 

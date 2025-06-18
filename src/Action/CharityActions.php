@@ -31,6 +31,8 @@ final readonly class CharityActions
             if ($image === null) {
                 return ['image' => 'invalid'];
             }
+
+            $image->setUsedAt(new \DateTimeImmutable());
         }
 
         $charity = new Charity($dto->name, $dto->description, $image, $dto->website);
@@ -47,8 +49,11 @@ final readonly class CharityActions
         if ($dto->imageUuid !== null) {
             $image = $this->imageRepository->find($dto->imageUuid);
 
-            if ($image) {
+            if ($image !== null) {
+                $oldImage = $charity->getImage();
                 $charity->setImage($image);
+                $image->setUsedAt(new \DateTimeImmutable());
+                $oldImage?->setUsedAt(null);
             }
         }
 

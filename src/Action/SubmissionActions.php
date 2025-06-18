@@ -50,6 +50,8 @@ final readonly class SubmissionActions
             return ['image' => 'invalid'];
         }
 
+        $image->setUsedAt(new \DateTimeImmutable());
+
         $submission = new Submission(
             $user,
             $activity,
@@ -125,7 +127,10 @@ final readonly class SubmissionActions
                 return ['image' => 'invalid'];
             }
 
+            $oldImage = $submission->getImage();
+            $image->setUsedAt(new \DateTimeImmutable());
             $submission->setImage($image);
+            $oldImage?->setUsedAt(null);
         }
 
         if ($dto->distance !== null) {
