@@ -16,7 +16,6 @@ doctrine:
             season_result: App\Types\SeasonResultType
     orm:
         auto_generate_proxy_classes: true
-        enable_lazy_ghost_objects: true
         report_fields_where_declared: true
         validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
@@ -27,6 +26,30 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+            gedmo_translatable:
+                type: attribute
+                prefix: Gedmo\Translatable\Entity
+                dir: "%kernel.project_dir%/vendor/gedmo/doctrine-extensions/src/Translatable/Entity"
+                alias: GedmoTranslatable # (optional) it will default to the name set for the mapping
+                is_bundle: false
+            gedmo_translator:
+                type: attribute
+                prefix: Gedmo\Translator\Entity
+                dir: "%kernel.project_dir%/vendor/gedmo/doctrine-extensions/src/Translator/Entity"
+                alias: GedmoTranslator # (optional) it will default to the name set for the mapping
+                is_bundle: false
+            gedmo_loggable:
+                type: attribute
+                prefix: Gedmo\Loggable\Entity
+                dir: "%kernel.project_dir%/vendor/gedmo/doctrine-extensions/src/Loggable/Entity"
+                alias: GedmoLoggable # (optional) it will default to the name set for the mapping
+                is_bundle: false
+            gedmo_tree:
+                type: attribute
+                prefix: Gedmo\Tree\Entity
+                dir: "%kernel.project_dir%/vendor/gedmo/doctrine-extensions/src/Tree/Entity"
+                alias: GedmoTree # (optional) it will default to the name set for the mapping
+                is_bundle: false
 
 when@test:
     doctrine:
