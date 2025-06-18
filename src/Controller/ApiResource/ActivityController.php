@@ -7,6 +7,7 @@ namespace App\Controller\ApiResource;
 use App\Action\ActivityActions;
 use App\Dto\Activity\ActivityCreateDto;
 use App\Dto\Activity\ActivityUpdateDto;
+use App\Dto\Activity\Response\ActivityResponseDto;
 use App\Entity\Activity;
 use App\Repository\ActivityRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -16,7 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[OA\Tag('Activity')]
@@ -177,8 +177,11 @@ final class ActivityController extends AbstractController
     )]
     public function activityList(NormalizerInterface $normalizer): Response
     {
-        return $this->json($normalizer->normalize($this->activityRepository->findAll(), null, [
-            AbstractNormalizer::GROUPS => ['fetchActivity'],
-        ]));
+        return $this->json(
+            array_map(
+                static fn (Activity $activity): ActivityResponseDto => $activity->toResponseObject(),
+                $this->activityRepository->findAll(),
+            )
+        );
     }
 }

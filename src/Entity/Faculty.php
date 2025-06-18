@@ -7,27 +7,30 @@ namespace App\Entity;
 use App\Dto\Faculty\Response\FacultyResponseDto;
 use App\Repository\FacultyRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacultyRepository::class)]
-class Faculty
+class Faculty implements Translatable
 {
     #[OA\Property(example: 1)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'fetchFacultySummary', 'fetchSeasonResult', 'fetchUser'])]
+    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[OA\Property(example: 'Fakulta aplikovaných věd')]
     #[ORM\Column(length: 255)]
-    #[Groups(['fetchSubmission', 'fetchFacultySummary', 'fetchSeasonResult', 'fetchUser'])]
+    #[Groups(['fetchSubmission'])]
+    #[Gedmo\Translatable]
     private string $name;
 
     #[OA\Property(example: 'FAV')]
     #[ORM\Column(length: 10)]
-    #[Groups(['fetchSubmission', 'fetchFacultySummary', 'fetchSeasonResult', 'fetchUser'])]
+    #[Groups(['fetchSubmission'])]
     private string $shortcut;
 
     #[OA\Parameter(example: true)]

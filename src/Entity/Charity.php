@@ -6,38 +6,42 @@ namespace App\Entity;
 
 use App\Repository\CharityRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CharityRepository::class)]
-class Charity
+class Charity implements Translatable
 {
     #[OA\Property]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
+    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[OA\Property]
     #[ORM\Column(length: 255)]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
+    #[Gedmo\Translatable]
+    #[Groups(['fetchSubmission'])]
     private string $name;
 
     #[OA\Property]
     #[ORM\Column(length: 10000)]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
+    #[Gedmo\Translatable]
+    #[Groups(['fetchSubmission'])]
     private string $description;
 
     #[OA\Property]
     #[ORM\ManyToOne(fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: true, referencedColumnName: 'uuid', name: 'image_uuid')]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
+    #[Groups(['fetchSubmission'])]
     private ?Image $image = null;
 
     #[OA\Property]
     #[ORM\Column(length: 512, nullable: true)]
-    #[Groups(['fetchSubmission', 'fetchSeasonList', 'fetchSeasonResult'])]
+    #[Groups(['fetchSubmission'])]
     private ?string $website = null;
 
     public function __construct(

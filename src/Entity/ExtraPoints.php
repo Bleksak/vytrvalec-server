@@ -6,27 +6,25 @@ namespace App\Entity;
 
 use App\Repository\ExtraPointsRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
 
 #[ORM\Entity(repositoryClass: ExtraPointsRepository::class)]
-class ExtraPoints
+class ExtraPoints implements Translatable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSeasonResult'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['fetchSeasonResult'])]
+    #[Gedmo\Translatable]
     private string $name;
 
     #[ORM\Column]
-    #[Groups(['fetchSeasonResult'])]
     private int $points;
 
     #[ORM\Column]
-    #[Groups(['fetchSeasonResult'])]
     private int $week;
 
     public function __construct(

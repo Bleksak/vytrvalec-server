@@ -10,6 +10,7 @@ use App\Dto\PasswordChangeDto;
 use App\Dto\User\PasswordResetDto;
 use App\Dto\User\PasswordResetRequestDto;
 use App\Dto\User\Response\UserLoginResponseDto;
+use App\Dto\User\Response\UserResponseDto;
 use App\Dto\User\UserEditDto;
 use App\Dto\User\UserLoginDto;
 use App\Dto\UserDto;
@@ -307,9 +308,12 @@ final class UserController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function userList(): Response
     {
-        return $this->json($this->normalizer->normalize($this->userRepository->findAllNotDeleted(), null, [
-            AbstractNormalizer::GROUPS => ['fetchUser'],
-        ]));
+        return $this->json(
+            array_map(
+                static fn (User $user): UserResponseDto => $user->toResponseObject(),
+                $this->userRepository->findAllNotDeleted(),
+            )
+        );
     }
 
     #[Route(

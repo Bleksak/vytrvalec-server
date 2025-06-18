@@ -17,16 +17,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Index(columns: ['email_unsubscribe_hash'], name: 'email_unsubscribe_hash')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
+    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true, nullable: true)]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
+    #[Groups(['fetchSubmission'])]
     private ?string $email = null;
 
     /**
@@ -34,30 +35,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
     #[ORM\Column(type: 'json')]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
+    #[Groups(['fetchSubmission'])]
     private array $roles = [];
 
     #[ORM\Column]
     private string $password;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
+    #[Groups(['fetchSubmission'])]
     private bool $banned = false;
 
-    #[ORM\Column]
+    #[ORM\Column(options: ['default' => 1])]
     private bool $mailing = true;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
+    #[Groups(['fetchSubmission'])]
     private string $firstName;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
+    #[Groups(['fetchSubmission'])]
     private string $lastName;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'], fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
+    #[Groups(['fetchSubmission'])]
     private Faculty $faculty;
 
     /**

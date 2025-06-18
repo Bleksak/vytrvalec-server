@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Index(columns: ['week'], name: 'week_index')]
+#[ORM\HasLifecycleCallbacks]
 class Submission
 {
     #[OA\Property(example: 1)]
@@ -78,7 +79,7 @@ class Submission
     private \DateTime $date;
 
     #[OA\Property(type: 'datetime', example: 1)]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', updatable: false, insertable: false, generated: 'ALWAYS')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['fetchSubmission'])]
     private \DateTime $updatedAt;
 
@@ -86,6 +87,13 @@ class Submission
     #[ORM\Column(length: 512)]
     #[Groups(['fetchSubmission'])]
     private string $message = '';
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updateTimestamps(): void
+    {
+        $this->updatedAt = new \DateTime();
+    }
 
     public function __construct(
         User $user,
