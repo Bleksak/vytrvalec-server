@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[OA\Tag('Activity')]
 final class ActivityController extends AbstractController
@@ -175,7 +174,7 @@ final class ActivityController extends AbstractController
         name: 'activity_index',
         methods: ['GET'],
     )]
-    public function activityList(NormalizerInterface $normalizer): Response
+    public function activityIndex(): Response
     {
         return $this->json(
             array_map(
