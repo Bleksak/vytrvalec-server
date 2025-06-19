@@ -85,6 +85,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $emailUnsubscribeHash = null;
 
+    #[ORM\Column(length: 8)]
+    private string $locale = 'cs_CZ';
+
     /**
      * @param array<string> $roles
      */
@@ -96,6 +99,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         bool $anonymize,
         array $roles = [],
         ?string $token = null,
+        string $locale = 'cs_CZ',
     ) {
         $this->submissions = new ArrayCollection();
         $this->profileCaches = new ArrayCollection();
@@ -108,6 +112,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles = $roles;
         $this->token = $token;
         $this->emailUnsubscribeHash = bin2hex(random_bytes(90));
+        $this->locale = $locale;
     }
 
     public function getId(): int
@@ -306,6 +311,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmailUnsubscribeHash(?string $emailUnsubscribeHash): static
     {
         $this->emailUnsubscribeHash = $emailUnsubscribeHash;
+
+        return $this;
+    }
+
+    public function getLocale(): string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(string $locale): static
+    {
+        $this->locale = $locale;
 
         return $this;
     }
