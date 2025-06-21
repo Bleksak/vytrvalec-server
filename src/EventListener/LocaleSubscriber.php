@@ -16,7 +16,7 @@ final class LocaleSubscriber
 {
     private bool $switchedFromRequest = false;
 
-    private const ALLOWED_LOCALES = ['cs_CZ', 'en_US'];
+    private const ALLOWED_LOCALES = ['cs', 'en'];
 
     public function __construct(
         private LocaleSwitcher $localeSwitcher,
