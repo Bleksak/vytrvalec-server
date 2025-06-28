@@ -46,8 +46,8 @@ final class WebsocketSubmissionProducerCommand extends Command
     ) {
         parent::__construct();
 
-        $port = $parameters->get('port') ?? 1337;
-        assert(is_int($port), 'Port must be an integer');
+        $port = $parameters->get('ws_port');
+        $port = (int) $port;
         assert($port >= 0, 'Port must be greater than 0');
         assert($port <= 65535, 'Port must be less than or equal to 65535');
 

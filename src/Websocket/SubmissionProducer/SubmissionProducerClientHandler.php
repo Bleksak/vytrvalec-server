@@ -66,7 +66,14 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
         echo 'Locking free-list'.PHP_EOL;
         $freeListLock = $this->freeListMutex->acquire();
 
-        $newSubmissions = $this->submissionRepository->findUnreviewed(self::SUBMISSIONS_BUFFER_LIMIT);
+        $oldSubmissions = array_map(
+            fn (Submission $submission): int => $submission->getId(),
+            $this->submissions,
+        );
+
+        $ignoredIds = array_diff($oldSubmissions, $this->freeList);
+
+        $newSubmissions = $this->submissionRepository->findUnreviewed(self::SUBMISSIONS_BUFFER_LIMIT, $ignoredIds);
 
         $toMerge = array_filter(
             array_diff_key($newSubmissions, $this->submissions),

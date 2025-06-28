@@ -106,23 +106,32 @@ final class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<int> $ignoredIds
+     *
      * @return array<int,Submission>
      */
-    public function findUnreviewed(int $limit): array
+    public function findUnreviewed(int $limit, array $ignoredIds = []): array
     {
-        /**
-         * @var array<Submission>
-         */
-        $result = $this
-            ->createQueryBuilder('s')
+        $qb = $this
+            ->createQueryBuilder('s');
+        $qb
             ->select('s, i, u')
             ->join('s.image', 'i')
             ->join('s.user', 'u')
             ->andWhere('s.reviewed = 0')
             ->orderBy('s.date', 'ASC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($limit);
+
+        if ($ignoredIds !== []) {
+            $qb->andWhere(
+                $qb->expr()->notIn('s.id', $ignoredIds)
+            );
+        }
+
+        /**
+         * @var array<Submission>
+         */
+        $result = $qb->getQuery()->getResult();
 
         $indexed = [];
 
