@@ -6,7 +6,6 @@ namespace App\Entity;
 
 use App\Repository\ExtraPointsRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
 
 #[ORM\Entity(repositoryClass: ExtraPointsRepository::class)]
@@ -18,7 +17,6 @@ class ExtraPoints implements Translatable
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Gedmo\Translatable]
     private string $name;
 
     #[ORM\Column]

@@ -23,7 +23,6 @@ class Charity implements Translatable
 
     #[OA\Property]
     #[ORM\Column(length: 255)]
-    #[Gedmo\Translatable]
     #[Groups(['fetchSubmission'])]
     private string $name;
 
