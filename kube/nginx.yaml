@@ -105,10 +105,10 @@ metadata:
 spec:
   storageClassName: csi-rbd-synergia
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
-      storage: 20Gi
+      storage: 40Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -117,7 +117,7 @@ metadata:
 spec:
   storageClassName: csi-rbd-synergia
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 1Gi
