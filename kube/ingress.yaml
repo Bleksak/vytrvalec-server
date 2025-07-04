@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: vytrvalec-kts
+  name: vytrvalec-uts
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/proxy-body-size: 100M
@@ -13,15 +13,15 @@ metadata:
 spec:
   tls:
     - hosts:
-        - vytrvalec.kts.zcu.cz
-      secretName: vytrvalec-kts-tls
+        - vytrvalec.uts.zcu.cz
+      secretName: vytrvalec-uts-tls
   defaultBackend:
     service:
       name: vytrvalec-nginx
       port:
         number: 80
   rules:
-    - host: vytrvalec.kts.zcu.cz
+    - host: vytrvalec.uts.zcu.cz
       http:
         paths:
           - path: /
@@ -40,7 +40,7 @@ data:
   default.conf: |
     server {
         root /var/www/vytrvalec/public;
-        server_name vytrvalec.kts.zcu.cz;
+        server_name vytrvalec.uts.zcu.cz;
         
         client_max_body_size 256M;
         

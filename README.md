@@ -55,10 +55,10 @@
   contexts:
   - context:
       cluster: synergia
-      namespace: vytrvalec-kts
-      user: gitlab-vytrvalec-kts
+      namespace: vytrvalec-uts
+      user: gitlab-vytrvalec-uts
     name: vytrvalec-kts
-  current-context: vytrvalec-kts
+  current-context: vytrvalec-uts
   kind: Config
   preferences: {}
   users:
@@ -66,7 +66,7 @@
     user:
       token: <token for gitlab-vytrvalec-kts>
   ```
-- Replace `<token for gitlab-vytrvalec-kts>` with token obtained from [Kubernetes Dashboard](https://dashboard.kube.zcu.cz/#/workloads?namespace=default) under vytrvalec-kts workspace -> config and storage -> secrets -> gitlab-vytrvalec-kts-token 
+- Replace `<token for gitlab-vytrvalec-kts>` with token obtained from [Kubernetes Dashboard](https://dashboard.kube.zcu.cz/#/workloads?namespace=default) under vytrvalec-uts workspace -> config and storage -> secrets -> gitlab-vytrvalec-kts-token 
   
   ![img.png](readme/img.png)
 
