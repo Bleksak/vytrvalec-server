@@ -7,26 +7,50 @@ namespace App\Action;
 use App\Dto\Activity\ActivityCreateDto;
 use App\Dto\Activity\ActivityUpdateDto;
 use App\Entity\Activity;
+use App\Entity\ActivityTranslation;
 use App\Repository\ActivityRepository;
+use App\Repository\ImageRepository;
 
 final readonly class ActivityActions
 {
     public function __construct(
         private ActivityRepository $activityRepository,
+        private ImageRepository $imageRepository,
     ) {
     }
 
-    public function create(ActivityCreateDto $dto): int
+    public function create(ActivityCreateDto $dto): ?Activity
     {
-        $activity = new Activity($dto->name, $dto->minElevation);
+        $icon = $this->imageRepository->find($dto->icon);
+
+        if ($icon === null) {
+            return null;
+        }
+
+        $activity = new Activity($dto->translations, $dto->minElevation, $icon);
+
         $this->activityRepository->save($activity, true);
 
-        return $activity->getId();
+        return $activity;
     }
 
     public function update(Activity $activity, ActivityUpdateDto $dto): void
     {
-        $activity->setName($dto->name ?? $activity->getName());
+        $nameTranslations = $dto->translations?->name?->toArray() ?? [];
+
+        foreach ($nameTranslations as $locale => $translation) {
+            assert($translation !== null, 'Translation cannot be null!');
+
+            $activityTranslation = $activity->getTranslations()->get($locale);
+
+            if ($activityTranslation === null) {
+                $activityTranslation = new ActivityTranslation($activity, $locale, $translation);
+                $activity->addTranslation($activityTranslation);
+            }
+
+            $activityTranslation->name = $translation;
+        }
+
         $activity->setMinElevation($dto->minElevation ?? $activity->getMinElevation());
 
         $this->activityRepository->save($activity, true);

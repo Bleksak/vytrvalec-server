@@ -10,6 +10,5 @@ final class WeeklySubmissionSum
         public int $distance,
         public int $faculty,
         public int $activity,
-    ) {
-    }
+    ) {}
 }

@@ -19,8 +19,7 @@ final readonly class SeasonResultCalculator
         private DailyDistanceExtraPoints $dailyDistanceExtraPoints,
         private WeeklyDistanceExtraPoints $weeklyDistanceExtraPoints,
         private WeeklyElevationExtraPoints $weeklyElevationExtraPoints,
-    ) {
-    }
+    ) {}
 
     public function calculate(Season $season): SeasonResultDto
     {
@@ -45,26 +44,17 @@ final readonly class SeasonResultCalculator
                     $activities[$result->activity] = [];
                 }
 
-                $activities[$result->activity][] = new FacultyResultDto(
-                    $result->faculty,
-                    $result->distance
-                );
+                $activities[$result->activity][] = new FacultyResultDto($result->faculty, $result->distance);
             }
 
             $activityResult = [];
 
             foreach ($activities as $activityId => $activity) {
-                $activityResult[$activityId] = new ActivityResultDto(
-                    $activityId,
-                    $activity
-                );
+                $activityResult[$activityId] = new ActivityResultDto($activityId, $activity);
             }
 
             if (count($activityResult) !== 0) {
-                $results[$i] = new WeeklyResultDto(
-                    $i,
-                    $activityResult
-                );
+                $results[$i] = new WeeklyResultDto($i, $activityResult);
             }
         }
 
@@ -76,7 +66,7 @@ final readonly class SeasonResultCalculator
                     $extra->facultyId,
                     $cls->getUniqueName(),
                     $extra->value,
-                    $cls->reward()
+                    $cls->reward(),
                 );
             }
         }
@@ -89,9 +79,6 @@ final readonly class SeasonResultCalculator
             $result->activities = array_values($result->activities);
         }
 
-        return new SeasonResultDto(
-            $results,
-            $topThree,
-        );
+        return new SeasonResultDto($results, $topThree);
     }
 }

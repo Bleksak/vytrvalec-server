@@ -7,6 +7,7 @@ namespace App\Action;
 use App\Dto\Faculty\FacultyCreateDto;
 use App\Dto\Faculty\FacultyUpdateDto;
 use App\Entity\Faculty;
+use App\Entity\FacultyTranslation;
 use App\Repository\FacultyRepository;
 use App\Utils\AbstractProperty;
 
@@ -19,10 +20,16 @@ final readonly class FacultyActions
 
     public function create(FacultyCreateDto $dto): int
     {
-        $faculty = new Faculty($dto->name, $dto->shortcut, $dto->visible);
+        $faculty = new Faculty(
+            $dto->translations,
+            $dto->shortcut,
+            $dto->visible,
+            $dto->color
+        );
+
         $this->facultyRepository->save($faculty, true);
 
-        return $faculty->getId();
+        return $faculty->id;
     }
 
     /**
@@ -30,12 +37,26 @@ final readonly class FacultyActions
      */
     public function update(Faculty $faculty, FacultyUpdateDto $dto): array
     {
-        $faculty->setName($dto->name ?? $faculty->getName());
-        $faculty->setShortcut($dto->shortcut ?? $faculty->getShortcut());
-        $faculty->setVisible($dto->visible ?? $faculty->isVisible());
+        $nameTranslations = $dto->translations?->name?->toArray() ?? [];
+
+        foreach ($nameTranslations as $locale => $translation) {
+            assert($translation !== null, 'Translation cannot be null!');
+
+            $facultyTranslation = $faculty->translations->get($locale);
+
+            if ($facultyTranslation === null) {
+                $facultyTranslation = new FacultyTranslation($faculty, $locale, $translation);
+                $faculty->addTranslation($facultyTranslation);
+            }
+
+            $facultyTranslation->name = $translation;
+        }
+
+        $faculty->shortcut = $dto->shortcut ?? $faculty->shortcut;
+        $faculty->visible = $dto->visible ?? $faculty->visible;
 
         if (AbstractProperty::isInitialized($dto, 'parent')) {
-            if ($dto->parent === $faculty->getId()) {
+            if ($dto->parent === $faculty->id) {
                 return ['parent' => 'invalid_value'];
             }
 
@@ -43,12 +64,12 @@ final readonly class FacultyActions
 
             if ($dto->parent !== null) {
                 $parent = $this->facultyRepository->find($dto->parent);
-                if ($parent === null || $parent->getParent() !== null) {
+                if ($parent === null || $parent->parent !== null) {
                     return ['parent' => 'invalid_value'];
                 }
             }
 
-            $faculty->setParent($parent);
+            $faculty->parent = $parent;
         }
 
         $this->facultyRepository->save($faculty, true);

@@ -14,22 +14,22 @@ final class SeasonFixtures extends Fixture
     #[\Override]
     public function load(ObjectManager $manager): void
     {
-        $start = \DateTimeImmutable::createFromFormat('Y-m-d', '2020-10-01');
+        $start = \DateTime::createFromFormat('Y-m-d', '2020-10-01');
 
         if (!$start) {
             return;
         }
 
-        $end = $start->add(new \DateInterval('P4W'));
+        $end = (clone $start)->add(new \DateInterval('P4W'));
 
         $oct2020 = new Season($start, $end, $this->getReference('anickaJirik', Charity::class));
 
-        $start = \DateTimeImmutable::createFromFormat('Y-m-d', '2021-10-01');
+        $start = \DateTime::createFromFormat('Y-m-d', '2021-10-01');
         if (!$start) {
             return;
         }
 
-        $end = $start->add(new \DateInterval('P4W'));
+        $end = (clone $start)->add(new \DateInterval('P4W'));
 
         $oct2021 = new Season($start, $end, $this->getReference('davidGolias', Charity::class));
 

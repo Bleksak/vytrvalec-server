@@ -13,6 +13,5 @@ final readonly class FacultyResultDto
         public int $faculty,
         #[OA\Property(example: 2250)]
         public int $distance,
-    ) {
-    }
+    ) {}
 }

@@ -6,10 +6,9 @@ namespace App\Entity;
 
 use App\Repository\ExtraPointsRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Translatable\Translatable;
 
 #[ORM\Entity(repositoryClass: ExtraPointsRepository::class)]
-class ExtraPoints implements Translatable
+class ExtraPoints
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -25,11 +24,8 @@ class ExtraPoints implements Translatable
     #[ORM\Column]
     private int $week;
 
-    public function __construct(
-        string $name,
-        int $points,
-        int $week,
-    ) {
+    public function __construct(string $name, int $points, int $week)
+    {
         $this->name = $name;
         $this->points = $points;
         $this->week = $week;

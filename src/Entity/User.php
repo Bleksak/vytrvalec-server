@@ -329,8 +329,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function anonymize(): static
     {
-        $this
-            ->setLastName('')
+        $this->setLastName('')
             ->setMailing(false)
             ->setAnonymization(true)
             ->setEmailUnsubscribeHash(null)

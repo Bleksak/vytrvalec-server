@@ -17,6 +17,5 @@ final class TotalStatisticsDto
          */
         #[OA\Property]
         public array $activities,
-    ) {
-    }
+    ) {}
 }

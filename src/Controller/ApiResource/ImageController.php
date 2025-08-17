@@ -13,6 +13,7 @@ use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -29,21 +30,17 @@ final class ImageController extends AbstractController
 
     #[OA\Post(
         description: 'Upload an image to the server',
-        requestBody: new OA\RequestBody(
-            content: new OA\MediaType(
-                mediaType: 'file',
-                schema: new OA\Schema(ref: new Model(type: ImageUploadDto::class)),
-            )
-        ),
+        requestBody: new OA\RequestBody(content: new OA\MediaType(
+            mediaType: 'file',
+            schema: new OA\Schema(ref: new Model(type: ImageUploadDto::class)),
+        )),
         responses: [
             new OA\Response(
                 description: 'Image uploaded successfully',
                 response: Response::HTTP_OK,
-                content: new OA\JsonContent(
-                    ref: new Model(type: ImageCreateResponseDto::class),
-                ),
+                content: new OA\JsonContent(ref: new Model(type: ImageCreateResponseDto::class)),
             ),
-        ]
+        ],
     )]
     #[Route('/api/image', 'image_store', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
@@ -61,8 +58,9 @@ final class ImageController extends AbstractController
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        // @phpstan-ignore-next-line
-        $image = $this->imageUploader->uploadImage($form->getData()->image);
+        /** @var object{'image': UploadedFile} */
+        $formData = $form->getData();
+        $image = $this->imageUploader->uploadImage($formData->image);
 
         if ($image === null) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
@@ -73,7 +71,7 @@ final class ImageController extends AbstractController
                 $image->getUuid(),
                 $image->getPath($this->imagePath),
                 $image->getUploadedAt(),
-                $image->getUsedAt()
+                $image->getUsedAt(),
             )
         );
     }

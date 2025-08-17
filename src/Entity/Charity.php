@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\Charity\CharityCreateTranslationDto;
+use App\Dto\Charity\Response\CharityGetResponseDto;
+use App\Dto\TranslationObjectDto;
 use App\Repository\CharityRepository;
+use App\Services\ImagePath;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Translatable\Translatable;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CharityRepository::class)]
-class Charity implements Translatable
+class Charity
 {
     #[OA\Property]
     #[ORM\Id]
@@ -20,17 +23,6 @@ class Charity implements Translatable
     #[ORM\Column]
     #[Groups(['fetchSubmission'])]
     private ?int $id = null;
-
-    #[OA\Property]
-    #[ORM\Column(length: 255)]
-    #[Groups(['fetchSubmission'])]
-    private string $name;
-
-    #[OA\Property]
-    #[ORM\Column(length: 10000)]
-    #[Gedmo\Translatable]
-    #[Groups(['fetchSubmission'])]
-    private string $description;
 
     #[OA\Property]
     #[ORM\ManyToOne(fetch: 'EAGER')]
@@ -43,45 +35,37 @@ class Charity implements Translatable
     #[Groups(['fetchSubmission'])]
     private ?string $website = null;
 
+    /** @var Collection<string, CharityTranslation> */
+    #[ORM\OneToMany(mappedBy: 'charity', targetEntity: CharityTranslation::class, cascade: ['persist', 'remove'], indexBy: 'locale')]
+    public Collection $translations;
+
     public function __construct(
-        string $name,
-        string $description,
+        CharityCreateTranslationDto $translations,
         ?Image $image = null,
         ?string $website = null,
     ) {
-        $this->name = $name;
-        $this->description = $description;
         $this->image = $image;
         $this->website = $website;
+
+        $descriptionTranslations = $translations->description->toArray();
+
+        foreach ($translations->name->toArray() as $locale => $translation) {
+            assert($translation !== null, 'Preklad nesmi byt null');
+
+            $this->addTranslation(
+                new CharityTranslation(
+                    $this,
+                    $locale,
+                    $translation,
+                    $descriptionTranslations[$locale] ?? ''
+                )
+            );
+        }
     }
 
     public function getId(): int
     {
         return $this->id ?? 0;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description): self
-    {
-        $this->description = $description;
-
-        return $this;
     }
 
     public function getImage(): ?Image
@@ -106,5 +90,23 @@ class Charity implements Translatable
         $this->website = $website;
 
         return $this;
+    }
+
+    public function addTranslation(CharityTranslation $translation): void
+    {
+        if (!$this->translations->containsKey($translation->locale)) {
+            $this->translations->set($translation->locale, $translation);
+        }
+    }
+
+    public function toResponseObject(?ImagePath $imagePath = null): CharityGetResponseDto
+    {
+        return new CharityGetResponseDto(
+            $this->id ?? 0,
+            TranslationObjectDto::fromArray(array_column($this->translations->toArray(), 'locale', 'name')),
+            TranslationObjectDto::fromArray(array_column($this->translations->toArray(), 'locale', 'description')),
+            $this->image?->getPath($imagePath),
+            $this->website,
+        );
     }
 }

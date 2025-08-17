@@ -20,8 +20,7 @@ final readonly class SeasonActions
         private SeasonRepository $seasonRepository,
         private CharityRepository $charityRepository,
         private MessageBusInterface $messageBus,
-    ) {
-    }
+    ) {}
 
     public function create(SeasonCreateDto $dto): int
     {
@@ -42,30 +41,22 @@ final readonly class SeasonActions
         $this->seasonRepository->save($season, true);
         $stamps = [];
 
-        $today = (new \DateTimeImmutable())->setTime(0, 0);
+        $today = new \DateTimeImmutable()->setTime(0, 0);
         $diff = $season->getStart()->diff($today)->days;
+
+        assert($diff !== false, 'Diff cannot be false?');
 
         if ($diff > 0) {
             $stamps[] = DelayStamp::delayUntil($dto->start);
         }
 
-        $this->messageBus->dispatch(
-            new Envelope(
-                new SeasonStartMessage($season->getId()),
-                $stamps,
-            )
-        );
+        $this->messageBus->dispatch(new Envelope(new SeasonStartMessage($season->getId()), $stamps));
 
         $stamps = [
             DelayStamp::delayUntil($dto->end),
         ];
 
-        $this->messageBus->dispatch(
-            new Envelope(
-                new SeasonEndMessage($season->getId()),
-                $stamps,
-            )
-        );
+        $this->messageBus->dispatch(new Envelope(new SeasonEndMessage($season->getId()), $stamps));
 
         return $season->getId();
     }

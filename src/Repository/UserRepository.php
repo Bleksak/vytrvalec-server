@@ -50,7 +50,7 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
     #[\Override]
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
-        if (!$user instanceof User) {
+        if (!($user instanceof User)) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
@@ -68,16 +68,20 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
 
         $rows = $queryBuilder
             ->select('f.id as id, count(u.id) as count')
-            ->where($queryBuilder->expr()->exists(
-                $this->getEntityManager()
-                    ->createQueryBuilder()
-                    ->select('1')
-                    ->from(Submission::class, 's')
-                    ->where('s.user = u')
-                    ->andWhere('s.accepted = :accepted')
-                    ->andWhere('s.season = :season')
-                    ->getDQL()
-            ))
+            ->where(
+                $queryBuilder
+                    ->expr()
+                    ->exists(
+                        $this->getEntityManager()
+                            ->createQueryBuilder()
+                            ->select('1')
+                            ->from(Submission::class, 's')
+                            ->where('s.user = u')
+                            ->andWhere('s.accepted = :accepted')
+                            ->andWhere('s.season = :season')
+                            ->getDQL(),
+                    ),
+            )
             ->innerJoin('u.faculty', 'f')
             ->groupBy('f.id')
             ->orderBy('count', 'desc')
@@ -105,6 +109,7 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
 
         $qb = $this->createQueryBuilder('u');
 
+        /** @var array<User> */
         $results = $qb
             ->select('u')
             ->where($qb->expr()->in('u.id', ':ids'))
@@ -114,10 +119,7 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
 
         $orderMap = array_flip($ids);
 
-        usort(
-            $results,
-            fn (User $a, User $b): int => $orderMap[$a->getId()] <=> $orderMap[$b->getId()]
-        );
+        usort($results, fn (User $a, User $b): int => $orderMap[$a->getId()] <=> $orderMap[$b->getId()]);
 
         return $results;
     }

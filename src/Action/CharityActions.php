@@ -7,6 +7,7 @@ namespace App\Action;
 use App\Dto\Charity\CharityCreateDto;
 use App\Dto\Charity\CharityEditDto;
 use App\Entity\Charity;
+use App\Entity\CharityTranslation;
 use App\Repository\CharityRepository;
 use App\Repository\ImageRepository;
 
@@ -32,10 +33,15 @@ final readonly class CharityActions
                 return ['image' => 'invalid'];
             }
 
-            $image->setUsedAt(new \DateTimeImmutable());
+            $image->setUsedAt(new \DateTime());
         }
 
-        $charity = new Charity($dto->name, $dto->description, $image, $dto->website);
+        $charity = new Charity(
+            $dto->translations,
+            $image,
+            $dto->website
+        );
+
         $this->charityRepository->save($charity, true);
 
         return $charity;
@@ -43,8 +49,44 @@ final readonly class CharityActions
 
     public function update(Charity $charity, CharityEditDto $dto): void
     {
-        $charity->setName($dto->name ?? $charity->getName());
-        $charity->setDescription($dto->description ?? $charity->getDescription());
+        $nameTranslations = $dto->translations?->name?->toArray() ?? [];
+        $descriptionTranslations = $dto->translations?->description?->toArray() ?? [];
+
+        foreach ($nameTranslations as $locale => $translation) {
+            assert($translation !== null, 'Translation cannot be null!');
+
+            $charityTranslation = $charity->translations->get($locale);
+
+            if ($charityTranslation === null) {
+                $charityTranslation = new CharityTranslation(
+                    $charity,
+                    $locale,
+                    $translation,
+                    $descriptionTranslations[$locale] ?? ''
+                );
+                $charity->addTranslation($charityTranslation);
+            }
+
+            $charityTranslation->name = $translation;
+        }
+
+        foreach ($descriptionTranslations as $locale => $translation) {
+            assert($translation !== null, 'Translation cannot be null!');
+
+            $charityTranslation = $charity->translations->get($locale);
+
+            if ($charityTranslation === null) {
+                $charityTranslation = new CharityTranslation(
+                    $charity,
+                    $locale,
+                    $nameTranslations[$locale] ?? '',
+                    $translation,
+                );
+                $charity->addTranslation($charityTranslation);
+            }
+
+            $charityTranslation->description = $translation;
+        }
 
         if ($dto->imageUuid !== null) {
             $image = $this->imageRepository->find($dto->imageUuid);
@@ -52,7 +94,7 @@ final readonly class CharityActions
             if ($image !== null && $image->getUsedAt() === null) {
                 $oldImage = $charity->getImage();
                 $charity->setImage($image);
-                $image->setUsedAt(new \DateTimeImmutable());
+                $image->setUsedAt(new \DateTime());
                 $oldImage?->setUsedAt(null);
             }
         }

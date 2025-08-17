@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class SubmissionProducerClientHandler implements WebsocketClientHandler
 {
     private const int SUBMISSIONS_BUFFER_LIMIT = 2;
+
     /**
      * @var array<int, Submission>
      */
@@ -31,7 +32,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
     /**
      * Contains the ids of free submissions.
      *
-     * @var array<int>
+     * @var list<int>
      */
     private array $freeList = [];
     private ReentrantMutex $freeListMutex;
@@ -66,10 +67,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
         echo 'Locking free-list'.PHP_EOL;
         $freeListLock = $this->freeListMutex->acquire();
 
-        $oldSubmissions = array_map(
-            fn (Submission $submission): int => $submission->getId(),
-            $this->submissions,
-        );
+        $oldSubmissions = array_map(fn (Submission $submission): int => $submission->getId(), $this->submissions);
 
         $ignoredIds = array_diff($oldSubmissions, $this->freeList);
 
@@ -77,7 +75,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
 
         $toMerge = array_filter(
             array_diff_key($newSubmissions, $this->submissions),
-            fn (Submission $submission): bool => $submission->isReviewed() === false
+            fn (Submission $submission): bool => $submission->isReviewed() === false,
         );
 
         foreach ($toMerge as $key => $submission) {
@@ -113,11 +111,8 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
     }
 
     #[\Override]
-    public function handleClient(
-        WebsocketClient $client,
-        Request $request,
-        Response $response,
-    ): void {
+    public function handleClient(WebsocketClient $client, Request $request, Response $response): void
+    {
         $this->gateway->addClient($client);
 
         $customClient = new SubmissionProducerClient($client->getId());
@@ -135,19 +130,17 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
 
                 echo sprintf('Client: %d - Got message of type: %s'.PHP_EOL, $client->getId(), $message->type->value);
 
-                if ($message->type !== SubmissionProducerMessageType::InitializeRequest && $customClient->user === null) {
-                    $client->sendText(
-                        $this->serializer->serialize(
-                            new SubmissionProducerMessage(
-                                SubmissionProducerMessageType::Fail,
-                                SubmissionProducerMessageType::SubmissionReviewRequest,
-                                [
-                                    'message' => 'Uninitialized connection, send an initialize request first',
-                                ]
-                            ),
-                            'json',
-                        )
-                    );
+                if (
+                    $message->type !== SubmissionProducerMessageType::InitializeRequest
+                        && $customClient->user === null
+                ) {
+                    $client->sendText($this->serializer->serialize(new SubmissionProducerMessage(
+                        SubmissionProducerMessageType::Fail,
+                        SubmissionProducerMessageType::SubmissionReviewRequest,
+                        [
+                            'message' => 'Uninitialized connection, send an initialize request first',
+                        ],
+                    ), 'json'));
 
                     $this->triggerDisconnect($client);
 
@@ -156,27 +149,26 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
 
                 switch ($message->type) {
                     case SubmissionProducerMessageType::InitializeRequest:
-                        $payload = $this->denormalizer->denormalize($message->payload, SubmissionProducerInitializeRequestPayload::class);
+                        /** @var SubmissionProducerInitializeRequestPayload */
+                        $payload = $this->denormalizer->denormalize(
+                            $message->payload,
+                            SubmissionProducerInitializeRequestPayload::class,
+                        );
 
                         $user = SubmissionProducerMessage::handleInitialize(
                             $payload,
                             $this->accessTokenHandler,
-                            $this->userRepository
+                            $this->userRepository,
                         );
 
                         if ($user === null) {
-                            $client->sendText(
-                                $this->serializer->serialize(
-                                    new SubmissionProducerMessage(
-                                        SubmissionProducerMessageType::Fail,
-                                        SubmissionProducerMessageType::SubmissionReviewRequest,
-                                        [
-                                            'message' => 'Invalid JWT token',
-                                        ]
-                                    ),
-                                    'json',
-                                )
-                            );
+                            $client->sendText($this->serializer->serialize(new SubmissionProducerMessage(
+                                SubmissionProducerMessageType::Fail,
+                                SubmissionProducerMessageType::SubmissionReviewRequest,
+                                [
+                                    'message' => 'Invalid JWT token',
+                                ],
+                            ), 'json'));
 
                             $this->triggerDisconnect($client);
 
@@ -185,15 +177,13 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
 
                         $customClient->user = $user;
 
-                        $client->sendText(
-                            $this->serializer->serialize(
-                                new SubmissionProducerMessage(
-                                    SubmissionProducerMessageType::Success,
-                                    SubmissionProducerMessageType::InitializeRequest
-                                ),
-                                'json',
-                            )
-                        );
+                        $client->sendText($this->serializer->serialize(
+                            new SubmissionProducerMessage(
+                                SubmissionProducerMessageType::Success,
+                                SubmissionProducerMessageType::InitializeRequest,
+                            ),
+                            'json',
+                        ));
 
                         break;
                     case SubmissionProducerMessageType::SubmissionRequest:
@@ -203,15 +193,13 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
 
                         if ($customClient->submissionId === null) {
                             echo 'No more submissions to process'.PHP_EOL;
-                            $client->sendText(
-                                $this->serializer->serialize(
-                                    new SubmissionProducerMessage(
-                                        SubmissionProducerMessageType::Fail,
-                                        SubmissionProducerMessageType::SubmissionRequest
-                                    ),
-                                    'json'
-                                )
-                            );
+                            $client->sendText($this->serializer->serialize(
+                                new SubmissionProducerMessage(
+                                    SubmissionProducerMessageType::Fail,
+                                    SubmissionProducerMessageType::SubmissionRequest,
+                                ),
+                                'json',
+                            ));
 
                             $this->triggerDisconnect($client);
 
@@ -230,28 +218,18 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
                             ],
                         );
 
-                        $client->sendText(
-                            $this->serializer->serialize(
-                                $response,
-                                'json',
-                            )
-                        );
+                        $client->sendText($this->serializer->serialize($response, 'json'));
 
                         break;
                     case SubmissionProducerMessageType::SubmissionReviewRequest:
                         if ($customClient->submissionId === null) {
-                            $client->sendText(
-                                $this->serializer->serialize(
-                                    new SubmissionProducerMessage(
-                                        SubmissionProducerMessageType::Fail,
-                                        SubmissionProducerMessageType::SubmissionReviewRequest,
-                                        [
-                                            'message' => 'Client has no submission to be reviewed.',
-                                        ]
-                                    ),
-                                    'json',
-                                )
-                            );
+                            $client->sendText($this->serializer->serialize(new SubmissionProducerMessage(
+                                SubmissionProducerMessageType::Fail,
+                                SubmissionProducerMessageType::SubmissionReviewRequest,
+                                [
+                                    'message' => 'Client has no submission to be reviewed.',
+                                ],
+                            ), 'json'));
 
                             $this->triggerDisconnect($client);
 
@@ -261,7 +239,10 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
                         /**
                          * @var SubmissionProducerReviewPayload
                          */
-                        $payload = $this->denormalizer->denormalize($message->payload, SubmissionProducerReviewPayload::class);
+                        $payload = $this->denormalizer->denormalize(
+                            $message->payload,
+                            SubmissionProducerReviewPayload::class,
+                        );
 
                         $submission = $this->submissions[$customClient->submissionId];
 
@@ -272,15 +253,13 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
 
                         $customClient->submissionId = null;
 
-                        $client->sendText(
-                            $this->serializer->serialize(
-                                new SubmissionProducerMessage(
-                                    SubmissionProducerMessageType::Success,
-                                    SubmissionProducerMessageType::SubmissionReviewRequest,
-                                ),
-                                'json',
-                            )
-                        );
+                        $client->sendText($this->serializer->serialize(
+                            new SubmissionProducerMessage(
+                                SubmissionProducerMessageType::Success,
+                                SubmissionProducerMessageType::SubmissionReviewRequest,
+                            ),
+                            'json',
+                        ));
 
                         break;
                 }

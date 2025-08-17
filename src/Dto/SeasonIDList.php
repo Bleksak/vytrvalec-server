@@ -11,11 +11,6 @@ final class SeasonIDList
     /**
      * @var array<int>
      */
-    #[OA\Property(
-        type: 'array',
-        items: new OA\Items(
-            type: 'integer'
-        )
-    )]
+    #[OA\Property(type: 'array', items: new OA\Items(type: 'integer'))]
     public array $seasons = [];
 }

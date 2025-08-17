@@ -9,9 +9,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class FacultyCreateDto
 {
-    #[OA\Property(example: 'Fakulta aplikovaných věd')]
+    #[OA\Property]
     #[Assert\NotBlank(allowNull: false)]
-    public string $name;
+    public FacultyCreateTranslationDto $translations;
 
     #[Assert\NotBlank(allowNull: false)]
     #[OA\Property(example: 'FAV')]
@@ -24,4 +24,14 @@ final class FacultyCreateDto
     #[Assert\Type(type: 'integer', message: 'invalid_value')]
     #[OA\Property(type: 'integer')]
     public ?int $parent;
+
+    #[Assert\Type(type: 'string', message: 'invalid_value')]
+    #[Assert\CssColor(formats: [
+        Assert\CssColor::HEX_LONG_WITH_ALPHA,
+        Assert\CssColor::HEX_LONG,
+        Assert\CssColor::HEX_SHORT_WITH_ALPHA,
+        Assert\CssColor::HEX_SHORT,
+    ], message: 'invalid')]
+    #[OA\Property(type: 'string')]
+    public string $color;
 }

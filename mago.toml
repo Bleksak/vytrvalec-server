@@ -1,6 +1,6 @@
 # Mago configuration file
 # For more information, see https://mago.carthage.software/#/getting-started/configuration
-php_version = "8.4.0"
+php_version = "8.5.0"
 
 [source]
 paths = ["src"]
@@ -50,4 +50,8 @@ level = "off"
 
 [[linter.rules]]
 name = "maintainability/cyclomatic-complexity"
+level = "off"
+
+[[linter.rules]]
+name = "maintainability/kan-defect"
 level = "off"

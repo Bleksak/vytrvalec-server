@@ -14,13 +14,11 @@ final class VytrvalecEmail extends TemplatedEmail
         parent::__construct();
 
         // TODO(@jvelek): use env for the mail
-        $this
-            ->from(new Address('vytrvale@ntis.zcu.cz', 'Měsíční Vytrvalec'))
+        $this->from(new Address('vytrvale@ntis.zcu.cz', 'Měsíční Vytrvalec'))
             ->to(new Address($recipient))
             // ->bcc('vytrvale@ntis.zcu.cz')
             ->subject($template->getSubject())
             ->htmlTemplate($template->getTemplate())
-            ->context($template->getContext())
-        ;
+            ->context($template->getContext());
     }
 }

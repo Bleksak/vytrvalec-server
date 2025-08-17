@@ -17,8 +17,7 @@ final class SeasonCacheController extends AbstractController
 {
     public function __construct(
         private readonly SeasonCacheActions $action,
-    ) {
-    }
+    ) {}
 
     #[OA\Post(
         description: 'Cache season results',
@@ -34,13 +33,9 @@ final class SeasonCacheController extends AbstractController
                 response: Response::HTTP_CREATED,
                 description: 'Cache successfully created',
             ),
-        ]
+        ],
     )]
-    #[Route(
-        '/api/cache/season/{season}',
-        name: 'api_cache_season',
-        methods: ['POST'],
-    )]
+    #[Route('/api/cache/season/{season}', name: 'api_cache_season', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
     public function cacheSeason(Season $season): Response
     {
@@ -67,18 +62,12 @@ final class SeasonCacheController extends AbstractController
                 response: Response::HTTP_OK,
                 description: 'Result if cached or not',
             ),
-        ]
+        ],
     )]
-    #[Route(
-        '/api/cache/season/{season}',
-        name: 'api_cache_check_season',
-        methods: ['GET'],
-    )]
+    #[Route('/api/cache/season/{season}', name: 'api_cache_check_season', methods: ['GET'])]
     #[IsGranted('ROLE_STAFF')]
     public function isCached(Season $season): Response
     {
-        return $this->json(
-            $this->action->isCached($season)
-        );
+        return $this->json($this->action->isCached($season));
     }
 }

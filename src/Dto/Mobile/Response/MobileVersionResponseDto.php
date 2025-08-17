@@ -13,6 +13,5 @@ final class MobileVersionResponseDto
         public string $android,
         #[OA\Property]
         public string $ios,
-    ) {
-    }
+    ) {}
 }

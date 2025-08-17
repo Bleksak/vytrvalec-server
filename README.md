@@ -60,7 +60,7 @@
       cluster: synergia
       namespace: vytrvalec-uts
       user: gitlab-vytrvalec-uts
-    name: vytrvalec-kts
+    name: vytrvalec-uts
   current-context: vytrvalec-uts
   kind: Config
   preferences: {}

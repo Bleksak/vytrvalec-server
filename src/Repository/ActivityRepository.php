@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\ActivityStatisticsDto;
 use App\Entity\Activity;
 use App\Entity\Submission;
+use App\Services\ImagePath;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -44,12 +47,42 @@ final class ActivityRepository extends ServiceEntityRepository
 
     public function submissionsCount(Activity $activity): int
     {
-        return intval($this->createQueryBuilder('a')
-            ->select('COUNT(*)')
-            ->from(Submission::class, 's')
-            ->where(['s.activity = :activity'])
-            ->setParameter('activity', $activity->getId())
+        $qb = $this->createQueryBuilder('a');
+
+        return intval(
+            $qb
+                ->select($qb->expr()->count('a'))
+                ->from(Submission::class, 's')
+                ->where(['s.activity = :activity'])
+                ->setParameter('activity', $activity->getId())
+                ->getQuery()
+                ->getSingleScalarResult(),
+        );
+    }
+
+    /**
+     * @return array<ActivityStatisticsDto>
+     */
+    public function getTotalStatistics(?ImagePath $imagePath = null): array
+    {
+        /**
+         * @var array<array{0: Activity, distance: string}> $data
+         */
+        $data = $this->createQueryBuilder('a')
+            ->addSelect('a as activity')
+            ->addSelect('SUM(s.distance) as distance')
+            ->join(Submission::class, 's', Join::WITH, 's.activity = a')
+            ->where('s.accepted = 1')
+            ->groupBy('s.activity')
             ->getQuery()
-            ->getSingleScalarResult());
+            ->getResult();
+
+        return array_map(
+            static fn (array $row): ActivityStatisticsDto => new ActivityStatisticsDto(
+                $row[0]->toResponseObject($imagePath),
+                (int) $row['distance'],
+            ),
+            $data,
+        );
     }
 }

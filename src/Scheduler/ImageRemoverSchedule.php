@@ -18,12 +18,10 @@ final readonly class ImageRemoverSchedule
         private EntityManagerInterface $em,
         private Filesystem $fs,
         private LoggerInterface $logger,
-    ) {
-    }
+    ) {}
 
-    public function __invoke(
-        ImageRemoverMessage $message,
-    ): void {
+    public function __invoke(ImageRemoverMessage $_message): void
+    {
         $this->logger->info('ImageRemoverSchedule was called');
         $images = $this->imageRepository->findUnusedImagesForRemoval();
 

@@ -13,10 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'results:find-outliers',
-    description: 'Add a short description for your command',
-)]
+#[AsCommand(name: 'results:find-outliers', description: 'Add a short description for your command')]
 final class ResultsFindOutliersCommand extends Command
 {
     public function __construct(
@@ -29,9 +26,7 @@ final class ResultsFindOutliersCommand extends Command
     #[\Override]
     protected function configure(): void
     {
-        $this
-            ->addArgument('season_id', InputArgument::REQUIRED, 'Season ID')
-        ;
+        $this->addArgument('season_id', InputArgument::REQUIRED, 'Season ID');
     }
 
     #[\Override]
@@ -51,12 +46,14 @@ final class ResultsFindOutliersCommand extends Command
         $topThree = $this->submissionRepository->findOutliers($season, shouldAnonymize: false);
 
         foreach ($topThree as $outlier) {
-            $io->writeln('Aktivita ID: '.$outlier->activityId);
+            $io->writeln('Aktivita ID: ' . $outlier->activityId);
 
             foreach ($outlier->results as $result) {
-                $io->writeln($result->user->firstName.' '.$result->user->lastName);
-                $io->writeln('Fakulta: '.$result->facultyId);
-                $io->writeln('Celkove m: '.$result->value);
+                assert($result->user->lastName !== null, 'User should not be anonymized');
+
+                $io->writeln($result->user->firstName . ' ' . $result->user->lastName);
+                $io->writeln('Fakulta: ' . $result->facultyId);
+                $io->writeln('Celkove m: ' . $result->value);
             }
         }
 

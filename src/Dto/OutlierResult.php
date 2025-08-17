@@ -10,6 +10,5 @@ final class OutlierResult
         public AnonymizedUser $user,
         public int $facultyId,
         public int $value,
-    ) {
-    }
+    ) {}
 }

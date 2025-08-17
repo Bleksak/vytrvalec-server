@@ -19,6 +19,5 @@ final readonly class ExtraPointsDto
         public int $value,
         #[OA\Property(example: 1)]
         public int $points,
-    ) {
-    }
+    ) {}
 }

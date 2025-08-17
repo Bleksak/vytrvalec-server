@@ -13,6 +13,5 @@ final class SeasonResultDto
     public function __construct(
         public array $results,
         public array $outliers,
-    ) {
-    }
+    ) {}
 }

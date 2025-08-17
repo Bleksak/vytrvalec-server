@@ -33,11 +33,8 @@ final readonly class SubmissionActions
     /**
      * @return array<string, string>
      */
-    public function create(
-        SubmissionCreateDto $dto,
-        User $user,
-        Season $season,
-    ): array {
+    public function create(SubmissionCreateDto $dto, User $user, Season $season): array
+    {
         $activity = $this->activityRepository->find($dto->activityId);
 
         if ($activity === null) {
@@ -50,16 +47,9 @@ final readonly class SubmissionActions
             return ['image' => 'invalid'];
         }
 
-        $image->setUsedAt(new \DateTimeImmutable());
+        $image->setUsedAt(new \DateTime());
 
-        $submission = new Submission(
-            $user,
-            $activity,
-            $season,
-            $image,
-            $dto->distance,
-            $dto->elevation ?? 0
-        );
+        $submission = new Submission($user, $activity, $season, $image, $dto->distance, $dto->elevation ?? 0);
 
         $this->submissionRepository->save($submission, true);
 
@@ -94,7 +84,10 @@ final readonly class SubmissionActions
             $now = new \DateTimeImmutable();
 
             if ($submission->getDate()->diff($now)->m < 2) {
-                $this->mailer->send($submission->getUser(), new SubmissionRejectedEmailTemplate($submission, $dto->message));
+                $this->mailer->send(
+                    $submission->getUser(),
+                    new SubmissionRejectedEmailTemplate($submission, $dto->message),
+                );
             }
         }
 
@@ -128,7 +121,7 @@ final readonly class SubmissionActions
             }
 
             $oldImage = $submission->getImage();
-            $image->setUsedAt(new \DateTimeImmutable());
+            $image->setUsedAt(new \DateTime());
             $submission->setImage($image);
             $oldImage?->setUsedAt(null);
         }

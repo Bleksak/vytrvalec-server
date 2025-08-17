@@ -13,6 +13,5 @@ final class ExtractSubmissionDto
         public int $distance,
         public int $elevation,
         public string $image,
-    ) {
-    }
+    ) {}
 }

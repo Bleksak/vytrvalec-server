@@ -15,6 +15,5 @@ final readonly class UnreviewedSubmissionResponseDto
     public function __construct(
         public array $submissions,
         public array $users,
-    ) {
-    }
+    ) {}
 }

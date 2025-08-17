@@ -27,23 +27,14 @@ final class StatisticsController extends AbstractController
     ) {
     }
 
-    #[OA\Get(
-        description: 'Retrieve all statistics',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Collection of statistics',
-                content: new OA\JsonContent(
-                    ref: new Model(type: TotalStatisticsDto::class)
-                ),
-            ),
-        ],
-    )]
-    #[Route(
-        '/api/stats/total',
-        name: 'stats_index',
-        methods: ['GET'],
-    )]
+    #[OA\Get(description: 'Retrieve all statistics', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Collection of statistics',
+            content: new OA\JsonContent(ref: new Model(type: TotalStatisticsDto::class)),
+        ),
+    ])]
+    #[Route('/api/stats/total', name: 'stats_index', methods: ['GET'])]
     public function indexTotalStatistics(): Response
     {
         return $this->json($this->action->getTotalStatistics());
@@ -64,45 +55,28 @@ final class StatisticsController extends AbstractController
                 description: 'User counts by faculties',
                 content: new OA\JsonContent(
                     type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: UserCountByFacultyStatistics::class),
-                    ),
+                    items: new OA\Items(ref: new Model(type: UserCountByFacultyStatistics::class)),
                 ),
             ),
-        ]
+        ],
     )]
-    #[Route(
-        '/api/statistics/faculties/{season}',
-        name: 'statistics_faculties_index',
-        methods: ['GET'],
-    )]
+    #[Route('/api/statistics/faculties/{season}', name: 'statistics_faculties_index', methods: ['GET'])]
     public function indexFacultyStatistics(Season $season): Response
     {
-        return $this->json(
-            $this->action->getUserCountByFaculties($season)
-        );
+        return $this->json($this->action->getUserCountByFaculties($season));
     }
 
-    #[OA\Get(
-        description: 'Retrieve the user profile statistics',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'User statistics',
-                content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: ProfileCacheSchema::class),
-                    ),
-                ),
+    #[OA\Get(description: 'Retrieve the user profile statistics', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'User statistics',
+            content: new OA\JsonContent(
+                type: 'array',
+                items: new OA\Items(ref: new Model(type: ProfileCacheSchema::class)),
             ),
-        ]
-    )]
-    #[Route(
-        '/api/stats/{user}',
-        name: 'stats_user_index',
-        methods: ['GET'],
-    )]
+        ),
+    ])]
+    #[Route('/api/stats/{user}', name: 'stats_user_index', methods: ['GET'])]
     public function indexUserStatistics(?User $user = null): Response
     {
         if ($user === null) {

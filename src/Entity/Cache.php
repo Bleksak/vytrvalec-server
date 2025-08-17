@@ -19,16 +19,14 @@ class Cache
     private Season $season;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private \DateTimeInterface $createdAt;
+    private \DateTime $createdAt;
 
     #[ORM\Column(type: SeasonResultType::NAME)]
     private SeasonResultDto $data;
 
-    public function __construct(
-        Season $season,
-        SeasonResultDto $data,
-    ) {
-        $this->createdAt = new \DateTimeImmutable();
+    public function __construct(Season $season, SeasonResultDto $data)
+    {
+        $this->createdAt = new \DateTime();
         $this->season = $season;
         $this->data = $data;
     }

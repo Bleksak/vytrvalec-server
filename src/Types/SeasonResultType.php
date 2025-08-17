@@ -20,12 +20,6 @@ final class SeasonResultType extends Type
     }
 
     #[\Override]
-    public function getName(): string
-    {
-        return self::NAME;
-    }
-
-    #[\Override]
     public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
         if (!is_string($value)) {
@@ -41,10 +35,7 @@ final class SeasonResultType extends Type
             throw new InvalidArgumentException('Invalid value, resutls and outliers expected');
         }
 
-        return new SeasonResultDto(
-            $seasonResultData->results,
-            $seasonResultData->outliers,
-        );
+        return new SeasonResultDto($seasonResultData->results, $seasonResultData->outliers);
     }
 
     #[\Override]

@@ -11,6 +11,5 @@ final class ExtraPointsResultDto
         public int $activityId,
         public int $facultyId,
         public int $value,
-    ) {
-    }
+    ) {}
 }

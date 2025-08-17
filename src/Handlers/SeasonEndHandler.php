@@ -13,8 +13,7 @@ final readonly class SeasonEndHandler
 {
     public function __construct(
         private SeasonRepository $seasonRepository,
-    ) {
-    }
+    ) {}
 
     public function __invoke(SeasonEndMessage $seasonEndMessage): void
     {

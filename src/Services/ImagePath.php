@@ -11,9 +11,8 @@ final readonly class ImagePath
 {
     private string $applicationPath;
 
-    public function __construct(
-        ParameterBagInterface $parameterBag,
-    ) {
+    public function __construct(ParameterBagInterface $parameterBag)
+    {
         $this->applicationPath = $parameterBag->get('app_base');
     }
 

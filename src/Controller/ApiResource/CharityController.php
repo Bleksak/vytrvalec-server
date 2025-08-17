@@ -10,6 +10,7 @@ use App\Dto\Charity\CharityEditDto;
 use App\Dto\Charity\Response\CharityCreateResponseDto;
 use App\Dto\Charity\Response\CharityGetResponseDto;
 use App\Dto\Charity\Response\CharityIndexResponseDto;
+use App\Dto\TranslationObjectDto;
 use App\Entity\Charity;
 use App\Repository\CharityRepository;
 use App\Services\ImagePath;
@@ -36,23 +37,19 @@ final class CharityController extends AbstractController
         requestBody: new OA\RequestBody(
             required: true,
             description: 'The new charity object',
-            content: new OA\JsonContent(
-                ref: new Model(type: CharityCreateDto::class)
-            ),
+            content: new OA\JsonContent(ref: new Model(type: CharityCreateDto::class)),
         ),
         responses: [
             new OA\Response(
                 response: Response::HTTP_CREATED,
                 description: 'Charity created',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(
-                            property: 'id',
-                            type: 'integer',
-                            example: 1,
-                        ),
-                    ],
-                ),
+                content: new OA\JsonContent(properties: [
+                    new OA\Property(
+                        property: 'id',
+                        type: 'integer',
+                        example: 1,
+                    ),
+                ]),
             ),
             new OA\Response(
                 response: Response::HTTP_UNAUTHORIZED,
@@ -62,18 +59,12 @@ final class CharityController extends AbstractController
                 response: Response::HTTP_BAD_REQUEST,
                 description: 'Bad data',
             ),
-        ]
+        ],
     )]
-    #[Route(
-        '/api/charity',
-        'api_charity_create',
-        methods: ['POST'],
-    )]
+    #[Route('/api/charity', 'api_charity_create', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
-    public function create(
-        #[MapRequestPayload]
-        CharityCreateDto $charityCreateDto,
-    ): Response {
+    public function create(#[MapRequestPayload] CharityCreateDto $charityCreateDto): Response
+    {
         $charity = $this->action->create($charityCreateDto);
 
         if (is_array($charity)) {
@@ -83,12 +74,12 @@ final class CharityController extends AbstractController
         return $this->json(
             new CharityCreateResponseDto(
                 $charity->getId(),
-                $charity->getName(),
-                $charity->getDescription(),
+                TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'name')),
+                TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'description')),
                 $charity->getImage() === null ? null : $charity->getImage()->getPath($this->imagePath),
                 $charity->getWebsite(),
             ),
-            Response::HTTP_CREATED
+            Response::HTTP_CREATED,
         );
     }
 
@@ -105,33 +96,24 @@ final class CharityController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_OK,
                 description: 'OK',
-                content: new OA\JsonContent(
-                    ref: new Model(type: Charity::class)
-                )
+                content: new OA\JsonContent(ref: new Model(type: Charity::class)),
             ),
             new OA\Response(
                 response: Response::HTTP_NOT_FOUND,
                 description: 'Charity with the given ID not found',
             ),
-        ]
+        ],
     )]
-    #[Route(
-        '/api/charity/{charity}',
-        'api_charity_get',
-        methods: ['GET'],
-    )]
-    public function get(
-        Charity $charity,
-    ): Response {
-        return $this->json(
-            new CharityGetResponseDto(
-                $charity->getId(),
-                $charity->getName(),
-                $charity->getDescription(),
-                $charity->getImage() === null ? null : $charity->getImage()->getPath($this->imagePath),
-                $charity->getWebsite(),
-            ),
-        );
+    #[Route('/api/charity/{charity}', 'api_charity_get', methods: ['GET'])]
+    public function get(Charity $charity): Response
+    {
+        return $this->json(new CharityGetResponseDto(
+            $charity->getId(),
+            TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'name')),
+            TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'description')),
+            $charity->getImage() === null ? null : $charity->getImage()->getPath($this->imagePath),
+            $charity->getWebsite(),
+        ));
     }
 
     #[OA\Patch(
@@ -145,9 +127,7 @@ final class CharityController extends AbstractController
         ],
         requestBody: new OA\RequestBody(
             required: false,
-            content: new OA\JsonContent(
-                ref: new Model(type: CharityEditDto::class)
-            )
+            content: new OA\JsonContent(ref: new Model(type: CharityEditDto::class)),
         ),
         responses: [
             new OA\Response(
@@ -158,58 +138,40 @@ final class CharityController extends AbstractController
                 response: Response::HTTP_NOT_FOUND,
                 description: 'Charity with given ID not found',
             ),
-        ]
+        ],
     )]
-    #[Route(
-        '/api/charity/{charity}',
-        'api_charity_patch',
-        methods: ['PATCH'],
-    )]
+    #[Route('/api/charity/{charity}', 'api_charity_patch', methods: ['PATCH'])]
     #[IsGranted('ROLE_STAFF')]
-    public function updatePatch(
-        Charity $charity,
-        #[MapRequestPayload]
-        CharityEditDto $charityEditDto,
-    ): Response {
+    public function updatePatch(Charity $charity, #[MapRequestPayload] CharityEditDto $charityEditDto): Response
+    {
         $this->action->update($charity, $charityEditDto);
 
         return new Response();
     }
 
-    #[OA\Get(
-        description: 'Retrieve a collection of charities',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Collection of charities',
-                content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: Charity::class),
-                    ),
-                ),
+    #[OA\Get(description: 'Retrieve a collection of charities', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Collection of charities',
+            content: new OA\JsonContent(
+                type: 'array',
+                items: new OA\Items(ref: new Model(type: Charity::class)),
             ),
-        ],
-    )]
-    #[Route(
-        '/api/charity',
-        'api_charity_index',
-        methods: ['GET'],
-    )]
+        ),
+    ])]
+    #[Route('/api/charity', 'api_charity_index', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->json(
-            array_map(
-                fn (Charity $charity): CharityIndexResponseDto => new CharityIndexResponseDto(
-                    $charity->getId(),
-                    $charity->getName(),
-                    $charity->getDescription(),
-                    $charity->getImage() === null ? null : $charity->getImage()->getPath($this->imagePath),
-                    $charity->getWebsite(),
-                ),
-                $this->charityRepository->findAll(),
-            )
-        );
+        return $this->json(array_map(
+            fn (Charity $charity): CharityIndexResponseDto => new CharityIndexResponseDto(
+                $charity->getId(),
+                TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'name')),
+                TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'description')),
+                $charity->getImage()?->getPath($this->imagePath),
+                $charity->getWebsite(),
+            ),
+            $this->charityRepository->findAll(),
+        ));
     }
 
     #[OA\Delete(
@@ -228,11 +190,7 @@ final class CharityController extends AbstractController
             ),
         ],
     )]
-    #[Route(
-        '/api/charity/{charity}',
-        'api_charity_delete',
-        methods: ['DELETE'],
-    )]
+    #[Route('/api/charity/{charity}', 'api_charity_delete', methods: ['DELETE'])]
     #[IsGranted('ROLE_STAFF')]
     public function delete(Charity $charity): Response
     {

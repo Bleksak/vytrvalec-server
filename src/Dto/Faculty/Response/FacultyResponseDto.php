@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Dto\Faculty\Response;
 
+use App\Dto\TranslationObjectDto;
 use OpenApi\Attributes as OA;
 
 final readonly class FacultyResponseDto
@@ -12,13 +13,15 @@ final readonly class FacultyResponseDto
         #[OA\Property]
         public int $id,
         #[OA\Property]
-        public string $name,
+        public TranslationObjectDto $name,
         #[OA\Property]
         public string $shortcut,
         #[OA\Property]
         public bool $visible,
         #[OA\Property]
         public ?int $parentId,
+        #[OA\Property]
+        public string $color,
     ) {
     }
 }

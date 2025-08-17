@@ -9,6 +9,5 @@ final class SubmissionProducerReviewPayload
     public function __construct(
         public bool $accepted,
         public string $message = '',
-    ) {
-    }
+    ) {}
 }

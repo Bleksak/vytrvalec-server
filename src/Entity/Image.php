@@ -22,17 +22,16 @@ class Image
     private string $path;
 
     #[ORM\Column]
-    private \DateTimeImmutable $uploadedAt;
+    private \DateTime $uploadedAt;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $usedAt = null;
+    private ?\DateTime $usedAt = null;
 
-    public function __construct(
-        string $path,
-    ) {
+    public function __construct(string $path)
+    {
         $this->path = $path;
         $this->uuid = Uuid::v7();
-        $this->uploadedAt = new \DateTimeImmutable();
+        $this->uploadedAt = new \DateTime();
         $this->usedAt = null;
     }
 
@@ -64,24 +63,24 @@ class Image
         return $this;
     }
 
-    public function getUploadedAt(): \DateTimeImmutable
+    public function getUploadedAt(): \DateTime
     {
         return $this->uploadedAt;
     }
 
-    public function setUploadedAt(\DateTimeImmutable $uploadedAt): static
+    public function setUploadedAt(\DateTime $uploadedAt): static
     {
         $this->uploadedAt = $uploadedAt;
 
         return $this;
     }
 
-    public function getUsedAt(): ?\DateTimeImmutable
+    public function getUsedAt(): ?\DateTime
     {
         return $this->usedAt;
     }
 
-    public function setUsedAt(?\DateTimeImmutable $usedAt): static
+    public function setUsedAt(?\DateTime $usedAt): static
     {
         $this->usedAt = $usedAt;
 

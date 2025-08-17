@@ -17,6 +17,5 @@ final class WeeklyResultDto
         public readonly int $week,
         #[OA\Property(type: 'array', items: new OA\Items(ref: new Model(type: ActivityResultDto::class)))]
         public array $activities,
-    ) {
-    }
+    ) {}
 }

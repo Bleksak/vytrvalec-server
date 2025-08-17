@@ -14,6 +14,5 @@ final class UserCountByFacultyStatistics
         public int $faculty,
         #[OA\Property(example: 70)]
         public int $count,
-    ) {
-    }
+    ) {}
 }

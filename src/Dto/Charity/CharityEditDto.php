@@ -11,11 +11,7 @@ final class CharityEditDto
 {
     #[OA\Property(type: 'string', example: 'David a Goliáš')]
     #[Assert\Type(type: 'string')]
-    public ?string $name = null;
-
-    #[OA\Property(type: 'string', example: 'Krátký text o charitě')]
-    #[Assert\Type(type: 'string')]
-    public ?string $description = null;
+    public ?CharityUpdateTranslationDto $translations;
 
     #[OA\Property(type: 'string', example: 'https://davidagolias.cz/')]
     #[Assert\Url(requireTld: false, message: 'invalid')]

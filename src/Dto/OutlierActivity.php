@@ -12,6 +12,5 @@ final class OutlierActivity
     public function __construct(
         public int $activityId,
         public array $results,
-    ) {
-    }
+    ) {}
 }

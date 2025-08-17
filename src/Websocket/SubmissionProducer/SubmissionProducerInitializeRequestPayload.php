@@ -7,7 +7,6 @@ namespace App\Websocket\SubmissionProducer;
 final readonly class SubmissionProducerInitializeRequestPayload
 {
     public function __construct(
-        public string $jwt
-    ) {
-    }
+        public string $jwt,
+    ) {}
 }

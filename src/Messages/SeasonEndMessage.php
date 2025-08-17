@@ -11,6 +11,5 @@ final class SeasonEndMessage
 {
     public function __construct(
         public int $seasonId,
-    ) {
-    }
+    ) {}
 }

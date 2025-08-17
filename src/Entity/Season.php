@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\Season\Response\SeasonIndexResponseDto;
 use App\Repository\SeasonRepository;
+use App\Services\ImagePath;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -29,13 +31,13 @@ class Season
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
     #[Groups(['fetchSubmission'])]
-    private \DateTimeInterface $start;
+    private \DateTime $start;
 
     #[OA\Property(example: '2025-05-01')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
     #[Groups(['fetchSubmission'])]
-    private \DateTimeInterface $end;
+    private \DateTime $end;
 
     #[OA\Property]
     #[ORM\ManyToOne(cascade: ['persist'])]
@@ -49,7 +51,7 @@ class Season
     #[ORM\OneToMany(mappedBy: 'season', targetEntity: Submission::class)]
     private Collection $submissions;
 
-    public function __construct(\DateTimeInterface $start, \DateTimeInterface $end, Charity $charity)
+    public function __construct(\DateTime $start, \DateTime $end, Charity $charity)
     {
         $this->submissions = new ArrayCollection();
         $this->start = $start;
@@ -62,24 +64,24 @@ class Season
         return $this->id ?? 0;
     }
 
-    public function getStart(): \DateTimeInterface
+    public function getStart(): \DateTime
     {
         return $this->start;
     }
 
-    public function setStart(\DateTimeInterface $start): self
+    public function setStart(\DateTime $start): self
     {
         $this->start = $start;
 
         return $this;
     }
 
-    public function getEnd(): \DateTimeInterface
+    public function getEnd(): \DateTime
     {
         return $this->end;
     }
 
-    public function setEnd(\DateTimeInterface $end): self
+    public function setEnd(\DateTime $end): self
     {
         $this->end = $end;
 
@@ -126,6 +128,7 @@ class Season
     public function canDelete(): bool
     {
         return $this->getSubmissions()->isEmpty();
+
         // return $this->getStart() >= new DateTimeImmutable('now');
     }
 
@@ -146,5 +149,17 @@ class Season
         $weeks = intdiv($end->diff($start)->days + 1, 7);
 
         return $weeks === 0 ? 1 : $weeks;
+    }
+
+    public function toResponseObject(?ImagePath $imagePath = null): SeasonIndexResponseDto
+    {
+        return new SeasonIndexResponseDto(
+            $this->id ?? 0,
+            $this->charity->toResponseObject($imagePath),
+            $this->start,
+            $this->end,
+            $this->canDelete(),
+            $this->isRunning(),
+        );
     }
 }

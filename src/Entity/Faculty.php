@@ -4,51 +4,63 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\Faculty\FacultyCreateTranslationDto;
 use App\Dto\Faculty\Response\FacultyResponseDto;
+use App\Dto\TranslationObjectDto;
 use App\Repository\FacultyRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Translatable\Translatable;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacultyRepository::class)]
-class Faculty implements Translatable
+class Faculty
 {
     #[OA\Property(example: 1)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(['fetchSubmission'])]
-    private ?int $id = null;
-
-    #[OA\Property(example: 'Fakulta aplikovaných věd')]
-    #[ORM\Column(length: 255)]
-    #[Groups(['fetchSubmission'])]
-    #[Gedmo\Translatable]
-    private string $name;
+    public private(set) int $id;
 
     #[OA\Property(example: 'FAV')]
     #[ORM\Column(length: 10)]
     #[Groups(['fetchSubmission'])]
-    private string $shortcut;
+    public string $shortcut;
 
     #[OA\Parameter(example: true)]
     #[ORM\Column]
     #[Groups(['fetchSubmission'])]
-    private bool $visible;
+    public bool $visible;
 
     #[ORM\ManyToOne(targetEntity: self::class)]
-    private ?Faculty $parent = null;
+    public ?Faculty $parent = null;
+
+    #[ORM\Column(length: 8)]
+    public string $color;
+
+    /** @var Collection<string, FacultyTranslation> */
+    #[ORM\OneToMany(mappedBy: 'faculty', targetEntity: FacultyTranslation::class, cascade: ['persist', 'remove'], indexBy: 'locale')]
+    public Collection $translations;
 
     public function __construct(
-        string $name,
+        FacultyCreateTranslationDto $translations,
         string $shortcut,
         bool $visible,
+        string $color,
     ) {
-        $this->name = $name;
         $this->shortcut = $shortcut;
         $this->visible = $visible;
+
+        $this->translations = new ArrayCollection();
+        $this->color = $color;
+
+        foreach ($translations->name->toArray() as $locale => $value) {
+            assert($value !== null, 'Hodnota překladu nesmí být null');
+
+            $this->addTranslation(new FacultyTranslation($this, $locale, $value));
+        }
     }
 
     public function getId(): int
@@ -56,62 +68,22 @@ class Faculty implements Translatable
         return $this->id ?? 0;
     }
 
-    public function getName(): string
+    public function addTranslation(FacultyTranslation $translation): void
     {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getShortcut(): string
-    {
-        return $this->shortcut;
-    }
-
-    public function setShortcut(string $shortcut): self
-    {
-        $this->shortcut = $shortcut;
-
-        return $this;
-    }
-
-    public function isVisible(): bool
-    {
-        return $this->visible;
-    }
-
-    public function setVisible(bool $visible): self
-    {
-        $this->visible = $visible;
-
-        return $this;
-    }
-
-    public function getParent(): ?self
-    {
-        return $this->parent;
-    }
-
-    public function setParent(?Faculty $parent): static
-    {
-        $this->parent = $parent;
-
-        return $this;
+        if (!$this->translations->containsKey($translation->locale)) {
+            $this->translations->set($translation->locale, $translation);
+        }
     }
 
     public function toResponseObject(): FacultyResponseDto
     {
         return new FacultyResponseDto(
-            $this->getId(),
-            $this->getName(),
-            $this->getShortcut(),
-            $this->isVisible(),
-            $this->getParent()?->getId(),
+            $this->id,
+            TranslationObjectDto::fromArray(array_column($this->translations->toArray(), 'name', 'locale')),
+            $this->shortcut,
+            $this->visible,
+            $this->parent?->id,
+            $this->color,
         );
     }
 }

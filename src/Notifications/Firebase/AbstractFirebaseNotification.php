@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Notifications\Firebase;
 
-abstract class AbstractFirebaseNotification
+abstract readonly class AbstractFirebaseNotification
 {
     public function __construct(
-        private readonly string $to,
-        private readonly string $title,
-        private readonly string $message,
-        private readonly ?string $action = null,
+        private string $to,
+        private string $title,
+        private string $message,
+        private ?string $action = null,
     ) {
     }
 

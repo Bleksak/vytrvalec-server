@@ -22,13 +22,16 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final readonly class UserActions
 {
+    private string $clientUrl;
+
     public function __construct(
         private UserRepository $userRepository,
         private FacultyRepository $facultyRepository,
         private UserPasswordHasherInterface $hasher,
         private VytrvalecMailer $mailer,
-        private ParameterBagInterface $params,
+        ParameterBagInterface $params,
     ) {
+        $this->clientUrl = (string) $params->get('client_url');
     }
 
     /**
@@ -115,7 +118,7 @@ final readonly class UserActions
         return [];
     }
 
-    public function forgottenPasswordRequest(string $email, string $lang): void
+    public function forgottenPasswordRequest(string $email): void
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
 
@@ -123,12 +126,14 @@ final readonly class UserActions
             return;
         }
 
-        $user->setPasswordResetToken(bin2hex(random_bytes(90)));
+        $userPasswordResetToken = bin2hex(random_bytes(90));
+
+        $user->setPasswordResetToken($userPasswordResetToken);
 
         $this->userRepository->save($user, true);
 
         $mail = new ForgottenPasswordEmailTemplate();
-        $mail->setContext('password_reset_link', $this->params->get('client_url').'/reset-password/'.$user->getPasswordResetToken());
+        $mail->setContext('password_reset_link', $this->clientUrl.'/reset-password/'.$userPasswordResetToken);
 
         $this->mailer->send($user, $mail, true);
     }
@@ -199,9 +204,8 @@ final readonly class UserActions
         $this->userRepository->save($user->anonymize(), true);
     }
 
-    public function login(
-        UserLoginDto $dto,
-    ): ?User {
+    public function login(UserLoginDto $dto): ?User
+    {
         $user = $this->userRepository->findOneBy(['email' => $dto->email]);
         if ($user === null) {
             return null;

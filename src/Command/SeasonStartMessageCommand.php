@@ -5,59 +5,28 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Messages\SeasonStartMessage;
+use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-#[AsCommand(
-    name: 'season:start-message',
-    description: 'Add a short description for your command',
-)]
-final class SeasonStartMessageCommand extends Command
+#[AsCommand(name: 'season:start-message', description: 'Add a short description for your command')]
+final readonly class SeasonStartMessageCommand
 {
     public function __construct(
         private MessageBusInterface $messageBus,
-    ) {
-        parent::__construct();
-    }
+    ) {}
 
-    #[\Override]
-    protected function configure(): void
+    public function __invoke(SymfonyStyle $io, #[Argument] int $seasonId, #[Option] bool $send): int
     {
-        $this
-            ->addArgument('season_id', InputArgument::REQUIRED, 'Season ID to resend the mails')
-            ->addOption('send', 's', InputOption::VALUE_NONE, 'if you really want to send the emails, you must provide this')
-        ;
-    }
-
-    #[\Override]
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $send = $input->getOption('send');
-
         if (!$send) {
-            return -1;
+            $io->writeln('Send option is required for emails to be sent!');
+            return Command::FAILURE;
         }
 
-        $seasonId = $input->getArgument('season_id');
-
-        if (!filter_var($seasonId, FILTER_VALIDATE_INT)) {
-            return -1;
-        }
-
-        if (!is_string($seasonId) && !is_int($seasonId)) {
-            return -1;
-        }
-
-        $seasonId = intval($seasonId);
-
-        $this->messageBus->dispatch(
-            new SeasonStartMessage($seasonId)
-        );
+        $this->messageBus->dispatch(new SeasonStartMessage($seasonId));
 
         return Command::SUCCESS;
     }

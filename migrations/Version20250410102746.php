@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
@@ -27,7 +29,13 @@ final class Version20250410102746 extends AbstractMigration
             ->setDefault(null)
             ->setNotnull(false);
 
-        $table->setPrimaryKey(['uuid'], 'pk_hash');
+        $table->addPrimaryKeyConstraint(
+            PrimaryKeyConstraint::editor()
+                ->setQuotedColumnNames('uuid')
+                ->setQuotedName('pk_hash')
+                ->create()
+        );
+
         $table->addIndex(['used_at'], 'idx_used_at');
     }
 

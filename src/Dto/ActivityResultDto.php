@@ -23,6 +23,5 @@ final class ActivityResultDto
         public readonly int $activity,
         #[OA\Property(type: 'array', items: new OA\Items(ref: new Model(type: FacultyResultDto::class)))]
         public readonly array $results,
-    ) {
-    }
+    ) {}
 }

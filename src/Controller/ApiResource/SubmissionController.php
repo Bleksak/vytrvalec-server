@@ -22,7 +22,6 @@ use App\Services\ImagePath;
 use App\Utils\FeatureFlag;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
@@ -47,7 +46,7 @@ final class SubmissionController extends AbstractController
     #[Route(
         path: '/api/submission/{submission}',
         name: 'api_submission_delete',
-        methods: ['DELETE'],
+        methods: ['DELETE']
         // documentation: 'Deletes a <code>Submission</code> entity',
         // responses: [
         //     Response::HTTP_OK => [
@@ -77,11 +76,7 @@ final class SubmissionController extends AbstractController
         return new Response(status: Response::HTTP_OK);
     }
 
-    #[Route(
-        '/api/submission',
-        name: 'api_submission_create',
-        methods: ['POST'],
-    )]
+    #[Route('/api/submission', name: 'api_submission_create', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function create(
         #[CurrentUser]
@@ -108,7 +103,7 @@ final class SubmissionController extends AbstractController
     #[Route(
         '/api/submission/list/{season}/{page}',
         name: 'api_submission_list_season',
-        methods: ['GET'],
+        methods: ['GET']
         // documentation: 'Retrieves all submissions in given Season',
         // responses: [
         //     Response::HTTP_OK => [
@@ -121,39 +116,34 @@ final class SubmissionController extends AbstractController
         // ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function listSeason(
-        Season $season,
-        Request $request,
-        int $page = 1,
-    ): Response {
+    public function listSeason(Season $season, int $page = 1): Response
+    {
         $limit = 50;
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
 
-        return $this->json(
-            $this->normalizer->normalize(
-                [
-                    'pages' => $pageCount,
-                    'submissions' => $submissions,
+        return $this->json($this->normalizer->normalize(
+            [
+                'pages' => $pageCount,
+                'submissions' => $submissions,
+            ],
+            null,
+            [
+                AbstractNormalizer::GROUPS => ['fetchSubmission'],
+                AbstractNormalizer::CALLBACKS => [
+                    'season' => fn (Season $object): int => $object->getId(),
+                    'activity' => fn (Activity $object): int => $object->getId(),
+                    'faculty' => fn (Faculty $object): int => $object->getId(),
+                    'image' => fn (Image $image): string => $this->imagePath->fullPath($image),
                 ],
-                null,
-                [
-                    AbstractNormalizer::GROUPS => ['fetchSubmission'],
-                    AbstractNormalizer::CALLBACKS => [
-                        'season' => fn (Season $object): int => $object->getId(),
-                        'activity' => fn (Activity $object): int => $object->getId(),
-                        'faculty' => fn (Faculty $object): int => $object->getId(),
-                        'image' => fn (Image $image): string => $this->imagePath->fullPath($image),
-                    ],
-                ]
-            )
-        );
+            ],
+        ));
     }
 
     #[Route(
         '/api/submission/user',
         name: 'api_submission_list',
-        methods: ['GET'],
+        methods: ['GET']
         // documentation: 'Retrieves all submissions for current user',
         // responses: [
         //     Response::HTTP_OK => [
@@ -161,10 +151,8 @@ final class SubmissionController extends AbstractController
         //     ],
         // ]
     )]
-    public function list(
-        #[CurrentUser]
-        User $user,
-    ): Response {
+    public function list(#[CurrentUser] User $user): Response
+    {
         $submissions = $this->submissionRepository->findAllByUser($user, 1, 5000);
         $url = $this->getParameter('app_base');
 
@@ -188,7 +176,7 @@ final class SubmissionController extends AbstractController
     #[Route(
         '/api/submission/unresolved/{count}',
         name: 'api_submission_list_unresolved',
-        methods: ['GET'],
+        methods: ['GET']
         // documentation: 'Retrieves some unresolved submissions across all seasons',
         // responses: [
         //     Response::HTTP_OK => [
@@ -197,7 +185,7 @@ final class SubmissionController extends AbstractController
         // ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function unresolvedList(Request $request, int $count): Response
+    public function unresolvedList(int $count): Response
     {
         $url = $this->getParameter('app_base');
         $submissions = $this->submissionRepository->findUnreviewed($count);
@@ -216,18 +204,13 @@ final class SubmissionController extends AbstractController
             }
         }
 
-        return $this->json(
-            new UnreviewedSubmissionResponseDto(
-                $submissionResponse,
-                $userResponse,
-            )
-        );
+        return $this->json(new UnreviewedSubmissionResponseDto($submissionResponse, $userResponse));
     }
 
     #[Route(
         '/api/submission/{submission}',
         name: 'api_submission_edit',
-        methods: ['PATCH'],
+        methods: ['PATCH']
         // documentation: 'Edits a <code>Submission</code> entity',
         // responses: [
         //     Response::HTTP_CREATED => [
@@ -294,7 +277,7 @@ final class SubmissionController extends AbstractController
     #[Route(
         '/api/submission/{submission}/state',
         name: 'api_submission_state',
-        methods: ['PATCH'],
+        methods: ['PATCH']
         // documentation: 'Accepts/rejects a <code>Submission</code> entity',
         // responses: [
         //     Response::HTTP_OK => [
@@ -314,11 +297,8 @@ final class SubmissionController extends AbstractController
         // ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function setState(
-        #[MapRequestPayload]
-        SubmissionStateDto $dto,
-        Submission $submission,
-    ): Response {
+    public function setState(#[MapRequestPayload] SubmissionStateDto $dto, Submission $submission): Response
+    {
         $errors = $this->action->setState($submission, $dto);
 
         if (count($errors) !== 0) {
@@ -328,12 +308,9 @@ final class SubmissionController extends AbstractController
         return $this->json($submission->getUpdatedAt());
     }
 
-    #[OA\Get(
-        description: 'Extract submission for given seasons',
-    )]
+    #[OA\Get(description: 'Extract submission for given seasons')]
     #[Route('/api/extract/submissions', 'api_extract_submissions', methods: ['GET'])]
     public function extractReviewedSubmissionForSeasons(
-        ParameterBagInterface $parameterBag,
         #[CurrentUser]
         User $user,
         #[MapQueryString]

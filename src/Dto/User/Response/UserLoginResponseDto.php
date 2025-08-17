@@ -13,6 +13,5 @@ final readonly class UserLoginResponseDto
         public UserResponseDto $user,
         #[OA\Property]
         public string $token,
-    ) {
-    }
+    ) {}
 }

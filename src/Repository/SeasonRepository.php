@@ -43,16 +43,13 @@ final class SeasonRepository extends ServiceEntityRepository
 
     public function getCurrent(): ?Season
     {
-        $query = $this->createQueryBuilder('s')
-            ->select('s')
+        return $this->createQueryBuilder('s')
             ->where('s.start <= :now')
             ->andWhere('s.end >= :now')
             ->setParameter('now', new \DateTimeImmutable())
             ->setMaxResults(1)
             ->getQuery()
-        ;
-
-        return $query->getOneOrNullResult();
+            ->getOneOrNullResult();
     }
 
     public function getLast(): ?Season
@@ -66,19 +63,20 @@ final class SeasonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<Season>
+     * @return list<Season>
      */
     public function findOrdered(): array
     {
         return $this->createQueryBuilder('s')
-            ->select('s')
+            ->select('s', 'c')
+            ->join('s.charity', 'c')
             ->orderBy('s.start', 'DESC')
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * @return Season[]
+     * @return list<Season>
      */
     public function findPast(): array
     {

@@ -31,10 +31,8 @@ class ProfileCache
     #[ORM\Column]
     private int $elevation = 0;
 
-    public function __construct(
-        User $user,
-        Activity $activity,
-    ) {
+    public function __construct(User $user, Activity $activity)
+    {
         $this->user = $user;
         $this->activity = $activity;
     }
@@ -47,26 +45,6 @@ class ProfileCache
     public function getActivity(): Activity
     {
         return $this->activity;
-    }
-
-    /**
-     * @param callable(int): int $updateFn
-     */
-    public function updateDistance(callable $updateFn): ProfileCache
-    {
-        $this->setDistance(call_user_func($updateFn, $this->getDistance()));
-
-        return $this;
-    }
-
-    /**
-     * @param callable(int): int $updateFn
-     */
-    public function updateElevation(callable $updateFn): ProfileCache
-    {
-        $this->setElevation(call_user_func($updateFn, $this->getElevation()));
-
-        return $this;
     }
 
     public function getDistance(): int

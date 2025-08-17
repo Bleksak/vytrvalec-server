@@ -15,9 +15,9 @@ final class ImageCreateResponseDto
         #[OA\Property]
         public string $path,
         #[OA\Property]
-        public \DateTimeImmutable $uploadedAt,
+        public \DateTime $uploadedAt,
         #[OA\Property]
-        public ?\DateTimeImmutable $usedAt,
+        public ?\DateTime $usedAt,
     ) {
     }
 }
