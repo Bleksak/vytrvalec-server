@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Action;
 
 use App\Dto\Charity\CharityCreateDto;
-use App\Dto\Charity\CharityEditDto;
+use App\Dto\Charity\CharityUpdateDto;
 use App\Entity\Charity;
 use App\Entity\CharityTranslation;
 use App\Repository\CharityRepository;
@@ -47,7 +47,7 @@ final readonly class CharityActions
         return $charity;
     }
 
-    public function update(Charity $charity, CharityEditDto $dto): void
+    public function update(Charity $charity, CharityUpdateDto $dto): void
     {
         $nameTranslations = $dto->translations?->name?->toArray() ?? [];
         $descriptionTranslations = $dto->translations?->description?->toArray() ?? [];
@@ -88,8 +88,8 @@ final readonly class CharityActions
             $charityTranslation->description = $translation;
         }
 
-        if ($dto->imageUuid !== null) {
-            $image = $this->imageRepository->find($dto->imageUuid);
+        if ($dto->image !== null) {
+            $image = $this->imageRepository->find($dto->image);
 
             if ($image !== null && $image->getUsedAt() === null) {
                 $oldImage = $charity->getImage();

@@ -6,7 +6,7 @@ namespace App\Controller\ApiResource;
 
 use App\Action\CharityActions;
 use App\Dto\Charity\CharityCreateDto;
-use App\Dto\Charity\CharityEditDto;
+use App\Dto\Charity\CharityUpdateDto;
 use App\Dto\Charity\Response\CharityGetResponseDto;
 use App\Entity\Charity;
 use App\Repository\CharityRepository;
@@ -114,7 +114,7 @@ final class CharityController extends AbstractController
         ],
         requestBody: new OA\RequestBody(
             required: false,
-            content: new OA\JsonContent(ref: new Model(type: CharityEditDto::class)),
+            content: new OA\JsonContent(ref: new Model(type: CharityUpdateDto::class)),
         ),
         responses: [
             new OA\Response(
@@ -129,7 +129,7 @@ final class CharityController extends AbstractController
     )]
     #[Route('/api/charity/{charity}', 'api_charity_patch', methods: ['PATCH'])]
     #[IsGranted('ROLE_STAFF')]
-    public function updatePatch(Charity $charity, #[MapRequestPayload] CharityEditDto $charityEditDto): Response
+    public function updatePatch(Charity $charity, #[MapRequestPayload] CharityUpdateDto $charityEditDto): Response
     {
         $this->action->update($charity, $charityEditDto);
 
