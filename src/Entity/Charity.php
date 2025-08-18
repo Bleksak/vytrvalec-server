@@ -9,6 +9,7 @@ use App\Dto\Charity\Response\CharityGetResponseDto;
 use App\Dto\TranslationObjectDto;
 use App\Repository\CharityRepository;
 use App\Services\ImagePath;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
@@ -46,6 +47,7 @@ class Charity
     ) {
         $this->image = $image;
         $this->website = $website;
+        $this->translations = new ArrayCollection();
 
         $descriptionTranslations = $translations->description->toArray();
 
@@ -103,8 +105,8 @@ class Charity
     {
         return new CharityGetResponseDto(
             $this->id ?? 0,
-            TranslationObjectDto::fromArray(array_column($this->translations->toArray(), 'locale', 'name')),
-            TranslationObjectDto::fromArray(array_column($this->translations->toArray(), 'locale', 'description')),
+            TranslationObjectDto::fromArray(array_column($this->translations->toArray(), 'name', 'locale')),
+            TranslationObjectDto::fromArray(array_column($this->translations->toArray(), 'description', 'locale')),
             $this->image?->getPath($imagePath),
             $this->website,
         );

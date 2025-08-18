@@ -25,7 +25,12 @@ final class FacultyUpdateDto
     public ?int $parent;
 
     #[Assert\Type(type: 'string', message: 'invalid_value')]
-    #[Assert\CssColor(formats: [Assert\CssColor::HEX_LONG_WITH_ALPHA], message: 'invalid_value')]
+    #[Assert\CssColor(formats: [
+        Assert\CssColor::HEX_LONG_WITH_ALPHA,
+        Assert\CssColor::HEX_LONG,
+        Assert\CssColor::HEX_SHORT_WITH_ALPHA,
+        Assert\CssColor::HEX_SHORT,
+    ], message: 'invalid')]
     #[OA\Property(type: 'string')]
     public ?string $color;
 }

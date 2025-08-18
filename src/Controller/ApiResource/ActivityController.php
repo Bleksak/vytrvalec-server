@@ -25,7 +25,8 @@ final class ActivityController extends AbstractController
     public function __construct(
         private readonly ActivityRepository $activityRepository,
         private readonly ActivityActions $action,
-    ) {}
+    ) {
+    }
 
     #[OA\Post(
         description: 'Create new Activity',
@@ -152,9 +153,11 @@ final class ActivityController extends AbstractController
     #[Route('/api/activity', name: 'activity_index', methods: ['GET'])]
     public function index(ImagePath $imagePath): Response
     {
-        return $this->json(array_map(
-            static fn(Activity $activity): ActivityResponseDto => $activity->toResponseObject($imagePath),
-            $this->activityRepository->findAll(),
-        ));
+        return $this->json(
+            array_map(
+                static fn (Activity $activity): ActivityResponseDto => $activity->toResponseObject($imagePath),
+                $this->activityRepository->findAll(),
+            )
+        );
     }
 }

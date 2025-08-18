@@ -7,10 +7,7 @@ namespace App\Controller\ApiResource;
 use App\Action\CharityActions;
 use App\Dto\Charity\CharityCreateDto;
 use App\Dto\Charity\CharityEditDto;
-use App\Dto\Charity\Response\CharityCreateResponseDto;
 use App\Dto\Charity\Response\CharityGetResponseDto;
-use App\Dto\Charity\Response\CharityIndexResponseDto;
-use App\Dto\TranslationObjectDto;
 use App\Entity\Charity;
 use App\Repository\CharityRepository;
 use App\Services\ImagePath;
@@ -72,13 +69,7 @@ final class CharityController extends AbstractController
         }
 
         return $this->json(
-            new CharityCreateResponseDto(
-                $charity->getId(),
-                TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'name')),
-                TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'description')),
-                $charity->getImage() === null ? null : $charity->getImage()->getPath($this->imagePath),
-                $charity->getWebsite(),
-            ),
+            $charity->toResponseObject(),
             Response::HTTP_CREATED,
         );
     }
@@ -107,13 +98,9 @@ final class CharityController extends AbstractController
     #[Route('/api/charity/{charity}', 'api_charity_get', methods: ['GET'])]
     public function get(Charity $charity): Response
     {
-        return $this->json(new CharityGetResponseDto(
-            $charity->getId(),
-            TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'name')),
-            TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'description')),
-            $charity->getImage() === null ? null : $charity->getImage()->getPath($this->imagePath),
-            $charity->getWebsite(),
-        ));
+        return $this->json(
+            $charity->toResponseObject($this->imagePath)
+        );
     }
 
     #[OA\Patch(
@@ -162,16 +149,12 @@ final class CharityController extends AbstractController
     #[Route('/api/charity', 'api_charity_index', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->json(array_map(
-            fn (Charity $charity): CharityIndexResponseDto => new CharityIndexResponseDto(
-                $charity->getId(),
-                TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'name')),
-                TranslationObjectDto::fromArray(array_column($charity->translations->toArray(), 'locale', 'description')),
-                $charity->getImage()?->getPath($this->imagePath),
-                $charity->getWebsite(),
-            ),
-            $this->charityRepository->findAll(),
-        ));
+        return $this->json(
+            array_map(
+                fn (Charity $charity): CharityGetResponseDto => $charity->toResponseObject($this->imagePath),
+                $this->charityRepository->findAll(),
+            )
+        );
     }
 
     #[OA\Delete(
