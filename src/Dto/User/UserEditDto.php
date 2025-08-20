@@ -30,7 +30,7 @@ final class UserEditDto
     public ?bool $banned = null;
 
     /**
-     * @var array<string>
+     * @var array<string>|null
      */
     #[OA\Property]
     #[Assert\NotBlank]

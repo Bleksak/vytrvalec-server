@@ -6,13 +6,11 @@ namespace App\Controller\ApiResource;
 
 use App\Action\SubmissionActions;
 use App\Dto\SeasonIDList;
+use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Dto\Submission\Response\UnreviewedSubmissionResponseDto;
 use App\Dto\Submission\SubmissionCreateDto;
 use App\Dto\Submission\SubmissionEditDto;
 use App\Dto\Submission\SubmissionStateDto;
-use App\Entity\Activity;
-use App\Entity\Faculty;
-use App\Entity\Image;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -22,22 +20,18 @@ use App\Services\ImagePath;
 use App\Utils\FeatureFlag;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[OA\Tag(name: 'Submission')]
 final class SubmissionController extends AbstractController
 {
     public function __construct(
         private readonly SubmissionRepository $submissionRepository,
-        private readonly NormalizerInterface $normalizer,
         private readonly SubmissionActions $action,
         private readonly ImagePath $imagePath,
     ) {
@@ -122,22 +116,15 @@ final class SubmissionController extends AbstractController
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
         $pageCount = 1 + intdiv($submissions->count(), $limit);
 
-        return $this->json($this->normalizer->normalize(
+        return $this->json(
             [
                 'pages' => $pageCount,
-                'submissions' => $submissions,
+                'submissions' => array_map(
+                    fn (Submission $submission) => $submission->toResponseObject($this->imagePath),
+                    iterator_to_array($submissions),
+                ),
             ],
-            null,
-            [
-                AbstractNormalizer::GROUPS => ['fetchSubmission'],
-                AbstractNormalizer::CALLBACKS => [
-                    'season' => fn (Season $object): int => $object->getId(),
-                    'activity' => fn (Activity $object): int => $object->getId(),
-                    'faculty' => fn (Faculty $object): int => $object->getId(),
-                    'image' => fn (Image $image): string => $this->imagePath->fullPath($image),
-                ],
-            ],
-        ));
+        );
     }
 
     #[Route(
@@ -154,22 +141,12 @@ final class SubmissionController extends AbstractController
     public function list(#[CurrentUser] User $user): Response
     {
         $submissions = $this->submissionRepository->findAllByUser($user, 1, 5000);
-        $url = $this->getParameter('app_base');
 
         return $this->json(
-            $submissions,
-            200,
-            [],
-            [
-                // @phpstan-ignore-next-line
-                AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn (mixed $object): int => $object->getId(),
-                AbstractNormalizer::GROUPS => ['fetchSubmission'],
-                AbstractNormalizer::CALLBACKS => [
-                    'image' => fn (Image $image): string => $this->imagePath->fullPath($image),
-                    'activity' => fn (Activity $activity): int => $activity->getId(),
-                ],
-                AbstractNormalizer::IGNORED_ATTRIBUTES => ['user', 'season'],
-            ],
+            array_map(
+                fn (Submission $submission): SubmissionResponseDto => $submission->toResponseObject($this->imagePath),
+                iterator_to_array($submissions),
+            )
         );
     }
 
@@ -187,7 +164,6 @@ final class SubmissionController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function unresolvedList(int $count): Response
     {
-        $url = $this->getParameter('app_base');
         $submissions = $this->submissionRepository->findUnreviewed($count);
 
         $userResponse = [];

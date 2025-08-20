@@ -32,8 +32,14 @@ final readonly class ImageUploader
 
         $newFile = $image->move($dirname, $tmpPath);
 
+        $filePath = $newFile->getRealPath();
+
+        if ($filePath === false) {
+            return null;
+        }
+
         try {
-            $img = new \Imagick($newFile->getRealPath());
+            $img = new \Imagick($filePath);
             $profiles = $img->getImageProfiles('icc');
 
             $img->stripImage();
