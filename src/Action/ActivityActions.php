@@ -39,7 +39,7 @@ final readonly class ActivityActions
         $nameTranslations = $dto->translations?->name?->toArray() ?? [];
 
         foreach ($nameTranslations as $locale => $translation) {
-            assert($translation !== null, 'Translation cannot be null!');
+            \assert($translation !== null, 'Translation cannot be null!');
 
             $activityTranslation = $activity->getTranslations()->get($locale);
 

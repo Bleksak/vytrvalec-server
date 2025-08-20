@@ -87,7 +87,7 @@ final class SubmissionController extends AbstractController
 
         $errors = $this->action->create($submissionCreateDto, $user, $season);
 
-        if (count($errors) !== 0) {
+        if (\count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -114,14 +114,14 @@ final class SubmissionController extends AbstractController
     {
         $limit = 50;
         $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
-        $pageCount = 1 + intdiv($submissions->count(), $limit);
+        $pageCount = 1 + \intdiv($submissions->count(), $limit);
 
         return $this->json(
             [
                 'pages' => $pageCount,
-                'submissions' => array_map(
-                    fn (Submission $submission) => $submission->toResponseObject($this->imagePath),
-                    iterator_to_array($submissions),
+                'submissions' => \array_map(
+                    fn (Submission $submission): SubmissionResponseDto => $submission->toResponseObject($this->imagePath),
+                    \iterator_to_array($submissions),
                 ),
             ],
         );
@@ -143,9 +143,9 @@ final class SubmissionController extends AbstractController
         $submissions = $this->submissionRepository->findAllByUser($user, 1, 5000);
 
         return $this->json(
-            array_map(
+            \array_map(
                 fn (Submission $submission): SubmissionResponseDto => $submission->toResponseObject($this->imagePath),
-                iterator_to_array($submissions),
+                \iterator_to_array($submissions),
             )
         );
     }
@@ -243,7 +243,7 @@ final class SubmissionController extends AbstractController
 
         $errors = $this->action->update($submission, $submissionEditDto);
 
-        if (count($errors) !== 0) {
+        if (\count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -286,7 +286,7 @@ final class SubmissionController extends AbstractController
             $dto
         );
 
-        if (count($errors) !== 0) {
+        if (\count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 

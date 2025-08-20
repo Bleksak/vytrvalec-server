@@ -20,16 +20,16 @@ final class SeasonResultType extends Type
     }
 
     #[\Override]
-    public function convertToPHPValue($value, AbstractPlatform $platform): mixed
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new InvalidArgumentException('Invalid value, JSON string expected');
         }
 
         /**
          * @var SeasonResultDto $seasonResultData
          */
-        $seasonResultData = json_decode($value);
+        $seasonResultData = \json_decode($value);
 
         if (!isset($seasonResultData->results, $seasonResultData->outliers)) {
             throw new InvalidArgumentException('Invalid value, resutls and outliers expected');
@@ -39,8 +39,8 @@ final class SeasonResultType extends Type
     }
 
     #[\Override]
-    public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
+    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
     {
-        return json_encode($value, JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION);
+        return \json_encode($value, JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION);
     }
 }

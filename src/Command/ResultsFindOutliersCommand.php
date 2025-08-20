@@ -46,14 +46,14 @@ final class ResultsFindOutliersCommand extends Command
         $topThree = $this->submissionRepository->findOutliers($season, shouldAnonymize: false);
 
         foreach ($topThree as $outlier) {
-            $io->writeln('Aktivita ID: ' . $outlier->activityId);
+            $io->writeln('Aktivita ID: '.$outlier->activityId);
 
             foreach ($outlier->results as $result) {
-                assert($result->user->lastName !== null, 'User should not be anonymized');
+                \assert($result->user->lastName !== null, 'User should not be anonymized');
 
-                $io->writeln($result->user->firstName . ' ' . $result->user->lastName);
-                $io->writeln('Fakulta: ' . $result->facultyId);
-                $io->writeln('Celkove m: ' . $result->value);
+                $io->writeln($result->user->firstName.' '.$result->user->lastName);
+                $io->writeln('Fakulta: '.$result->facultyId);
+                $io->writeln('Celkove m: '.$result->value);
             }
         }
 

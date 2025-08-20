@@ -66,7 +66,7 @@ final class ProfileCacheRepository extends ServiceEntityRepository
     {
         $cachesByUser = $this->findBy(['user' => $user]);
 
-        if (count($cachesByUser) === 0) {
+        if (\count($cachesByUser) === 0) {
             return;
         }
 

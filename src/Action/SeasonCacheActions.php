@@ -27,12 +27,10 @@ final readonly class SeasonCacheActions
         $cache = $this->cacheRepository->findBySeason($season);
         $result = $this->seasonResult->calculate($season);
 
-        if ($cache !== null) {
-            $cache->setData($result);
-            $this->cacheRepository->save($cache, true);
-        } else {
-            $this->cacheRepository->save(new Cache($season, $result), true);
-        }
+        $cache?->setData($result);
+        $cache ??= new Cache($season, $result);
+
+        $this->cacheRepository->save($cache, true);
     }
 
     public function isCached(Season $season): bool

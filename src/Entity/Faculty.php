@@ -57,7 +57,7 @@ class Faculty
         $this->color = $color;
 
         foreach ($translations->name->toArray() as $locale => $value) {
-            assert($value !== null, 'Hodnota překladu nesmí být null');
+            \assert($value !== null, 'Hodnota překladu nesmí být null');
 
             $this->addTranslation(new FacultyTranslation($this, $locale, $value));
         }
@@ -79,7 +79,7 @@ class Faculty
     {
         return new FacultyResponseDto(
             $this->id,
-            TranslationObjectDto::fromArray(array_column($this->translations->toArray(), 'name', 'locale')),
+            TranslationObjectDto::fromArray(\array_column($this->translations->toArray(), 'name', 'locale')),
             $this->shortcut,
             $this->visible,
             $this->parent?->id,

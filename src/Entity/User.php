@@ -111,7 +111,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->anonymize = $anonymize;
         $this->roles = $roles;
         $this->token = $token;
-        $this->emailUnsubscribeHash = bin2hex(random_bytes(90));
+        $this->emailUnsubscribeHash = \bin2hex(\random_bytes(90));
         $this->locale = $locale;
     }
 
@@ -166,13 +166,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
-        return array_unique($roles);
+        return \array_unique($roles);
     }
 
     #[Ignore]
     public function hasRole(string $roleName): bool
     {
-        return in_array($roleName, $this->getRoles(), true);
+        return \in_array($roleName, $this->getRoles(), true);
     }
 
     /**

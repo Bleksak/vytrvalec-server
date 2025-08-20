@@ -51,7 +51,7 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         if (!($user instanceof User)) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
+            throw new UnsupportedUserException(\sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
         $user->setPassword($newHashedPassword);
@@ -90,8 +90,8 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
             ->getQuery()
             ->getResult();
 
-        return array_map(
-            fn (array $row): UserCountByFacultyStatistics => new UserCountByFacultyStatistics($row['id'], $row['count']),
+        return \array_map(
+            static fn (array $row): UserCountByFacultyStatistics => new UserCountByFacultyStatistics($row['id'], $row['count']),
             $rows,
         );
     }
@@ -103,7 +103,7 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
      */
     public function findByIds(array $ids): array
     {
-        if (count($ids) === 0) {
+        if ($ids === []) {
             return [];
         }
 
@@ -117,9 +117,9 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
             ->getQuery()
             ->getResult();
 
-        $orderMap = array_flip($ids);
+        $orderMap = \array_flip($ids);
 
-        usort($results, fn (User $a, User $b): int => $orderMap[$a->getId()] <=> $orderMap[$b->getId()]);
+        \usort($results, fn (User $a, User $b): int => $orderMap[$a->getId()] <=> $orderMap[$b->getId()]);
 
         return $results;
     }

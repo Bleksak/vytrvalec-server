@@ -18,7 +18,8 @@ final readonly class SeasonStartHandler
         private SeasonRepository $seasonRepository,
         private UserRepository $userRepository,
         private VytrvalecMailer $mailer,
-    ) {}
+    ) {
+    }
 
     public function __invoke(SeasonStartMessage $seasonStartMessage): void
     {
@@ -40,7 +41,7 @@ final readonly class SeasonStartHandler
 
         $batchSize = 30;
 
-        foreach (array_chunk($users, $batchSize) as $chunk) {
+        foreach (\array_chunk($users, $batchSize) as $chunk) {
             $this->mailer->send($chunk, $template);
         }
     }

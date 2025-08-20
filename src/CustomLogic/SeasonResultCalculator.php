@@ -19,7 +19,8 @@ final readonly class SeasonResultCalculator
         private DailyDistanceExtraPoints $dailyDistanceExtraPoints,
         private WeeklyDistanceExtraPoints $weeklyDistanceExtraPoints,
         private WeeklyElevationExtraPoints $weeklyElevationExtraPoints,
-    ) {}
+    ) {
+    }
 
     public function calculate(Season $season): SeasonResultDto
     {
@@ -40,7 +41,7 @@ final readonly class SeasonResultCalculator
             $activities = [];
 
             foreach ($weeklyResult as $result) {
-                if (!array_key_exists($result->activity, $activities)) {
+                if (!\array_key_exists($result->activity, $activities)) {
                     $activities[$result->activity] = [];
                 }
 
@@ -53,7 +54,7 @@ final readonly class SeasonResultCalculator
                 $activityResult[$activityId] = new ActivityResultDto($activityId, $activity);
             }
 
-            if (count($activityResult) !== 0) {
+            if (\count($activityResult) !== 0) {
                 $results[$i] = new WeeklyResultDto($i, $activityResult);
             }
         }
@@ -71,12 +72,12 @@ final readonly class SeasonResultCalculator
             }
         }
 
-        $results = array_values($results);
+        $results = \array_values($results);
 
         $topThree = $this->submissionRepository->findOutliers($season);
 
         foreach ($results as $key => $result) {
-            $result->activities = array_values($result->activities);
+            $result->activities = \array_values($result->activities);
         }
 
         return new SeasonResultDto($results, $topThree);

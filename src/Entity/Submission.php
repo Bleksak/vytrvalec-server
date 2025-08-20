@@ -232,7 +232,7 @@ class Submission
             $days = 0;
         }
 
-        $this->week = intdiv($days, 7);
+        $this->week = \intdiv($days, num2: 7);
 
         return $this->week;
     }

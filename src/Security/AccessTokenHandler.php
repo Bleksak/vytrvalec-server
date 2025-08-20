@@ -15,7 +15,8 @@ final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
 {
     public function __construct(
         private ParameterBagInterface $parameters,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function getUserBadgeFrom(string $accessToken): UserBadge
@@ -23,7 +24,7 @@ final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
         try {
             $payload = JWT::decode($accessToken, new Key($this->parameters->get('jwt_secret'), 'HS256'));
 
-            assert(isset($payload->user) && is_string($payload->user), 'Invalid jwt payload');
+            \assert(isset($payload->user) && \is_string($payload->user), 'Invalid jwt payload');
 
             return new UserBadge($payload->user);
         } catch (\Throwable) {

@@ -53,7 +53,7 @@ final readonly class CharityActions
         $descriptionTranslations = $dto->translations?->description?->toArray() ?? [];
 
         foreach ($nameTranslations as $locale => $translation) {
-            assert($translation !== null, 'Translation cannot be null!');
+            \assert($translation !== null, 'Translation cannot be null!');
 
             $charityTranslation = $charity->translations->get($locale);
 
@@ -71,7 +71,7 @@ final readonly class CharityActions
         }
 
         foreach ($descriptionTranslations as $locale => $translation) {
-            assert($translation !== null, 'Translation cannot be null!');
+            \assert($translation !== null, 'Translation cannot be null!');
 
             $charityTranslation = $charity->translations->get($locale);
 
@@ -108,7 +108,7 @@ final readonly class CharityActions
     {
         $seasons = $this->charityRepository->findSeasonsByCharity($charity);
 
-        if (count($seasons) !== 0) {
+        if (\count($seasons) !== 0) {
             return false;
         }
 

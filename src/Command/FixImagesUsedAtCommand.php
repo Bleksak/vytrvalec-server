@@ -51,7 +51,7 @@ final readonly class FixImagesUsedAtCommand
             ->getQuery()
             ->getSingleScalarResult();
 
-        $io->success(sprintf('Updated %d images', (int) $updated));
+        $io->success(\sprintf('Updated %d images', (int) $updated));
 
         return Command::SUCCESS;
     }

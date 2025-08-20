@@ -33,7 +33,7 @@ final readonly class VytrvalecMailer
 
     private function constructUnsubscribeLink(User $user): string
     {
-        return sprintf('%s/unsubscribe/%s', $this->clientUrl, $user->getEmailUnsubscribeHash());
+        return \sprintf('%s/unsubscribe/%s', $this->clientUrl, $user->getEmailUnsubscribeHash());
     }
 
     /**
@@ -44,7 +44,7 @@ final readonly class VytrvalecMailer
         AbstractEmailTemplate $template,
         bool $forceSend = false,
     ): void {
-        if (!is_array($recipient)) {
+        if (!\is_array($recipient)) {
             /** @var array<User> $recipient */
             $recipient = [$recipient];
         }

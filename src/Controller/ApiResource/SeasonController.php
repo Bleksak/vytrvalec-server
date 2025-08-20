@@ -229,14 +229,14 @@ final class SeasonController extends AbstractController
         foreach ($queryFilterKeys as $key) {
             $data = $request->get($key, null);
 
-            if ($data !== null && (is_string($data) || is_int($data))) {
+            if ($data !== null && (\is_string($data) || \is_int($data))) {
                 $queryFilter[$key] = $data;
             }
         }
 
         $currentPage = $request->get('page', 1);
 
-        if (!is_int($currentPage)) {
+        if (!\is_int($currentPage)) {
             $currentPage = 1;
         }
 
@@ -326,9 +326,11 @@ final class SeasonController extends AbstractController
     #[Route('/api/season', name: 'api_season_index', methods: ['GET'])]
     public function index(ImagePath $imagePath): Response
     {
-        return $this->json(array_map(
-            fn (Season $season): SeasonIndexResponseDto => $season->toResponseObject($imagePath),
-            $this->seasonRepository->findOrdered(),
-        ));
+        return $this->json(
+            \array_map(
+                static fn (Season $season): SeasonIndexResponseDto => $season->toResponseObject($imagePath),
+                $this->seasonRepository->findOrdered(),
+            )
+        );
     }
 }

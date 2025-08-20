@@ -13,7 +13,6 @@ use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -54,7 +53,7 @@ final class ImageController extends AbstractController
 
         $errors = FormErrors::collect($form);
 
-        if (count($errors) !== 0) {
+        if (\count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 

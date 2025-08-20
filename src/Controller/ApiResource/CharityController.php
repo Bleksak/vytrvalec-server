@@ -64,7 +64,7 @@ final class CharityController extends AbstractController
     {
         $charity = $this->action->create($charityCreateDto);
 
-        if (is_array($charity)) {
+        if (\is_array($charity)) {
             return $this->json($charity, Response::HTTP_BAD_REQUEST);
         }
 
@@ -150,7 +150,7 @@ final class CharityController extends AbstractController
     public function index(): Response
     {
         return $this->json(
-            array_map(
+            \array_map(
                 fn (Charity $charity): CharityGetResponseDto => $charity->toResponseObject($this->imagePath),
                 $this->charityRepository->findAll(),
             )

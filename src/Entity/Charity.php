@@ -52,7 +52,7 @@ class Charity
         $descriptionTranslations = $translations->description->toArray();
 
         foreach ($translations->name->toArray() as $locale => $translation) {
-            assert($translation !== null, 'Preklad nesmi byt null');
+            \assert($translation !== null, 'Preklad nesmi byt null');
 
             $this->addTranslation(
                 new CharityTranslation(
@@ -105,8 +105,8 @@ class Charity
     {
         return new CharityGetResponseDto(
             $this->id ?? 0,
-            TranslationObjectDto::fromArray(array_column($this->translations->toArray(), 'name', 'locale')),
-            TranslationObjectDto::fromArray(array_column($this->translations->toArray(), 'description', 'locale')),
+            TranslationObjectDto::fromArray(\array_column($this->translations->toArray(), 'name', 'locale')),
+            TranslationObjectDto::fromArray(\array_column($this->translations->toArray(), 'description', 'locale')),
             $this->image?->getPath($imagePath),
             $this->website,
         );

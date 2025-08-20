@@ -40,7 +40,7 @@ final readonly class FacultyActions
         $nameTranslations = $dto->translations?->name?->toArray() ?? [];
 
         foreach ($nameTranslations as $locale => $translation) {
-            assert($translation !== null, 'Translation cannot be null!');
+            \assert($translation !== null, 'Translation cannot be null!');
 
             $facultyTranslation = $faculty->translations->get($locale);
 

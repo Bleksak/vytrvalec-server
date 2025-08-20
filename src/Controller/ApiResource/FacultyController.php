@@ -110,7 +110,7 @@ final class FacultyController extends AbstractController
     {
         $errors = $this->action->update($faculty, $facultyDto);
 
-        if (count($errors) !== 0) {
+        if (\count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -154,7 +154,7 @@ final class FacultyController extends AbstractController
     public function facultyList(): Response
     {
         return $this->json(
-            array_map(
+            \array_map(
                 static fn (Faculty $faculty): FacultyResponseDto => $faculty->toResponseObject(),
                 $this->facultyRepository->findAll(),
             ),

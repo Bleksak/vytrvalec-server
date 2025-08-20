@@ -24,14 +24,12 @@ final readonly class ImageUploader
     public function uploadImage(UploadedFile $image): ?Image
     {
         do {
-            $uniquePath = '/uploads/'.uniqid(more_entropy: true).'.webp';
+            $uniquePath = \sprintf('/uploads/%s.webp', \uniqid(more_entropy: true));
             $absolutePath = $this->publicDirectory.$uniquePath;
         } while ($this->fs->exists($absolutePath));
 
-        $tmpPath = $uniquePath.'.tmp';
-
+        $tmpPath = \sprintf('%s.tmp', $uniquePath);
         $newFile = $image->move($this->publicDirectory, $tmpPath);
-
         $filePath = $newFile->getRealPath();
 
         if ($filePath === false) {
@@ -43,7 +41,7 @@ final readonly class ImageUploader
             $profiles = $img->getImageProfiles('icc');
 
             $img->stripImage();
-            if (count($profiles) !== 0) {
+            if (\count($profiles) !== 0) {
                 $img->profileImage('icc', $profiles['icc']);
             }
 
@@ -57,7 +55,6 @@ final readonly class ImageUploader
         }
 
         $image = new Image($uniquePath);
-
         $this->imageRepository->save($image, true);
 
         return $image;

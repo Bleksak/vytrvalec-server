@@ -51,7 +51,7 @@ class Activity
         $this->translations = new ArrayCollection();
 
         foreach ($translations->name->toArray() as $locale => $value) {
-            assert($value !== null, 'Hodnota překladu nesmí být null');
+            \assert($value !== null, 'Hodnota překladu nesmí být null');
 
             $this->addTranslation(new ActivityTranslation($this, $locale, $value));
         }
@@ -117,7 +117,7 @@ class Activity
     {
         return new ActivityResponseDto(
             $this->getId(),
-            TranslationObjectDto::fromArray(array_column($this->translations->toArray(), 'name', 'locale')),
+            TranslationObjectDto::fromArray(\array_column($this->translations->toArray(), 'name', 'locale')),
             $this->getIcon()?->getPath($imagePath),
             $this->isActive(),
             $this->getMinElevation(),

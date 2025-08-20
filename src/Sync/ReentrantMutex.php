@@ -25,7 +25,7 @@ final class ReentrantMutex implements Mutex
     public function acquire(): Lock
     {
         $currentFiber = \Fiber::getCurrent();
-        $currentFiberId = $currentFiber ? spl_object_id($currentFiber) : -1;
+        $currentFiberId = $currentFiber ? \spl_object_id($currentFiber) : -1;
 
         $releaseFn = function (): void {
             $this->releaseInternal();

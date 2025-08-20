@@ -192,7 +192,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        return array_map(
+        return \array_map(
             static fn (array $row): WeeklySubmissionSum => new WeeklySubmissionSum(
                 (int) $row['distance'],
                 $row['faculty'],
@@ -244,7 +244,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $activities = [];
 
         foreach ($result as $row) {
-            if (!array_key_exists($row['activity_id'], $activities)) {
+            if (!\array_key_exists($row['activity_id'], $activities)) {
                 $activities[$row['activity_id']] = [];
             }
 
@@ -276,7 +276,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleColumnResult();
 
-        return array_sum($result);
+        return \array_sum($result);
     }
 
     /**
@@ -300,7 +300,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         /** @var array<Submission> */
         $result = $qb->getQuery()->getResult();
 
-        return array_map(
+        return \array_map(
             static fn (Submission $submission): ExtractSubmissionDto => new ExtractSubmissionDto(
                 $submission->getActivity()->getId(),
                 $submission->getSeason()->getId(),

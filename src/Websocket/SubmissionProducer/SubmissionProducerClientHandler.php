@@ -67,14 +67,14 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
         echo 'Locking free-list'.PHP_EOL;
         $freeListLock = $this->freeListMutex->acquire();
 
-        $oldSubmissions = array_map(fn (Submission $submission): int => $submission->getId(), $this->submissions);
+        $oldSubmissions = \array_map(fn (Submission $submission): int => $submission->getId(), $this->submissions);
 
-        $ignoredIds = array_diff($oldSubmissions, $this->freeList);
+        $ignoredIds = \array_diff($oldSubmissions, $this->freeList);
 
         $newSubmissions = $this->submissionRepository->findUnreviewed(self::SUBMISSIONS_BUFFER_LIMIT, $ignoredIds);
 
-        $toMerge = array_filter(
-            array_diff_key($newSubmissions, $this->submissions),
+        $toMerge = \array_filter(
+            \array_diff_key($newSubmissions, $this->submissions),
             fn (Submission $submission): bool => $submission->isReviewed() === false,
         );
 
@@ -82,7 +82,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
             $this->submissions[$key] = $submission;
         }
 
-        array_push($this->freeList, ...array_keys($newSubmissions));
+        \array_push($this->freeList, ...\array_keys($newSubmissions));
 
         echo 'Releasing free-list'.PHP_EOL;
         $freeListLock->release();
@@ -96,7 +96,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
             return;
         }
 
-        echo sprintf('Releasing client id %d'.PHP_EOL, $client->getId());
+        echo \sprintf('Releasing client id %d'.PHP_EOL, $client->getId());
 
         $submissionId = $this->clients[$client->getId()]->submissionId;
 
@@ -118,7 +118,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
         $customClient = new SubmissionProducerClient($client->getId());
         $this->clients[$client->getId()] = $customClient;
 
-        echo sprintf('New client with id %d joined'.PHP_EOL, $client->getId());
+        echo \sprintf('New client with id %d joined'.PHP_EOL, $client->getId());
 
         try {
             while ($message = $client->receive()) {
@@ -128,7 +128,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
                  */
                 $message = $this->serializer->deserialize($buffer, SubmissionProducerMessage::class, 'json');
 
-                echo sprintf('Client: %d - Got message of type: %s'.PHP_EOL, $client->getId(), $message->type->value);
+                echo \sprintf('Client: %d - Got message of type: %s'.PHP_EOL, $client->getId(), $message->type->value);
 
                 if (
                     $message->type !== SubmissionProducerMessageType::InitializeRequest
@@ -287,7 +287,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
             return null;
         }
 
-        $submissionId = array_pop($this->freeList);
+        $submissionId = \array_pop($this->freeList);
 
         echo 'Releasing free-list'.PHP_EOL;
         $lock->release();

@@ -154,7 +154,7 @@ final class ActivityController extends AbstractController
     public function index(ImagePath $imagePath): Response
     {
         return $this->json(
-            array_map(
+            \array_map(
                 static fn (Activity $activity): ActivityResponseDto => $activity->toResponseObject($imagePath),
                 $this->activityRepository->findAll(),
             )

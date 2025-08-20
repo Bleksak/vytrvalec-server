@@ -88,7 +88,7 @@ final readonly class UserActions
             $user->setBanned($dto->banned);
         }
 
-        if ($dto->roles !== null && count($dto->roles) !== 0) {
+        if ($dto->roles !== null && \count($dto->roles) !== 0) {
             $user->setRoles($dto->roles);
         }
 
@@ -126,7 +126,7 @@ final readonly class UserActions
             return;
         }
 
-        $userPasswordResetToken = bin2hex(random_bytes(90));
+        $userPasswordResetToken = \bin2hex(\random_bytes(90));
 
         $user->setPasswordResetToken($userPasswordResetToken);
 
@@ -188,7 +188,7 @@ final readonly class UserActions
 
         $unsubscribeHash = null;
         if ($user->hasMailing()) {
-            $unsubscribeHash = bin2hex(random_bytes(90));
+            $unsubscribeHash = \bin2hex(\random_bytes(90));
         }
 
         $user->setEmailUnsubscribeHash($unsubscribeHash);

@@ -49,7 +49,7 @@ final class ActivityRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('a');
 
-        return intval(
+        return \intval(
             $qb
                 ->select($qb->expr()->count('a'))
                 ->from(Submission::class, 's')
@@ -77,7 +77,7 @@ final class ActivityRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        return array_map(
+        return \array_map(
             static fn (array $row): ActivityStatisticsDto => new ActivityStatisticsDto(
                 $row[0]->toResponseObject($imagePath),
                 (int) $row['distance'],

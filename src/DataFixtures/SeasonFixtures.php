@@ -14,24 +14,24 @@ final class SeasonFixtures extends Fixture
     #[\Override]
     public function load(ObjectManager $manager): void
     {
-        $start = \DateTime::createFromFormat('Y-m-d', '2020-10-01');
+        $start = \DateTime::createFromFormat(format: 'Y-m-d', datetime: '2020-10-01');
 
         if (!$start) {
             return;
         }
 
-        $end = (clone $start)->add(new \DateInterval('P4W'));
+        $end = (clone $start)->add(new \DateInterval(duration: 'P4W'));
 
-        $oct2020 = new Season($start, $end, $this->getReference('anickaJirik', Charity::class));
+        $oct2020 = new Season($start, $end, $this->getReference(name: 'anickaJirik', class: Charity::class));
 
-        $start = \DateTime::createFromFormat('Y-m-d', '2021-10-01');
+        $start = \DateTime::createFromFormat(format: 'Y-m-d', datetime: '2021-10-01');
         if (!$start) {
             return;
         }
 
-        $end = (clone $start)->add(new \DateInterval('P4W'));
+        $end = (clone $start)->add(new \DateInterval(duration: 'P4W'));
 
-        $oct2021 = new Season($start, $end, $this->getReference('davidGolias', Charity::class));
+        $oct2021 = new Season($start, $end, $this->getReference(name: 'davidGolias', class: Charity::class));
 
         $manager->persist($oct2020);
         $manager->persist($oct2021);

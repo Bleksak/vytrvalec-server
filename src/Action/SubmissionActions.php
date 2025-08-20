@@ -11,8 +11,6 @@ use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use App\Notifications\EmailTemplate\SubmissionRejectedEmailTemplate;
-use App\Notifications\Firebase\Firebase;
-use App\Notifications\VytrvalecNotification;
 use App\Repository\ActivityRepository;
 use App\Repository\ImageRepository;
 use App\Repository\ProfileCacheRepository;
@@ -70,16 +68,15 @@ final readonly class SubmissionActions
 
         $submission->setMessage($dto->message);
 
-        if ($dto->state) {
-            // noop when already accepted, otherwise profile cache would stack
-            if (!$submission->isReviewed() || !$submission->isAccepted()) {
-                $this->profileCacheRepository->addCache($submission);
-            }
-        } else {
-            if ($submission->isReviewed() && $submission->isAccepted()) {
-                $this->profileCacheRepository->removeCache($submission);
-            }
+        $this->handleCacheUpdate($submission, $dto);
 
+        if ($dto->state && (!$submission->isReviewed() || !$submission->isAccepted())) {
+            // noop when already accepted, otherwise profile cache would stack
+            $this->profileCacheRepository->addCache($submission);
+        }
+
+        // TODO(@jvelek): Ted mi doslo, ze tady se da frajerovi zaspamovat email kdyby kutak furt schvaloval a zamital aktivitu :D
+        if (!$dto->state) {
             // if ($submission->getUser()->getToken() !== null) {
             //     $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));
             // }
@@ -156,5 +153,19 @@ final readonly class SubmissionActions
         $this->submissionRepository->save($submission, true);
 
         return [];
+    }
+
+    private function handleCacheUpdate(
+        Submission $submission,
+        SubmissionStateDto $dto,
+    ): void {
+        if ($dto->state && (!$submission->isReviewed() || !$submission->isAccepted())) {
+            // noop when already accepted, otherwise profile cache would stack
+            $this->profileCacheRepository->addCache($submission);
+        }
+
+        if (!$dto->state) {
+            $this->profileCacheRepository->removeCache($submission);
+        }
     }
 }

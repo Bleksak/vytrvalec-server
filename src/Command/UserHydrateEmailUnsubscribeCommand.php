@@ -26,7 +26,7 @@ final class UserHydrateEmailUnsubscribeCommand extends Command
     {
         foreach ($this->userRepository->findAll() as $user) {
             if ($user->getEmailUnsubscribeHash() === null) {
-                $user->setEmailUnsubscribeHash(bin2hex(random_bytes(90)));
+                $user->setEmailUnsubscribeHash(\bin2hex(\random_bytes(90)));
                 $this->userRepository->save($user);
             }
         }

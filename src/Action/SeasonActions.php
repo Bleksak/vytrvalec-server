@@ -20,7 +20,8 @@ final readonly class SeasonActions
         private SeasonRepository $seasonRepository,
         private CharityRepository $charityRepository,
         private MessageBusInterface $messageBus,
-    ) {}
+    ) {
+    }
 
     public function create(SeasonCreateDto $dto): int
     {
@@ -44,7 +45,7 @@ final readonly class SeasonActions
         $today = new \DateTimeImmutable()->setTime(0, 0);
         $diff = $season->getStart()->diff($today)->days;
 
-        assert($diff !== false, 'Diff cannot be false?');
+        \assert($diff !== false, 'Diff cannot be false?');
 
         if ($diff > 0) {
             $stamps[] = DelayStamp::delayUntil($dto->start);

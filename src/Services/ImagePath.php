@@ -18,7 +18,7 @@ final readonly class ImagePath
 
     public function fullPath(string|Image $image): string
     {
-        if (is_string($image)) {
+        if (\is_string($image)) {
             return $this->applicationPath.$image;
         }
 

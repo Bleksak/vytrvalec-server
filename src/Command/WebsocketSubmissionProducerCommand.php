@@ -42,8 +42,8 @@ final readonly class WebsocketSubmissionProducerCommand
         $port = $parameters->get('ws_port');
         $port = (int) $port;
 
-        assert($port >= 0, 'Port must be >= 0');
-        assert($port <= 65535, 'Port must be <= 65535');
+        \assert($port >= 0, 'Port must be >= 0');
+        \assert($port <= 65535, 'Port must be <= 65535');
 
         $this->port = $port;
     }
@@ -77,7 +77,7 @@ final readonly class WebsocketSubmissionProducerCommand
 
         $signal = trapSignal([SIGINT, SIGTERM]);
 
-        $this->logger->info(sprintf('Received signald %d, stopping HTTP server', $signal));
+        $this->logger->info(\sprintf('Received signald %d, stopping HTTP server', $signal));
 
         $server->stop();
 

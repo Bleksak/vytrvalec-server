@@ -13,7 +13,8 @@ final readonly class WeeklyElevationExtraPoints implements ExtraPointsInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManagerInterface,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public static function getUniqueName(): string
@@ -64,8 +65,8 @@ final readonly class WeeklyElevationExtraPoints implements ExtraPointsInterface
          */
         $result = $query->executeQuery()->fetchAllAssociative();
 
-        return array_map(
-            static fn(array $row): ExtraPointsResultDto => new ExtraPointsResultDto(
+        return \array_map(
+            static fn (array $row): ExtraPointsResultDto => new ExtraPointsResultDto(
                 new AnonymizedUser($row['first_name'], $row['last_name'], $row['anonymize']),
                 $row['activity_id'],
                 $row['faculty_id'],
