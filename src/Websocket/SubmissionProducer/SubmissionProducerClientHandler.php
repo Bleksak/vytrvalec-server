@@ -82,7 +82,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
             $this->submissions[$key] = $submission;
         }
 
-        $this->freeList += array_keys($newSubmissions);
+        array_push($this->freeList, ...array_keys($newSubmissions));
 
         echo 'Releasing free-list'.PHP_EOL;
         $freeListLock->release();
