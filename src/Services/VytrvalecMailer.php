@@ -39,8 +39,11 @@ final readonly class VytrvalecMailer
     /**
      * @param User|array<User> $recipient
      */
-    public function send(User|array $recipient, AbstractEmailTemplate $template, bool $forceSend = false): void
-    {
+    public function send(
+        User|array $recipient,
+        AbstractEmailTemplate $template,
+        bool $forceSend = false,
+    ): void {
         if (!is_array($recipient)) {
             /** @var array<User> $recipient */
             $recipient = [$recipient];
@@ -58,7 +61,12 @@ final readonly class VytrvalecMailer
             if ($user->hasMailing() || $forceSend) {
                 $template->setContext('unsubscribe_link', $this->constructUnsubscribeLink($user));
 
-                $this->mailer->send(new VytrvalecEmail($email, $template));
+                $mail = new VytrvalecEmail($email, $template);
+                if ($template->replyTo) {
+                    $mail->replyTo($template->replyTo);
+                }
+
+                $this->mailer->send($mail);
             }
         }
     }

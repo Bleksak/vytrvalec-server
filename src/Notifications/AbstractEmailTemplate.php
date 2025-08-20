@@ -11,6 +11,8 @@ abstract class AbstractEmailTemplate
      */
     private array $context = [];
 
+    public ?string $replyTo = null;
+
     /**
      * @return array<string, mixed>
      */

@@ -59,8 +59,11 @@ final readonly class SubmissionActions
     /**
      * @return array<int,string>
      */
-    public function setState(Submission $submission, SubmissionStateDto $dto): array
-    {
+    public function setState(
+        User $issuer,
+        Submission $submission,
+        SubmissionStateDto $dto,
+    ): array {
         if ($dto->updatedAt !== $submission->getUpdatedAt()) {
             return ['mismatch_updated_at'];
         }
@@ -84,9 +87,12 @@ final readonly class SubmissionActions
             $now = new \DateTimeImmutable();
 
             if ($submission->getDate()->diff($now)->m < 2) {
+                $template = new SubmissionRejectedEmailTemplate($submission, $dto->message);
+                $template->replyTo = $issuer->getEmail();
+
                 $this->mailer->send(
                     $submission->getUser(),
-                    new SubmissionRejectedEmailTemplate($submission, $dto->message),
+                    $template,
                 );
             }
         }

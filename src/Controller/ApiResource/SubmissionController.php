@@ -297,9 +297,18 @@ final class SubmissionController extends AbstractController
         // ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function setState(#[MapRequestPayload] SubmissionStateDto $dto, Submission $submission): Response
-    {
-        $errors = $this->action->setState($submission, $dto);
+    public function setState(
+        #[CurrentUser]
+        User $user,
+        #[MapRequestPayload]
+        SubmissionStateDto $dto,
+        Submission $submission,
+    ): Response {
+        $errors = $this->action->setState(
+            $user,
+            $submission,
+            $dto
+        );
 
         if (count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
