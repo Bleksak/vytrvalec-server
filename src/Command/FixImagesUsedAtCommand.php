@@ -17,7 +17,8 @@ final readonly class FixImagesUsedAtCommand
 {
     public function __construct(
         private EntityManagerInterface $em,
-    ) {}
+    ) {
+    }
 
     public function __invoke(SymfonyStyle $io): int
     {

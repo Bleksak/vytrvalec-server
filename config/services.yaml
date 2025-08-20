@@ -19,3 +19,7 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    App\Services\ImageUploader:
+        arguments:
+            $projectDirectory: '%kernel.project_dir%'

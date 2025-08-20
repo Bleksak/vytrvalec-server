@@ -6,31 +6,31 @@ namespace App\Services;
 
 use App\Entity\Image;
 use App\Repository\ImageRepository;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final readonly class ImageUploader
 {
+    private string $publicDirectory;
+
     public function __construct(
         private Filesystem $fs,
-        private ParameterBagInterface $parameterBag,
         private ImageRepository $imageRepository,
+        string $projectDirectory,
     ) {
+        $this->publicDirectory = $projectDirectory.'/public';
     }
 
     public function uploadImage(UploadedFile $image): ?Image
     {
-        $dirname = $this->parameterBag->get('kernel.project_dir').'/public';
-
         do {
             $uniquePath = '/uploads/'.uniqid(more_entropy: true).'.webp';
-            $absolutePath = $dirname.$uniquePath;
+            $absolutePath = $this->publicDirectory.$uniquePath;
         } while ($this->fs->exists($absolutePath));
 
         $tmpPath = $uniquePath.'.tmp';
 
-        $newFile = $image->move($dirname, $tmpPath);
+        $newFile = $image->move($this->publicDirectory, $tmpPath);
 
         $filePath = $newFile->getRealPath();
 
@@ -53,7 +53,7 @@ final readonly class ImageUploader
         } catch (\ImagickException) {
             return null;
         } finally {
-            $this->fs->remove($newFile->getRealPath());
+            $this->fs->remove($filePath);
         }
 
         $image = new Image($uniquePath);
