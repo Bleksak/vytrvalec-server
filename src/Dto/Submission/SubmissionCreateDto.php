@@ -35,5 +35,5 @@ final class SubmissionCreateDto
     #[OA\Property]
     #[Assert\Type('datetime')]
     #[Assert\NotBlank(allowNull: false)]
-    public \DateTime $datetime;
+    public \DateTime $date;
 }

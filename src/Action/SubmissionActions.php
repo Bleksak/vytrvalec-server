@@ -56,7 +56,7 @@ final readonly class SubmissionActions
             $season,
             $image,
             $dto->distance,
-            $dto->datetime,
+            $dto->date,
             $dto->elevation ?? 0,
         );
 
