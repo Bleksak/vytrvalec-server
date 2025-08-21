@@ -101,10 +101,10 @@ class Submission
         Season $season,
         Image $image,
         int $distance,
+        \DateTime $date,
         int $elevation = 0,
-        string $message = '',
     ) {
-        $this->date = new \DateTime();
+        $this->date = $date;
 
         $this->user = $user;
         $this->activity = $activity;
@@ -112,7 +112,7 @@ class Submission
         $this->image = $image;
         $this->distance = $distance;
         $this->elevation = $elevation;
-        $this->message = $message;
+        $this->message = '';
 
         $this->calculateWeek();
     }

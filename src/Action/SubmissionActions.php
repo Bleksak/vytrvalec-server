@@ -31,8 +31,11 @@ final readonly class SubmissionActions
     /**
      * @return array<string, string>
      */
-    public function create(SubmissionCreateDto $dto, User $user, Season $season): array
-    {
+    public function create(
+        SubmissionCreateDto $dto,
+        User $user,
+        Season $season,
+    ): array {
         $activity = $this->activityRepository->find($dto->activityId);
 
         if ($activity === null) {
@@ -47,7 +50,15 @@ final readonly class SubmissionActions
 
         $image->setUsedAt(new \DateTime());
 
-        $submission = new Submission($user, $activity, $season, $image, $dto->distance, $dto->elevation ?? 0);
+        $submission = new Submission(
+            $user,
+            $activity,
+            $season,
+            $image,
+            $dto->distance,
+            $dto->datetime,
+            $dto->elevation ?? 0,
+        );
 
         $this->submissionRepository->save($submission, true);
 
