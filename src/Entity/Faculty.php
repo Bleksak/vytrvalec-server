@@ -63,11 +63,6 @@ class Faculty
         }
     }
 
-    public function getId(): int
-    {
-        return $this->id ?? 0;
-    }
-
     public function addTranslation(FacultyTranslation $translation): void
     {
         if (!$this->translations->containsKey($translation->locale)) {

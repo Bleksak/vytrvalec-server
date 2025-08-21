@@ -9,7 +9,6 @@ use App\Dto\Extract\ExtractSubmissionDto;
 use App\Dto\OutlierActivity;
 use App\Dto\OutlierResult;
 use App\Dto\WeeklySubmissionSum;
-use App\Entity\Activity;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -169,11 +168,11 @@ final class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<WeeklySubmissionSum>
+     * @return list<WeeklySubmissionSum>
      */
     public function getResultsForWeek(Season $season, int $week): array
     {
-        /** @var array<int, array{distance: int, faculty: int, activity: int}> */
+        /** @var list<array{distance: int, faculty: int, activity: int}> */
         $result = $this->createQueryBuilder('s')
             ->select(
                 'sum(s.distance) as distance, COALESCE(IDENTITY(f.parent), IDENTITY(u.faculty)) as faculty, IDENTITY(s.activity) as activity',
@@ -203,7 +202,7 @@ final class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<OutlierActivity>
+     * @return list<OutlierActivity>
      */
     public function findOutliers(Season $season, int $n = 3, bool $shouldAnonymize = true): array
     {
@@ -237,7 +236,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $query->bindValue(3, $n);
 
         /**
-         * @var array<int, array{activity_id: int, anonymize: bool, first_name: string, last_name: string, faculty_id: int, value: string}> $result
+         * @var list<array{activity_id: int, anonymize: bool, first_name: string, last_name: string, faculty_id: int, value: string}> $result
          */
         $result = $query->executeQuery()->fetchAllAssociative();
 
@@ -268,7 +267,7 @@ final class SubmissionRepository extends ServiceEntityRepository
 
     public function sumCountUserGroupedByFaculties(): int
     {
-        /** @var array<int> */
+        /** @var list<int> */
         $result = $this->createQueryBuilder('s')
             ->select('count(distinct s.user) as count')
             ->where('s.accepted = 1')
@@ -282,7 +281,7 @@ final class SubmissionRepository extends ServiceEntityRepository
     /**
      * @param array<int>|null $seasons
      *
-     * @return array<ExtractSubmissionDto>
+     * @return list<ExtractSubmissionDto>
      */
     public function extractBySeasons(ImagePath $imagePath, ?array $seasons): array
     {
@@ -297,7 +296,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             $qb->where('ss.season IN (:seasons)')->setParameter('seasons', $seasons);
         }
 
-        /** @var array<Submission> */
+        /** @var list<Submission> */
         $result = $qb->getQuery()->getResult();
 
         return \array_map(

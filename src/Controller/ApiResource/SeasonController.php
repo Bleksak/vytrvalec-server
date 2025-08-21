@@ -210,8 +210,11 @@ final class SeasonController extends AbstractController
     )]
     #[Route('/api/season/{season}/submissions', name: 'api_season_submissions', methods: ['GET'])]
     #[IsGranted('ROLE_STAFF')]
-    public function submissions(SubmissionRepository $submissionRepository, Season $season, Request $request): Response
-    {
+    public function submissions(
+        SubmissionRepository $submissionRepository,
+        Season $season,
+        Request $request,
+    ): Response {
         $queryFilterKeys = [
             'date',
             'week',

@@ -17,21 +17,17 @@ use App\Repository\FacultyRepository;
 use App\Repository\UserRepository;
 use App\Services\VytrvalecMailer;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final readonly class UserActions
 {
-    private string $clientUrl;
-
     public function __construct(
         private UserRepository $userRepository,
         private FacultyRepository $facultyRepository,
         private UserPasswordHasherInterface $hasher,
         private VytrvalecMailer $mailer,
-        ParameterBagInterface $params,
+        private string $clientUrl,
     ) {
-        $this->clientUrl = (string) $params->get('client_url');
     }
 
     /**

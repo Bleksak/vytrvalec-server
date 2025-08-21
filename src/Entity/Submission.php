@@ -44,12 +44,12 @@ class Submission
     #[OA\Property(type: 'integer', example: 1500)]
     #[ORM\Column(type: Types::BIGINT)]
     #[Groups(['fetchSubmission'])]
-    private string $elevation;
+    private int $elevation;
 
     #[OA\Property(type: 'integer', example: 1500)]
     #[ORM\Column(type: Types::BIGINT)]
     #[Groups(['fetchSubmission'])]
-    private string $distance;
+    private int $distance;
 
     #[OA\Property(example: true)]
     #[ORM\Column]
@@ -110,8 +110,8 @@ class Submission
         $this->activity = $activity;
         $this->season = $season;
         $this->image = $image;
-        $this->distance = (string) $distance;
-        $this->elevation = (string) $elevation;
+        $this->distance = $distance;
+        $this->elevation = $elevation;
         $this->message = $message;
 
         $this->calculateWeek();
@@ -165,19 +165,19 @@ class Submission
 
     public function setElevation(int $elevation): self
     {
-        $this->elevation = (string) $elevation;
+        $this->elevation = $elevation;
 
         return $this;
     }
 
     public function getDistance(): int
     {
-        return (int) $this->distance;
+        return $this->distance;
     }
 
     public function setDistance(int $distance): self
     {
-        $this->distance = (string) $distance;
+        $this->distance = $distance;
 
         return $this;
     }

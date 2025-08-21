@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\Cache;
 use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -63,6 +64,6 @@ final class SeasonCacheRepository extends ServiceEntityRepository
             ->where('c.season = :season')
             ->setParameter('season', $season)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult(Query::HYDRATE_OBJECT);
     }
 }

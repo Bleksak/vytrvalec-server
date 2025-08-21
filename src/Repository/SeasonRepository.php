@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Charity;
 use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -49,7 +51,7 @@ final class SeasonRepository extends ServiceEntityRepository
             ->setParameter('now', new \DateTimeImmutable())
             ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult(Query::HYDRATE_OBJECT);
     }
 
     public function getLast(): ?Season
@@ -59,7 +61,7 @@ final class SeasonRepository extends ServiceEntityRepository
             ->orderBy('s.end', 'ASC')
             ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult(Query::HYDRATE_OBJECT);
     }
 
     /**
@@ -100,6 +102,16 @@ final class SeasonRepository extends ServiceEntityRepository
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult(Query::HYDRATE_OBJECT);
+    }
+
+    public function countSeasonsByCharity(Charity $charity): int
+    {
+        return (int) $this->createQueryBuilder('s')
+            ->select('COUNT(s)')
+            ->where('s.charity = :charity')
+            ->setParameter('charity', $charity)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

@@ -10,11 +10,13 @@ use App\Entity\Charity;
 use App\Entity\CharityTranslation;
 use App\Repository\CharityRepository;
 use App\Repository\ImageRepository;
+use App\Repository\SeasonRepository;
 
 final readonly class CharityActions
 {
     public function __construct(
         private CharityRepository $charityRepository,
+        private SeasonRepository $seasonRepository,
         private ImageRepository $imageRepository,
     ) {
     }
@@ -106,9 +108,9 @@ final readonly class CharityActions
 
     public function remove(Charity $charity): bool
     {
-        $seasons = $this->charityRepository->findSeasonsByCharity($charity);
+        $seasonCount = $this->seasonRepository->countSeasonsByCharity($charity);
 
-        if (\count($seasons) !== 0) {
+        if ($seasonCount > 0) {
             return false;
         }
 

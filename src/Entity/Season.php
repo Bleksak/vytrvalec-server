@@ -146,7 +146,10 @@ class Season
         $start = \DateTimeImmutable::createFromInterface($this->getStart());
         $end = \DateTimeImmutable::createFromInterface($this->getEnd());
 
-        $weeks = \intdiv($end->diff($start)->days + 1, 7);
+        $diff = $end->diff($start);
+        \assert($diff->days !== false, 'DateInterval vytvoreny pres diff nemuze mit days = false');
+
+        $weeks = \intdiv($diff->days + 1, 7);
 
         return $weeks === 0 ? 1 : $weeks;
     }

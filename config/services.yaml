@@ -23,3 +23,7 @@ services:
     App\Services\ImageUploader:
         arguments:
             $projectDirectory: '%kernel.project_dir%'
+
+    App\Action\UserActions:
+        arguments:
+            $clientUrl: '%client_url%'
