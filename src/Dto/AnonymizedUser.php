@@ -6,15 +6,19 @@ namespace App\Dto;
 
 final readonly class AnonymizedUser
 {
-    public ?string $lastName = null;
+    public ?string $lastName;
 
     public function __construct(
         public string $firstName,
         ?string $lastName,
         int|bool|null $anonymize,
     ) {
+        $lastNameAnonymized = null;
+
         if ($anonymize !== null) {
-            $this->lastName = $lastName;
+            $lastNameAnonymized = $lastName;
         }
+
+        $this->lastName = $lastNameAnonymized;
     }
 }
