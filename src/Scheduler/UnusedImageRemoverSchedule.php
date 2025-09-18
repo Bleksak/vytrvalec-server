@@ -11,7 +11,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final readonly class ImageRemoverSchedule
+final readonly class UnusedImageRemoverSchedule
 {
     public function __construct(
         private ImageRepository $imageRepository,
@@ -21,7 +21,7 @@ final readonly class ImageRemoverSchedule
     ) {
     }
 
-    public function __invoke(ImageRemoverMessage $_message): void
+    public function __invoke(UnusedImageRemoverMessage $_message): void
     {
         $this->logger->info('ImageRemoverSchedule was called');
         $images = $this->imageRepository->findUnusedImagesForRemoval();
