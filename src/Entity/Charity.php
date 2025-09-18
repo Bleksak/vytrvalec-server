@@ -13,7 +13,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CharityRepository::class)]
 class Charity
@@ -22,18 +21,15 @@ class Charity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[OA\Property]
     #[ORM\ManyToOne(fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: true, referencedColumnName: 'uuid', name: 'image_uuid')]
-    #[Groups(['fetchSubmission'])]
     private ?Image $image = null;
 
     #[OA\Property]
     #[ORM\Column(length: 512, nullable: true)]
-    #[Groups(['fetchSubmission'])]
     private ?string $website = null;
 
     /** @var Collection<string, CharityTranslation> */
@@ -105,8 +101,30 @@ class Charity
     {
         return new CharityGetResponseDto(
             $this->id ?? 0,
-            TranslationObjectDto::fromArray(\array_column($this->translations->toArray(), 'name', 'locale')),
-            TranslationObjectDto::fromArray(\array_column($this->translations->toArray(), 'description', 'locale')),
+            TranslationObjectDto::fromArray(
+                \array_combine(
+                    \array_map(
+                        fn(CharityTranslation $translation): string => $translation->locale,
+                        $this->translations->toArray(),
+                    ),
+                    \array_map(
+                        fn(CharityTranslation $translation): string => $translation->name,
+                        $this->translations->toArray(),
+                    ),
+                ),
+            ),
+            TranslationObjectDto::fromArray(
+                \array_combine(
+                    \array_map(
+                        fn(CharityTranslation $translation): string => $translation->locale,
+                        $this->translations->toArray(),
+                    ),
+                    \array_map(
+                        fn(CharityTranslation $translation): string => $translation->description,
+                        $this->translations->toArray(),
+                    ),
+                ),
+            ),
             $this->image?->getPath($imagePath),
             $this->website,
         );

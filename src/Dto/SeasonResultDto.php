@@ -7,8 +7,8 @@ namespace App\Dto;
 final class SeasonResultDto
 {
     /**
-     * @param array<WeeklyResultDto> $results
-     * @param array<OutlierActivity> $outliers
+     * @param list<WeeklyResultDto> $results
+     * @param list<OutlierActivity> $outliers
      */
     public function __construct(
         public array $results,

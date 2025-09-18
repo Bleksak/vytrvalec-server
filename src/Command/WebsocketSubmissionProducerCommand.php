@@ -27,6 +27,7 @@ use function Amp\trapSignal;
 #[AsCommand(name: 'mv:ws-submission-producer', description: 'Produces submissions for websocket consumer')]
 final readonly class WebsocketSubmissionProducerCommand
 {
+    /** @var int<0, 65535> */
     private readonly int $port;
 
     public function __construct(

@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Image;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 final readonly class ImagePath
 {
-    private string $applicationPath;
-
-    public function __construct(ParameterBagInterface $parameterBag)
-    {
-        $this->applicationPath = $parameterBag->get('app_base');
+    public function __construct(
+        private string $applicationPath,
+    ) {
     }
 
     public function fullPath(string|Image $image): string

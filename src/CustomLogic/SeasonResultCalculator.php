@@ -76,7 +76,7 @@ final readonly class SeasonResultCalculator
 
         $topThree = $this->submissionRepository->findOutliers($season);
 
-        foreach ($results as $key => $result) {
+        foreach ($results as $result) {
             $result->activities = \array_values($result->activities);
         }
 

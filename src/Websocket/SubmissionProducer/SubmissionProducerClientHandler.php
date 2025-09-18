@@ -90,15 +90,17 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
         $submissionsLock->release();
     }
 
-    private function triggerDisconnect(WebsocketClient $client): void
+    private function triggerDisconnect(WebsocketClient $wsClient): void
     {
-        if (!isset($this->clients[$client->getId()])) {
+        $client = $this->clients[$wsClient->getId()] ?? null;
+
+        if ($client === null) {
             return;
         }
 
-        echo \sprintf('Releasing client id %d'.PHP_EOL, $client->getId());
+        echo \sprintf('Releasing client id %d'.PHP_EOL, $wsClient->getId());
 
-        $submissionId = $this->clients[$client->getId()]->submissionId;
+        $submissionId = $client->submissionId;
 
         if ($submissionId !== null) {
             $lock = $this->freeListMutex->acquire();
@@ -106,8 +108,8 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
             $lock->release();
         }
 
-        unset($this->clients[$client->getId()]);
-        $client->close();
+        unset($this->clients[$wsClient->getId()]);
+        $wsClient->close();
     }
 
     #[\Override]

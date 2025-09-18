@@ -6,31 +6,13 @@ namespace App\Notifications\Firebase;
 
 abstract readonly class AbstractFirebaseNotification
 {
+    /**
+     * @param non-empty-string $to
+     */
     public function __construct(
-        private string $to,
-        private string $title,
-        private string $message,
-        private ?string $action = null,
-    ) {
-    }
-
-    public function to(): string
-    {
-        return $this->to;
-    }
-
-    public function title(): string
-    {
-        return $this->title;
-    }
-
-    public function message(): string
-    {
-        return $this->message;
-    }
-
-    public function action(): ?string
-    {
-        return $this->action;
-    }
+        public string $to,
+        public string $title,
+        public string $message,
+        public null|string $action = null,
+    ) {}
 }

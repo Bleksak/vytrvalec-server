@@ -29,9 +29,9 @@ final class SubmissionResponseDto
         public int $week,
         #[OA\Property(type: 'integer', example: 1)]
         public int $activityId,
-        #[OA\Property(type: 'date', example: '2025-04-11')]
+        #[OA\Property(type: 'string', format: 'date', example: '2025-04-11')]
         public \DateTime $date,
-        #[OA\Property(type: 'datetime', example: 1)]
+        #[OA\Property(type: 'string', format: 'date-time', example: 1)]
         public \DateTime $updatedAt,
         #[OA\Property(example: 'Dobrej vykon lil bro')]
         public string $message = '',

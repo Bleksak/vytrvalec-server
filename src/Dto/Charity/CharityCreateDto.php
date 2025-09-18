@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class CharityCreateDto
 {
-    #[OA\Property(type: 'string', example: 'David a Goliáš')]
+    #[OA\Property]
     #[Assert\NotBlank(message: 'blank', allowNull: false)]
     public CharityCreateTranslationDto $translations;
 

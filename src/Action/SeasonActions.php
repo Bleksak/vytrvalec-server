@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Action;
 
-use App\Dto\Season\SeasonCreateDto;
+use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
+use App\Entity\Faculty;
+use App\Entity\FacultyMapping;
 use App\Entity\Season;
 use App\Messages\SeasonEndMessage;
 use App\Messages\SeasonStartMessage;
-use App\Repository\CharityRepository;
+use App\Repository\FacultyMappingRepository;
 use App\Repository\SeasonRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -18,47 +21,74 @@ final readonly class SeasonActions
 {
     public function __construct(
         private SeasonRepository $seasonRepository,
-        private CharityRepository $charityRepository,
+        private FacultyMappingRepository $facultyMappingRepository,
+        private CharityActions $charityAction,
         private MessageBusInterface $messageBus,
-    ) {
-    }
+        private EntityManagerInterface $entityManager,
+    ) {}
 
-    public function create(SeasonCreateDto $dto): int
+    /**
+     * @return Season|array<string, array<string, string>|list<string>>
+     */
+    public function create(SeasonConfigurationCreateDto $dto): Season|array
     {
-        $existingSeason = $this->seasonRepository->findByStartMonth($dto->start);
+        $existingSeason = $this->seasonRepository->findByStartMonth($dto->season->start);
 
         if ($existingSeason !== null) {
-            return -1;
+            return [
+                'season' => ['running'],
+            ];
         }
 
-        $charity = $this->charityRepository->find($dto->charityId);
+        $this->entityManager->beginTransaction();
 
-        if ($charity === null) {
-            return -1;
+        $charity = $this->charityAction->create($dto->charity);
+
+        if (is_array($charity)) {
+            $this->entityManager->rollback();
+
+            return [
+                'charity' => $charity,
+            ];
         }
 
-        $season = new Season($dto->start, $dto->end, $charity);
-
+        $season = new Season($dto->season->start, $dto->season->end, $charity);
         $this->seasonRepository->save($season, true);
-        $stamps = [];
 
-        $today = new \DateTimeImmutable()->setTime(0, 0);
-        $diff = $season->getStart()->diff($today)->days;
+        foreach ($dto->facultyMapping as $mapping) {
+            $faculty = $this->entityManager->getReference(Faculty::class, $mapping->faculty);
 
-        \assert($diff !== false, 'Diff cannot be false?');
+            if ($faculty === null) {
+                continue;
+            }
 
-        if ($diff > 0) {
-            $stamps[] = DelayStamp::delayUntil($dto->start);
+            $parent = $mapping->parent === null
+                ? null
+                : $this->entityManager->getReference(Faculty::class, $mapping->parent);
+
+            $mapping = new FacultyMapping($season, $faculty, $parent);
+            $this->facultyMappingRepository->save($mapping, false);
         }
 
-        $this->messageBus->dispatch(new Envelope(new SeasonStartMessage($season->getId()), $stamps));
+        $this->entityManager->flush();
 
-        $stamps = [
-            DelayStamp::delayUntil($dto->end),
-        ];
+        $this->entityManager->commit();
 
-        $this->messageBus->dispatch(new Envelope(new SeasonEndMessage($season->getId()), $stamps));
+        // if ($dto->season->notificationDate !== null) {
+        //     $stamps[] = DelayStamp::delayUntil($dto->season->start);
+        //     $this->messageBus->dispatch(
+        //         new Envelope(new SeasonStartMessage($season->getId()), [
+        //             DelayStamp::delayUntil($dto->season->notificationDate),
+        //         ]),
+        //     );
+        // }
 
-        return $season->getId();
+        // $stamps = [
+        //     DelayStamp::delayUntil($dto->season->notificationDate),
+        // ];
+
+        // $this->messageBus->dispatch(new Envelope(new SeasonEndMessage($season->getId()), $stamps));
+
+        return $season;
     }
 }

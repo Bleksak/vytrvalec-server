@@ -1,68 +1,42 @@
 # Mago configuration file
 # For more information, see https://mago.carthage.software/#/getting-started/configuration
-php_version = "8.5.0"
+php-version = "8.5.0"
 
 [source]
 paths = ["src"]
 includes = ["vendor"]
 excludes = []
 
-[format]
-print_width = 120
-tab_width = 4
-use_tabs = false
+[formatter]
+print-width = 120
+tab-width = 4
+use-tabs = false
+method-chain-breaking-style = "next_line"
+null-type-hint = "question"
+always-break-attribute-named-argument-lists = true
 
 [linter]
-integrations = ["symfony"]
+integrations = ["symfony", "amphp", "phpunit", "doctrine"]
 
 [linter.rules]
-halstead = {"enabled" = false}
 too-many-properties = {"enabled" = false}
 too-many-methods = {"enabled" = false}
 kan-defect = {"enabled" = false}
 excessive-parameter-list = {"enabled" = false}
 cyclomatic-complexity = {"enabled" = false}
-# ambiguous-function-call = {enabled = false} # TODO: vypnout tohle
 no-assign-in-condition = {enabled = false}
-literal-named-argument = {enabled = false}
 no-boolean-flag-parameter = {enabled=false}
-no-boolean-literal-comparison = {enabled=false}
+prefer-arrow-function = {enabled=true}
 
-# name = "maintainability/excessive-parameter-list"
-# level = "off"
+literal-named-argument = { enabled = false }
+halstead = { effort-threshold = 7000, enabled = false }
+no-boolean-literal-comparison = {enabled = false}
 
-# [[linter.rules]]
-# name = "maintainability/too-many-properties"
-# level = "off"
 
-# [[linter.rules]]
-# name = "best-practices/literal-named-argument"
-# level = "off"
-
-# [[linter.rules]]
-# name = "strictness/no-assignment-in-condition"
-# level = "off"
-
-# [[linter.rules]]
-# name = "maintainability/halstead"
-# level = "off"
-
-# [[linter.rules]]
-# name = "best-practices/no-boolean-flag-parameter"
-# level = "off"
-
-# [[linter.rules]]
-# name = "maintainability/too-many-methods"
-# level = "off"
-
-# [[linter.rules]]
-# name = "best-practices/no-else-clause"
-# level = "off"
-
-# [[linter.rules]]
-# name = "maintainability/cyclomatic-complexity"
-# level = "off"
-
-# [[linter.rules]]
-# name = "maintainability/kan-defect"
-# level = "off"
+[analyzer]
+find-unused-definitions = true
+find-unused-expressions = true
+analyze-dead-code = true
+allow-possibly-undefined-array-keys = false
+perform-heuristic-checks = true
+check-throws = false

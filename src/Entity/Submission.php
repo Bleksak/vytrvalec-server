@@ -10,7 +10,6 @@ use App\Services\ImagePath;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Index(columns: ['week'], name: 'week_index')]
@@ -21,71 +20,58 @@ class Submission
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[OA\Property(example: true)]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private bool $accepted = false;
 
     #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne(inversedBy: 'submissions', fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission'])]
     private Season $season;
 
     #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne(inversedBy: 'submissions', fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission'])]
     private User $user;
 
     #[OA\Property(type: 'integer', example: 1500)]
     #[ORM\Column(type: Types::BIGINT)]
-    #[Groups(['fetchSubmission'])]
     private int $elevation;
 
     #[OA\Property(type: 'integer', example: 1500)]
     #[ORM\Column(type: Types::BIGINT)]
-    #[Groups(['fetchSubmission'])]
     private int $distance;
 
     #[OA\Property(example: true)]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private bool $reviewed = false;
 
     #[OA\Property]
     #[ORM\ManyToOne(fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: true, referencedColumnName: 'uuid', name: 'image_uuid')]
-    #[Groups(['fetchSubmission'])]
     private ?Image $image;
 
     #[OA\Property(example: 2)]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private int $week;
 
     #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne(fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission'])]
     private Activity $activity;
 
-    #[OA\Property(type: 'date', example: '2025-04-11')]
+    #[OA\Property(type: 'string', format: 'date', example: '2025-04-11')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(['fetchSubmission'])]
     private \DateTime $date;
 
-    #[OA\Property(type: 'datetime', example: 1)]
+    #[OA\Property(type: 'string', format: 'date-time', example: 1)]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['fetchSubmission'])]
     private \DateTime $updatedAt;
 
     #[OA\Property(example: 'Dobrej vykon lil bro')]
     #[ORM\Column(length: 512)]
-    #[Groups(['fetchSubmission'])]
     private string $message = '';
 
     #[ORM\PrePersist]

@@ -4,24 +4,28 @@ declare(strict_types=1);
 
 namespace App\Validation;
 
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 
 final class FormErrors
 {
     /**
-     * @param FormInterface<mixed> $form
+     * @param FormInterface $form
      *
      * @return array<string, array<int, string>>
      */
     public static function collect(FormInterface $form): array
     {
         $errors = [];
-        foreach ($form as $child) {
+        foreach ($form->all() as $child) {
             if (!$child->isValid()) {
                 $errors[$child->getName()] = [];
             }
 
-            foreach ($child->getErrors(true) as $error) {
+            $errorIterator = $child->getErrors(true);
+
+            foreach ($errorIterator as $error) {
+                assert($error instanceof FormError, 'Error is not an iterator!');
                 $errors[$child->getName()][] = $error->getMessage();
             }
         }

@@ -59,7 +59,7 @@ final readonly class DailyDistanceExtraPoints implements ExtraPointsInterface
         $query->bindValue(3, $season->getId());
 
         /**
-         * @var array<array{first_name: string, last_name: string, anonymize: bool|null, activity_id: int, faculty_id: int, value: string}> $result
+         * @var list<array{first_name: string, last_name: string, anonymize: bool|null, activity_id: int, faculty_id: int, value: string}> $result
          */
         $result = $query->executeQuery()->fetchAllAssociative();
 

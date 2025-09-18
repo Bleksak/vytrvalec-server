@@ -9,6 +9,7 @@ use App\Dto\Image\Response\ImageCreateResponseDto;
 use App\Form\ImageUploadFormType;
 use App\Services\ImagePath;
 use App\Services\ImageUploader;
+use App\Utils\MimeType;
 use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
@@ -58,9 +59,9 @@ final class ImageController extends AbstractController
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        /** @var object{'image': UploadedFile} */
+        /** @var ImageUploadDto */
         $formData = $form->getData();
-        $image = $this->imageUploader->uploadImage($formData->image);
+        $image = $this->imageUploader->uploadImage($formData->image, MimeType::all());
 
         if ($image === null) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);

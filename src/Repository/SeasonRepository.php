@@ -45,6 +45,7 @@ final class SeasonRepository extends ServiceEntityRepository
 
     public function getCurrent(): ?Season
     {
+        /** @var Season|null */
         return $this->createQueryBuilder('s')
             ->where('s.start <= :now')
             ->andWhere('s.end >= :now')
@@ -56,6 +57,7 @@ final class SeasonRepository extends ServiceEntityRepository
 
     public function getLast(): ?Season
     {
+        /** @var Season|null */
         return $this->createQueryBuilder('s')
             ->select('s')
             ->orderBy('s.end', 'ASC')
@@ -69,6 +71,7 @@ final class SeasonRepository extends ServiceEntityRepository
      */
     public function findOrdered(): array
     {
+        /** @var list<Season> */
         return $this->createQueryBuilder('s')
             ->select('s', 'c')
             ->join('s.charity', 'c')
@@ -82,6 +85,7 @@ final class SeasonRepository extends ServiceEntityRepository
      */
     public function findPast(): array
     {
+        /** @var list<Season> */
         return $this->createQueryBuilder('s')
             ->select('s')
             ->where('s.end < :now')
@@ -96,6 +100,7 @@ final class SeasonRepository extends ServiceEntityRepository
         $startDate = new \DateTimeImmutable($dateTime->format('Y-m-01'));
         $endDate = new \DateTimeImmutable($dateTime->format('Y-m-t'));
 
+        /** @var Season|null */
         return $this->createQueryBuilder('s')
             ->select('s')
             ->where('s.start BETWEEN :startDate AND :endDate')

@@ -7,13 +7,13 @@ namespace App\Entity;
 use App\Dto\User\Response\UserResponseDto;
 use App\Repository\UserRepository;
 use App\Utils\FeatureFlag;
+use Deprecated;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -23,11 +23,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true, nullable: true)]
-    #[Groups(['fetchSubmission'])]
     private ?string $email = null;
 
     /**
@@ -35,30 +33,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
     #[ORM\Column(type: 'json')]
-    #[Groups(['fetchSubmission'])]
     private array $roles = [];
 
     #[ORM\Column]
     private string $password;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private bool $banned = false;
 
     #[ORM\Column(options: ['default' => 1])]
     private bool $mailing = true;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission'])]
     private string $firstName;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission'])]
     private string $lastName;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'], fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission'])]
     private Faculty $faculty;
 
     /**
@@ -144,16 +137,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->anonymize;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     #[\Override]
     public function getUserIdentifier(): string
     {
-        // @phpstan-ignore-next-line
-        return $this->email ?? 'null';
+        if($this->email === null || $this->email === '') {
+            return 'null';
+        }
+
+        return $this->email;
     }
 
     /**
@@ -286,6 +277,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->profileCaches;
     }
 
+    #[Deprecated('do not use')]
     #[\Override]
     public function eraseCredentials(): void
     {

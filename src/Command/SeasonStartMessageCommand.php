@@ -12,7 +12,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-#[AsCommand(name: 'season:start-message', description: 'Add a short description for your command')]
+#[AsCommand(name: 'season:start-message', description: 'Resends e-mails for the given season')]
 final readonly class SeasonStartMessageCommand
 {
     public function __construct(

@@ -16,6 +16,7 @@ use App\Dto\User\UserLoginDto;
 use App\Dto\UserDto;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Security\JWTPayload;
 use App\Utils\FeatureFlag;
 use Firebase\JWT\JWT;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -50,16 +51,16 @@ final class UserController extends AbstractController
 
         $expirationTime = \time() + (10 * 365 * 24 * 60 * 60); // 10 years expiration
 
-        $payload = [
-            'kid' => $user->getId(),
-            'user' => $user->getUserIdentifier(),
-            'exp' => $expirationTime,
-        ];
+        $payload = new JWTPayload(
+            $user->getId(),
+            $user->getUserIdentifier(),
+            $expirationTime,
+        );
 
         /** @var string */
         $key = $bag->get(name: 'jwt_secret');
 
-        $jwt = JWT::encode($payload, $key, alg: 'HS256');
+        $jwt = JWT::encode($payload->toArray(), $key, alg: 'HS256');
 
         return $this->json(new UserLoginResponseDto($user->toResponseObject(), $jwt));
     }
@@ -325,6 +326,7 @@ final class UserController extends AbstractController
             new OA\Parameter(
                 name: 'unsubscribe_hash',
                 in: 'path',
+                required: true,
                 schema: new OA\Schema(
                     type: 'string',
                     example: '4a7c7a836adcaf51eea0515028d3a3d45fb6bde835a0d25c442f1e9b27d25e6479985a8d6b6d5c20a7350b54e3e1cbac93a1',

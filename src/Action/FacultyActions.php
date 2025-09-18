@@ -54,6 +54,7 @@ final readonly class FacultyActions
 
         $faculty->shortcut = $dto->shortcut ?? $faculty->shortcut;
         $faculty->visible = $dto->visible ?? $faculty->visible;
+        $faculty->color = $dto->color ?? $faculty->color;
 
         if (AbstractProperty::isInitialized($dto, 'parent')) {
             if ($dto->parent === $faculty->id) {

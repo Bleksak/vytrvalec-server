@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\ApiResource;
 
 use App\Action\SubmissionActions;
-use App\Dto\SeasonIDList;
+use App\Dto\Extract\ExtractSubmissionDto;
 use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Dto\Submission\Response\UnreviewedSubmissionResponseDto;
 use App\Dto\Submission\SubmissionCreateDto;
@@ -18,10 +18,12 @@ use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Services\ImagePath;
 use App\Utils\FeatureFlag;
+use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
+use OpenApi\Attributes\JsonContent;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -287,25 +289,37 @@ final class SubmissionController extends AbstractController
         );
 
         if (\count($errors) !== 0) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+            return $this->json(
+                $errors,
+                Response::HTTP_BAD_REQUEST
+            );
         }
 
         return $this->json($submission->getUpdatedAt());
     }
 
-    #[OA\Get(description: 'Extract submission for given seasons')]
+    #[OA\Get(
+        description: 'Extract submission for given seasons',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Submissions for the season',
+                content: new JsonContent(ref: new Model(type: ExtractSubmissionDto::class)),
+            ),
+        ]
+    )]
     #[Route('/api/extract/submissions', 'api_extract_submissions', methods: ['GET'])]
     public function extractReviewedSubmissionForSeasons(
         #[CurrentUser]
         User $user,
-        #[MapQueryString]
-        ?SeasonIDList $seasons,
+        #[MapQueryParameter]
+        ?int $season = null,
     ): Response {
         if (!$user->canAccess(FeatureFlag::ROLE_STAFF) && !$user->canAccess(FeatureFlag::FEATURE_EXPORT_SUBMISSIONS)) {
             return new Response(status: Response::HTTP_UNAUTHORIZED);
         }
 
-        $extractedData = $this->submissionRepository->extractBySeasons($this->imagePath, $seasons?->seasons);
+        $extractedData = $this->submissionRepository->extractBySeasons($this->imagePath, $season);
 
         return $this->json($extractedData);
     }

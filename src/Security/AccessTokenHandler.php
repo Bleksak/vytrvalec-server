@@ -6,15 +6,16 @@ namespace App\Security;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
 {
     public function __construct(
-        private ParameterBagInterface $parameters,
+        private DenormalizerInterface $denormalizer,
+        private string $secret,
     ) {
     }
 
@@ -22,9 +23,10 @@ final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
     public function getUserBadgeFrom(string $accessToken): UserBadge
     {
         try {
-            $payload = JWT::decode($accessToken, new Key($this->parameters->get('jwt_secret'), 'HS256'));
+            $payload = JWT::decode($accessToken, new Key($this->secret, 'HS256'));
 
-            \assert(isset($payload->user) && \is_string($payload->user), 'Invalid jwt payload');
+            /* @var JWTPayload */
+            $payload = $this->denormalizer->denormalize($payload, JWTPayload::class);
 
             return new UserBadge($payload->user);
         } catch (\Throwable) {

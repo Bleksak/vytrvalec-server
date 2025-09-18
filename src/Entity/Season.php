@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\Faculty\Response\FacultyMappingResponseDto;
 use App\Dto\Season\Response\SeasonIndexResponseDto;
 use App\Repository\SeasonRepository;
 use App\Services\ImagePath;
@@ -13,43 +14,54 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]
-#[ORM\Index(columns: ['start'], name: 'date_index')]
+#[ORM\Index(
+    columns: ['start'],
+    name: 'date_index',
+)]
 class Season
 {
     #[OA\Property(example: 1)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[OA\Property(example: '2025-04-01')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
-    #[Groups(['fetchSubmission'])]
     private \DateTime $start;
 
     #[OA\Property(example: '2025-05-01')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
-    #[Groups(['fetchSubmission'])]
     private \DateTime $end;
 
     #[OA\Property]
     #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission'])]
     private Charity $charity;
 
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(mappedBy: 'season', targetEntity: Submission::class)]
+    #[ORM\OneToMany(
+        mappedBy: 'season',
+        targetEntity: Submission::class,
+    )]
     private Collection $submissions;
+
+    /**
+     * @var Collection<int, FacultyMapping>
+     */
+    #[ORM\OneToMany(
+        targetEntity: FacultyMapping::class,
+        mappedBy: 'season',
+        orphanRemoval: true,
+    )]
+    private Collection $facultyMappings;
 
     public function __construct(\DateTime $start, \DateTime $end, Charity $charity)
     {
@@ -57,6 +69,7 @@ class Season
         $this->start = $start;
         $this->end = $end;
         $this->charity = $charity;
+        $this->facultyMappings = new ArrayCollection();
     }
 
     public function getId(): int
@@ -154,6 +167,31 @@ class Season
         return $weeks === 0 ? 1 : $weeks;
     }
 
+    /**
+     * @return Collection<int, FacultyMapping>
+     */
+    public function getFacultyMappings(): Collection
+    {
+        return $this->facultyMappings;
+    }
+
+    public function addFacultyMapping(FacultyMapping $facultyMapping): static
+    {
+        if (!$this->facultyMappings->contains($facultyMapping)) {
+            $this->facultyMappings->add($facultyMapping);
+            $facultyMapping->season = $this;
+        }
+
+        return $this;
+    }
+
+    public function removeFacultyMapping(FacultyMapping $facultyMapping): static
+    {
+        $this->facultyMappings->removeElement($facultyMapping);
+
+        return $this;
+    }
+
     public function toResponseObject(?ImagePath $imagePath = null): SeasonIndexResponseDto
     {
         return new SeasonIndexResponseDto(
@@ -163,6 +201,10 @@ class Season
             $this->end,
             $this->canDelete(),
             $this->isRunning(),
+            array_map(
+                static fn(FacultyMapping $mapping): FacultyMappingResponseDto => $mapping->toResponseObject(),
+                $this->facultyMappings->toArray(),
+            ),
         );
     }
 }

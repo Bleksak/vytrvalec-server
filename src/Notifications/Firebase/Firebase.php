@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications\Firebase;
 
 use Kreait\Firebase\Contract\Messaging;
+use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\MessageData;
 use Kreait\Firebase\Messaging\Notification;
 
@@ -19,22 +20,22 @@ final readonly class Firebase
     {
         try {
             $this->messaging->send(
-                [
-                    'token' => $notification->to(),
-                    // 'topic' => null,
-                    // 'condition' => null,
-                    'data' => MessageData::fromArray([
-                        'notification_type' => '',
-                    ]),
-                    'notification' => Notification::create($notification->title(), $notification->message(), null), // ?: Notification|NotificationShape,
-                    // 'android' => null, // ?: AndroidConfigShape,
-                    // 'apns' => null, // ?: ApnsConfig|ApnsConfigShape,
-                    // 'webpush' => null, // ?: WebPushConfig|WebPushConfigShape,
-                    // 'fcm_options' => null, // ?: FcmOptions|FcmOptionsShape
-                ],
-                false,
+                CloudMessage::new()
+                    ->toToken($notification->to)
+                    ->withData(MessageData::fromArray(
+                        [
+                            'notification_type' => '',
+                        ]
+                    ))
+                    ->withNotification(
+                        Notification::create(
+                            $notification->title,
+                            $notification->message,
+                            null,
+                        )
+                    )
             );
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return false;
         }
 

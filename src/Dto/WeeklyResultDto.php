@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
 final class WeeklyResultDto
 {
     /**
-     * @param array<int,ActivityResultDto> $activities
+     * @param array<int, ActivityResultDto> $activities
      */
     public function __construct(
         #[OA\Property(example: 2)]

@@ -13,6 +13,9 @@ final class SeasonResultType extends Type
 {
     public const string NAME = 'season_result';
 
+    /**
+     * @param array<string, mixed> $column
+     */
     #[\Override]
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {

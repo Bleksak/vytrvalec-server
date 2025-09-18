@@ -13,7 +13,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 class Activity
@@ -22,7 +21,6 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[OA\Property]
@@ -32,12 +30,10 @@ class Activity
 
     #[OA\Property(example: true)]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private bool $active = true;
 
     #[OA\Property(example: 1000)]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private int $minElevation;
 
     /** @var Collection<string, ActivityTranslation> */
@@ -117,7 +113,13 @@ class Activity
     {
         return new ActivityResponseDto(
             $this->getId(),
-            TranslationObjectDto::fromArray(\array_column($this->translations->toArray(), 'name', 'locale')),
+            TranslationObjectDto::fromArray(
+                \array_column(
+                    $this->translations->toArray(),
+                    'name',
+                    'locale',
+                ),
+            ),
             $this->getIcon()?->getPath($imagePath),
             $this->isActive(),
             $this->getMinElevation(),

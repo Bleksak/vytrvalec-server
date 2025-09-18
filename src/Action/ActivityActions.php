@@ -10,6 +10,7 @@ use App\Entity\Activity;
 use App\Entity\ActivityTranslation;
 use App\Repository\ActivityRepository;
 use App\Repository\ImageRepository;
+use App\Utils\MimeType;
 
 final readonly class ActivityActions
 {
@@ -23,7 +24,7 @@ final readonly class ActivityActions
     {
         $icon = $this->imageRepository->find($dto->icon);
 
-        if ($icon === null) {
+        if ($icon === null || $icon->originalMimeType !== MimeType::SVG) {
             return null;
         }
 
@@ -49,6 +50,12 @@ final readonly class ActivityActions
             }
 
             $activityTranslation->name = $translation;
+        }
+
+        $icon = $this->imageRepository->find($dto->icon);
+
+        if ($icon !== null && $icon->originalMimeType === MimeType::SVG) {
+            $activity->setIcon($icon);
         }
 
         $activity->setMinElevation($dto->minElevation ?? $activity->getMinElevation());

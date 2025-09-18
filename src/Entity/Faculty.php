@@ -12,7 +12,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacultyRepository::class)]
 class Faculty
@@ -21,17 +20,14 @@ class Faculty
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     public private(set) int $id;
 
     #[OA\Property(example: 'FAV')]
     #[ORM\Column(length: 10)]
-    #[Groups(['fetchSubmission'])]
     public string $shortcut;
 
     #[OA\Parameter(example: true)]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     public bool $visible;
 
     #[ORM\ManyToOne(targetEntity: self::class)]
@@ -74,7 +70,18 @@ class Faculty
     {
         return new FacultyResponseDto(
             $this->id,
-            TranslationObjectDto::fromArray(\array_column($this->translations->toArray(), 'name', 'locale')),
+            TranslationObjectDto::fromArray(
+                \array_combine(
+                    \array_map(
+                        fn(FacultyTranslation $translation): string => $translation->locale,
+                        $this->translations->toArray(),
+                    ),
+                    \array_map(
+                        fn(FacultyTranslation $translation): string => $translation->name,
+                        $this->translations->toArray(),
+                    ),
+                ),
+            ),
             $this->shortcut,
             $this->visible,
             $this->parent?->id,

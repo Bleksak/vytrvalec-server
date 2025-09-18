@@ -24,6 +24,19 @@ services:
         arguments:
             $projectDirectory: '%kernel.project_dir%'
 
+    App\Services\ImagePath:
+        arguments:
+            $applicationPath: '%app_base%'
+
+    App\Services\VytrvalecMailer:
+        arguments:
+            $clientUrl: '%client_url%'
+            $appBase: '%app_base%'
+
     App\Action\UserActions:
         arguments:
             $clientUrl: '%client_url%'
+
+    App\Security\AccessTokenHandler:
+        arguments:
+            $secret: '%jwt_secret%'

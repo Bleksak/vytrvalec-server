@@ -16,12 +16,14 @@ use OpenApi\Attributes as OA;
     ),
     new OA\Property(
         property: 'start',
-        type: 'date',
+        type: 'string',
+        format: 'date',
         example: '2025-04-01',
     ),
     new OA\Property(
         property: 'end',
-        type: 'date',
+        type: 'string',
+        format: 'date',
         example: '2025-05-01',
     ),
     new OA\Property(

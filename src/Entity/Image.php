@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Repository\ImageRepository;
 use App\Services\ImagePath;
+use App\Utils\MimeType;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -27,9 +28,15 @@ class Image
     #[ORM\Column(nullable: true)]
     private ?\DateTime $usedAt = null;
 
-    public function __construct(string $path)
-    {
+    #[ORM\Column(enumType: MimeType::class)]
+    public ?MimeType $originalMimeType;
+
+    public function __construct(
+        string $path,
+        MimeType $originalMimeType,
+    ) {
         $this->path = $path;
+        $this->originalMimeType = $originalMimeType;
         $this->uuid = Uuid::v7();
         $this->uploadedAt = new \DateTime();
         $this->usedAt = null;

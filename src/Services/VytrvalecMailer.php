@@ -7,18 +7,15 @@ namespace App\Services;
 use App\Entity\User;
 use App\Notifications\AbstractEmailTemplate;
 use App\Notifications\VytrvalecEmail;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
 
 final readonly class VytrvalecMailer
 {
-    private string $clientUrl;
-
     public function __construct(
         private MailerInterface $mailer,
-        private ParameterBagInterface $parameterBag,
+        private string $clientUrl,
+        private string $appBase,
     ) {
-        $this->clientUrl = $parameterBag->get('client_url');
     }
 
     /**
@@ -27,13 +24,19 @@ final readonly class VytrvalecMailer
     private function getContext(): array
     {
         return [
-            'base_uri' => $this->parameterBag->get('app_base'),
+            'base_uri' => $this->appBase,
         ];
     }
 
     private function constructUnsubscribeLink(User $user): string
     {
-        return \sprintf('%s/unsubscribe/%s', $this->clientUrl, $user->getEmailUnsubscribeHash());
+        $emailUnsubscribeHash = $user->getEmailUnsubscribeHash();
+
+        if ($emailUnsubscribeHash === null) {
+            return $this->clientUrl;
+        }
+
+        return \sprintf('%s/unsubscribe/%s', $this->clientUrl, $emailUnsubscribeHash);
     }
 
     /**

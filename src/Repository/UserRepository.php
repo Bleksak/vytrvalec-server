@@ -50,7 +50,7 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
     #[\Override]
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
-        if (!($user instanceof User)) {
+        if (!$user instanceof User) {
             throw new UnsupportedUserException(\sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
@@ -60,12 +60,13 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
     }
 
     /**
-     * @return array<UserCountByFacultyStatistics>
+     * @return list<UserCountByFacultyStatistics>
      */
     public function countUserGroupedByFaculties(Season $season): array
     {
         $queryBuilder = $this->createQueryBuilder('u');
 
+        /** @var list<array{id: integer, count: integer}> */
         $rows = $queryBuilder
             ->select('f.id as id, count(u.id) as count')
             ->where(
@@ -90,45 +91,22 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
             ->getQuery()
             ->getResult();
 
+        /** @var list<UserCountByFacultyStatistics> */
         return \array_map(
-            static fn (array $row): UserCountByFacultyStatistics => new UserCountByFacultyStatistics($row['id'], $row['count']),
+            static fn(array $row): UserCountByFacultyStatistics => new UserCountByFacultyStatistics(
+                $row['id'],
+                $row['count'],
+            ),
             $rows,
         );
     }
 
     /**
-     * @param array<int> $ids
-     *
-     * @return array<User>
-     */
-    public function findByIds(array $ids): array
-    {
-        if ($ids === []) {
-            return [];
-        }
-
-        $qb = $this->createQueryBuilder('u');
-
-        /** @var array<User> */
-        $results = $qb
-            ->select('u')
-            ->where($qb->expr()->in('u.id', ':ids'))
-            ->setParameter('ids', $ids)
-            ->getQuery()
-            ->getResult();
-
-        $orderMap = \array_flip($ids);
-
-        \usort($results, fn (User $a, User $b): int => $orderMap[$a->getId()] <=> $orderMap[$b->getId()]);
-
-        return $results;
-    }
-
-    /**
-     * @return array<User>
+     * @return list<User>
      */
     public function findAllForMailing(): array
     {
+        /** @var list<User> */
         return $this->createQueryBuilder('u')
             ->select('u')
             ->where('u.mailing = 1')
@@ -142,10 +120,11 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
     }
 
     /**
-     * @return array<User>
+     * @return list<User>
      */
     public function findAllNotDeleted(): array
     {
+        /** @var list<User> */
         return $this->createQueryBuilder('u')
             ->where('u.email IS NOT NULL')
             ->getQuery()

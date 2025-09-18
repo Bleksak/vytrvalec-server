@@ -16,7 +16,7 @@ final readonly class VytrvalecNotification extends AbstractFirebaseNotification 
             $recipient = $recipient->getToken();
         }
 
-        if ($recipient === null) {
+        if ($recipient === null || $recipient === '') {
             return;
         }
 
@@ -27,9 +27,9 @@ final readonly class VytrvalecNotification extends AbstractFirebaseNotification 
     public function jsonSerialize(): mixed
     {
         return [
-            'to' => $this->to(),
-            'message' => $this->message(),
-            'action' => $this->action(),
+            'to' => $this->to,
+            'message' => $this->message,
+            'action' => $this->action,
         ];
     }
 }

@@ -42,12 +42,13 @@ final class ImageRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<Image>
+     * @return list<Image>
      */
     public function findUnusedImagesForRemoval(): array
     {
         $weekAgo = new \DateTime()->sub(new \DateInterval('P1W'));
 
+        /** @var list<Image> */
         return $this->createQueryBuilder('i')
             ->select('i')
             ->where('i.usedAt IS NULL')

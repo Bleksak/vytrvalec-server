@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
 final class ActivityResultDto
 {
     /**
-     * @var array<ExtraPointsDto>
+     * @var list<ExtraPointsDto>
      **/
     #[OA\Property(type: 'array', items: new OA\Items(ref: new Model(type: ExtraPointsDto::class)))]
     public array $extras = [];
