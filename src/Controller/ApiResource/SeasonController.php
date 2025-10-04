@@ -65,7 +65,7 @@ final class SeasonController extends AbstractController
     {
         $result = $this->action->create($dto);
 
-        if (is_array($result)) {
+        if (\is_array($result)) {
             return $this->json($result, Response::HTTP_BAD_REQUEST);
         }
 
@@ -216,9 +216,9 @@ final class SeasonController extends AbstractController
     ): Response {
         $results = $submissionRepository->findBySeasonAndFilter($season, $queryFilter, 25);
 
-        return $this->json(array_map(
+        return $this->json(\array_map(
             static fn(Submission $submission): SubmissionResponseDto => $submission->toResponseObject($imagePath),
-            iterator_to_array($results),
+            \iterator_to_array($results),
         ));
     }
 

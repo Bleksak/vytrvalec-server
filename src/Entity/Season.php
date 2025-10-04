@@ -201,7 +201,7 @@ class Season
             $this->end,
             $this->canDelete(),
             $this->isRunning(),
-            array_map(
+            \array_map(
                 static fn(FacultyMapping $mapping): FacultyMappingResponseDto => $mapping->toResponseObject(),
                 $this->facultyMappings->toArray(),
             ),

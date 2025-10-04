@@ -25,6 +25,7 @@ final readonly class ActivityActions
         $icon = $this->imageRepository->find($dto->icon);
 
         if ($icon === null || $icon->originalMimeType !== MimeType::SVG) {
+            // TODO(@bleksak): Tady musi byt upozorneni ze obrazek musi byt svg.
             return null;
         }
 

@@ -12,12 +12,16 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
+use SensitiveParameter;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Index(columns: ['email_unsubscribe_hash'], name: 'email_unsubscribe_hash')]
+#[ORM\Index(
+    columns: ['email_unsubscribe_hash'],
+    name: 'email_unsubscribe_hash',
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -25,13 +29,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180, unique: true, nullable: true)]
+    #[ORM\Column(
+        length: 180,
+        unique: true,
+        nullable: true,
+    )]
     private ?string $email = null;
 
     /**
      * @var array<string>
      */
-    #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
+    #[OA\Property(
+        type: 'array',
+        items: new OA\Items(type: 'string'),
+    )]
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
@@ -44,38 +55,63 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(options: ['default' => 1])]
     private bool $mailing = true;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(
+        type: 'string',
+        length: 255,
+    )]
     private string $firstName;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(
+        type: 'string',
+        length: 255,
+    )]
     private string $lastName;
 
-    #[ORM\ManyToOne(cascade: ['persist', 'remove'], fetch: 'EAGER')]
+    #[ORM\ManyToOne(
+        cascade: ['persist', 'remove'],
+        fetch: 'EAGER',
+    )]
     #[ORM\JoinColumn(nullable: false)]
     private Faculty $faculty;
 
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class, orphanRemoval: true)]
+    #[ORM\OneToMany(
+        mappedBy: 'user',
+        targetEntity: Submission::class,
+        orphanRemoval: true,
+    )]
     private Collection $submissions;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(
+        length: 255,
+        nullable: true,
+    )]
     private ?string $token = null;
 
     /**
      * @var Collection<int, ProfileCache>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
+    #[ORM\OneToMany(
+        mappedBy: 'user',
+        targetEntity: ProfileCache::class,
+    )]
     private Collection $profileCaches;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(
+        length: 255,
+        nullable: true,
+    )]
     private ?string $passwordResetToken = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $anonymize = false;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(
+        length: 255,
+        nullable: true,
+    )]
     private ?string $emailUnsubscribeHash = null;
 
     #[ORM\Column(length: 8)]
@@ -91,6 +127,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         Faculty $faculty,
         bool $anonymize,
         array $roles = [],
+        #[SensitiveParameter]
         ?string $token = null,
         string $locale = 'cs_CZ',
     ) {
@@ -140,7 +177,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[\Override]
     public function getUserIdentifier(): string
     {
-        if($this->email === null || $this->email === '') {
+        if ($this->email === null || $this->email === '') {
             return 'null';
         }
 
@@ -182,7 +219,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(#[SensitiveParameter] string $password): self
     {
         $this->password = $password;
 
@@ -262,7 +299,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->token;
     }
 
-    public function setToken(?string $token): static
+    public function setToken(#[SensitiveParameter] ?string $token): static
     {
         $this->token = $token;
 
@@ -288,7 +325,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->passwordResetToken;
     }
 
-    public function setPasswordResetToken(?string $passwordResetToken): static
+    public function setPasswordResetToken(#[SensitiveParameter] ?string $passwordResetToken): static
     {
         $this->passwordResetToken = $passwordResetToken;
 

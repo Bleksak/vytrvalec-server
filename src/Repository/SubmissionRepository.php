@@ -162,7 +162,7 @@ final class SubmissionRepository extends ServiceEntityRepository
                 SeasonQueryFilterType::Reviewed->value => $queryBuilder->andWhere(
                     's.reviewed = :reviewed',
                 )->setParameter('reviewed', $value),
-                SeasonQueryFilterType::User->value => is_string($value)
+                SeasonQueryFilterType::User->value => \is_string($value)
                     ? $queryBuilder->andWhere('u.email LIKE :userId')->setParameter('userId', $value . '%')
                     : $queryBuilder,
                 SeasonQueryFilterType::Faculty->value => $queryBuilder->andWhere(
@@ -171,7 +171,7 @@ final class SubmissionRepository extends ServiceEntityRepository
                 SeasonQueryFilterType::Activity->value => $queryBuilder->andWhere(
                     's.activity = :activityId',
                 )->setParameter('activityId', $value),
-                SeasonQueryFilterType::Page->value => is_int($value)
+                SeasonQueryFilterType::Page->value => \is_int($value)
                     ? $queryBuilder->setFirstResult(($value - 1) * $limit)
                     : $queryBuilder,
                 default => $queryBuilder,

@@ -44,7 +44,7 @@ final readonly class SeasonActions
 
         $charity = $this->charityAction->create($dto->charity);
 
-        if (is_array($charity)) {
+        if (\is_array($charity)) {
             $this->entityManager->rollback();
 
             return [

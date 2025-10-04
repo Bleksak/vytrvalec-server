@@ -6,6 +6,7 @@ namespace App\Security;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use SensitiveParameter;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -15,12 +16,12 @@ final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
 {
     public function __construct(
         private DenormalizerInterface $denormalizer,
+        #[SensitiveParameter]
         private string $secret,
-    ) {
-    }
+    ) {}
 
     #[\Override]
-    public function getUserBadgeFrom(string $accessToken): UserBadge
+    public function getUserBadgeFrom(#[SensitiveParameter] string $accessToken): UserBadge
     {
         try {
             $payload = JWT::decode($accessToken, new Key($this->secret, 'HS256'));

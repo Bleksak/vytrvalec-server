@@ -27,6 +27,10 @@ cyclomatic-complexity = {"enabled" = false}
 no-assign-in-condition = {enabled = false}
 no-boolean-flag-parameter = {enabled=false}
 prefer-arrow-function = {enabled=true}
+yoda-conditions = { enabled = false }
+sensitive-parameter = { enabled = true }
+
+ambiguous-function-call = {enabled=true}
 
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000, enabled = false }

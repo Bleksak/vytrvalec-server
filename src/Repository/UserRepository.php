@@ -10,6 +10,7 @@ use App\Entity\Submission;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SensitiveParameter;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -48,8 +49,10 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
     }
 
     #[\Override]
-    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
-    {
+    public function upgradePassword(
+        PasswordAuthenticatedUserInterface $user,
+        #[SensitiveParameter] string $newHashedPassword,
+    ): void {
         if (!$user instanceof User) {
             throw new UnsupportedUserException(\sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
@@ -91,7 +94,6 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
             ->getQuery()
             ->getResult();
 
-        /** @var list<UserCountByFacultyStatistics> */
         return \array_map(
             static fn(array $row): UserCountByFacultyStatistics => new UserCountByFacultyStatistics(
                 $row['id'],
