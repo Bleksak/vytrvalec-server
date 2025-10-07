@@ -11,9 +11,9 @@ use App\Dto\Season\Response\SeasonIndexResponseDto;
 use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
 use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Dto\WeeklyResultDto;
-use App\Entity\Activity;
+
 use App\Entity\Charity;
-use App\Entity\Faculty;
+
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Repository\SeasonCacheRepository;

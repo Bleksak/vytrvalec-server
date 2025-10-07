@@ -29,6 +29,7 @@ no-boolean-flag-parameter = {enabled=false}
 prefer-arrow-function = {enabled=true}
 yoda-conditions = { enabled = false }
 sensitive-parameter = { enabled = true }
+no-redundant-use = { enabled = true }
 
 ambiguous-function-call = {enabled=true}
 

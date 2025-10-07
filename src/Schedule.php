@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\Scheduler\UnusedImageRemoverMessage as UnusedImageRemoverMessage;
+
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
-use Symfony\Component\Scheduler\RecurringMessage;
+
 use Symfony\Component\Scheduler\Schedule as SymfonySchedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
 use Symfony\Contracts\Cache\CacheInterface;
