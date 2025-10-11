@@ -26,7 +26,7 @@ final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
         try {
             $payload = JWT::decode($accessToken, new Key($this->secret, 'HS256'));
 
-            /* @var JWTPayload */
+            /** @var JWTPayload */
             $payload = $this->denormalizer->denormalize($payload, JWTPayload::class);
 
             return new UserBadge($payload->user);
