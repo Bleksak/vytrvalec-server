@@ -40,3 +40,7 @@ services:
     App\Security\AccessTokenHandler:
         arguments:
             $secret: '%jwt_secret%'
+    App\Services\SubmissionImageValidityCheckerService:
+        arguments:
+            $tempDirectory: '%kernel.project_dir%/var'
+            $publicDirectory: '%kernel.project_dir%/public'
