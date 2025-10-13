@@ -22,7 +22,7 @@ final readonly class SubmissionFeatureReaderOCR
                 ->config('classify_bln_numeric_mode', '1') // @mago-expect analysis: mixed-method-access
                 ->config('segment_segcost_rating', '0.1') // @mago-expect analysis: mixed-method-access
                 ->run(); // @mago-expect analysis: mixed-method-access
-        } catch (TesseractOcrException|TesseractNotFoundException $e) {
+        } catch (TesseractOcrException|TesseractNotFoundException) {
             return null;
         }
     }
