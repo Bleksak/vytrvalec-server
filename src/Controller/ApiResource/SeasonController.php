@@ -11,9 +11,7 @@ use App\Dto\Season\Response\SeasonIndexResponseDto;
 use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
 use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Dto\WeeklyResultDto;
-
 use App\Entity\Charity;
-
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Repository\SeasonCacheRepository;
@@ -61,15 +59,20 @@ final class SeasonController extends AbstractController
     )]
     #[Route('/api/season', name: 'api_season_create', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
-    public function create(#[MapRequestPayload] SeasonConfigurationCreateDto $dto, ImagePath $imagePath): Response
-    {
+    public function create(
+        #[MapRequestPayload] SeasonConfigurationCreateDto $dto,
+        ImagePath $imagePath,
+    ): Response {
         $result = $this->action->create($dto);
 
         if (\is_array($result)) {
             return $this->json($result, Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json($result->toResponseObject($imagePath), Response::HTTP_CREATED);
+        return $this->json(
+            $result->toResponseObject($imagePath),
+            Response::HTTP_CREATED,
+        );
     }
 
     #[OA\Get(
@@ -78,7 +81,9 @@ final class SeasonController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_OK,
                 description: 'The running season',
-                content: new OA\JsonContent(ref: new Model(type: SeasonWithoutSubmissionsSchema::class)),
+                content: new OA\JsonContent(
+                    ref: new Model(type: SeasonWithoutSubmissionsSchema::class),
+                ),
             ),
             new OA\Response(
                 response: Response::HTTP_NOT_FOUND,
@@ -86,7 +91,11 @@ final class SeasonController extends AbstractController
             ),
         ],
     )]
-    #[Route('/api/season/current', name: 'api_season_current', methods: ['GET'])]
+    #[Route(
+        '/api/season/current',
+        name: 'api_season_current',
+        methods: ['GET'],
+    )]
     public function current(): Response
     {
         $season = $this->seasonRepository->getCurrent();
@@ -94,9 +103,7 @@ final class SeasonController extends AbstractController
             return $this->json([], Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($this->normalizer->normalize($season, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
-        ]));
+        return $this->json($season->toResponseObject());
     }
 
     #[OA\Delete(
@@ -130,7 +137,11 @@ final class SeasonController extends AbstractController
             ),
         ],
     )]
-    #[Route('/api/season/{season}', name: 'api_season_delete', methods: ['DELETE'])]
+    #[Route(
+        '/api/season/{season}',
+        name: 'api_season_delete',
+        methods: ['DELETE'],
+    )]
     #[IsGranted('ROLE_STAFF')]
     public function delete(Season $season): Response
     {
@@ -159,7 +170,9 @@ final class SeasonController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_OK,
                 description: 'The Season results',
-                content: new OA\JsonContent(ref: new Model(type: WeeklyResultDto::class)),
+                content: new OA\JsonContent(
+                    ref: new Model(type: WeeklyResultDto::class),
+                ),
             ),
             new OA\Response(
                 response: Response::HTTP_NOT_FOUND,
@@ -167,7 +180,11 @@ final class SeasonController extends AbstractController
             ),
         ],
     )]
-    #[Route('/api/season/{season}/results', name: 'api_season_results', methods: ['GET'])]
+    #[Route(
+        '/api/season/{season}/results',
+        name: 'api_season_results',
+        methods: ['GET'],
+    )]
     public function result(
         Season $season,
         SeasonResultCalculator $result,
@@ -198,7 +215,9 @@ final class SeasonController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_OK,
                 description: 'Season successfully deleted',
-                content: new OA\JsonContent(ref: new Model(type: Submission::class)),
+                content: new OA\JsonContent(
+                    ref: new Model(type: Submission::class),
+                ),
             ),
             new OA\Response(
                 response: Response::HTTP_NOT_FOUND,
@@ -206,7 +225,11 @@ final class SeasonController extends AbstractController
             ),
         ],
     )]
-    #[Route('/api/season/{season}/submissions', name: 'api_season_submissions', methods: ['GET'])]
+    #[Route(
+        '/api/season/{season}/submissions',
+        name: 'api_season_submissions',
+        methods: ['GET'],
+    )]
     #[IsGranted('ROLE_STAFF')]
     public function submissions(
         ImagePath $imagePath,
@@ -214,10 +237,16 @@ final class SeasonController extends AbstractController
         Season $season,
         #[MapQueryString] SeasonQueryFilterRequestDto $queryFilter,
     ): Response {
-        $results = $submissionRepository->findBySeasonAndFilter($season, $queryFilter, 25);
+        $results = $submissionRepository->findBySeasonAndFilter(
+            $season,
+            $queryFilter,
+            25,
+        );
 
         return $this->json(\array_map(
-            static fn(Submission $submission): SubmissionResponseDto => $submission->toResponseObject($imagePath),
+            static fn(Submission $submission): SubmissionResponseDto => $submission->toResponseObject(
+                $imagePath,
+            ),
             \iterator_to_array($results),
         ));
     }
@@ -230,17 +259,26 @@ final class SeasonController extends AbstractController
                 description: 'The running season',
                 content: new OA\JsonContent(
                     type: 'array',
-                    items: new OA\Items(ref: new Model(type: SeasonWithoutSubmissionsSchema::class)),
+                    items: new OA\Items(
+                        ref: new Model(type: SeasonWithoutSubmissionsSchema::class),
+                    ),
                 ),
             ),
         ],
     )]
-    #[Route('/api/season/past', name: 'api_season_index_past', methods: ['GET'])]
+    #[Route(
+        '/api/season/past',
+        name: 'api_season_index_past',
+        methods: ['GET'],
+    )]
     public function indexPast(ImagePath $imagePath): Response
     {
-        return $this->json(\array_map(static fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject(
-            $imagePath,
-        ), $this->seasonRepository->findPast()));
+        return $this->json(\array_map(
+            static fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject(
+                $imagePath,
+            ),
+            $this->seasonRepository->findPast(),
+        ));
     }
 
     #[OA\Get(
@@ -259,7 +297,9 @@ final class SeasonController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_OK,
                 description: 'The Season',
-                content: new OA\JsonContent(ref: new Model(type: SeasonWithoutSubmissionsSchema::class)),
+                content: new OA\JsonContent(
+                    ref: new Model(type: SeasonWithoutSubmissionsSchema::class),
+                ),
             ),
             new OA\Response(
                 response: Response::HTTP_NOT_FOUND,
@@ -271,8 +311,14 @@ final class SeasonController extends AbstractController
     public function season(Season $season): Response
     {
         $season = $this->normalizer->normalize($season, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['facultySummaries', 'userSummaries', 'submissions'],
-            AbstractNormalizer::CALLBACKS => ['charity' => fn(Charity $charity): int => $charity->getId()],
+            AbstractNormalizer::IGNORED_ATTRIBUTES => [
+                'facultySummaries',
+                'userSummaries',
+                'submissions',
+            ],
+            AbstractNormalizer::CALLBACKS => [
+                'charity' => fn(Charity $charity): int => $charity->getId(),
+            ],
         ]);
 
         return $this->json($season);
@@ -286,7 +332,9 @@ final class SeasonController extends AbstractController
                 description: 'All Seasons',
                 content: new OA\JsonContent(
                     type: 'array',
-                    items: new OA\Items(ref: new Model(type: SeasonIndexResponseDto::class)),
+                    items: new OA\Items(
+                        ref: new Model(type: SeasonIndexResponseDto::class),
+                    ),
                 ),
             ),
         ],
@@ -294,8 +342,11 @@ final class SeasonController extends AbstractController
     #[Route('/api/season', name: 'api_season_index', methods: ['GET'])]
     public function index(ImagePath $imagePath): Response
     {
-        return $this->json(\array_map(static fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject(
-            $imagePath,
-        ), $this->seasonRepository->findOrdered()));
+        return $this->json(\array_map(
+            static fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject(
+                $imagePath,
+            ),
+            $this->seasonRepository->findOrdered(),
+        ));
     }
 }

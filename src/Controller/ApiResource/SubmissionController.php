@@ -36,13 +36,12 @@ final class SubmissionController extends AbstractController
         private readonly SubmissionRepository $submissionRepository,
         private readonly SubmissionActions $action,
         private readonly ImagePath $imagePath,
-    ) {
-    }
+    ) {}
 
     #[Route(
         path: '/api/submission/{submission}',
         name: 'api_submission_delete',
-        methods: ['DELETE']
+        methods: ['DELETE'],
         // documentation: 'Deletes a <code>Submission</code> entity',
         // responses: [
         //     Response::HTTP_OK => [
@@ -57,8 +56,10 @@ final class SubmissionController extends AbstractController
         // ]
     )]
     #[IsGranted('ROLE_USER')]
-    public function delete(#[CurrentUser] User $user, Submission $submission): Response
-    {
+    public function delete(
+        #[CurrentUser] User $user,
+        Submission $submission,
+    ): Response {
         if (!$user->hasRole('ROLE_STAFF') && $user !== $submission->getUser()) {
             return new Response(status: Response::HTTP_FORBIDDEN);
         }
@@ -72,19 +73,23 @@ final class SubmissionController extends AbstractController
         return new Response(status: Response::HTTP_OK);
     }
 
-    #[Route('/api/submission', name: 'api_submission_create', methods: ['POST'])]
+    #[Route(
+        '/api/submission',
+        name: 'api_submission_create',
+        methods: ['POST'],
+    )]
     #[IsGranted('ROLE_USER')]
     public function create(
-        #[CurrentUser]
-        User $user,
+        #[CurrentUser] User $user,
         SeasonRepository $seasonRepository,
-        #[MapRequestPayload]
-        SubmissionCreateDto $submissionCreateDto,
+        #[MapRequestPayload] SubmissionCreateDto $submissionCreateDto,
     ): Response {
         $season = $seasonRepository->getCurrent();
 
         if ($season === null) {
-            return $this->json(['season' => ['no_season']], Response::HTTP_BAD_REQUEST);
+            return $this->json(['season' => [
+                'no_season',
+            ]], Response::HTTP_BAD_REQUEST);
         }
 
         $errors = $this->action->create($submissionCreateDto, $user, $season);
@@ -99,7 +104,7 @@ final class SubmissionController extends AbstractController
     #[Route(
         '/api/submission/list/{season}/{page}',
         name: 'api_submission_list_season',
-        methods: ['GET']
+        methods: ['GET'],
         // documentation: 'Retrieves all submissions in given Season',
         // responses: [
         //     Response::HTTP_OK => [
@@ -115,24 +120,26 @@ final class SubmissionController extends AbstractController
     public function listSeason(Season $season, int $page = 1): Response
     {
         $limit = 50;
-        $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
+        $submissions = $this->submissionRepository->findBySeason(
+            $season,
+            $page,
+            $limit,
+        );
         $pageCount = 1 + \intdiv($submissions->count(), $limit);
 
-        return $this->json(
-            [
-                'pages' => $pageCount,
-                'submissions' => \array_map(
-                    fn (Submission $submission): SubmissionResponseDto => $submission->toResponseObject($this->imagePath),
-                    \iterator_to_array($submissions),
-                ),
-            ],
-        );
+        return $this->json([
+            'pages' => $pageCount,
+            'submissions' => \array_map(
+                fn(Submission $submission): SubmissionResponseDto => $submission->toResponseObject($this->imagePath),
+                \iterator_to_array($submissions),
+            ),
+        ]);
     }
 
     #[Route(
         '/api/submission/user',
         name: 'api_submission_list',
-        methods: ['GET']
+        methods: ['GET'],
         // documentation: 'Retrieves all submissions for current user',
         // responses: [
         //     Response::HTTP_OK => [
@@ -142,20 +149,22 @@ final class SubmissionController extends AbstractController
     )]
     public function list(#[CurrentUser] User $user): Response
     {
-        $submissions = $this->submissionRepository->findAllByUser($user, 1, 5000);
-
-        return $this->json(
-            \array_map(
-                fn (Submission $submission): SubmissionResponseDto => $submission->toResponseObject($this->imagePath),
-                \iterator_to_array($submissions),
-            )
+        $submissions = $this->submissionRepository->findAllByUser(
+            $user,
+            1,
+            5000,
         );
+
+        return $this->json(\array_map(
+            fn(Submission $submission): SubmissionResponseDto => $submission->toResponseObject($this->imagePath),
+            \iterator_to_array($submissions),
+        ));
     }
 
     #[Route(
         '/api/submission/unresolved/{count}',
         name: 'api_submission_list_unresolved',
-        methods: ['GET']
+        methods: ['GET'],
         // documentation: 'Retrieves some unresolved submissions across all seasons',
         // responses: [
         //     Response::HTTP_OK => [
@@ -182,13 +191,16 @@ final class SubmissionController extends AbstractController
             }
         }
 
-        return $this->json(new UnreviewedSubmissionResponseDto($submissionResponse, $userResponse));
+        return $this->json(new UnreviewedSubmissionResponseDto(
+            $submissionResponse,
+            $userResponse,
+        ));
     }
 
     #[Route(
         '/api/submission/{submission}',
         name: 'api_submission_edit',
-        methods: ['PATCH']
+        methods: ['PATCH'],
         // documentation: 'Edits a <code>Submission</code> entity',
         // responses: [
         //     Response::HTTP_CREATED => [
@@ -218,14 +230,14 @@ final class SubmissionController extends AbstractController
     )]
     #[IsGranted('ROLE_USER')]
     public function edit(
-        #[CurrentUser]
-        User $user,
+        #[CurrentUser] User $user,
         Submission $submission,
-        #[MapRequestPayload]
-        SubmissionEditDto $submissionEditDto,
+        #[MapRequestPayload] SubmissionEditDto $submissionEditDto,
     ): Response {
         if ($submission->isAccepted()) {
-            return $this->json(['submission' => ['accepted']], Response::HTTP_BAD_REQUEST);
+            return $this->json(['submission' => [
+                'accepted',
+            ]], Response::HTTP_BAD_REQUEST);
         }
 
         // Uzivatel posle v roce 2024 submission a dostane reject,
@@ -233,7 +245,9 @@ final class SubmissionController extends AbstractController
         // -> neni mozne zjistit jestli je z roku 2024/2025
         // -> acceptne se -> zmeni vysledky z predchozich let
         if (!$submission->getSeason()->isRunning()) {
-            return $this->json(['season' => ['no_season']], Response::HTTP_BAD_REQUEST);
+            return $this->json(['season' => [
+                'no_season',
+            ]], Response::HTTP_BAD_REQUEST);
         }
 
         // 1. uzivatel da edit, admin vidi starou verzi
@@ -255,7 +269,7 @@ final class SubmissionController extends AbstractController
     #[Route(
         '/api/submission/{submission}/state',
         name: 'api_submission_state',
-        methods: ['PATCH']
+        methods: ['PATCH'],
         // documentation: 'Accepts/rejects a <code>Submission</code> entity',
         // responses: [
         //     Response::HTTP_OK => [
@@ -276,23 +290,14 @@ final class SubmissionController extends AbstractController
     )]
     #[IsGranted('ROLE_STAFF')]
     public function setState(
-        #[CurrentUser]
-        User $user,
-        #[MapRequestPayload]
-        SubmissionStateDto $dto,
+        #[CurrentUser] User $user,
+        #[MapRequestPayload] SubmissionStateDto $dto,
         Submission $submission,
     ): Response {
-        $errors = $this->action->setState(
-            $user,
-            $submission,
-            $dto
-        );
+        $errors = $this->action->setState($user, $submission, $dto);
 
         if (\count($errors) !== 0) {
-            return $this->json(
-                $errors,
-                Response::HTTP_BAD_REQUEST
-            );
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
         return $this->json($submission->getUpdatedAt());
@@ -304,22 +309,32 @@ final class SubmissionController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_OK,
                 description: 'Submissions for the season',
-                content: new JsonContent(ref: new Model(type: ExtractSubmissionDto::class)),
+                content: new JsonContent(
+                    ref: new Model(type: ExtractSubmissionDto::class),
+                ),
             ),
-        ]
+        ],
     )]
-    #[Route('/api/extract/submissions', 'api_extract_submissions', methods: ['GET'])]
+    #[Route(
+        '/api/extract/submissions',
+        'api_extract_submissions',
+        methods: ['GET'],
+    )]
     public function extractReviewedSubmissionForSeasons(
-        #[CurrentUser]
-        User $user,
-        #[MapQueryParameter]
-        ?int $season = null,
+        #[CurrentUser] User $user,
+        #[MapQueryParameter] ?int $season = null,
     ): Response {
-        if (!$user->canAccess(FeatureFlag::ROLE_STAFF) && !$user->canAccess(FeatureFlag::FEATURE_EXPORT_SUBMISSIONS)) {
+        if (
+            !$user->canAccess(FeatureFlag::ROLE_STAFF)
+            && !$user->canAccess(FeatureFlag::FEATURE_EXPORT_SUBMISSIONS)
+        ) {
             return new Response(status: Response::HTTP_UNAUTHORIZED);
         }
 
-        $extractedData = $this->submissionRepository->extractBySeasons($this->imagePath, $season);
+        $extractedData = $this->submissionRepository->extractBySeasons(
+            $this->imagePath,
+            $season,
+        );
 
         return $this->json($extractedData);
     }
