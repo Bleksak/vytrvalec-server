@@ -8,12 +8,13 @@ includes = ["vendor"]
 excludes = []
 
 [formatter]
-print-width = 120
+print-width = 80
 tab-width = 4
 use-tabs = false
 method-chain-breaking-style = "next_line"
 null-type-hint = "question"
 always-break-attribute-named-argument-lists = true
+method-brace-style = "next_line"
 
 [linter]
 integrations = ["symfony", "amphp", "phpunit", "doctrine"]

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\Statistics\ProfileCacheResponseDto;
 use App\Repository\ProfileCacheRepository;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
@@ -69,5 +70,14 @@ class ProfileCache
         $this->elevation = $elevation;
 
         return $this;
+    }
+
+    public function toResponseObject(): ProfileCacheResponseDto
+    {
+        return new ProfileCacheResponseDto(
+            $this->activity->getId(),
+            $this->distance,
+            $this->elevation,
+        );
     }
 }

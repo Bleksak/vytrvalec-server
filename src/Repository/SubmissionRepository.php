@@ -59,16 +59,20 @@ final class SubmissionRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('s')
             ->select('s')
-            ->join('s.image', 'i')
-            ->where('s.user = :userId')
+            ->addSelect('i')
+            ->leftJoin('s.image', 'i')
+            ->where('s.user = :user')
             ->addOrderBy('s.date', 'DESC')
-            ->setParameter('userId', $user->getId());
+            ->setParameter('user', $user);
 
         /**
          * @var Paginator<Submission>
          */
         $paginator = new Paginator($query);
-        $paginator->getQuery()->setFirstResult(($page - 1) * $limit)->setMaxResults($limit);
+        $paginator
+            ->getQuery()
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
 
         return $paginator;
     }
@@ -76,8 +80,11 @@ final class SubmissionRepository extends ServiceEntityRepository
     /**
      * @return Paginator<Submission>
      */
-    public function findBySeason(Season $season, int $page, int $limit): Paginator
-    {
+    public function findBySeason(
+        Season $season,
+        int $page,
+        int $limit,
+    ): Paginator {
         $query = $this->createQueryBuilder('s')
             ->select('s')
             ->join('s.image', 'i')
@@ -90,7 +97,10 @@ final class SubmissionRepository extends ServiceEntityRepository
          * @var Paginator<Submission>
          */
         $paginator = new Paginator($query);
-        $paginator->getQuery()->setFirstResult(($page - 1) * $limit)->setMaxResults($limit);
+        $paginator
+            ->getQuery()
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
 
         return $paginator;
     }
@@ -112,7 +122,10 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->setMaxResults($limit);
 
         if ($ignoredIds !== []) {
-            $qb->andWhere($qb->expr()->notIn('s.id', $ignoredIds));
+            $qb->andWhere($qb->expr()->notIn(
+                's.id',
+                ':ignoredIds',
+            ))->setParameter('ignoredIds', $ignoredIds);
         }
 
         /** @var list<Submission> */
@@ -148,27 +161,31 @@ final class SubmissionRepository extends ServiceEntityRepository
 
         foreach ($queryFilter->toArray() as $key => $value) {
             $queryBuilder = match ($key) {
-                SeasonQueryFilterType::Date->value => $queryBuilder->andWhere('s.date = :date')->setParameter(
-                    'date',
-                    $value,
-                ),
-                SeasonQueryFilterType::Week->value => $queryBuilder->andWhere('s.week = :weekId')->setParameter(
-                    'weekId',
-                    $value,
-                ),
-                SeasonQueryFilterType::Accepted->value => $queryBuilder->andWhere(
+                SeasonQueryFilterType::Date->value => $queryBuilder->andWhere(
+                    's.date = :date',
+                )->setParameter('date', $value),
+                SeasonQueryFilterType::Week->value => $queryBuilder->andWhere(
+                    's.week = :weekId',
+                )->setParameter('weekId', $value),
+                SeasonQueryFilterType::Accepted->value
+                    => $queryBuilder->andWhere(
                     's.accepted = :accepted',
                 )->setParameter('accepted', $value),
-                SeasonQueryFilterType::Reviewed->value => $queryBuilder->andWhere(
+                SeasonQueryFilterType::Reviewed->value
+                    => $queryBuilder->andWhere(
                     's.reviewed = :reviewed',
                 )->setParameter('reviewed', $value),
                 SeasonQueryFilterType::User->value => \is_string($value)
-                    ? $queryBuilder->andWhere('u.email LIKE :userId')->setParameter('userId', $value . '%')
+                    ? $queryBuilder->andWhere(
+                        'u.email LIKE :userId',
+                    )->setParameter('userId', $value . '%')
                     : $queryBuilder,
-                SeasonQueryFilterType::Faculty->value => $queryBuilder->andWhere(
+                SeasonQueryFilterType::Faculty->value
+                    => $queryBuilder->andWhere(
                     'u.faculty = :facultyId',
                 )->setParameter('facultyId', $value),
-                SeasonQueryFilterType::Activity->value => $queryBuilder->andWhere(
+                SeasonQueryFilterType::Activity->value
+                    => $queryBuilder->andWhere(
                     's.activity = :activityId',
                 )->setParameter('activityId', $value),
                 SeasonQueryFilterType::Page->value => \is_int($value)
@@ -223,8 +240,11 @@ final class SubmissionRepository extends ServiceEntityRepository
     /**
      * @return list<OutlierActivity>
      */
-    public function findOutliers(Season $season, int $n = 3, bool $shouldAnonymize = true): array
-    {
+    public function findOutliers(
+        Season $season,
+        int $n = 3,
+        bool $shouldAnonymize = true,
+    ): array {
         $query = $this->getEntityManager()
             ->getConnection()
             ->prepare('
@@ -270,7 +290,11 @@ final class SubmissionRepository extends ServiceEntityRepository
             $anonymize = $shouldAnonymize ? $row['anonymize'] : false;
 
             $activities[$row['activity_id']][] = new OutlierResult(
-                new AnonymizedUser($row['first_name'], $row['last_name'], $anonymize),
+                new AnonymizedUser(
+                    $row['first_name'],
+                    $row['last_name'],
+                    $anonymize,
+                ),
                 $row['faculty_id'],
                 (int) $row['value'],
             );
@@ -301,8 +325,10 @@ final class SubmissionRepository extends ServiceEntityRepository
     /**
      * @return list<ExtractSubmissionDto>
      */
-    public function extractBySeasons(ImagePath $imagePath, ?int $season = null): array
-    {
+    public function extractBySeasons(
+        ImagePath $imagePath,
+        ?int $season = null,
+    ): array {
         $qb = $this->createQueryBuilder('ss')
             ->select('ss, i')
             ->join('ss.image', 'i')
@@ -311,7 +337,10 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->orderBy('ss.season');
 
         if ($season !== null) {
-            $qb->where('ss.season = (:season)')->setParameter('season', $season);
+            $qb->where('ss.season = (:season)')->setParameter(
+                'season',
+                $season,
+            );
         }
 
         /** @var list<Submission> */
