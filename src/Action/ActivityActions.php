@@ -17,8 +17,7 @@ final readonly class ActivityActions
     public function __construct(
         private ActivityRepository $activityRepository,
         private ImageRepository $imageRepository,
-    ) {
-    }
+    ) {}
 
     public function create(ActivityCreateDto $dto): ?Activity
     {
@@ -46,20 +45,28 @@ final readonly class ActivityActions
             $activityTranslation = $activity->getTranslations()->get($locale);
 
             if ($activityTranslation === null) {
-                $activityTranslation = new ActivityTranslation($activity, $locale, $translation);
+                $activityTranslation = new ActivityTranslation(
+                    $activity,
+                    $locale,
+                    $translation,
+                );
                 $activity->addTranslation($activityTranslation);
             }
 
             $activityTranslation->name = $translation;
         }
 
-        $icon = $this->imageRepository->find($dto->icon);
+        if ($dto->icon !== null) {
+            $icon = $this->imageRepository->find($dto->icon);
 
-        if ($icon !== null && $icon->originalMimeType === MimeType::SVG) {
-            $activity->setIcon($icon);
+            if ($icon !== null && $icon->originalMimeType === MimeType::SVG) {
+                $activity->setIcon($icon);
+            }
         }
 
-        $activity->setMinElevation($dto->minElevation ?? $activity->getMinElevation());
+        $activity->setMinElevation(
+            $dto->minElevation ?? $activity->getMinElevation(),
+        );
 
         $this->activityRepository->save($activity, true);
     }

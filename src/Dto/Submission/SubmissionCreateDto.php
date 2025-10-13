@@ -32,8 +32,8 @@ final class SubmissionCreateDto
     #[Assert\GreaterThanOrEqual(1, message: 'negative')]
     public int $activityId;
 
-    #[OA\Property]
-    #[Assert\Type('datetime')]
-    #[Assert\NotBlank(allowNull: false)]
-    public \DateTime $date;
+    // #[OA\Property]
+    // #[Assert\Type('datetime')]
+    // #[Assert\NotBlank(allowNull: false)]
+    // public \DateTime $date;
 }

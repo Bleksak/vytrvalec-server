@@ -16,6 +16,7 @@ use App\Repository\ImageRepository;
 use App\Repository\ProfileCacheRepository;
 use App\Repository\SubmissionRepository;
 use App\Services\VytrvalecMailer;
+use DateTime;
 
 final readonly class SubmissionActions
 {
@@ -56,7 +57,8 @@ final readonly class SubmissionActions
             $season,
             $image,
             $dto->distance,
-            $dto->date,
+            new DateTime(),
+            // $dto->date,
             $dto->elevation ?? 0,
         );
 
