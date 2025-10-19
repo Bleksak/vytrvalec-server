@@ -37,8 +37,6 @@ ambiguous-function-call = {enabled=true}
 
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000, enabled = false }
-no-boolean-literal-comparison = {enabled = false}
-
 
 [analyzer]
 find-unused-definitions = true
@@ -47,3 +45,7 @@ analyze-dead-code = true
 allow-possibly-undefined-array-keys = false
 perform-heuristic-checks = true
 check-throws = false
+check-missing-type-hints = true
+check-closure-missing-type-hints = true
+check-arrow-function-missing-type-hints = true
+register-super-globals = true
