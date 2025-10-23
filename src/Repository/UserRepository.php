@@ -11,7 +11,6 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use SensitiveParameter;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
@@ -23,7 +22,8 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  * @method User[]    findAll()
  * @method User[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
  */
-final class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
+final class UserRepository extends ServiceEntityRepository implements
+    PasswordUpgraderInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -53,9 +53,10 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
         PasswordAuthenticatedUserInterface $user,
         #[SensitiveParameter] string $newHashedPassword,
     ): void {
-        if (!$user instanceof User) {
-            throw new UnsupportedUserException(\sprintf('Instances of "%s" are not supported.', \get_class($user)));
-        }
+        \assert(
+            $user instanceof User,
+            'unreachable: user is instance of ' . $user::class,
+        );
 
         $user->setPassword($newHashedPassword);
 
