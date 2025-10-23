@@ -11,7 +11,6 @@ use App\Dto\Season\Response\SeasonIndexResponseDto;
 use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
 use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Dto\WeeklyResultDto;
-use App\Entity\Charity;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Repository\SeasonCacheRepository;
@@ -27,7 +26,6 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[OA\Tag(name: 'Season')]
@@ -310,18 +308,7 @@ final class SeasonController extends AbstractController
     #[Route('/api/season/{season}', name: 'api_season', methods: ['GET'])]
     public function season(Season $season): Response
     {
-        $season = $this->normalizer->normalize($season, null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => [
-                'facultySummaries',
-                'userSummaries',
-                'submissions',
-            ],
-            AbstractNormalizer::CALLBACKS => [
-                'charity' => fn(Charity $charity): int => $charity->getId(),
-            ],
-        ]);
-
-        return $this->json($season);
+        return $this->json($season->toResponseObject($this->imagePath));
     }
 
     #[OA\Get(
@@ -340,12 +327,10 @@ final class SeasonController extends AbstractController
         ],
     )]
     #[Route('/api/season', name: 'api_season_index', methods: ['GET'])]
-    public function index(ImagePath $imagePath): Response
+    public function index(): Response
     {
         return $this->json(\array_map(
-            static fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject(
-                $imagePath,
-            ),
+            static fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject($this->imagePath),
             $this->seasonRepository->findOrdered(),
         ));
     }
