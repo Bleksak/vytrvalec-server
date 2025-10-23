@@ -9,8 +9,10 @@ use Symfony\Component\Mime\Address;
 
 final class VytrvalecEmail extends TemplatedEmail
 {
-    public function __construct(string $recipient, AbstractEmailTemplate $template)
-    {
+    public function __construct(
+        string $recipient,
+        AbstractEmailTemplate $template,
+    ) {
         parent::__construct();
 
         // TODO(@jvelek): use env for the mail
