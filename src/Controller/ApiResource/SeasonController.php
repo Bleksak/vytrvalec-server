@@ -330,7 +330,7 @@ final class SeasonController extends AbstractController
     public function index(): Response
     {
         return $this->json(\array_map(
-            static fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject($this->imagePath),
+            fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject($this->imagePath),
             $this->seasonRepository->findOrdered(),
         ));
     }
