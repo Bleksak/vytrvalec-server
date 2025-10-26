@@ -4,6 +4,8 @@ parameters:
     app_url: '%env(APP_URL)%'
     jwt_secret: '%env(JWT_SECRET)%'
     client_url: '%env(CLIENT_URL)%'
+    ws_port: '%env(WS_PORT)%'
+
 
 framework:
     secret: '%env(APP_SECRET)%'

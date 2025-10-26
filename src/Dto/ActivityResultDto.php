@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto;
 
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -8,7 +10,7 @@ use OpenApi\Attributes as OA;
 final class ActivityResultDto
 {
     /**
-     * @var array<ExtraPointsDto>
+     * @var list<ExtraPointsDto>
      **/
     #[OA\Property(type: 'array', items: new OA\Items(ref: new Model(type: ExtraPointsDto::class)))]
     public array $extras = [];
@@ -21,6 +23,5 @@ final class ActivityResultDto
         public readonly int $activity,
         #[OA\Property(type: 'array', items: new OA\Items(ref: new Model(type: FacultyResultDto::class)))]
         public readonly array $results,
-    ) {
-    }
+    ) {}
 }

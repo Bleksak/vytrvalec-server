@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Messages;
 
 use Symfony\Component\Messenger\Attribute\AsMessage;
@@ -9,6 +11,5 @@ final class SeasonStartMessage
 {
     public function __construct(
         public int $seasonId,
-    ) {
-    }
+    ) {}
 }

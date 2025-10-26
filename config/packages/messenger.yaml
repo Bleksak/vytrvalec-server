@@ -4,13 +4,13 @@ framework:
 
         transports:
             delayed_rabbitmq:
-                    dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
-                    options:
-                        exchange:
-                            name: delayed_exchange
-                            type: x-delayed-message
-                            arguments:
-                                x-delayed-type: direct
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    # exchange:
+                    #     name: delayed_exchange
+                    #     type: x-delayed-message
+                    #     arguments:
+                    #         x-delayed-type: direct
             # https://symfony.com/doc/current/messenger.html#transport-configuration
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'

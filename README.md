@@ -34,6 +34,9 @@
 - Install  symfony-cli - `paru -S xdebug symfony-cli`
 - Run with `symfony server:start {..args}`
 
+## Starting the Websocket server
+- php bin/console mv:ws-submission-producer
+
 ### ZČU VPN connection
 - On Linux, install NetworkManager - `paru -S networkmanager-openconnect`
 - In your VPN client create VPN Cisco AnyConnect connection
@@ -57,7 +60,7 @@
       cluster: synergia
       namespace: vytrvalec-uts
       user: gitlab-vytrvalec-uts
-    name: vytrvalec-kts
+    name: vytrvalec-uts
   current-context: vytrvalec-uts
   kind: Config
   preferences: {}

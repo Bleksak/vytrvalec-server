@@ -12,13 +12,13 @@ use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use App\Repository\SubmissionRepository;
 
-final class SeasonResultCalculator
+final readonly class SeasonResultCalculator
 {
     public function __construct(
-        private readonly SubmissionRepository $submissionRepository,
-        private readonly DailyDistanceExtraPoints $dailyDistanceExtraPoints,
-        private readonly WeeklyDistanceExtraPoints $weeklyDistanceExtraPoints,
-        private readonly WeeklyElevationExtraPoints $weeklyElevationExtraPoints,
+        private SubmissionRepository $submissionRepository,
+        private DailyDistanceExtraPoints $dailyDistanceExtraPoints,
+        private WeeklyDistanceExtraPoints $weeklyDistanceExtraPoints,
+        private WeeklyElevationExtraPoints $weeklyElevationExtraPoints,
     ) {
     }
 
@@ -28,7 +28,7 @@ final class SeasonResultCalculator
         $results = [];
 
         /**
-         * @var array<ExtraPoints>
+         * @var array<ExtraPointsInterface>
          */
         $extraPointsClasses = [
             $this->dailyDistanceExtraPoints,
@@ -41,30 +41,21 @@ final class SeasonResultCalculator
             $activities = [];
 
             foreach ($weeklyResult as $result) {
-                if (!array_key_exists($result->activity, $activities)) {
+                if (!\array_key_exists($result->activity, $activities)) {
                     $activities[$result->activity] = [];
                 }
 
-                $activities[$result->activity][] = new FacultyResultDto(
-                    $result->faculty,
-                    $result->distance
-                );
+                $activities[$result->activity][] = new FacultyResultDto($result->faculty, $result->distance);
             }
 
             $activityResult = [];
 
             foreach ($activities as $activityId => $activity) {
-                $activityResult[$activityId] = new ActivityResultDto(
-                    $activityId,
-                    $activity
-                );
+                $activityResult[$activityId] = new ActivityResultDto($activityId, $activity);
             }
 
-            if (!empty($activityResult)) {
-                $results[$i] = new WeeklyResultDto(
-                    $i,
-                    $activityResult
-                );
+            if (\count($activityResult) !== 0) {
+                $results[$i] = new WeeklyResultDto($i, $activityResult);
             }
         }
 
@@ -76,22 +67,19 @@ final class SeasonResultCalculator
                     $extra->facultyId,
                     $cls->getUniqueName(),
                     $extra->value,
-                    $cls->reward()
+                    $cls->reward(),
                 );
             }
         }
 
-        $results = array_values($results);
+        $results = \array_values($results);
 
         $topThree = $this->submissionRepository->findOutliers($season);
 
-        foreach ($results as $key => $result) {
-            $result->activities = array_values($result->activities);
+        foreach ($results as $result) {
+            $result->activities = \array_values($result->activities);
         }
 
-        return new SeasonResultDto(
-            $results,
-            $topThree,
-        );
+        return new SeasonResultDto($results, $topThree);
     }
 }

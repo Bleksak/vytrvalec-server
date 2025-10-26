@@ -1,30 +1,72 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Action;
 
-use App\Dto\ActivityDto;
+use App\Dto\Activity\ActivityCreateDto;
+use App\Dto\Activity\ActivityUpdateDto;
 use App\Entity\Activity;
+use App\Entity\ActivityTranslation;
 use App\Repository\ActivityRepository;
+use App\Repository\ImageRepository;
+use App\Utils\MimeType;
 
-final class ActivityActions
+final readonly class ActivityActions
 {
     public function __construct(
-        private readonly ActivityRepository $activityRepository,
-    ) {
-    }
+        private ActivityRepository $activityRepository,
+        private ImageRepository $imageRepository,
+    ) {}
 
-    public function create(ActivityDto $dto): int
+    public function create(ActivityCreateDto $dto): ?Activity
     {
-        $activity = new Activity($dto->name, $dto->minElevation);
+        $icon = $this->imageRepository->find($dto->icon);
+
+        if ($icon === null || $icon->originalMimeType !== MimeType::SVG) {
+            // TODO(@bleksak): Tady musi byt upozorneni ze obrazek musi byt svg.
+            return null;
+        }
+
+        $activity = new Activity($dto->translations, $dto->minElevation, $icon);
+
         $this->activityRepository->save($activity, true);
 
-        return $activity->getId();
+        return $activity;
     }
 
-    public function update(Activity $activity, ActivityDto $dto): void
+    public function update(Activity $activity, ActivityUpdateDto $dto): void
     {
-        $activity->setName($dto->name ?? $activity->getName());
-        $activity->setMinElevation($dto->minElevation ?? $activity->getMinElevation());
+        $nameTranslations = $dto->translations?->name?->toArray() ?? [];
+
+        foreach ($nameTranslations as $locale => $translation) {
+            \assert($translation !== null, 'Translation cannot be null!');
+
+            $activityTranslation = $activity->getTranslations()->get($locale);
+
+            if ($activityTranslation === null) {
+                $activityTranslation = new ActivityTranslation(
+                    $activity,
+                    $locale,
+                    $translation,
+                );
+                $activity->addTranslation($activityTranslation);
+            }
+
+            $activityTranslation->name = $translation;
+        }
+
+        if ($dto->icon !== null) {
+            $icon = $this->imageRepository->find($dto->icon);
+
+            if ($icon !== null && $icon->originalMimeType === MimeType::SVG) {
+                $activity->setIcon($icon);
+            }
+        }
+
+        $activity->setMinElevation(
+            $dto->minElevation ?? $activity->getMinElevation(),
+        );
 
         $this->activityRepository->save($activity, true);
     }

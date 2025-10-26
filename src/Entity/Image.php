@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\ImageRepository;
+use App\Services\ImagePath;
+use App\Utils\MimeType;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
+#[ORM\Index(columns: ['used_at'], name: 'idx_used_at')]
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
 class Image
 {
@@ -20,17 +23,22 @@ class Image
     private string $path;
 
     #[ORM\Column]
-    private \DateTimeImmutable $uploadedAt;
+    private \DateTime $uploadedAt;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $usedAt = null;
+    private ?\DateTime $usedAt = null;
+
+    #[ORM\Column(enumType: MimeType::class)]
+    public ?MimeType $originalMimeType;
 
     public function __construct(
         string $path,
+        MimeType $originalMimeType,
     ) {
         $this->path = $path;
+        $this->originalMimeType = $originalMimeType;
         $this->uuid = Uuid::v7();
-        $this->uploadedAt = new \DateTimeImmutable();
+        $this->uploadedAt = new \DateTime();
         $this->usedAt = null;
     }
 
@@ -46,9 +54,13 @@ class Image
         return $this;
     }
 
-    public function getPath(): string
+    public function getPath(?ImagePath $imagePath = null): string
     {
-        return $this->path;
+        if ($imagePath === null) {
+            return $this->path;
+        }
+
+        return $imagePath->fullPath($this->path);
     }
 
     public function setPath(string $path): static
@@ -58,24 +70,24 @@ class Image
         return $this;
     }
 
-    public function getUploadedAt(): \DateTimeImmutable
+    public function getUploadedAt(): \DateTime
     {
         return $this->uploadedAt;
     }
 
-    public function setUploadedAt(\DateTimeImmutable $uploadedAt): static
+    public function setUploadedAt(\DateTime $uploadedAt): static
     {
         $this->uploadedAt = $uploadedAt;
 
         return $this;
     }
 
-    public function getUsedAt(): ?\DateTimeImmutable
+    public function getUsedAt(): ?\DateTime
     {
         return $this->usedAt;
     }
 
-    public function setUsedAt(\DateTimeImmutable $usedAt): static
+    public function setUsedAt(?\DateTime $usedAt): static
     {
         $this->usedAt = $usedAt;
 

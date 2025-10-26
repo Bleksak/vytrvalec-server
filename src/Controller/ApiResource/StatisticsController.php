@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\ApiResource;
 
 use App\Action\StatisticsActions;
+use App\Dto\Statistics\ProfileCacheResponseDto;
 use App\Dto\TotalStatisticsDto;
 use App\Dto\UserCountByFacultyStatistics;
+use App\Entity\ProfileCache;
 use App\Entity\Season;
 use App\Entity\User;
 use App\Schema\ProfileCacheSchema;
@@ -13,17 +17,13 @@ use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[OA\Tag(name: 'Statistics')]
 final class StatisticsController extends AbstractController
 {
     public function __construct(
         private readonly StatisticsActions $action,
-        private readonly NormalizerInterface $normalizer,
-    ) {
-    }
+    ) {}
 
     #[OA\Get(
         description: 'Retrieve all statistics',
@@ -32,16 +32,12 @@ final class StatisticsController extends AbstractController
                 response: Response::HTTP_OK,
                 description: 'Collection of statistics',
                 content: new OA\JsonContent(
-                    ref: new Model(type: TotalStatisticsDto::class)
+                    ref: new Model(type: TotalStatisticsDto::class),
                 ),
             ),
         ],
     )]
-    #[Route(
-        '/api/stats/total',
-        name: 'stats_index',
-        methods: ['GET'],
-    )]
+    #[Route('/api/stats/total', name: 'stats_index', methods: ['GET'])]
     public function indexTotalStatistics(): Response
     {
         return $this->json($this->action->getTotalStatistics());
@@ -67,7 +63,7 @@ final class StatisticsController extends AbstractController
                     ),
                 ),
             ),
-        ]
+        ],
     )]
     #[Route(
         '/api/statistics/faculties/{season}',
@@ -76,9 +72,7 @@ final class StatisticsController extends AbstractController
     )]
     public function indexFacultyStatistics(Season $season): Response
     {
-        return $this->json(
-            $this->action->getUserCountByFaculties($season)
-        );
+        return $this->json($this->action->getUserCountByFaculties($season));
     }
 
     #[OA\Get(
@@ -94,13 +88,9 @@ final class StatisticsController extends AbstractController
                     ),
                 ),
             ),
-        ]
+        ],
     )]
-    #[Route(
-        '/api/stats/{user}',
-        name: 'stats_user_index',
-        methods: ['GET'],
-    )]
+    #[Route('/api/stats/{user}', name: 'stats_user_index', methods: ['GET'])]
     public function indexUserStatistics(?User $user = null): Response
     {
         if ($user === null) {
@@ -110,8 +100,11 @@ final class StatisticsController extends AbstractController
             $user = $this->getUser();
         }
 
-        return $this->json($this->normalizer->normalize($user?->getProfileCaches(), null, [
-            AbstractNormalizer::IGNORED_ATTRIBUTES => ['user'],
-        ]));
+        $cache = $user?->getProfileCaches();
+
+        return $this->json(\array_map(
+            static fn(ProfileCache $profileCache): ProfileCacheResponseDto => $profileCache->toResponseObject(),
+            $cache?->toArray() ?? [],
+        ));
     }
 }

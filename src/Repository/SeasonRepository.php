@@ -1,18 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
+use App\Entity\Charity;
 use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Season>
  *
  * @method Season|null find($id, $lockMode = null, $lockVersion = null)
- * @method Season|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Season|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method Season[]    findAll()
- * @method Season[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Season[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
  */
 final class SeasonRepository extends ServiceEntityRepository
 {
@@ -41,45 +45,47 @@ final class SeasonRepository extends ServiceEntityRepository
 
     public function getCurrent(): ?Season
     {
-        $query = $this->createQueryBuilder('s')
-            ->select('s')
+        /** @var Season|null */
+        return $this->createQueryBuilder('s')
             ->where('s.start <= :now')
             ->andWhere('s.end >= :now')
             ->setParameter('now', new \DateTimeImmutable())
             ->setMaxResults(1)
             ->getQuery()
-        ;
-
-        return $query->getOneOrNullResult();
+            ->getOneOrNullResult(Query::HYDRATE_OBJECT);
     }
 
     public function getLast(): ?Season
     {
+        /** @var Season|null */
         return $this->createQueryBuilder('s')
             ->select('s')
             ->orderBy('s.end', 'ASC')
             ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult(Query::HYDRATE_OBJECT);
     }
 
     /**
-     * @return array<Season>
+     * @return list<Season>
      */
     public function findOrdered(): array
     {
+        /** @var list<Season> */
         return $this->createQueryBuilder('s')
-            ->select('s')
+            ->select('s', 'c')
+            ->join('s.charity', 'c')
             ->orderBy('s.start', 'DESC')
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * @return Season[]
+     * @return list<Season>
      */
     public function findPast(): array
     {
+        /** @var list<Season> */
         return $this->createQueryBuilder('s')
             ->select('s')
             ->where('s.end < :now')
@@ -89,17 +95,28 @@ final class SeasonRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByStartMonth(?\DateTime $dateTime): ?Season
+    public function findByStartMonth(\DateTime $dateTime): ?Season
     {
         $startDate = new \DateTimeImmutable($dateTime->format('Y-m-01'));
         $endDate = new \DateTimeImmutable($dateTime->format('Y-m-t'));
 
+        /** @var Season|null */
         return $this->createQueryBuilder('s')
             ->select('s')
             ->where('s.start BETWEEN :startDate AND :endDate')
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult(Query::HYDRATE_OBJECT);
+    }
+
+    public function countSeasonsByCharity(Charity $charity): int
+    {
+        return (int) $this->createQueryBuilder('s')
+            ->select('COUNT(s)')
+            ->where('s.charity = :charity')
+            ->setParameter('charity', $charity)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

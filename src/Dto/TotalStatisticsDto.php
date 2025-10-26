@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto;
 
 use OpenApi\Attributes as OA;
@@ -15,6 +17,5 @@ final class TotalStatisticsDto
          */
         #[OA\Property]
         public array $activities,
-    ) {
-    }
+    ) {}
 }

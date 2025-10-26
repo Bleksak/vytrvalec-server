@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Handlers;
 
 use App\Messages\SeasonEndMessage;
@@ -7,12 +9,11 @@ use App\Repository\SeasonRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class SeasonEndHandler
+final readonly class SeasonEndHandler
 {
     public function __construct(
-        private readonly SeasonRepository $seasonRepository,
-    ) {
-    }
+        private SeasonRepository $seasonRepository,
+    ) {}
 
     public function __invoke(SeasonEndMessage $seasonEndMessage): void
     {

@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\User;
-use App\Notifications\EmailTemplate;
+use App\Notifications\AbstractEmailTemplate;
 use App\Notifications\VytrvalecEmail;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
 
-final class VytrvalecMailer
+final readonly class VytrvalecMailer
 {
     public function __construct(
-        private readonly MailerInterface $mailer,
-        private readonly ParameterBagInterface $parameterBag,
+        private MailerInterface $mailer,
+        private string $clientUrl,
+        private string $appBase,
     ) {
     }
 
@@ -24,21 +24,30 @@ final class VytrvalecMailer
     private function getContext(): array
     {
         return [
-            'base_uri' => $this->parameterBag->get('app_base'),
+            'base_uri' => $this->appBase,
         ];
     }
 
     private function constructUnsubscribeLink(User $user): string
     {
-        return sprintf('%s/unsubscribe/%s', $this->parameterBag->get('client_url'), $user->getEmailUnsubscribeHash());
+        $emailUnsubscribeHash = $user->getEmailUnsubscribeHash();
+
+        if ($emailUnsubscribeHash === null) {
+            return $this->clientUrl;
+        }
+
+        return \sprintf('%s/unsubscribe/%s', $this->clientUrl, $emailUnsubscribeHash);
     }
 
     /**
      * @param User|array<User> $recipient
      */
-    public function send(User|array $recipient, EmailTemplate $template, bool $forceSend = false): void
-    {
-        if (!is_array($recipient)) {
+    public function send(
+        User|array $recipient,
+        AbstractEmailTemplate $template,
+        bool $forceSend = false,
+    ): void {
+        if (!\is_array($recipient)) {
             /** @var array<User> $recipient */
             $recipient = [$recipient];
         }
@@ -55,7 +64,12 @@ final class VytrvalecMailer
             if ($user->hasMailing() || $forceSend) {
                 $template->setContext('unsubscribe_link', $this->constructUnsubscribeLink($user));
 
-                $this->mailer->send(new VytrvalecEmail($email, $template));
+                $mail = new VytrvalecEmail($email, $template);
+                if ($template->replyTo) {
+                    $mail->replyTo($template->replyTo);
+                }
+
+                $this->mailer->send($mail);
             }
         }
     }

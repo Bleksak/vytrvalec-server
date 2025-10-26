@@ -6,28 +6,26 @@ namespace App\Action;
 
 use App\Dto\Submission\SubmissionCreateDto;
 use App\Dto\Submission\SubmissionEditDto;
-use App\Dto\SubmissionStateDto;
+use App\Dto\Submission\SubmissionStateDto;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use App\Notifications\EmailTemplate\SubmissionRejectedEmailTemplate;
-use App\Notifications\Firebase\Firebase;
-use App\Notifications\VytrvalecNotification;
 use App\Repository\ActivityRepository;
 use App\Repository\ImageRepository;
 use App\Repository\ProfileCacheRepository;
 use App\Repository\SubmissionRepository;
 use App\Services\VytrvalecMailer;
+use DateTime;
 
-final class SubmissionActions
+final readonly class SubmissionActions
 {
     public function __construct(
-        private readonly Firebase $firebase,
-        private readonly SubmissionRepository $submissionRepository,
-        private readonly ProfileCacheRepository $profileCacheRepository,
-        private readonly VytrvalecMailer $mailer,
-        private readonly ImageRepository $imageRepository,
-        private readonly ActivityRepository $activityRepository,
+        private SubmissionRepository $submissionRepository,
+        private ProfileCacheRepository $profileCacheRepository,
+        private VytrvalecMailer $mailer,
+        private ImageRepository $imageRepository,
+        private ActivityRepository $activityRepository,
     ) {
     }
 
@@ -51,13 +49,17 @@ final class SubmissionActions
             return ['image' => 'invalid'];
         }
 
+        $image->setUsedAt(new \DateTime());
+
         $submission = new Submission(
             $user,
             $activity,
             $season,
             $image,
             $dto->distance,
-            $dto->elevation ?? 0
+            new DateTime(),
+            // $dto->date,
+            $dto->elevation ?? 0,
         );
 
         $this->submissionRepository->save($submission, true);
@@ -68,32 +70,40 @@ final class SubmissionActions
     /**
      * @return array<int,string>
      */
-    public function setState(Submission $submission, SubmissionStateDto $dto): array
-    {
-        if ($dto->updatedAt != $submission->getUpdatedAt()) {
+    public function setState(
+        User $issuer,
+        Submission $submission,
+        SubmissionStateDto $dto,
+    ): array {
+        if ($dto->updatedAt !== $submission->getUpdatedAt()) {
             return ['mismatch_updated_at'];
         }
 
         $submission->setMessage($dto->message);
 
-        if ($dto->state) {
-            // noop when already accepted, otherwise profile cache would stack
-            if (!$submission->isReviewed() || !$submission->isAccepted()) {
-                $this->profileCacheRepository->addCache($submission, true);
-            }
-        } else {
-            if ($submission->isReviewed() && $submission->isAccepted()) {
-                $this->profileCacheRepository->removeCache($submission, true);
-            }
+        $this->handleCacheUpdate($submission, $dto);
 
-            if ($submission->getUser()->getToken() !== null) {
-                $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));
-            }
+        if ($dto->state && (!$submission->isReviewed() || !$submission->isAccepted())) {
+            // noop when already accepted, otherwise profile cache would stack
+            $this->profileCacheRepository->addCache($submission);
+        }
+
+        // TODO(@jvelek): Ted mi doslo, ze tady se da frajerovi zaspamovat email kdyby kutak furt schvaloval a zamital aktivitu :D
+        if (!$dto->state) {
+            // if ($submission->getUser()->getToken() !== null) {
+            //     $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));
+            // }
 
             $now = new \DateTimeImmutable();
 
             if ($submission->getDate()->diff($now)->m < 2) {
-                $this->mailer->send($submission->getUser(), new SubmissionRejectedEmailTemplate($submission, $dto->message));
+                $template = new SubmissionRejectedEmailTemplate($submission, $dto->message);
+                $template->replyTo = $issuer->getEmail();
+
+                $this->mailer->send(
+                    $submission->getUser(),
+                    $template,
+                );
             }
         }
 
@@ -115,7 +125,7 @@ final class SubmissionActions
      */
     public function update(Submission $submission, SubmissionEditDto $dto): array
     {
-        if ($submission->getUpdatedAt() != $dto->updatedAt) {
+        if ($submission->getUpdatedAt() !== $dto->updatedAt) {
             return ['updated_at' => 'mismatch'];
         }
 
@@ -126,7 +136,10 @@ final class SubmissionActions
                 return ['image' => 'invalid'];
             }
 
+            $oldImage = $submission->getImage();
+            $image->setUsedAt(new \DateTime());
             $submission->setImage($image);
+            $oldImage?->setUsedAt(null);
         }
 
         if ($dto->distance !== null) {
@@ -153,5 +166,19 @@ final class SubmissionActions
         $this->submissionRepository->save($submission, true);
 
         return [];
+    }
+
+    private function handleCacheUpdate(
+        Submission $submission,
+        SubmissionStateDto $dto,
+    ): void {
+        if ($dto->state && (!$submission->isReviewed() || !$submission->isAccepted())) {
+            // noop when already accepted, otherwise profile cache would stack
+            $this->profileCacheRepository->addCache($submission);
+        }
+
+        if (!$dto->state) {
+            $this->profileCacheRepository->removeCache($submission);
+        }
     }
 }

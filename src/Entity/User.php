@@ -4,84 +4,118 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\User\Response\UserResponseDto;
 use App\Repository\UserRepository;
 use App\Utils\FeatureFlag;
+use Deprecated;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
+use SensitiveParameter;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Index(
+    columns: ['email_unsubscribe_hash'],
+    name: 'email_unsubscribe_hash',
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
+    #[ORM\Column(
+        length: 180,
+        unique: true,
+        nullable: true,
+    )]
     private ?string $email = null;
 
     /**
      * @var array<string>
      */
-    #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
+    #[OA\Property(
+        type: 'array',
+        items: new OA\Items(type: 'string'),
+    )]
     #[ORM\Column(type: 'json')]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
     private array $roles = [];
 
     #[ORM\Column]
-    private ?string $password = null;
+    private string $password;
 
     #[ORM\Column]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
-    private ?bool $banned = false;
+    private bool $banned = false;
 
-    #[ORM\Column]
-    private ?bool $mailing = true;
+    #[ORM\Column(options: ['default' => 1])]
+    private bool $mailing = true;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
-    private ?string $firstName = null;
+    #[ORM\Column(
+        type: 'string',
+        length: 255,
+    )]
+    private string $firstName;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
-    private ?string $lastName = null;
+    #[ORM\Column(
+        type: 'string',
+        length: 255,
+    )]
+    private string $lastName;
 
-    #[ORM\ManyToOne(cascade: ['persist', 'remove'], fetch: 'EAGER')]
+    #[ORM\ManyToOne(
+        cascade: ['persist', 'remove'],
+        fetch: 'EAGER',
+    )]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission', 'fetchUser'])]
-    private ?Faculty $faculty = null;
+    private Faculty $faculty;
 
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Submission::class, orphanRemoval: true)]
-    private ?Collection $submissions;
+    #[ORM\OneToMany(
+        mappedBy: 'user',
+        targetEntity: Submission::class,
+        orphanRemoval: true,
+    )]
+    private Collection $submissions;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(
+        length: 255,
+        nullable: true,
+    )]
     private ?string $token = null;
 
     /**
      * @var Collection<int, ProfileCache>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
+    #[ORM\OneToMany(
+        mappedBy: 'user',
+        targetEntity: ProfileCache::class,
+    )]
     private Collection $profileCaches;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(
+        length: 255,
+        nullable: true,
+    )]
     private ?string $passwordResetToken = null;
 
-    #[ORM\Column]
-    private ?bool $acceptedGdpr = false;
+    #[ORM\Column(nullable: true)]
+    private ?bool $anonymize = false;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(
+        length: 255,
+        nullable: true,
+    )]
     private ?string $emailUnsubscribeHash = null;
+
+    #[ORM\Column(length: 8)]
+    private string $locale = 'cs_CZ';
 
     /**
      * @param array<string> $roles
@@ -91,9 +125,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         string $firstName,
         string $lastName,
         Faculty $faculty,
-        bool $acceptedGdpr,
+        bool $anonymize,
         array $roles = [],
+        #[SensitiveParameter]
         ?string $token = null,
+        string $locale = 'cs_CZ',
     ) {
         $this->submissions = new ArrayCollection();
         $this->profileCaches = new ArrayCollection();
@@ -102,15 +138,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->faculty = $faculty;
-        $this->acceptedGdpr = $acceptedGdpr;
+        $this->anonymize = $anonymize;
         $this->roles = $roles;
         $this->token = $token;
-        $this->emailUnsubscribeHash = bin2hex(random_bytes(90));
+        $this->emailUnsubscribeHash = \bin2hex(\random_bytes(90));
+        $this->locale = $locale;
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
-        return $this->id;
+        return $this->id ?? 0;
     }
 
     public function getEmail(): ?string
@@ -125,44 +162,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function setAcceptedGdpr(bool $value): self
+    public function setAnonymization(bool $value): self
     {
-        $this->acceptedGdpr = $value;
+        $this->anonymize = $value;
 
         return $this;
     }
 
-    public function hasAcceptedGdpr(): ?bool
+    public function shouldAnonymize(): ?bool
     {
-        return $this->acceptedGdpr;
+        return $this->anonymize;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
+    #[\Override]
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        if ($this->email === null || $this->email === '') {
+            return 'null';
+        }
+
+        return $this->email;
     }
 
     /**
      * @return array<string>
      */
+    #[\Override]
     public function getRoles(): array
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
-        return array_unique($roles);
+        return \array_unique($roles);
     }
 
     #[Ignore]
     public function hasRole(string $roleName): bool
     {
-        return in_array($roleName, $this->getRoles(), true);
+        return \in_array($roleName, $this->getRoles(), true);
     }
 
     /**
@@ -175,19 +213,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[\Override]
     public function getPassword(): string
     {
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(#[SensitiveParameter] string $password): self
     {
         $this->password = $password;
 
         return $this;
     }
 
-    public function getFaculty(): ?Faculty
+    public function getFaculty(): Faculty
     {
         return $this->faculty;
     }
@@ -199,7 +238,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isBanned(): ?bool
+    public function isBanned(): bool
     {
         return $this->banned;
     }
@@ -211,7 +250,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function hasMailing(): ?bool
+    public function hasMailing(): bool
     {
         return $this->mailing;
     }
@@ -223,7 +262,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getFirstName(): ?string
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
@@ -235,7 +274,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getLastName(): ?string
+    public function getLastName(): string
     {
         return $this->lastName;
     }
@@ -260,7 +299,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->token;
     }
 
-    public function setToken(?string $token): static
+    public function setToken(#[SensitiveParameter] ?string $token): static
     {
         $this->token = $token;
 
@@ -275,6 +314,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->profileCaches;
     }
 
+    #[Deprecated('do not use')]
+    #[\Override]
     public function eraseCredentials(): void
     {
     }
@@ -284,7 +325,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->passwordResetToken;
     }
 
-    public function setPasswordResetToken(?string $passwordResetToken): static
+    public function setPasswordResetToken(#[SensitiveParameter] ?string $passwordResetToken): static
     {
         $this->passwordResetToken = $passwordResetToken;
 
@@ -303,12 +344,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getLocale(): string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(string $locale): static
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
     public function anonymize(): static
     {
-        $this
-            ->setLastName('')
+        $this->setLastName('')
             ->setMailing(false)
-            ->setAcceptedGdpr(false)
+            ->setAnonymization(true)
             ->setEmailUnsubscribeHash(null)
             ->setToken(null)
             ->setPasswordResetToken(null);
@@ -321,5 +373,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function canAccess(FeatureFlag $featureFlag): bool
     {
         return \in_array($featureFlag->value, $this->roles, true);
+    }
+
+    public function toResponseObject(): UserResponseDto
+    {
+        return new UserResponseDto(
+            $this->getId(),
+            $this->getEmail(),
+            $this->getRoles(),
+            $this->isBanned(),
+            $this->hasMailing(),
+            $this->getFirstName(),
+            $this->getLastName(),
+            $this->getFaculty()->toResponseObject(),
+            $this->shouldAnonymize(),
+        );
     }
 }

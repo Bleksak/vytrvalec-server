@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace App\Action;
 
 use App\Dto\Charity\CharityCreateDto;
-use App\Dto\Charity\CharityEditDto;
+use App\Dto\Charity\CharityUpdateDto;
 use App\Entity\Charity;
+use App\Entity\CharityTranslation;
 use App\Repository\CharityRepository;
 use App\Repository\ImageRepository;
+use App\Repository\SeasonRepository;
 
-final class CharityActions
+final readonly class CharityActions
 {
     public function __construct(
-        private readonly CharityRepository $charityRepository,
-        private readonly ImageRepository $imageRepository,
+        private CharityRepository $charityRepository,
+        private SeasonRepository $seasonRepository,
+        private ImageRepository $imageRepository,
     ) {
     }
 
@@ -28,27 +31,73 @@ final class CharityActions
         if ($dto->imageUuid !== null) {
             $image = $this->imageRepository->find($dto->imageUuid);
 
-            if ($image === null) {
+            if ($image === null || $image->getUsedAt() !== null) {
                 return ['image' => 'invalid'];
             }
+
+            $image->setUsedAt(new \DateTime());
         }
 
-        $charity = new Charity($dto->name, $dto->description, $image, $dto->website);
+        $charity = new Charity(
+            $dto->translations,
+            $image,
+            $dto->website
+        );
+
         $this->charityRepository->save($charity, true);
 
         return $charity;
     }
 
-    public function update(Charity $charity, CharityEditDto $dto): void
+    public function update(Charity $charity, CharityUpdateDto $dto): void
     {
-        $charity->setName($dto->name ?? $charity->getName());
-        $charity->setDescription($dto->description ?? $charity->getDescription());
+        $nameTranslations = $dto->translations?->name?->toArray() ?? [];
+        $descriptionTranslations = $dto->translations?->description?->toArray() ?? [];
 
-        if ($dto->imageUuid !== null) {
-            $image = $this->imageRepository->find($dto->imageUuid);
+        foreach ($nameTranslations as $locale => $translation) {
+            \assert($translation !== null, 'Translation cannot be null!');
 
-            if ($image) {
+            $charityTranslation = $charity->translations->get($locale);
+
+            if ($charityTranslation === null) {
+                $charityTranslation = new CharityTranslation(
+                    $charity,
+                    $locale,
+                    $translation,
+                    $descriptionTranslations[$locale] ?? ''
+                );
+                $charity->addTranslation($charityTranslation);
+            }
+
+            $charityTranslation->name = $translation;
+        }
+
+        foreach ($descriptionTranslations as $locale => $translation) {
+            \assert($translation !== null, 'Translation cannot be null!');
+
+            $charityTranslation = $charity->translations->get($locale);
+
+            if ($charityTranslation === null) {
+                $charityTranslation = new CharityTranslation(
+                    $charity,
+                    $locale,
+                    $nameTranslations[$locale] ?? '',
+                    $translation,
+                );
+                $charity->addTranslation($charityTranslation);
+            }
+
+            $charityTranslation->description = $translation;
+        }
+
+        if ($dto->image !== null) {
+            $image = $this->imageRepository->find($dto->image);
+
+            if ($image !== null && $image->getUsedAt() === null) {
+                $oldImage = $charity->getImage();
                 $charity->setImage($image);
+                $image->setUsedAt(new \DateTime());
+                $oldImage?->setUsedAt(null);
             }
         }
 
@@ -59,9 +108,9 @@ final class CharityActions
 
     public function remove(Charity $charity): bool
     {
-        $seasons = $this->charityRepository->findSeasonsByCharity($charity);
+        $seasonCount = $this->seasonRepository->countSeasonsByCharity($charity);
 
-        if (!empty($seasons)) {
+        if ($seasonCount > 0) {
             return false;
         }
 

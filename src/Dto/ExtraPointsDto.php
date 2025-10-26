@@ -1,22 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto;
 
 use OpenApi\Attributes as OA;
 
-final class ExtraPointsDto
+final readonly class ExtraPointsDto
 {
     public function __construct(
         #[OA\Property]
-        public readonly AnonymizedUser $user,
+        public AnonymizedUser $user,
         #[OA\Property(example: 1)]
-        public readonly int $faculty,
+        public int $faculty,
         #[OA\Property(example: 'daily_distance')]
-        public readonly string $name,
+        public string $name,
         #[OA\Property(example: 2700)]
-        public readonly int $value,
+        public int $value,
         #[OA\Property(example: 1)]
-        public readonly int $points,
-    ) {
-    }
+        public int $points,
+    ) {}
 }

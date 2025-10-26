@@ -1,19 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Cache;
 use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Cache>
  *
  * @method Cache|null find($id, $lockMode = null, $lockVersion = null)
- * @method Cache|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Cache|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method Cache[]    findAll()
- * @method Cache[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Cache[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
  */
 final class SeasonCacheRepository extends ServiceEntityRepository
 {
@@ -32,10 +35,11 @@ final class SeasonCacheRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<Cache>
+     * @return list<Cache>
      */
     public function findLastN(int $n): array
     {
+        /** @var list<Cache> */
         return $this->createQueryBuilder('c')
             ->join('c.season', 's')
             ->orderBy('s.start', 'DESC')
@@ -56,11 +60,12 @@ final class SeasonCacheRepository extends ServiceEntityRepository
 
     public function findBySeason(Season $season): ?Cache
     {
+        /** @var Cache|null */
         return $this->createQueryBuilder('c')
             ->select('c')
             ->where('c.season = :season')
             ->setParameter('season', $season)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult(Query::HYDRATE_OBJECT);
     }
 }

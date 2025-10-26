@@ -12,9 +12,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Image>
  *
  * @method Image|null find($id, $lockMode = null, $lockVersion = null)
- * @method Image|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Image|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method Image[]    findAll()
- * @method Image[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Image[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
  */
 final class ImageRepository extends ServiceEntityRepository
 {
@@ -30,5 +30,31 @@ final class ImageRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function remove(Image $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * @return list<Image>
+     */
+    public function findUnusedImagesForRemoval(): array
+    {
+        $weekAgo = new \DateTime()->sub(new \DateInterval('P1W'));
+
+        /** @var list<Image> */
+        return $this->createQueryBuilder('i')
+            ->select('i')
+            ->where('i.usedAt IS NULL')
+            ->andWhere('i.uploadedAt <= :weekAgo')
+            ->setParameter('weekAgo', $weekAgo)
+            ->getQuery()
+            ->getResult();
     }
 }

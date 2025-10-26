@@ -5,42 +5,38 @@ declare(strict_types=1);
 namespace App\Controller\ApiResource;
 
 use App\Action\SubmissionActions;
-use App\Dto\SeasonIDList;
+use App\Dto\Extract\ExtractSubmissionDto;
+use App\Dto\Submission\Response\SubmissionResponseDto;
+use App\Dto\Submission\Response\UnreviewedSubmissionResponseDto;
 use App\Dto\Submission\SubmissionCreateDto;
 use App\Dto\Submission\SubmissionEditDto;
-use App\Entity\Activity;
-use App\Entity\Faculty;
-use App\Entity\Image;
+use App\Dto\Submission\SubmissionStateDto;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
-use App\Form\SubmissionStateFormType;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
+use App\Services\ImagePath;
 use App\Utils\FeatureFlag;
-use App\Validation\FormErrors;
+use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
+use OpenApi\Attributes\JsonContent;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[OA\Tag(name: 'Submission')]
 final class SubmissionController extends AbstractController
 {
     public function __construct(
         private readonly SubmissionRepository $submissionRepository,
-        private readonly NormalizerInterface $normalizer,
         private readonly SubmissionActions $action,
-    ) {
-    }
+        private readonly ImagePath $imagePath,
+    ) {}
 
     #[Route(
         path: '/api/submission/{submission}',
@@ -60,8 +56,10 @@ final class SubmissionController extends AbstractController
         // ]
     )]
     #[IsGranted('ROLE_USER')]
-    public function delete(#[CurrentUser] User $user, Submission $submission): Response
-    {
+    public function delete(
+        #[CurrentUser] User $user,
+        Submission $submission,
+    ): Response {
         if (!$user->hasRole('ROLE_STAFF') && $user !== $submission->getUser()) {
             return new Response(status: Response::HTTP_FORBIDDEN);
         }
@@ -82,21 +80,21 @@ final class SubmissionController extends AbstractController
     )]
     #[IsGranted('ROLE_USER')]
     public function create(
-        #[CurrentUser]
-        User $user,
+        #[CurrentUser] User $user,
         SeasonRepository $seasonRepository,
-        #[MapRequestPayload]
-        SubmissionCreateDto $submissionCreateDto,
+        #[MapRequestPayload] SubmissionCreateDto $submissionCreateDto,
     ): Response {
         $season = $seasonRepository->getCurrent();
 
         if ($season === null) {
-            return $this->json(['season' => ['no_season']], Response::HTTP_BAD_REQUEST);
+            return $this->json(['season' => [
+                'no_season',
+            ]], Response::HTTP_BAD_REQUEST);
         }
 
         $errors = $this->action->create($submissionCreateDto, $user, $season);
 
-        if (!empty($errors)) {
+        if (\count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -119,35 +117,23 @@ final class SubmissionController extends AbstractController
         // ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function listSeason(
-        Season $season,
-        Request $request,
-        int $page = 1,
-    ): Response {
+    public function listSeason(Season $season, int $page = 1): Response
+    {
         $limit = 50;
-        $submissions = $this->submissionRepository->findBySeason($season, $page, $limit);
-        $pageCount = 1 + intdiv($submissions->count(), $limit);
-
-        $url = $this->getParameter('app_base');
-
-        return $this->json(
-            $this->normalizer->normalize(
-                [
-                    'pages' => $pageCount,
-                    'submissions' => $submissions,
-                ],
-                null,
-                [
-                    AbstractNormalizer::GROUPS => ['fetchSubmission'],
-                    AbstractNormalizer::CALLBACKS => [
-                        'season' => fn (Season $object) => $object->getId(),
-                        'activity' => fn (Activity $object) => $object->getId(),
-                        'faculty' => fn (Faculty $object) => $object->getId(),
-                        'image' => fn (Image $image) => $url.$image->getPath(),
-                    ],
-                ]
-            )
+        $submissions = $this->submissionRepository->findBySeason(
+            $season,
+            $page,
+            $limit,
         );
+        $pageCount = 1 + \intdiv($submissions->count(), $limit);
+
+        return $this->json([
+            'pages' => $pageCount,
+            'submissions' => \array_map(
+                fn(Submission $submission): SubmissionResponseDto => $submission->toResponseObject($this->imagePath),
+                \iterator_to_array($submissions),
+            ),
+        ]);
     }
 
     #[Route(
@@ -161,28 +147,18 @@ final class SubmissionController extends AbstractController
         //     ],
         // ]
     )]
-    public function list(
-        #[CurrentUser]
-        User $user,
-        Request $request,
-    ): Response {
-        $submissions = $this->submissionRepository->findAllByUser($user, 1, 5000);
-        $url = $this->getParameter('app_base');
-
-        return $this->json(
-            $submissions,
-            200,
-            [],
-            [
-                AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn ($object) => $object->getId(),
-                AbstractNormalizer::GROUPS => ['fetchSubmission'],
-                AbstractNormalizer::CALLBACKS => [
-                    'image' => fn (Image $image) => $url.$image->getPath(),
-                    'activity' => fn (Activity $activity) => $activity->getId(),
-                ],
-                AbstractNormalizer::IGNORED_ATTRIBUTES => ['user', 'season'],
-            ],
+    public function list(#[CurrentUser] User $user): Response
+    {
+        $submissions = $this->submissionRepository->findAllByUser(
+            $user,
+            1,
+            5000,
         );
+
+        return $this->json(\array_map(
+            fn(Submission $submission): SubmissionResponseDto => $submission->toResponseObject($this->imagePath),
+            \iterator_to_array($submissions),
+        ));
     }
 
     #[Route(
@@ -197,22 +173,28 @@ final class SubmissionController extends AbstractController
         // ]
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function unresolvedList(Request $request, int $count): Response
+    public function unresolvedList(int $count): Response
     {
-        $url = $this->getParameter('app_base');
         $submissions = $this->submissionRepository->findUnreviewed($count);
 
-        return $this->json(
-            $submissions,
-            200,
-            [],
-            [
-                AbstractNormalizer::GROUPS => ['fetchSubmission'],
-                AbstractNormalizer::IGNORED_ATTRIBUTES => ['charity', 'season'],
-                AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => fn ($object) => $object->getId(),
-                AbstractNormalizer::CALLBACKS => ['image' => fn (Image $image) => $url.$image->getPath()],
-            ]
-        );
+        $userResponse = [];
+        $submissionResponse = [];
+
+        foreach ($submissions as $submission) {
+            $submissionResponse[] = $submission->toResponseObject($this->imagePath);
+            $user = $submission->getUser();
+
+            $userId = $user->getId();
+
+            if (!isset($userResponse[$userId])) {
+                $userResponse[$userId] = $user->toResponseObject();
+            }
+        }
+
+        return $this->json(new UnreviewedSubmissionResponseDto(
+            $submissionResponse,
+            $userResponse,
+        ));
     }
 
     #[Route(
@@ -248,14 +230,14 @@ final class SubmissionController extends AbstractController
     )]
     #[IsGranted('ROLE_USER')]
     public function edit(
-        #[CurrentUser]
-        User $user,
+        #[CurrentUser] User $user,
         Submission $submission,
-        #[MapRequestPayload]
-        SubmissionEditDto $submissionEditDto,
+        #[MapRequestPayload] SubmissionEditDto $submissionEditDto,
     ): Response {
         if ($submission->isAccepted()) {
-            return $this->json(['submission' => ['accepted']], Response::HTTP_BAD_REQUEST);
+            return $this->json(['submission' => [
+                'accepted',
+            ]], Response::HTTP_BAD_REQUEST);
         }
 
         // Uzivatel posle v roce 2024 submission a dostane reject,
@@ -263,7 +245,9 @@ final class SubmissionController extends AbstractController
         // -> neni mozne zjistit jestli je z roku 2024/2025
         // -> acceptne se -> zmeni vysledky z predchozich let
         if (!$submission->getSeason()->isRunning()) {
-            return $this->json(['season' => ['no_season']], Response::HTTP_BAD_REQUEST);
+            return $this->json(['season' => [
+                'no_season',
+            ]], Response::HTTP_BAD_REQUEST);
         }
 
         // 1. uzivatel da edit, admin vidi starou verzi
@@ -275,7 +259,7 @@ final class SubmissionController extends AbstractController
 
         $errors = $this->action->update($submission, $submissionEditDto);
 
-        if (!empty($errors)) {
+        if (\count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -305,20 +289,14 @@ final class SubmissionController extends AbstractController
         // ],
     )]
     #[IsGranted('ROLE_STAFF')]
-    public function setState(Submission $submission, Request $request): Response
-    {
-        $form = $this->createForm(SubmissionStateFormType::class);
-        $form->submit($request->getPayload()->all());
+    public function setState(
+        #[CurrentUser] User $user,
+        #[MapRequestPayload] SubmissionStateDto $dto,
+        Submission $submission,
+    ): Response {
+        $errors = $this->action->setState($user, $submission, $dto);
 
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $errors = $this->action->setState($submission, $form->getData());
-
-        if (!empty($errors)) {
+        if (\count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
@@ -327,22 +305,36 @@ final class SubmissionController extends AbstractController
 
     #[OA\Get(
         description: 'Extract submission for given seasons',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Submissions for the season',
+                content: new JsonContent(
+                    ref: new Model(type: ExtractSubmissionDto::class),
+                ),
+            ),
+        ],
     )]
-    #[Route('/api/extract/submissions', 'api_extract_submissions', methods: ['GET'])]
+    #[Route(
+        '/api/extract/submissions',
+        'api_extract_submissions',
+        methods: ['GET'],
+    )]
     public function extractReviewedSubmissionForSeasons(
-        ParameterBagInterface $parameterBag,
-        #[CurrentUser]
-        User $user,
-        #[MapQueryString]
-        ?SeasonIDList $seasons,
+        #[CurrentUser] User $user,
+        #[MapQueryParameter] ?int $season = null,
     ): Response {
-        if (!$user->canAccess(FeatureFlag::ROLE_STAFF) && !$user->canAccess(FeatureFlag::FEATURE_EXPORT_SUBMISSIONS)) {
+        if (
+            !$user->canAccess(FeatureFlag::ROLE_STAFF)
+            && !$user->canAccess(FeatureFlag::FEATURE_EXPORT_SUBMISSIONS)
+        ) {
             return new Response(status: Response::HTTP_UNAUTHORIZED);
         }
 
-        $url = $parameterBag->get('app_base');
-
-        $extractedData = $this->submissionRepository->extractBySeasons($url, $seasons?->seasons);
+        $extractedData = $this->submissionRepository->extractBySeasons(
+            $this->imagePath,
+            $season,
+        );
 
         return $this->json($extractedData);
     }

@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\ExtraPointsRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ExtraPointsRepository::class)]
 class ExtraPoints
@@ -12,20 +13,16 @@ class ExtraPoints
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSeasonResult'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['fetchSeasonResult'])]
-    private ?string $name = null;
+    private string $name;
 
     #[ORM\Column]
-    #[Groups(['fetchSeasonResult'])]
-    private ?int $points = null;
+    private int $points;
 
     #[ORM\Column]
-    #[Groups(['fetchSeasonResult'])]
-    private ?int $week = null;
+    private int $week;
 
     public function __construct(string $name, int $points, int $week)
     {

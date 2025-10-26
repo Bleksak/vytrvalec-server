@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
+use App\Dto\Statistics\ProfileCacheResponseDto;
 use App\Repository\ProfileCacheRepository;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
@@ -13,61 +16,39 @@ class ProfileCache
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'profileCaches')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user;
+    private User $user;
 
     #[OA\Property]
     #[ORM\Id]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Activity $activity;
+    private Activity $activity;
 
     #[OA\Property]
     #[ORM\Column]
-    private ?int $distance = 0;
+    private int $distance = 0;
 
     #[OA\Property]
     #[ORM\Column]
-    private ?int $elevation = 0;
+    private int $elevation = 0;
 
-    public function __construct(
-        User $user,
-        Activity $activity,
-    ) {
+    public function __construct(User $user, Activity $activity)
+    {
         $this->user = $user;
         $this->activity = $activity;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
 
-    public function getActivity(): ?Activity
+    public function getActivity(): Activity
     {
         return $this->activity;
     }
 
-    /**
-     * @param callable(int): int $updateFn
-     */
-    public function updateDistance(callable $updateFn): ProfileCache
-    {
-        $this->setDistance(call_user_func($updateFn, $this->getDistance()));
-
-        return $this;
-    }
-
-    /**
-     * @param callable(int): int $updateFn
-     */
-    public function updateElevation(callable $updateFn): ProfileCache
-    {
-        $this->setElevation(call_user_func($updateFn, $this->getElevation()));
-
-        return $this;
-    }
-
-    public function getDistance(): ?int
+    public function getDistance(): int
     {
         return $this->distance;
     }
@@ -79,7 +60,7 @@ class ProfileCache
         return $this;
     }
 
-    public function getElevation(): ?int
+    public function getElevation(): int
     {
         return $this->elevation;
     }
@@ -89,5 +70,14 @@ class ProfileCache
         $this->elevation = $elevation;
 
         return $this;
+    }
+
+    public function toResponseObject(): ProfileCacheResponseDto
+    {
+        return new ProfileCacheResponseDto(
+            $this->activity->getId(),
+            $this->distance,
+            $this->elevation,
+        );
     }
 }

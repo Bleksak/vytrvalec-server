@@ -7,11 +7,14 @@ namespace App\Controller\ApiResource;
 use App\Dto\Image\ImageUploadDto;
 use App\Dto\Image\Response\ImageCreateResponseDto;
 use App\Form\ImageUploadFormType;
+use App\Services\ImagePath;
 use App\Services\ImageUploader;
+use App\Utils\MimeType;
 use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,26 +25,23 @@ final class ImageController extends AbstractController
 {
     public function __construct(
         private readonly ImageUploader $imageUploader,
+        private readonly ImagePath $imagePath,
     ) {
     }
 
     #[OA\Post(
         description: 'Upload an image to the server',
-        requestBody: new OA\RequestBody(
-            content: new OA\MediaType(
-                mediaType: 'file',
-                schema: new OA\Schema(ref: new Model(type: ImageUploadDto::class)),
-            )
-        ),
+        requestBody: new OA\RequestBody(content: new OA\MediaType(
+            mediaType: 'file',
+            schema: new OA\Schema(ref: new Model(type: ImageUploadDto::class)),
+        )),
         responses: [
             new OA\Response(
                 description: 'Image uploaded successfully',
                 response: Response::HTTP_OK,
-                content: new OA\JsonContent(
-                    ref: new Model(type: ImageCreateResponseDto::class),
-                ),
+                content: new OA\JsonContent(ref: new Model(type: ImageCreateResponseDto::class)),
             ),
-        ]
+        ],
     )]
     #[Route('/api/image', 'image_store', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
@@ -55,11 +55,13 @@ final class ImageController extends AbstractController
 
         $errors = FormErrors::collect($form);
 
-        if (!empty($errors)) {
+        if (\count($errors) !== 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        $image = $this->imageUploader->uploadImage($form->getData()->image);
+        /** @var ImageUploadDto */
+        $formData = $form->getData();
+        $image = $this->imageUploader->uploadImage($formData->image, MimeType::all());
 
         if ($image === null) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
@@ -68,9 +70,9 @@ final class ImageController extends AbstractController
         return $this->json(
             new ImageCreateResponseDto(
                 $image->getUuid(),
-                $image->getPath(),
+                $image->getPath($this->imagePath),
                 $image->getUploadedAt(),
-                $image->getUsedAt()
+                $image->getUsedAt(),
             )
         );
     }

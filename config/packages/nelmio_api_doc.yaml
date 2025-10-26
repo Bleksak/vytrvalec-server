@@ -1,8 +1,8 @@
 nelmio_api_doc:
-
     documentation:
         servers:
             - url: '%env(APP_BASE_URL)%'
+            - url: 'https://vytrvalec.uts.zcu.cz'
         info:
             title: Měsíční Vytrvalec
             description: Měsíční Vytrvalec

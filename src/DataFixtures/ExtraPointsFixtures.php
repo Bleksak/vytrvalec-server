@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\ExtraPoints;
@@ -8,6 +10,7 @@ use Doctrine\Persistence\ObjectManager;
 
 final class ExtraPointsFixtures extends Fixture
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $dailyDistanceExtraPoints = new ExtraPoints('daily_distance', 1, 2);

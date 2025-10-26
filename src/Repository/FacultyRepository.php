@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Faculty;
@@ -10,9 +12,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Faculty>
  *
  * @method Faculty|null find($id, $lockMode = null, $lockVersion = null)
- * @method Faculty|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Faculty|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method Faculty[]    findAll()
- * @method Faculty[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Faculty[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
  */
 final class FacultyRepository extends ServiceEntityRepository
 {

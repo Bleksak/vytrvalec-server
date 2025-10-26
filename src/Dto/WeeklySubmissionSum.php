@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto;
 
 final class WeeklySubmissionSum
@@ -8,6 +10,5 @@ final class WeeklySubmissionSum
         public int $distance,
         public int $faculty,
         public int $activity,
-    ) {
-    }
+    ) {}
 }

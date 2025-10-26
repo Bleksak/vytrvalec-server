@@ -10,15 +10,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class CharityCreateDto
 {
-    #[OA\Property(type: 'string', example: 'David a Goliáš')]
+    #[OA\Property]
     #[Assert\NotBlank(message: 'blank', allowNull: false)]
-    #[Assert\Type(type: 'string')]
-    public string $name;
-
-    #[OA\Property(type: 'string', example: 'Krátký text o charitě')]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
-    #[Assert\Type(type: 'string')]
-    public string $description;
+    public CharityCreateTranslationDto $translations;
 
     #[OA\Property(type: 'string', example: 'https://davidagolias.cz/')]
     #[Assert\Url(requireTld: false, message: 'invalid')]

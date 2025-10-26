@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Dto\Charity\Response;
 
+use App\Dto\TranslationObjectDto;
 use OpenApi\Attributes as OA;
 
 final class CharityIndexResponseDto
@@ -12,9 +13,9 @@ final class CharityIndexResponseDto
         #[OA\Property]
         public int $id,
         #[OA\Property]
-        public string $name,
+        public TranslationObjectDto $name,
         #[OA\Property]
-        public string $description,
+        public TranslationObjectDto $description,
         #[OA\Property]
         public ?string $image = null,
         #[OA\Property]

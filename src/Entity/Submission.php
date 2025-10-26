@@ -4,89 +4,82 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Repository\SubmissionRepository;
+use App\Services\ImagePath;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Index(columns: ['week'], name: 'week_index')]
+#[ORM\HasLifecycleCallbacks]
 class Submission
 {
     #[OA\Property(example: 1)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private ?int $id = null;
 
     #[OA\Property(example: true)]
-    #[ORM\Column(nullable: true)]
-    #[Groups(['fetchSubmission'])]
+    #[ORM\Column]
     private bool $accepted = false;
 
     #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne(inversedBy: 'submissions', fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission'])]
     private Season $season;
 
     #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne(inversedBy: 'submissions', fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission'])]
     private User $user;
 
     #[OA\Property(type: 'integer', example: 1500)]
     #[ORM\Column(type: Types::BIGINT)]
-    #[Groups(['fetchSubmission'])]
-    private string $elevation;
+    private int $elevation;
 
     #[OA\Property(type: 'integer', example: 1500)]
     #[ORM\Column(type: Types::BIGINT)]
-    #[Groups(['fetchSubmission'])]
-    private string $distance;
+    private int $distance;
 
     #[OA\Property(example: true)]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private bool $reviewed = false;
 
     #[OA\Property]
     #[ORM\ManyToOne(fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: true, referencedColumnName: 'uuid', name: 'image_uuid')]
-    #[Groups(['fetchSubmission'])]
     private ?Image $image;
 
     #[OA\Property(example: 2)]
     #[ORM\Column]
-    #[Groups(['fetchSubmission'])]
     private int $week;
 
     #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne(fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['fetchSubmission'])]
     private Activity $activity;
 
-    #[OA\Property(type: 'date', example: '2025-04-11')]
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    #[Groups(['fetchSubmission'])]
-    private \DateTimeInterface $date;
+    #[OA\Property(type: 'string', format: 'date', example: '2025-04-11')]
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private \DateTime $date;
 
-    #[OA\Property(type: 'datetime', example: 1)]
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', updatable: false, insertable: false, generated: 'ALWAYS')]
-    #[Groups(['fetchSubmission'])]
-    /**
-     * @phpstan-ignore-next-line
-     */
-    private \DateTimeInterface $updatedAt;
+    #[OA\Property(type: 'string', format: 'date-time', example: 1)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private \DateTime $updatedAt;
 
     #[OA\Property(example: 'Dobrej vykon lil bro')]
     #[ORM\Column(length: 512)]
-    #[Groups(['fetchSubmission'])]
     private string $message = '';
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updateTimestamps(): void
+    {
+        $this->updatedAt = new \DateTime();
+    }
 
     public function __construct(
         User $user,
@@ -94,28 +87,28 @@ class Submission
         Season $season,
         Image $image,
         int $distance,
+        \DateTime $date,
         int $elevation = 0,
-        string $message = '',
     ) {
-        $this->date = new \DateTimeImmutable();
+        $this->date = $date;
 
         $this->user = $user;
         $this->activity = $activity;
         $this->season = $season;
         $this->image = $image;
-        $this->distance = (string) $distance;
-        $this->elevation = (string) $elevation;
-        $this->message = $message;
+        $this->distance = $distance;
+        $this->elevation = $elevation;
+        $this->message = '';
 
         $this->calculateWeek();
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
-        return $this->id;
+        return $this->id ?? 0;
     }
 
-    public function isAccepted(): ?bool
+    public function isAccepted(): bool
     {
         return $this->accepted;
     }
@@ -127,24 +120,24 @@ class Submission
         return $this;
     }
 
-    public function getSeason(): ?Season
+    public function getSeason(): Season
     {
         return $this->season;
     }
 
-    public function setSeason(?Season $season): self
+    public function setSeason(Season $season): self
     {
         $this->season = $season;
 
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -158,24 +151,24 @@ class Submission
 
     public function setElevation(int $elevation): self
     {
-        $this->elevation = (string) $elevation;
+        $this->elevation = $elevation;
 
         return $this;
     }
 
     public function getDistance(): int
     {
-        return (int) $this->distance;
+        return $this->distance;
     }
 
     public function setDistance(int $distance): self
     {
-        $this->distance = (string) $distance;
+        $this->distance = $distance;
 
         return $this;
     }
 
-    public function isReviewed(): ?bool
+    public function isReviewed(): bool
     {
         return $this->reviewed;
     }
@@ -199,39 +192,38 @@ class Submission
         return $this;
     }
 
-    public function getActivity(): ?Activity
+    public function getActivity(): Activity
     {
         return $this->activity;
     }
 
-    public function setActivity(?Activity $activity): self
+    public function setActivity(Activity $activity): self
     {
         $this->activity = $activity;
 
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): \DateTime
     {
         return $this->date;
-    }
-
-    public function setDate(\DateTimeInterface $date): self
-    {
-        $this->date = $date;
-
-        return $this;
     }
 
     public function calculateWeek(): int
     {
         $sub = $this->getDate()->diff($this->getSeason()->getStart());
-        $this->week = intdiv($sub->days, 7);
+        $days = $sub->days;
+
+        if ($days === false) {
+            $days = 0;
+        }
+
+        $this->week = \intdiv($days, num2: 7);
 
         return $this->week;
     }
 
-    public function getWeek(): ?int
+    public function getWeek(): int
     {
         return $this->week;
     }
@@ -255,8 +247,27 @@ class Submission
         return $this;
     }
 
-    public function getUpdatedAt(): \DateTimeInterface
+    public function getUpdatedAt(): \DateTime
     {
         return $this->updatedAt;
+    }
+
+    public function toResponseObject(?ImagePath $imagePath): SubmissionResponseDto
+    {
+        return new SubmissionResponseDto(
+            $this->getId(),
+            $this->isAccepted(),
+            $this->getSeason()->getId(),
+            $this->getUser()->getId(),
+            $this->getElevation(),
+            $this->getDistance(),
+            $this->isReviewed(),
+            $this->getImage()?->getPath($imagePath),
+            $this->getWeek(),
+            $this->getActivity()->getId(),
+            $this->getDate(),
+            $this->getUpdatedAt(),
+            $this->getMessage(),
+        );
     }
 }

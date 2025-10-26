@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\ProfileCache;
@@ -12,9 +14,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<ProfileCache>
  *
  * @method ProfileCache|null find($id, $lockMode = null, $lockVersion = null)
- * @method ProfileCache|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ProfileCache|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method ProfileCache[]    findAll()
- * @method ProfileCache[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ProfileCache[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
  */
 final class ProfileCacheRepository extends ServiceEntityRepository
 {
@@ -35,25 +37,25 @@ final class ProfileCacheRepository extends ServiceEntityRepository
     public function addCache(Submission $submission, bool $flush = false): void
     {
         $profileCache = $this->findOneBy(['user' => $submission->getUser(), 'activity' => $submission->getActivity()]);
-        $profileCache = $profileCache ?? new ProfileCache($submission->getUser(), $submission->getActivity());
+        $profileCache ??= new ProfileCache($submission->getUser(), $submission->getActivity());
 
-        $profileCache
-            ->updateDistance(fn (int $oldDistance) => $oldDistance + $submission->getDistance())
-            ->updateElevation(fn (int $oldElevation) => $oldElevation + $submission->getElevation())
-        ;
+        $newDistance = $profileCache->getDistance() + $submission->getDistance();
+        $newElevation = $profileCache->getElevation() + $submission->getElevation();
+
+        $profileCache->setDistance($newDistance)->setElevation($newElevation);
 
         $this->save($profileCache, $flush);
     }
 
-    public function removeCache(Submission $submission, bool $flush): void
+    public function removeCache(Submission $submission, bool $flush = false): void
     {
         $profileCache = $this->findOneBy(['user' => $submission->getUser(), 'activity' => $submission->getActivity()]);
 
         if ($profileCache !== null) {
-            $profileCache
-                ->updateDistance(fn (int $oldDistance) => $oldDistance - $submission->getDistance())
-                ->updateElevation(fn (int $oldElevation) => $oldElevation - $submission->getElevation())
-            ;
+            $newDistance = $profileCache->getDistance() - $submission->getDistance();
+            $newElevation = $profileCache->getElevation() - $submission->getElevation();
+
+            $profileCache->setDistance($newDistance)->setElevation($newElevation);
 
             $this->save($profileCache, $flush);
         }
@@ -64,7 +66,7 @@ final class ProfileCacheRepository extends ServiceEntityRepository
     {
         $cachesByUser = $this->findBy(['user' => $user]);
 
-        if (empty($cachesByUser)) {
+        if (\count($cachesByUser) === 0) {
             return;
         }
 

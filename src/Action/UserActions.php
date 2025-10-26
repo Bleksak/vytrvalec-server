@@ -6,9 +6,10 @@ namespace App\Action;
 
 use App\Dto\EmailingChangeDto;
 use App\Dto\PasswordChangeDto;
-use App\Dto\PasswordResetDto;
+use App\Dto\User\PasswordResetDto;
+use App\Dto\User\UserEditDto;
+use App\Dto\User\UserLoginDto;
 use App\Dto\UserDto;
-use App\Dto\UserEditDto;
 use App\Entity\User;
 use App\Notifications\EmailTemplate\ForgottenPasswordEmailTemplate;
 use App\Notifications\EmailTemplate\RegisterEmailTemplate;
@@ -16,7 +17,6 @@ use App\Repository\FacultyRepository;
 use App\Repository\UserRepository;
 use App\Services\VytrvalecMailer;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final readonly class UserActions
@@ -26,7 +26,7 @@ final readonly class UserActions
         private FacultyRepository $facultyRepository,
         private UserPasswordHasherInterface $hasher,
         private VytrvalecMailer $mailer,
-        private ParameterBagInterface $params,
+        private string $clientUrl,
     ) {
     }
 
@@ -41,7 +41,7 @@ final readonly class UserActions
             return ['faculty' => ['invalid']];
         }
 
-        $user = new User($dto->email, $dto->firstName, $dto->lastName, $faculty, $dto->gdpr);
+        $user = new User($dto->email, $dto->firstName, $dto->lastName, $faculty, $dto->anonymize);
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
 
         try {
@@ -72,15 +72,19 @@ final readonly class UserActions
             $user->setLastName($dto->lastName);
         }
 
-        if ($dto->faculty !== null) {
-            $user->setFaculty($dto->faculty);
+        if ($dto->facultyId !== null) {
+            $faculty = $this->facultyRepository->find($dto->facultyId);
+
+            if ($faculty !== null) {
+                $user->setFaculty($faculty);
+            }
         }
 
         if ($dto->banned !== null) {
             $user->setBanned($dto->banned);
         }
 
-        if ($dto->roles !== null && !empty($dto->roles)) {
+        if ($dto->roles !== null && \count($dto->roles) !== 0) {
             $user->setRoles($dto->roles);
         }
 
@@ -102,17 +106,15 @@ final readonly class UserActions
             return ['old_password' => ['mismatch']];
         }
 
-        if ($dto->password !== null) {
-            $hashedPassword = $this->hasher->hashPassword($currentUser, $dto->password);
-            $currentUser->setPassword($hashedPassword);
-        }
+        $hashedPassword = $this->hasher->hashPassword($currentUser, $dto->password);
+        $currentUser->setPassword($hashedPassword);
 
         $this->userRepository->save($currentUser, true);
 
         return [];
     }
 
-    public function forgottenPasswordRequest(string $email, string $lang): void
+    public function forgottenPasswordRequest(string $email): void
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
 
@@ -120,12 +122,14 @@ final readonly class UserActions
             return;
         }
 
-        $user->setPasswordResetToken(bin2hex(random_bytes(90)));
+        $userPasswordResetToken = \bin2hex(\random_bytes(90));
+
+        $user->setPasswordResetToken($userPasswordResetToken);
 
         $this->userRepository->save($user, true);
 
         $mail = new ForgottenPasswordEmailTemplate();
-        $mail->setContext('password_reset_link', $this->params->get('client_url').'/reset-password/'.$user->getPasswordResetToken());
+        $mail->setContext('password_reset_link', $this->clientUrl.'/reset-password/'.$userPasswordResetToken);
 
         $this->mailer->send($user, $mail, true);
     }
@@ -149,9 +153,9 @@ final readonly class UserActions
         return [];
     }
 
-    public function updateGdpr(User $user, bool $gdprValue): void
+    public function updateAnonymization(User $user, bool $anonymize): void
     {
-        $user->setAcceptedGdpr($gdprValue);
+        $user->setAnonymization($anonymize);
         $this->userRepository->save($user, true);
     }
 
@@ -178,11 +182,12 @@ final readonly class UserActions
 
         $user->setMailing($dto->mailing);
 
-        $user->setEmailUnsubscribeHash(
-            $user->hasMailing()
-                ? bin2hex(random_bytes(90))
-                : null
-        );
+        $unsubscribeHash = null;
+        if ($user->hasMailing()) {
+            $unsubscribeHash = \bin2hex(\random_bytes(90));
+        }
+
+        $user->setEmailUnsubscribeHash($unsubscribeHash);
 
         $this->userRepository->save($user, true);
     }
@@ -193,5 +198,24 @@ final readonly class UserActions
     public function delete(User $user): void
     {
         $this->userRepository->save($user->anonymize(), true);
+    }
+
+    public function login(UserLoginDto $dto): ?User
+    {
+        $user = $this->userRepository->findOneBy(['email' => $dto->email]);
+        if ($user === null) {
+            return null;
+        }
+
+        if (!$this->hasher->isPasswordValid($user, $dto->password)) {
+            return null;
+        }
+
+        if ($dto->firebaseToken !== null) {
+            $user->setToken($dto->firebaseToken);
+            $this->userRepository->save($user, true);
+        }
+
+        return $user;
     }
 }

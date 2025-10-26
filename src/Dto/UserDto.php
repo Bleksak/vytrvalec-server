@@ -19,7 +19,7 @@ final class UserDto
 
     #[OA\Property]
     #[Assert\NotBlank(message: 'blank', allowNull: false)]
-    #[Assert\PasswordStrength(message: 'weak', minScore: 1)]
+    #[Assert\PasswordStrength(message: 'weak', minScore: Assert\PasswordStrength::STRENGTH_WEAK)]
     public string $password;
 
     #[OA\Property]
@@ -39,5 +39,5 @@ final class UserDto
     #[OA\Property]
     #[Assert\NotNull(message: 'blank')]
     #[Assert\Type(type: 'bool', message: 'invalid')]
-    public bool $gdpr;
+    public bool $anonymize;
 }

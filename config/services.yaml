@@ -20,11 +20,27 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    App\Services\ImageUploader:
+        arguments:
+            $projectDirectory: '%kernel.project_dir%'
 
-    App\Security\JWTLogout:
-        tags:
-            - name: 'kernel.event_listener'
-              event: 'Symfony\Component\Security\Http\Event\LogoutEvent'
-              dispatcher: security.event_dispatcher.main
+    App\Services\ImagePath:
+        arguments:
+            $applicationPath: '%app_base%'
+
+    App\Services\VytrvalecMailer:
+        arguments:
+            $clientUrl: '%client_url%'
+            $appBase: '%app_base%'
+
+    App\Action\UserActions:
+        arguments:
+            $clientUrl: '%client_url%'
+
+    App\Security\AccessTokenHandler:
+        arguments:
+            $secret: '%jwt_secret%'
+    App\Services\SubmissionImageValidityCheckerService:
+        arguments:
+            $tempDirectory: '%kernel.project_dir%/var'
+            $publicDirectory: '%kernel.project_dir%/public'

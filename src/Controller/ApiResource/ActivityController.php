@@ -1,22 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\ApiResource;
 
 use App\Action\ActivityActions;
-use App\Dto\ActivityDto;
+use App\Dto\Activity\ActivityCreateDto;
+use App\Dto\Activity\ActivityUpdateDto;
+use App\Dto\Activity\Response\ActivityResponseDto;
 use App\Entity\Activity;
-use App\Form\ActivityFormType;
 use App\Repository\ActivityRepository;
-use App\Validation\FormErrors;
+use App\Services\ImagePath;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[OA\Tag('Activity')]
 final class ActivityController extends AbstractController
@@ -24,17 +25,14 @@ final class ActivityController extends AbstractController
     public function __construct(
         private readonly ActivityRepository $activityRepository,
         private readonly ActivityActions $action,
-    ) {
-    }
+    ) {}
 
     #[OA\Post(
         description: 'Create new Activity',
         requestBody: new OA\RequestBody(
             description: 'The new Activity',
             required: true,
-            content: new OA\JsonContent(
-                ref: new Model(type: ActivityDto::class)
-            )
+            content: new OA\JsonContent(ref: new Model(type: ActivityCreateDto::class)),
         ),
         responses: [
             new OA\Response(
@@ -51,26 +49,19 @@ final class ActivityController extends AbstractController
             ),
         ],
     )]
-    #[Route(
-        '/api/activity',
-        name: 'activity_create',
-        methods: ['POST'],
-    )]
+    #[Route('/api/activity', name: 'activity_create', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
-    public function create(Request $request): Response
+    public function create(#[MapRequestPayload] ActivityCreateDto $activityCreateDto, ImagePath $imagePath): Response
     {
-        $form = $this->createForm(ActivityFormType::class);
-        $form->submit($request->getPayload()->all());
+        $activity = $this->action->create($activityCreateDto);
 
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        if ($activity === null) {
+            return $this->json([
+                'icon' => ['string.'],
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $id = $this->action->create($form->getData());
-
-        return $this->json(['id' => $id], Response::HTTP_OK);
+        return $this->json($activity->toResponseObject($imagePath), Response::HTTP_CREATED);
     }
 
     #[OA\Delete(
@@ -95,13 +86,9 @@ final class ActivityController extends AbstractController
                 response: Response::HTTP_BAD_REQUEST,
                 description: 'Bad request',
             ),
-        ]
+        ],
     )]
-    #[Route(
-        '/api/activity/{activity}',
-        name: 'activity_delete',
-        methods: ['DELETE'],
-    )]
+    #[Route('/api/activity/{activity}', name: 'activity_delete', methods: ['DELETE'])]
     #[IsGranted('ROLE_STAFF')]
     public function delete(Activity $activity): Response
     {
@@ -126,14 +113,12 @@ final class ActivityController extends AbstractController
         requestBody: new OA\RequestBody(
             description: 'The updated activity',
             required: true,
-            content: new OA\JsonContent(
-                ref: new Model(type: ActivityDto::class)
-            )
+            content: new OA\JsonContent(ref: new Model(type: ActivityUpdateDto::class)),
         ),
         responses: [
             new OA\Response(
                 response: Response::HTTP_OK,
-                description: 'Activity deleted',
+                description: 'Activity updated',
             ),
             new OA\Response(
                 response: Response::HTTP_FORBIDDEN,
@@ -143,29 +128,13 @@ final class ActivityController extends AbstractController
                 response: Response::HTTP_BAD_REQUEST,
                 description: 'Bad request',
             ),
-        ]
+        ],
     )]
-    #[Route(
-        '/api/activity/{activity}',
-        name: 'activity_patch',
-        methods: ['PATCH'],
-    )]
+    #[Route('/api/activity/{activity}', name: 'activity_patch', methods: ['PATCH'])]
     #[IsGranted('ROLE_STAFF')]
-    public function updatePatch(Request $request, Activity $activity): Response
+    public function updatePatch(#[MapRequestPayload] ActivityUpdateDto $dto, Activity $activity): Response
     {
-        $form = $this->createForm(ActivityFormType::class, null, [
-            'method' => $request->getMethod(),
-        ]);
-
-        $form->submit($request->getPayload()->all());
-
-        $errors = FormErrors::collect($form);
-
-        if (!empty($errors)) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
-        }
-
-        $this->action->update($activity, $form->getData());
+        $this->action->update($activity, $dto);
 
         return new Response(status: Response::HTTP_OK);
     }
@@ -178,22 +147,16 @@ final class ActivityController extends AbstractController
                 description: 'Collection of activites',
                 content: new OA\JsonContent(
                     type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: Activity::class),
-                    ),
+                    items: new OA\Items(ref: new Model(type: Activity::class)),
                 ),
             ),
         ],
     )]
-    #[Route(
-        '/api/activity',
-        name: 'activity_index',
-        methods: ['GET'],
-    )]
-    public function activityList(NormalizerInterface $normalizer): Response
+    #[Route('/api/activity', name: 'activity_index', methods: ['GET'])]
+    public function index(ImagePath $imagePath): Response
     {
-        return $this->json($normalizer->normalize($this->activityRepository->findAll(), null, [
-            AbstractNormalizer::GROUPS => ['fetchActivity'],
-        ]));
+        return $this->json(\array_map(static fn(Activity $activity): ActivityResponseDto => $activity->toResponseObject(
+            $imagePath,
+        ), $this->activityRepository->findAll()));
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto\Extract;
 
 final class ExtractSubmissionDto
@@ -11,6 +13,5 @@ final class ExtractSubmissionDto
         public int $distance,
         public int $elevation,
         public string $image,
-    ) {
-    }
+    ) {}
 }

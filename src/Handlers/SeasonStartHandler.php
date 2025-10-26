@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Handlers;
 
 use App\Messages\SeasonStartMessage;
@@ -10,12 +12,12 @@ use App\Services\VytrvalecMailer;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class SeasonStartHandler
+final readonly class SeasonStartHandler
 {
     public function __construct(
-        private readonly SeasonRepository $seasonRepository,
-        private readonly UserRepository $userRepository,
-        private readonly VytrvalecMailer $mailer,
+        private SeasonRepository $seasonRepository,
+        private UserRepository $userRepository,
+        private VytrvalecMailer $mailer,
     ) {
     }
 
@@ -39,7 +41,7 @@ final class SeasonStartHandler
 
         $batchSize = 30;
 
-        foreach (array_chunk($users, $batchSize) as $chunk) {
+        foreach (\array_chunk($users, $batchSize) as $chunk) {
             $this->mailer->send($chunk, $template);
         }
     }

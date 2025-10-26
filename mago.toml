@@ -1,17 +1,51 @@
 # Mago configuration file
 # For more information, see https://mago.carthage.software/#/getting-started/configuration
-php_version = "8.2.0"
+php-version = "8.5.0"
 
 [source]
 paths = ["src"]
 includes = ["vendor"]
 excludes = []
 
-[format]
-print_width = 120
-tab_width = 4
-use_tabs = false
+[formatter]
+print-width = 80
+tab-width = 4
+use-tabs = false
+method-chain-breaking-style = "next_line"
+null-type-hint = "question"
+always-break-attribute-named-argument-lists = true
+method-brace-style = "next_line"
 
 [linter]
-default_plugins = true
-plugins = ["symfony", "analysis", "best-practices"]
+integrations = ["symfony", "amphp", "phpunit", "doctrine"]
+
+[linter.rules]
+too-many-properties = {"enabled" = false}
+too-many-methods = {"enabled" = false}
+kan-defect = {"enabled" = false}
+excessive-parameter-list = {"enabled" = false}
+cyclomatic-complexity = {"enabled" = false}
+no-assign-in-condition = {enabled = false}
+no-boolean-flag-parameter = {enabled=false}
+prefer-arrow-function = {enabled=true}
+yoda-conditions = { enabled = false }
+sensitive-parameter = { enabled = true }
+no-redundant-use = { enabled = true }
+no-variable-variable = { enabled = true }
+
+ambiguous-function-call = {enabled=true}
+
+literal-named-argument = { enabled = false }
+halstead = { effort-threshold = 7000, enabled = false }
+
+[analyzer]
+find-unused-definitions = true
+find-unused-expressions = true
+analyze-dead-code = true
+allow-possibly-undefined-array-keys = false
+perform-heuristic-checks = true
+check-throws = false
+check-missing-type-hints = true
+check-closure-missing-type-hints = true
+check-arrow-function-missing-type-hints = true
+register-super-globals = true

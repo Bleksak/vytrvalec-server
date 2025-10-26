@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto;
 
 // use App\Entity\Faculty;
@@ -12,6 +14,5 @@ final class UserCountByFacultyStatistics
         public int $faculty,
         #[OA\Property(example: 70)]
         public int $count,
-    ) {
-    }
+    ) {}
 }
