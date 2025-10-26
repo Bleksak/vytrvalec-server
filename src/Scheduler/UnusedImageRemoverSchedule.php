@@ -23,7 +23,7 @@ final readonly class UnusedImageRemoverSchedule
 
     public function __invoke(UnusedImageRemoverMessage $_message): void
     {
-        $this->logger->info('ImageRemoverSchedule was called');
+        $this->logger->info('Cleaning up images...');
         $images = $this->imageRepository->findUnusedImagesForRemoval();
 
         $imageCount = \count($images);
