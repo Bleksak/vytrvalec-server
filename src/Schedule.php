@@ -24,7 +24,7 @@ final class Schedule implements ScheduleProviderInterface
         return new SymfonySchedule()
             ->stateful($this->cache) // ensure missed tasks are executed
             ->processOnlyLastMissedRun(true) // ensure only last missed task is run
-            // ->add(RecurringMessage::every('1 week', new UnusedImageRemoverMessage()))
+            ->add(RecurringMessage::every('1 week', new UnusedImageRemoverMessage()))// add your own tasks here
         // see https://symfony.com/doc/current/scheduler.html#attaching-recurring-messages-to-a-schedule
         ;
     }
