@@ -21,7 +21,7 @@ final class Version20250808160952 extends AbstractMigration
         $table = $schema->createTable('activity_translation');
 
         $table->addColumn('locale', Types::STRING)->setLength(6);
-        $table->addColumn('activity_id', Types::BIGINT)->setUnsigned(true);
+        $table->addColumn('activity_id', Types::INTEGER)->setUnsigned(false);
         $table->addColumn('name', Types::STRING)->setLength(255)->setNotnull(true);
 
         $table->addPrimaryKeyConstraint(
