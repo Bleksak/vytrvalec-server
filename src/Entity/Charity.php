@@ -25,15 +25,28 @@ class Charity
 
     #[OA\Property]
     #[ORM\ManyToOne(fetch: 'EAGER')]
-    #[ORM\JoinColumn(nullable: true, referencedColumnName: 'uuid', name: 'image_uuid')]
+    #[ORM\JoinColumn(
+        nullable: true,
+        referencedColumnName: 'uuid',
+        name: 'image_uuid',
+    )]
     private ?Image $image = null;
 
     #[OA\Property]
-    #[ORM\Column(length: 512, nullable: true)]
+    #[ORM\Column(
+        length: 512,
+        nullable: true,
+    )]
     private ?string $website = null;
 
     /** @var Collection<string, CharityTranslation> */
-    #[ORM\OneToMany(mappedBy: 'charity', targetEntity: CharityTranslation::class, cascade: ['persist', 'remove'], indexBy: 'locale')]
+    #[ORM\OneToMany(
+        mappedBy: 'charity',
+        targetEntity: CharityTranslation::class,
+        cascade: ['persist', 'remove'],
+        indexBy: 'locale',
+        fetch: 'EAGER',
+    )]
     public Collection $translations;
 
     public function __construct(
@@ -55,8 +68,8 @@ class Charity
                     $this,
                     $locale,
                     $translation,
-                    $descriptionTranslations[$locale] ?? ''
-                )
+                    $descriptionTranslations[$locale] ?? '',
+                ),
             );
         }
     }
@@ -101,30 +114,26 @@ class Charity
     {
         return new CharityGetResponseDto(
             $this->id ?? 0,
-            TranslationObjectDto::fromArray(
-                \array_combine(
-                    \array_map(
-                        fn(CharityTranslation $translation): string => $translation->locale,
-                        $this->translations->toArray(),
-                    ),
-                    \array_map(
-                        fn(CharityTranslation $translation): string => $translation->name,
-                        $this->translations->toArray(),
-                    ),
+            TranslationObjectDto::fromArray(\array_combine(
+                \array_map(
+                    fn(CharityTranslation $translation): string => $translation->locale,
+                    $this->translations->toArray(),
                 ),
-            ),
-            TranslationObjectDto::fromArray(
-                \array_combine(
-                    \array_map(
-                        fn(CharityTranslation $translation): string => $translation->locale,
-                        $this->translations->toArray(),
-                    ),
-                    \array_map(
-                        fn(CharityTranslation $translation): string => $translation->description,
-                        $this->translations->toArray(),
-                    ),
+                \array_map(
+                    fn(CharityTranslation $translation): string => $translation->name,
+                    $this->translations->toArray(),
                 ),
-            ),
+            )),
+            TranslationObjectDto::fromArray(\array_combine(
+                \array_map(
+                    fn(CharityTranslation $translation): string => $translation->locale,
+                    $this->translations->toArray(),
+                ),
+                \array_map(
+                    fn(CharityTranslation $translation): string => $translation->description,
+                    $this->translations->toArray(),
+                ),
+            )),
             $this->image?->getPath($imagePath),
             $this->website,
         );
