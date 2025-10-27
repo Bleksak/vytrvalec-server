@@ -60,7 +60,6 @@ class Season
         targetEntity: FacultyMapping::class,
         mappedBy: 'season',
         orphanRemoval: true,
-        fetch: 'EAGER',
     )]
     private Collection $facultyMappings;
 

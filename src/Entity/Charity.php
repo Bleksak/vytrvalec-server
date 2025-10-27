@@ -24,7 +24,7 @@ class Charity
     private ?int $id = null;
 
     #[OA\Property]
-    #[ORM\ManyToOne(fetch: 'EAGER')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(
         nullable: true,
         referencedColumnName: 'uuid',
@@ -45,7 +45,6 @@ class Charity
         targetEntity: CharityTranslation::class,
         cascade: ['persist', 'remove'],
         indexBy: 'locale',
-        fetch: 'EAGER',
     )]
     public Collection $translations;
 
