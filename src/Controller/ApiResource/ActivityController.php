@@ -32,7 +32,9 @@ final class ActivityController extends AbstractController
         requestBody: new OA\RequestBody(
             description: 'The new Activity',
             required: true,
-            content: new OA\JsonContent(ref: new Model(type: ActivityCreateDto::class)),
+            content: new OA\JsonContent(
+                ref: new Model(type: ActivityCreateDto::class),
+            ),
         ),
         responses: [
             new OA\Response(
@@ -51,8 +53,10 @@ final class ActivityController extends AbstractController
     )]
     #[Route('/api/activity', name: 'activity_create', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
-    public function create(#[MapRequestPayload] ActivityCreateDto $activityCreateDto, ImagePath $imagePath): Response
-    {
+    public function create(
+        #[MapRequestPayload] ActivityCreateDto $activityCreateDto,
+        ImagePath $imagePath,
+    ): Response {
         $activity = $this->action->create($activityCreateDto);
 
         if ($activity === null) {
@@ -61,7 +65,10 @@ final class ActivityController extends AbstractController
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        return $this->json($activity->toResponseObject($imagePath), Response::HTTP_CREATED);
+        return $this->json(
+            $activity->toResponseObject($imagePath),
+            Response::HTTP_CREATED,
+        );
     }
 
     #[OA\Delete(
@@ -88,7 +95,11 @@ final class ActivityController extends AbstractController
             ),
         ],
     )]
-    #[Route('/api/activity/{activity}', name: 'activity_delete', methods: ['DELETE'])]
+    #[Route(
+        '/api/activity/{activity}',
+        name: 'activity_delete',
+        methods: ['DELETE'],
+    )]
     #[IsGranted('ROLE_STAFF')]
     public function delete(Activity $activity): Response
     {
@@ -113,7 +124,9 @@ final class ActivityController extends AbstractController
         requestBody: new OA\RequestBody(
             description: 'The updated activity',
             required: true,
-            content: new OA\JsonContent(ref: new Model(type: ActivityUpdateDto::class)),
+            content: new OA\JsonContent(
+                ref: new Model(type: ActivityUpdateDto::class),
+            ),
         ),
         responses: [
             new OA\Response(
@@ -130,10 +143,16 @@ final class ActivityController extends AbstractController
             ),
         ],
     )]
-    #[Route('/api/activity/{activity}', name: 'activity_patch', methods: ['PATCH'])]
+    #[Route(
+        '/api/activity/{activity}',
+        name: 'activity_patch',
+        methods: ['PATCH'],
+    )]
     #[IsGranted('ROLE_STAFF')]
-    public function updatePatch(#[MapRequestPayload] ActivityUpdateDto $dto, Activity $activity): Response
-    {
+    public function updatePatch(
+        #[MapRequestPayload] ActivityUpdateDto $dto,
+        Activity $activity,
+    ): Response {
         $this->action->update($activity, $dto);
 
         return new Response(status: Response::HTTP_OK);
@@ -155,8 +174,11 @@ final class ActivityController extends AbstractController
     #[Route('/api/activity', name: 'activity_index', methods: ['GET'])]
     public function index(ImagePath $imagePath): Response
     {
-        return $this->json(\array_map(static fn(Activity $activity): ActivityResponseDto => $activity->toResponseObject(
-            $imagePath,
-        ), $this->activityRepository->findAll()));
+        return $this->json(\array_map(
+            static fn(Activity $activity): ActivityResponseDto => $activity->toResponseObject(
+                $imagePath,
+            ),
+            $this->activityRepository->findAll(),
+        ));
     }
 }

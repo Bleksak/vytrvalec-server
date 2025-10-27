@@ -21,26 +21,39 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    public ?int $id = null;
 
     #[OA\Property]
-    #[ORM\JoinColumn(nullable: true, referencedColumnName: 'uuid', name: 'icon_uuid')]
-    private ?Image $icon;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(
+        nullable: true,
+        referencedColumnName: 'uuid',
+        name: 'icon_uuid',
+    )]
+    public ?Image $icon;
 
     #[OA\Property(example: true)]
     #[ORM\Column]
-    private bool $active = true;
+    public bool $active = true;
 
     #[OA\Property(example: 1000)]
     #[ORM\Column]
-    private int $minElevation;
+    public int $minElevation;
 
     /** @var Collection<string, ActivityTranslation> */
-    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: ActivityTranslation::class, cascade: ['persist', 'remove'], indexBy: 'locale')]
-    private Collection $translations;
+    #[ORM\OneToMany(
+        mappedBy: 'activity',
+        targetEntity: ActivityTranslation::class,
+        cascade: ['persist', 'remove'],
+        indexBy: 'locale',
+    )]
+    public Collection $translations;
 
-    public function __construct(ActivityCreateTranslationDto $translations, int $minElevation, Image $icon)
-    {
+    public function __construct(
+        ActivityCreateTranslationDto $translations,
+        int $minElevation,
+        Image $icon,
+    ) {
         $this->minElevation = $minElevation;
         $this->icon = $icon;
         $this->translations = new ArrayCollection();
@@ -48,7 +61,11 @@ class Activity
         foreach ($translations->name->toArray() as $locale => $value) {
             \assert($value !== null, 'Hodnota překladu nesmí být null');
 
-            $this->addTranslation(new ActivityTranslation($this, $locale, $value));
+            $this->addTranslation(new ActivityTranslation(
+                $this,
+                $locale,
+                $value,
+            ));
         }
     }
 
@@ -112,13 +129,11 @@ class Activity
     {
         return new ActivityResponseDto(
             $this->getId(),
-            TranslationObjectDto::fromArray(
-                \array_column(
-                    $this->translations->toArray(),
-                    'name',
-                    'locale',
-                ),
-            ),
+            TranslationObjectDto::fromArray(\array_column(
+                $this->translations->toArray(),
+                'name',
+                'locale',
+            )),
             $this->getIcon()?->getPath($imagePath),
             $this->isActive(),
             $this->getMinElevation(),
