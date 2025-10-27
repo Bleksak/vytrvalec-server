@@ -73,8 +73,9 @@ final class SeasonRepository extends ServiceEntityRepository
     {
         /** @var list<Season> */
         return $this->createQueryBuilder('s')
-            ->select('s', 'c')
+            ->select('s', 'c', 'i')
             ->join('s.charity', 'c')
+            ->leftJoin('c.image', 'i')
             ->orderBy('s.start', 'DESC')
             ->getQuery()
             ->getResult();

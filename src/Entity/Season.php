@@ -60,11 +60,15 @@ class Season
         targetEntity: FacultyMapping::class,
         mappedBy: 'season',
         orphanRemoval: true,
+        fetch: 'EAGER',
     )]
     private Collection $facultyMappings;
 
-    public function __construct(\DateTime $start, \DateTime $end, Charity $charity)
-    {
+    public function __construct(
+        \DateTime $start,
+        \DateTime $end,
+        Charity $charity,
+    ) {
         $this->submissions = new ArrayCollection();
         $this->start = $start;
         $this->end = $end;
@@ -160,7 +164,10 @@ class Season
         $end = \DateTimeImmutable::createFromInterface($this->getEnd());
 
         $diff = $end->diff($start);
-        \assert($diff->days !== false, 'DateInterval vytvoreny pres diff nemuze mit days = false');
+        \assert(
+            $diff->days !== false,
+            'DateInterval vytvoreny pres diff nemuze mit days = false',
+        );
 
         $weeks = \intdiv($diff->days + 1, 7);
 
