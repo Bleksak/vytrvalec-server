@@ -24,7 +24,6 @@ class Activity
     private ?int $id = null;
 
     #[OA\Property]
-    #[ORM\ManyToOne(fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: true, referencedColumnName: 'uuid', name: 'icon_uuid')]
     private ?Image $icon;
 

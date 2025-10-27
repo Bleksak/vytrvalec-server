@@ -116,14 +116,6 @@ class Season
         return $this;
     }
 
-    /**
-     * @return Collection<int, Submission>
-     */
-    public function getSubmissions(): Collection
-    {
-        return $this->submissions;
-    }
-
     public function addSubmission(Submission $submission): self
     {
         if (!$this->submissions->contains($submission)) {
@@ -143,9 +135,7 @@ class Season
 
     public function canDelete(): bool
     {
-        return $this->getSubmissions()->isEmpty();
-
-        // return $this->getStart() >= new DateTimeImmutable('now');
+        return $this->submissions->isEmpty();
     }
 
     public function isRunning(): bool

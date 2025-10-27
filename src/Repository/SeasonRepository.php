@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\Season\SeasonIndexDto;
 use App\Entity\Charity;
 use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -67,18 +68,37 @@ final class SeasonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return list<Season>
+     * @return list<SeasonIndexDto>
      */
     public function findOrdered(): array
     {
-        /** @var list<Season> */
-        return $this->createQueryBuilder('s')
-            ->select('s', 'c', 'i')
+        $qb = $this->createQueryBuilder('s')
+            ->select('s', 'c', 'i', 'ct', 'sfm')
+            // Add a subquery instead of a join
+            ->addSelect('(
+            SELECT COUNT(sub2.id)
+            FROM App\Entity\Submission sub2
+            WHERE sub2.season = s
+        ) AS submissionCount')
             ->join('s.charity', 'c')
+            ->leftJoin('s.facultyMappings', 'sfm')
             ->leftJoin('c.image', 'i')
-            ->orderBy('s.start', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->leftJoin('c.translations', 'ct')
+            ->orderBy('s.start', 'DESC');
+
+        /** @var list<array{0: Season, submissionCount: int}> */
+        $results = $qb->getQuery()->getResult();
+
+        $result = [];
+
+        foreach ($results as $row) {
+            $result[] = new SeasonIndexDto(
+                $row[0],
+                (int) $row['submissionCount'] === 0,
+            );
+        }
+
+        return $result;
     }
 
     /**

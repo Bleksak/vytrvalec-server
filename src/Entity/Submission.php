@@ -12,7 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
-#[ORM\Index(columns: ['week'], name: 'week_index')]
+#[ORM\Index(
+    columns: ['week'],
+    name: 'week_index',
+)]
 #[ORM\HasLifecycleCallbacks]
 class Submission
 {
@@ -26,21 +29,33 @@ class Submission
     #[ORM\Column]
     private bool $accepted = false;
 
-    #[OA\Property(type: 'integer', example: 1)]
-    #[ORM\ManyToOne(inversedBy: 'submissions', fetch: 'EAGER')]
+    #[OA\Property(
+        type: 'integer',
+        example: 1,
+    )]
+    #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
     private Season $season;
 
-    #[OA\Property(type: 'integer', example: 1)]
-    #[ORM\ManyToOne(inversedBy: 'submissions', fetch: 'EAGER')]
+    #[OA\Property(
+        type: 'integer',
+        example: 1,
+    )]
+    #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
-    #[OA\Property(type: 'integer', example: 1500)]
+    #[OA\Property(
+        type: 'integer',
+        example: 1500,
+    )]
     #[ORM\Column(type: Types::BIGINT)]
     private int $elevation;
 
-    #[OA\Property(type: 'integer', example: 1500)]
+    #[OA\Property(
+        type: 'integer',
+        example: 1500,
+    )]
     #[ORM\Column(type: Types::BIGINT)]
     private int $distance;
 
@@ -49,24 +64,39 @@ class Submission
     private bool $reviewed = false;
 
     #[OA\Property]
-    #[ORM\ManyToOne(fetch: 'EAGER')]
-    #[ORM\JoinColumn(nullable: true, referencedColumnName: 'uuid', name: 'image_uuid')]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(
+        nullable: true,
+        referencedColumnName: 'uuid',
+        name: 'image_uuid',
+    )]
     private ?Image $image;
 
     #[OA\Property(example: 2)]
     #[ORM\Column]
     private int $week;
 
-    #[OA\Property(type: 'integer', example: 1)]
-    #[ORM\ManyToOne(fetch: 'EAGER')]
+    #[OA\Property(
+        type: 'integer',
+        example: 1,
+    )]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private Activity $activity;
 
-    #[OA\Property(type: 'string', format: 'date', example: '2025-04-11')]
+    #[OA\Property(
+        type: 'string',
+        format: 'date',
+        example: '2025-04-11',
+    )]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private \DateTime $date;
 
-    #[OA\Property(type: 'string', format: 'date-time', example: 1)]
+    #[OA\Property(
+        type: 'string',
+        format: 'date-time',
+        example: 1,
+    )]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTime $updatedAt;
 

@@ -8,6 +8,7 @@ use App\Action\SeasonActions;
 use App\CustomLogic\SeasonResultCalculator;
 use App\Dto\Season\Request\SeasonQueryFilterRequestDto;
 use App\Dto\Season\Response\SeasonIndexResponseDto;
+use App\Dto\Season\SeasonIndexDto;
 use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
 use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Dto\WeeklyResultDto;
@@ -330,7 +331,7 @@ final class SeasonController extends AbstractController
     public function index(): Response
     {
         return $this->json(\array_map(
-            fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject($this->imagePath),
+            fn(SeasonIndexDto $season): SeasonIndexResponseDto => $season->toResponseObject($this->imagePath),
             $this->seasonRepository->findOrdered(),
         ));
     }
