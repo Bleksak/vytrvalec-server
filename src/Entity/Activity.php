@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
-class Activity
+final class Activity
 {
     #[OA\Property(example: 1)]
     #[ORM\Id]
