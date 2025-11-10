@@ -1,0 +1,12 @@
+{
+  "entrypoints": {
+    "emails": {
+      "css": [
+        "/build/emails.css"
+      ],
+      "js": [
+        "/build/emails.js"
+      ]
+    }
+  }
+}

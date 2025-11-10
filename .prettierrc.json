@@ -1,0 +1,11 @@
+{
+  "plugins": [
+    "@zackad/prettier-plugin-twig"
+  ],
+  "twigSingleQuote": true,
+  "twigAlwaysBreakObjects": true,
+  "twigFollowOfficialCodingStandards": true,
+  "twigOutputEndblockName": true,
+  "trailingComma": "all",
+  "tabWidth": 4
+}

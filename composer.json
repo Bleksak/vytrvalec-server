@@ -14,13 +14,16 @@
     "doctrine/doctrine-bundle": "^2.15",
     "doctrine/doctrine-migrations-bundle": "^3.4",
     "doctrine/orm": "^3.4",
+    "easycorp/easyadmin-bundle": "^4.27",
     "firebase/php-jwt": "^6.11",
     "kreait/firebase-bundle": "^5.6",
     "nelmio/api-doc-bundle": "^5.5",
     "nelmio/cors-bundle": "^2.5",
     "phpdocumentor/reflection-docblock": "^5.6",
+    "picocss/pico": "^2.1",
     "symfony/amqp-messenger": "7.3.*",
     "symfony/asset": "7.3.*",
+    "symfony/asset-mapper": "7.3.*",
     "symfony/cache": "7.3.*",
     "symfony/clock": "7.3.*",
     "symfony/config": "7.3.*",
@@ -61,17 +64,21 @@
     "symfony/security-csrf": "7.3.*",
     "symfony/security-http": "7.3.*",
     "symfony/serializer": "7.3.*",
+    "symfony/stimulus-bundle": "^2.31",
     "symfony/string": "7.3.*",
     "symfony/translation": "7.3.*",
     "symfony/twig-bridge": "7.3.*",
     "symfony/twig-bundle": "7.3.*",
     "symfony/uid": "7.3.*",
+    "symfony/ux-live-component": "^2.31",
+    "symfony/ux-turbo": "^2.31",
+    "symfony/ux-twig-component": "^2.31",
     "symfony/validator": "7.3.*",
     "symfony/var-dumper": "7.3.*",
     "symfony/var-exporter": "7.3.*",
     "symfony/web-link": "7.3.*",
-    "symfony/webpack-encore-bundle": "^2.1",
     "symfony/yaml": "7.3.*",
+    "symfonycasts/sass-bundle": "^0.8.3",
     "thiagoalessio/tesseract_ocr": "^2.13",
     "twig/cssinliner-extra": "^3.21",
     "twig/extra-bundle": "^3.21",
@@ -89,7 +96,8 @@
     "symfony/maker-bundle": "^1.64",
     "symfony/phpunit-bridge": "^7.3",
     "symfony/stopwatch": "7.3.*",
-    "symfony/web-profiler-bundle": "7.3.*"
+    "symfony/web-profiler-bundle": "7.3.*",
+    "vincentlanglet/twig-cs-fixer": "^3.10"
   },
   "config": {
     "allow-plugins": {
@@ -116,7 +124,8 @@
   "scripts": {
     "auto-scripts": {
       "cache:clear": "symfony-cmd",
-      "assets:install %PUBLIC_DIR%": "symfony-cmd"
+      "assets:install %PUBLIC_DIR%": "symfony-cmd",
+      "importmap:install": "symfony-cmd"
     },
     "post-install-cmd": [
       "@auto-scripts"

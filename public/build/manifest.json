@@ -1,0 +1,8 @@
+{
+  "build/emails.css": "/build/emails.css",
+  "build/emails.js": "/build/emails.js",
+  "build/fonts/CenturyGothic.ttf": "/build/fonts/CenturyGothic.ttf",
+  "build/images/favicon.png": "/build/images/favicon.png",
+  "build/translations/messages.en.yaml": "/build/translations/messages.en.yaml",
+  "build/translations/validators.en.yaml": "/build/translations/validators.en.yaml"
+}

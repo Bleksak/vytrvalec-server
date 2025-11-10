@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ProfileCache|null find($id, $lockMode = null, $lockVersion = null)
  * @method ProfileCache|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method ProfileCache[]    findAll()
- * @method ProfileCache[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
+ * @method ProfileCache[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class ProfileCacheRepository extends ServiceEntityRepository
 {
