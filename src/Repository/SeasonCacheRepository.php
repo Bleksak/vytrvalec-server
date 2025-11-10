@@ -14,9 +14,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Cache>
  *
  * @method Cache|null find($id, $lockMode = null, $lockVersion = null)
- * @method Cache|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
+ * @method Cache|null findOneBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null)
  * @method Cache[]    findAll()
- * @method Cache[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
+ * @method Cache[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class SeasonCacheRepository extends ServiceEntityRepository
 {

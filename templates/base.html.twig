@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="%lang%">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" href="%sveltekit.assets%/favicon.png" />
+        <meta name="apple-itunes-app" content="app-id=6743554661" />
+        <meta
+            name="description"
+            content="Akce měsíční vytrvalec vznikla během zimního semestru v roce 2020. Tuto pohybovou soutěž připravil a zorganizoval Ústav tělesné výchovy a sportu ZČU s úmyslem rozhýbat studenty během distanční výuky, která probíhala na ZČU během koronavirové pandemie."
+        />
+
+        <meta
+            name="keywords"
+            content="měsíční, vytrvalec, akce, pohyb, sport, běh, chůze, zču, západočeská univerzita, plzeň, fakulta, katedra, soutěž, měsíční vytrvalec, výzva"
+        />
+
+        <meta name="author" content="Ústav tělesné výchovy a sportu ZČU" />
+
+        <title>
+            {% block title %}
+                Měsíční Vytrvalec
+            {% endblock title %}
+        </title>
+
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('styles/app.scss') }}" />
+        {% endblock stylesheets %}
+
+        {% block javascripts %}
+            {% block importmap %}
+                {{ importmap('app') }}
+            {% endblock importmap %}
+        {% endblock javascripts %}
+    </head>
+
+    <body>
+        <header class="main-header">
+            <nav class="navbar">
+                <ul>
+                    <li>
+                        <a
+                            href="/{currentLocale}"
+                            aria-label="Hlavní stránka Měsíčního Vytrvalce"
+                        >
+                            <img
+                                class="vytrvalec-logo"
+                                src="{{ asset('/images/zcu-logo.png') }}"
+                                title="Logo ZČU"
+                                alt="Logo ZČU"
+                            />
+                        </a>
+                    </li>
+                </ul>
+                <button class="menu-toggle"><MenuIcon /></button>
+
+                <ul class="menu-content">
+                    <li>
+                        <button class="locale-change-btn">
+                            {% if app.request.locale == 'cs' %}
+                                <img
+                                    class="locale-flag"
+                                    src="{{ asset('/images/lang/cs.svg') }}"
+                                    alt="cs"
+                                />
+                            {% else %}
+                                <img
+                                    class="locale-flag"
+                                    src="{{ asset('/images/lang/en.svg') }}"
+                                    alt="en"
+                                />
+                            {% endif %}
+                        </button>
+                    </li>
+                    {% if is_granted('ROLE_STAFF') %}
+                        <li>
+                            <a href="/administration">
+                                {{ 'navbar.administration'|trans }}
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <a href="/{currentLocale}/rules">
+                            {{ 'navbar.rules'|trans }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/{currentLocale}/results">
+                            {{ 'navbar.results'|trans }}
+                        </a>
+                    </li>
+
+                    {% if not app.user %}
+                        <li><button>{{ 'navbar.login'|trans }}</button></li>
+                        <li>
+                            <button class="secondary">
+                                {{ 'navbar.register'|trans }}
+                            </button>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="/{currentLocale}/profile">
+                                {{ 'navbar.profile'|trans }}
+                            </a>
+                        </li>
+                        {% if currentSeason %}
+                            <li>
+                                <button>{{ 'navbar.submission'|trans }}</button>
+                            </li>
+                        {% endif %}
+                        <li>
+                            <form method="POST" action="/auth?/logout">
+                                <input
+                                    type="submit"
+                                    class="secondary"
+                                    value="{{ 'navbar.logout'|trans }}"
+                                />
+                            </form>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </header>
+
+        {% block body %}
+
+        {% endblock body %}
+    </body>
+</html>

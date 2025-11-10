@@ -18,7 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Activity|null find($id, $lockMode = null, $lockVersion = null)
  * @method Activity|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method Activity[]    findAll()
- * @method Activity[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
+ * @method Activity[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class ActivityRepository extends ServiceEntityRepository
 {

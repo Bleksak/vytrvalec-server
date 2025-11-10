@@ -1,61 +1,83 @@
-{%apply inline_css(source('@styles/foundation.css'), source('@styles/foundation-emails.css')) %}
+{% apply inline_css(
+    source('@styles/foundation.css'),
+    source('@styles/foundation-emails.css')
+)
+%}
 {% apply inky_to_html %}
 <!DOCTYPE html>
 <html>
-<head>
-    <style>
-        p {
-            word-break: break-word;
-        }
-    </style>
-</head>
+    <head>
+        <style>
+            p { word-break: break-word; }
+        </style>
+    </head>
 
-<body>
-    <container style="padding-top: 20px;">
-    {% block head %}
-            <row style="border-bottom: 2px solid #aaa;">
-                <columns style="padding-top: 10px;" large="2">
-                    <img style="width: 75px;" src="{{ absolute_url(asset('build/images/favicon.png')) }}" alt="Měsíční Vytrvalec" />
-                </columns>
-                <columns large="6">
-                    <container style="margin-top: 30px;">
-                        <row>
-                            <columns style="padding-bottom: 0;">
-                                <h1 style="margin: 0; font-weight: bold; font-size: 21px; color: #005cab;">Ústav</h1>
-                            </columns>
-                        </row>
-                        <row>
-                            <columns>
-                                <h2 style="margin: 0; font-weight: bolder; font-size: 19px; color: #aaa;">tělesné výchovy a sportu</h2>
-                            </columns>
-                        </row>
-                    </container>
-                </columns>
-                <columns large="4">
-                    <container style="margin-top: 58px;">
-                        <row>
-                            <columns style="padding-bottom: 0;">
-                                <h3 style="margin: 0; font-weight: bolder; font-size: 19px; color: #005cab;">Měsíční Vytrvalec</h3>
-                            </columns>
-                        </row>
-                    </container>
+    <body>
+        <container style="padding-top: 20px;">
+            {% block head %}
+                <row style="border-bottom: 2px solid #aaa;">
+                    <columns style="padding-top: 10px;" large="2">
+                        <img
+                            style="width: 75px;"
+                            src="{{
+                            absolute_url(
+                                asset('build/images/favicon.png')
+                            )
+                            }}"
+                            alt="Měsíční Vytrvalec"
+                        />
+                    </columns>
+                    <columns large="6">
+                        <container style="margin-top: 30px;">
+                            <row>
+                                <columns style="padding-bottom: 0;">
+                                    <h1
+                                        style="margin: 0; font-weight: bold; font-size: 21px; color: #005cab;"
+                                    >
+                                        Ústav
+                                    </h1>
+                                </columns>
+                            </row>
+                            <row>
+                                <columns>
+                                    <h2
+                                        style="margin: 0; font-weight: bolder; font-size: 19px; color: #aaa;"
+                                    >
+                                        tělesné výchovy a sportu
+                                    </h2>
+                                </columns>
+                            </row>
+                        </container>
+                    </columns>
+                    <columns large="4">
+                        <container style="margin-top: 58px;">
+                            <row>
+                                <columns style="padding-bottom: 0;">
+                                    <h3
+                                        style="margin: 0; font-weight: bolder; font-size: 19px; color: #005cab;"
+                                    >
+                                        Měsíční Vytrvalec
+                                    </h3>
+                                </columns>
+                            </row>
+                        </container>
+                    </columns>
+                </row>
+            {% endblock head %}
+            <row>
+                <columns align="right" style="padding-top: 20px;">
+                    {% block content %}
+
+                    {% endblock content %}
                 </columns>
             </row>
-    {% endblock %}
-    <row>
-        <columns align="right" style="padding-top: 20px;">
-            {% block content %}{% endblock %}
-        </columns>
-    </row>
-    {# <row> #}
-        {# <columns align="center"> #}
+            {# <row> #}
+            {# <columns align="center"> #}
             {# Přejete se odhlásit z odběru e-mailů? Klikněte <a href="{{ unsubscribe_link }}">zde</a> #}
-        {# </columns> #}
-    {# </row> #}
-
-    </container>
-
-</body>
+            {# </columns> #}
+            {# </row> #}
+        </container>
+    </body>
 </html>
 {% endapply %}
 {% endapply %}
