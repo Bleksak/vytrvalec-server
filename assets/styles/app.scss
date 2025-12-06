@@ -109,3 +109,133 @@ nav.navbar {
         flex-direction: column;
     }
 }
+
+dialog header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+header.heading {
+    background-image: linear-gradient(
+        to right,
+        rgba(0, 92, 171, 0.1),
+        transparent
+    );
+}
+
+header.dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.statistics-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.statistics-card-image {
+    height: 50px;
+    width: 50px;
+}
+
+.statistics-card-value {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.statistics-card-value-numeric {
+    font-weight: bold;
+}
+
+.statistics-card-heading {
+    color: #888888;
+    font-weight: normal;
+}
+
+.season-detail-winner-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: white;
+    border-radius: 0.25rem;
+}
+
+.season-detail-date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.season-detail-charity-grid {
+    align-items: center;
+    grid-template-columns: 1fr 2fr;
+}
+
+@media (max-width: map.get(map.get(pico.$breakpoints, "md"), "breakpoint")) {
+    .season-detail-charity-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.season-detail-charity-image-container {
+    position: relative;
+    height: 100%;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    border: 1px solid rgba(0, 92, 171, 0.2);
+}
+
+.season-detail-charity-image {
+    /* max-height: 24rem; */
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.season-detail-charity-placeholder-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.season-detail-money-collected {
+    margin-bottom: 0;
+    display: flex;
+    background-color: rgba(0, 92, 171, 0.1);
+    gap: 0.5rem;
+}
+
+.season-detail-money-icon-container {
+    background-color: #005cab;
+    color: white;
+    padding: 0.25rem;
+    border-radius: 100%;
+}
+
+.season-detail-charity {
+    margin-bottom: 0;
+}
+
+.sponsors {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+
+    > * {
+        flex: 1 1 calc(33.333% - 1rem); // subtract the gap
+        max-width: calc(33.333% - 1rem);
+    }
+}

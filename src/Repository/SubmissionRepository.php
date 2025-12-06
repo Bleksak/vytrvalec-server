@@ -215,9 +215,9 @@ final class SubmissionRepository extends ServiceEntityRepository
             )
             ->innerJoin('s.user', 'u')
             ->innerJoin('u.faculty', 'f')
-            ->where('s.week = :week')
-            ->andWhere('s.accepted = 1')
             ->andWhere('s.season = :season')
+            ->andWhere('s.week = :week')
+            ->andWhere('s.accepted = 1')
             ->groupBy('activity')
             ->addGroupBy('faculty')
             ->orderBy('activity', 'asc')
@@ -348,7 +348,7 @@ final class SubmissionRepository extends ServiceEntityRepository
 
         return \array_map(
             static fn(Submission $submission): ExtractSubmissionDto => new ExtractSubmissionDto(
-                $submission->getActivity()->getId(),
+                $submission->getActivity()->id,
                 $submission->getSeason()->getId(),
                 $submission->isAccepted(),
                 $submission->getDistance(),
@@ -357,5 +357,21 @@ final class SubmissionRepository extends ServiceEntityRepository
             ),
             $result,
         );
+    }
+
+    /**
+     * @return list<array{activity: int, distance: int}>
+     */
+    public function getTotalStatistics(): array
+    {
+        /** @var list<array{activity: int, distance: int}> */
+        return $this->createQueryBuilder('s')
+            ->select(
+                'IDENTITY(s.activity) as activity, SUM(s.distance) AS distance',
+            )
+            ->where('s.accepted = 1')
+            ->groupBy('s.activity')
+            ->getQuery()
+            ->getResult();
     }
 }

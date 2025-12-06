@@ -294,7 +294,7 @@ class Submission
             $this->isReviewed(),
             $this->getImage()?->getPath($imagePath),
             $this->getWeek(),
-            $this->getActivity()->getId(),
+            $this->getActivity()->id,
             $this->getDate(),
             $this->getUpdatedAt(),
             $this->getMessage(),

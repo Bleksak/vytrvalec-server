@@ -6,7 +6,7 @@ namespace App\Messages;
 
 use Symfony\Component\Messenger\Attribute\AsMessage;
 
-#[AsMessage('delayed_rabbitmq')]
+#[AsMessage]
 final class SeasonEndMessage
 {
     public function __construct(

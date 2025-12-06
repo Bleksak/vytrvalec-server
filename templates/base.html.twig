@@ -39,7 +39,7 @@
                 <ul>
                     <li>
                         <a
-                            href="/{currentLocale}"
+                            href="{{ path('index') }}"
                             aria-label="Hlavní stránka Měsíčního Vytrvalce"
                         >
                             <img
@@ -51,7 +51,10 @@
                         </a>
                     </li>
                 </ul>
-                <button class="menu-toggle"><MenuIcon /></button>
+
+                <button class="menu-toggle">
+                    <twig:ux:icon name="lucide:menu" />
+                </button>
 
                 <ul class="menu-content">
                     <li>
@@ -79,20 +82,31 @@
                         </li>
                     {% endif %}
                     <li>
-                        <a href="/{currentLocale}/rules">
+                        <a href="{{ path('rules') }}">
                             {{ 'navbar.rules'|trans }}
                         </a>
                     </li>
                     <li>
-                        <a href="/{currentLocale}/results">
+                        <a href="{{ path('results') }}">
                             {{ 'navbar.results'|trans }}
                         </a>
                     </li>
 
                     {% if not app.user %}
-                        <li><button>{{ 'navbar.login'|trans }}</button></li>
                         <li>
-                            <button class="secondary">
+                            <button
+                                command="show-modal"
+                                commandfor="login-dialog"
+                            >
+                                {{ 'navbar.login'|trans }}
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="secondary"
+                                command="show-modal"
+                                commandfor="register-dialog"
+                            >
                                 {{ 'navbar.register'|trans }}
                             </button>
                         </li>
@@ -121,8 +135,94 @@
             </nav>
         </header>
 
-        {% block body %}
+        <main>
+            {% block body %}
 
-        {% endblock body %}
+            {% endblock body %}
+        </main>
+
+        <footer class="container">
+            <article>
+                <p>
+                    Měsíční vytrvalec · oficiální stránka akce<br />
+                    <a href="mailto:{{ support_contact_email }}">
+                        {{ support_contact_email }}
+                    </a>
+                </p>
+
+                <nav>
+                    <ul>
+                        <li>
+                            <a href="{{ uts_url }}">{{ 'footer.uts'|trans }}</a>
+                        </li>
+                        <li>
+                            <a href="{{ zcu_url }}">Západočeská univerzita</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <p>
+                    <a target="_blank" href="{{ facebook_url }}">
+                        <img
+                            src="{{ asset('images/facebook.svg') }}"
+                            alt="Facebook"
+                            title="Facebook"
+                            width="24"
+                            height="24"
+                        />
+                    </a>
+                    <a target="_blank" href="{{ instagram_url }}">
+                        <img
+                            src="{{ asset('images/instagram.svg') }}"
+                            alt="Instagram"
+                            title="Instagram"
+                            width="24"
+                            height="24"
+                        />
+                    </a>
+                    <a target="_blank" href="{{ uts_url }}">
+                        <img
+                            src="{{ asset('images/web.svg') }}"
+                            alt="Web"
+                            title="Web"
+                            width="24"
+                            height="24"
+                        />
+                    </a>
+                    <a target="_blank" href="{{ discord_url }}">
+                        <img
+                            src="{{ asset('images/discord.svg') }}"
+                            alt="Discord"
+                            title="Discord"
+                            width="24"
+                            height="24"
+                        />
+                    </a>
+                </p>
+
+                <footer>
+                    <small>
+                        © Západočeská univerzita v Plzni 2020–2025 ·
+                        {{ 'footer.managed_by'|trans }}: Jiří Velek, Alena
+                        Kašparová
+                    </small>
+                </footer>
+            </article>
+        </footer>
     </body>
+
+    {% if not is_granted('ROLE_USER') %}
+        <twig:Dialog id="login-dialog">
+            <twig:block name="header">
+                {{ 'login.title'|trans }}
+            </twig:block>
+            <twig:Login />
+        </twig:Dialog>
+        <twig:Dialog id="register-dialog">
+            <twig:block name="header">
+                {{ 'registration.title'|trans }}
+            </twig:block>
+            <twig:Registration :faculties="faculties" />
+        </twig:Dialog>
+    {% endif %}
 </html>

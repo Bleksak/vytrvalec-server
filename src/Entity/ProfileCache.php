@@ -75,7 +75,7 @@ class ProfileCache
     public function toResponseObject(): ProfileCacheResponseDto
     {
         return new ProfileCacheResponseDto(
-            $this->activity->getId(),
+            $this->activity->id,
             $this->distance,
             $this->elevation,
         );

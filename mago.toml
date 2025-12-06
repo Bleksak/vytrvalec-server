@@ -32,6 +32,7 @@ yoda-conditions = { enabled = false }
 sensitive-parameter = { enabled = true }
 no-redundant-use = { enabled = true }
 no-variable-variable = { enabled = true }
+no-else-clause = { enabled = false }
 
 ambiguous-function-call = {enabled=true}
 

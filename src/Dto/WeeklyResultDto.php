@@ -7,6 +7,11 @@ namespace App\Dto;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 
+/**
+ * @import-type FacultyResultDtoType from FacultyResultDto
+ * @import-type ActivityResultDtoType from ActivityResultDto
+ * @type WeeklyResultDtoType = array{week: int, activities: array<int, ActivityResultDtoType>}
+ */
 final class WeeklyResultDto
 {
     /**
@@ -15,7 +20,43 @@ final class WeeklyResultDto
     public function __construct(
         #[OA\Property(example: 2)]
         public readonly int $week,
-        #[OA\Property(type: 'array', items: new OA\Items(ref: new Model(type: ActivityResultDto::class)))]
+        #[OA\Property(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: ActivityResultDto::class)),
+        )]
         public array $activities,
     ) {}
+
+    /**
+     * @param WeeklyResultDtoType $data
+     */
+    public static function fromCache(array $data): self
+    {
+        \assert(
+            \is_int($data['week']),
+            'week must be numeric in WeeklyResultDto',
+        );
+
+        \assert(
+            \is_array($data['activities']),
+            'activities must be an array in WeeklyResultDto',
+        );
+
+        return new self($data['week'], \array_map(
+            static function (mixed $activity): ActivityResultDto {
+                \assert(
+                    \is_array($activity),
+                    'activity must be an array in WeeklyResultDto',
+                );
+
+                \assert(
+                    isset($activity['activity'], $activity['results']),
+                    'activity and results must be set in ActivityResultDto',
+                );
+
+                return ActivityResultDto::fromCache($activity);
+            },
+            $data['activities'],
+        ));
+    }
 }

@@ -11,7 +11,10 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: 'user:hydrate-email-unsubscribe', description: 'Hydrates email unsubscribe hash for all users')]
+#[AsCommand(
+    name: 'user:hydrate-email-unsubscribe',
+    description: 'Hydrates email unsubscribe hash for all users',
+)]
 final class UserHydrateEmailUnsubscribeCommand extends Command
 {
     public function __construct(
@@ -22,13 +25,17 @@ final class UserHydrateEmailUnsubscribeCommand extends Command
     }
 
     #[\Override]
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         foreach ($this->userRepository->findAll() as $user) {
-            if ($user->getEmailUnsubscribeHash() === null) {
-                $user->setEmailUnsubscribeHash(\bin2hex(\random_bytes(90)));
-                $this->userRepository->save($user);
+            if ($user->getEmailUnsubscribeHash() !== null) {
+                continue;
             }
+
+            $user->setEmailUnsubscribeHash(\bin2hex(\random_bytes(90)));
+            $this->userRepository->save($user);
         }
 
         $this->entityManager->flush();

@@ -28,7 +28,7 @@ use function Amp\trapSignal;
 final readonly class WebsocketSubmissionProducerCommand
 {
     /** @var int<0, 65535> */
-    private readonly int $port;
+    private int $port;
 
     public function __construct(
         private LoggerInterface $logger,
