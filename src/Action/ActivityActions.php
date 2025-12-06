@@ -42,7 +42,7 @@ final readonly class ActivityActions
         foreach ($nameTranslations as $locale => $translation) {
             \assert($translation !== null, 'Translation cannot be null!');
 
-            $activityTranslation = $activity->getTranslations()->get($locale);
+            $activityTranslation = $activity->translations->get($locale);
 
             if ($activityTranslation === null) {
                 $activityTranslation = new ActivityTranslation(
@@ -60,13 +60,11 @@ final readonly class ActivityActions
             $icon = $this->imageRepository->find($dto->icon);
 
             if ($icon !== null && $icon->originalMimeType === MimeType::SVG) {
-                $activity->setIcon($icon);
+                $activity->icon = $icon;
             }
         }
 
-        $activity->setMinElevation(
-            $dto->minElevation ?? $activity->getMinElevation(),
-        );
+        $activity->minElevation = $dto->minElevation ?? $activity->minElevation;
 
         $this->activityRepository->save($activity, true);
     }

@@ -108,7 +108,13 @@ final class SeasonRepository extends ServiceEntityRepository
     {
         /** @var list<Season> */
         return $this->createQueryBuilder('s')
-            ->select('s')
+            ->addSelect('s')
+            ->addSelect('sc')
+            ->addSelect('sci')
+            ->addSelect('sct')
+            ->innerJoin('s.charity', 'sc')
+            ->innerJoin('sc.image', 'sci')
+            ->innerJoin('sc.translations', 'sct')
             ->where('s.end < :now')
             ->orderBy('s.start', 'DESC')
             ->setParameter('now', new \DateTimeImmutable())

@@ -2,7 +2,18 @@ twig:
     default_path: '%kernel.project_dir%/templates'
     paths:
         'assets/styles': styles
-  
+    number_format:
+        decimals: 0
+        decimal_point: ','
+        thousands_separator: ' '
+    globals:
+        support_contact_email: '%env(SUPPORT_CONTACT_EMAIL)%'
+        uts_url: '%env(UTS_URL)%'
+        zcu_url: '%env(ZCU_URL)%'
+        facebook_url: '%env(FACEBOOK_URL)%'
+        instagram_url: '%env(INSTAGRAM_URL)%'
+        discord_url: '%env(DISCORD_URL)%'
+
 when@test:
     twig:
         strict_variables: true

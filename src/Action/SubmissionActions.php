@@ -88,7 +88,7 @@ final readonly class SubmissionActions
             $this->profileCacheRepository->addCache($submission);
         }
 
-        // TODO(@jvelek): Ted mi doslo, ze tady se da frajerovi zaspamovat email kdyby kutak furt schvaloval a zamital aktivitu :D
+        // TODO(@bleksak): Ted mi doslo, ze tady se da frajerovi zaspamovat email kdyby kutak furt schvaloval a zamital aktivitu :D
         if (!$dto->state) {
             // if ($submission->getUser()->getToken() !== null) {
             //     $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));

@@ -113,25 +113,15 @@ class Charity
     {
         return new CharityGetResponseDto(
             $this->id ?? 0,
-            TranslationObjectDto::fromArray(\array_combine(
-                \array_map(
-                    fn(CharityTranslation $translation): string => $translation->locale,
-                    $this->translations->toArray(),
-                ),
-                \array_map(
-                    fn(CharityTranslation $translation): string => $translation->name,
-                    $this->translations->toArray(),
-                ),
+            TranslationObjectDto::fromArray(\array_column(
+                $this->translations->toArray(),
+                'name',
+                'locale',
             )),
-            TranslationObjectDto::fromArray(\array_combine(
-                \array_map(
-                    fn(CharityTranslation $translation): string => $translation->locale,
-                    $this->translations->toArray(),
-                ),
-                \array_map(
-                    fn(CharityTranslation $translation): string => $translation->description,
-                    $this->translations->toArray(),
-                ),
+            TranslationObjectDto::fromArray(\array_column(
+                $this->translations->toArray(),
+                'description',
+                'locale',
             )),
             $this->image?->getPath($imagePath),
             $this->website,

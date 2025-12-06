@@ -40,4 +40,18 @@ final class FacultyRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    /**
+     * @return list<Faculty>
+     */
+    public function findAllWithTranslations(): array
+    {
+        /** @var list<Faculty> */
+        return $this->createQueryBuilder('f')
+            ->join('f.translations', 'ft')
+            ->addSelect('ft')
+            ->indexBy('f', 'f.id')
+            ->getQuery()
+            ->getResult();
+    }
 }

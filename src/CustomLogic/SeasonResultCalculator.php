@@ -42,14 +42,8 @@ final readonly class SeasonResultCalculator
             $activities = [];
 
             foreach ($weeklyResult as $result) {
-                if (!\array_key_exists($result->activity, $activities)) {
-                    $activities[$result->activity] = [];
-                }
-
-                $activities[$result->activity][] = new FacultyResultDto(
-                    $result->faculty,
-                    $result->distance,
-                );
+                $activities[$result->activity][$result->faculty] =
+                    new FacultyResultDto($result->faculty, $result->distance);
             }
 
             $activityResult = [];
@@ -82,13 +76,7 @@ final readonly class SeasonResultCalculator
             }
         }
 
-        $results = \array_values($results);
-
         $topThree = $this->submissionRepository->findOutliers($season);
-
-        foreach ($results as $result) {
-            $result->activities = \array_values($result->activities);
-        }
 
         return new SeasonResultDto($results, $topThree);
     }

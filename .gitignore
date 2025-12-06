@@ -22,11 +22,6 @@ google-service-account.json
 .idea
 .vscode
 .helix
-
-###> friendsofphp/php-cs-fixer ###
-/.php-cs-fixer.cache
-###< friendsofphp/php-cs-fixer ###
-
 ###> symfony/asset-mapper ###
 /public/assets/
 /assets/vendor/
@@ -35,3 +30,7 @@ google-service-account.json
 ###> vincentlanglet/twig-cs-fixer ###
 /.twig-cs-fixer.cache
 ###< vincentlanglet/twig-cs-fixer ###
+
+###> symfonycasts/sass-bundle ###
+/public/assets/
+###< symfonycasts/sass-bundle ###
