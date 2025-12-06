@@ -84,7 +84,7 @@ final readonly class SeasonResultRankingService
             );
         }
 
-        usort(
+        \usort(
             $ranking,
             static fn(array $a, array $b): int => (
                 $b['points'] <=> $a['points']
@@ -132,18 +132,18 @@ final readonly class SeasonResultRankingService
             $facultyResults = [...$activityResult->results];
 
             // TODO(@bleksak): tenhle sort mozna movnout do SeasonResultCalculatoru
-            usort(
+            \usort(
                 $facultyResults,
                 static fn(FacultyResultDto $a, FacultyResultDto $b): int => (
                     $b->distance <=> $a->distance
                 ),
             );
 
-            for ($i = 0; $i < count($facultyResults); ++$i) {
+            for ($i = 0; $i < \count($facultyResults); ++$i) {
                 $facultyResult = $facultyResults[$i];
                 $facultyId = $facultyResult->faculty;
 
-                $points = count($facultySet) - $i;
+                $points = \count($facultySet) - $i;
 
                 $ranking[$facultyId] ??= [
                     'distance' => 0,

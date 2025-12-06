@@ -47,7 +47,7 @@ final class SeasonDetail
             $seasonResult,
         );
 
-        $this->totalDistance = array_reduce(
+        $this->totalDistance = \array_reduce(
             $this->ranking,
             static fn(int $carry, array $row): int => $row['distance'] + $carry,
             0,
