@@ -33,6 +33,7 @@ sensitive-parameter = { enabled = true }
 no-redundant-use = { enabled = true }
 no-variable-variable = { enabled = true }
 no-else-clause = { enabled = false }
+no-shorthand-ternary = { enabled = false }
 
 ambiguous-function-call = {enabled=true}
 
