@@ -43,6 +43,17 @@ final class Version20251204225217 extends AbstractMigration
         $this->addSql(
             'CREATE INDEX idx_season_start_end_charity_id ON season(start, end, charity_id);',
         );
+
+        $this->addSql(
+            'ALTER TABLE `charity_translation`
+            DROP INDEX `PRIMARY`,
+            ADD PRIMARY KEY `charity_id_locale` (`charity_id`, `locale`);',
+        );
+        $this->addSql(
+            'ALTER TABLE `faculty_translation`
+            DROP INDEX `PRIMARY`,
+            ADD PRIMARY KEY `PRIMARY` (`faculty_id`, `locale`);',
+        );
     }
 
     public function down(Schema $schema): void
@@ -67,5 +78,17 @@ final class Version20251204225217 extends AbstractMigration
             'DROP INDEX idx_submission_season_week_accepted ON submission;',
         );
         $this->addSql('DROP INDEX idx_season_start_end_charity_id ON season;');
+
+        $this->addSql('
+            ALTER TABLE `charity_translation`
+            DROP PRIMARY KEY,
+            ADD PRIMARY KEY (`locale`, `charity_id`);
+        ');
+
+        $this->addSql(
+            'ALTER TABLE `faculty_translation`
+            DROP PRIMARY KEY,
+            ADD PRIMARY KEY `PRIMARY` (`locale`, `faculty_id`);',
+        );
     }
 }
