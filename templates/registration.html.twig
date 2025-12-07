@@ -1,0 +1,49 @@
+{{ form_start(form) }}
+
+<fieldset>
+    {{ form_label(form.faculty) }}
+    {{ form_widget(form.faculty) }}
+    {{ form_errors(form.faculty) }}
+</fieldset>
+
+<fieldset>
+    {{ form_label(form.email) }}
+    {{ form_widget(form.email) }}
+    {{ form_errors(form.email) }}
+</fieldset>
+
+<fieldset>
+    {{ form_widget(form.password) }}
+    {{ form_errors(form.password) }}
+    {# TODO(@bleksak): Tady udelat PasswordProgress #}
+</fieldset>
+
+<fieldset>
+    {{ form_label(form.first_name) }}
+    {{ form_widget(form.first_name) }}
+    {{ form_errors(form.first_name) }}
+</fieldset>
+
+<fieldset>
+    {{ form_label(form.last_name) }}
+    {{ form_widget(form.last_name) }}
+    {{ form_errors(form.last_name) }}
+</fieldset>
+
+<fieldset>
+    {{ form_widget(form.anonymize) }}
+    {{ form_label(form.anonymize) }}
+    {{ form_errors(form.anonymize) }}
+</fieldset>
+
+<fieldset>
+    {{ form_widget(form.gdpr) }}
+    {{ form_label(form.gdpr) }}
+    {{ form_errors(form.gdpr) }}
+</fieldset>
+
+<fieldset>
+    {{ form_widget(form.submit) }}
+</fieldset>
+
+{{ form_end(form) }}
