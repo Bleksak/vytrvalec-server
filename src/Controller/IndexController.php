@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Translation\LocaleSwitcher;
 
-#[Route('/', name: self::ROUTE, methods: [Request::METHOD_GET, Request::METHOD_POST])]
+#[Route('/', name: self::ROUTE, methods: [Request::METHOD_GET])]
 final class IndexController extends AbstractController
 {
     public const string ROUTE = 'index';

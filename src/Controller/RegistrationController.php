@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Action\UserActions;
 use App\Dto\UserRegistrationDto;
 use App\Form\RegistrationType;
 use App\Repository\FacultyRepository;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -29,8 +27,6 @@ final class RegistrationController extends AbstractController
     public function __construct(
         private readonly FacultyRepository $facultyRepository,
         private readonly FormFactoryInterface $formFactory,
-        private readonly UserActions $userActions,
-        private readonly LoggerInterface $logger,
     ) {}
 
     public function __invoke(
@@ -45,28 +41,14 @@ final class RegistrationController extends AbstractController
             'faculties' => $faculties,
         ]);
 
-        $form->handleRequest($requestStack->getMainRequest());
+        $form->handleRequest($request);
 
         $responseCode = Response::HTTP_OK;
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $errors = $this->userActions->create($data);
-
-                if ($errors === []) {
-                    $this->addFlash('success', 'registration.success');
-                    return $this->redirectToRoute(IndexController::ROUTE);
-                }
-
-                foreach ($errors as $field => $fieldErrors) {
-                    foreach ($fieldErrors as $fieldError) {
-                        $this->addFlash('error', sprintf(
-                            'registration.%s.%s',
-                            $field,
-                            $fieldError,
-                        ));
-                    }
-                }
+                // TODO(@bleksak): flash message
+                return $this->redirectToRoute(IndexController::ROUTE);
             }
 
             $responseCode = Response::HTTP_UNPROCESSABLE_ENTITY;
