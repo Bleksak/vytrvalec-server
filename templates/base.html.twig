@@ -222,7 +222,8 @@
             <twig:block name="header">
                 {{ 'registration.title'|trans }}
             </twig:block>
-            <twig:Registration :faculties="faculties" />
+
+            <iframe loading="lazy" src="{{ path('registration') }}"></iframe>
         </twig:Dialog>
     {% endif %}
 </html>
