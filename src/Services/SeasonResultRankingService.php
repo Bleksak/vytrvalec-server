@@ -74,7 +74,6 @@ final readonly class SeasonResultRankingService
             }
         } else {
             if ($week < 0 || $week >= $season->getWeekCount()) {
-                // TODO(@bleksak): error handling
                 return [];
             }
 
