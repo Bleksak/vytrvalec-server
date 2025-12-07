@@ -39,6 +39,8 @@ final readonly class SeasonResultCalculator
                 $season,
                 $i,
             );
+
+            /** @var array<int, array<int, FacultyResultDto>> */
             $activities = [];
 
             foreach ($weeklyResult as $result) {

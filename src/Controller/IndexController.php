@@ -36,9 +36,11 @@ final class IndexController extends AbstractController
             ? null
             : $this->seasonResultService->getSeasonResult($lastSeason);
 
+        $faculties = $this->facultyRepository->findAllWithTranslations();
+
         return $this->render('index.html.twig', [
             'statistics' => $statistics,
-            'faculties' => $this->facultyRepository->findAllWithTranslations(),
+            'faculties' => $faculties,
             'past_seasons' => $pastSeasons,
             'last_season' => $lastSeason,
             'last_season_result' => $lastSeasonResult,
