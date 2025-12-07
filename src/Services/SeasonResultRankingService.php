@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\CustomLogic\SeasonResultCalculator;
 use App\Dto\FacultyResultDto;
+use App\Dto\SeasonResult\SeasonResultRankDto;
 use App\Dto\SeasonResultDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
@@ -33,13 +34,15 @@ final readonly class SeasonResultRankingService
     /**
      * @param int|null $week null => cela sezona
      * @param int|null $activity null => vsechny aktivity dohromady
+     *
+     * @return list<SeasonResultRankDto>
      */
     public function calculateSeasonResultRanking(
         Season $season,
         SeasonResultDto $seasonResult,
         ?int $activity = null,
         ?int $week = null,
-    ): ?array {
+    ): array {
         // za kazdy tyden se udeluje stejny pocet bodu(N)
         // tzn pokud se v prvnim tydnu zucastni 7 fakult a ve druhem tydnu 12 fakult, rozdeluje se i za prvni tyden 12 bodu
         // QUESTION(@bleksak): Je tohle opravdu co oni chteji? Kdyz to delali rucne, tak to spocitali za 1. tyden 7 fakult => 7 bodu, 2 tyden 12 bodu, ale nepamatuju si to uz
@@ -72,7 +75,7 @@ final readonly class SeasonResultRankingService
         } else {
             if ($week < 0 || $week >= $season->getWeekCount()) {
                 // TODO(@bleksak): error handling
-                return null;
+                return [];
             }
 
             $weeklyResult = $seasonResult->results[$week];
@@ -84,15 +87,25 @@ final readonly class SeasonResultRankingService
             );
         }
 
+        $result = [];
+
+        foreach ($ranking as $row) {
+            $result[] = new SeasonResultRankDto(
+                $row['faculty'],
+                $row['distance'],
+                $row['points'],
+            );
+        }
+
         \usort(
-            $ranking,
-            static fn(array $a, array $b): int => (
-                $b['points'] <=> $a['points']
-                ?: $b['distance'] <=> $a['distance']
+            $result,
+            static fn(SeasonResultRankDto $a, SeasonResultRankDto $b): int => (
+                $b->points <=> $a->points
+                ?: $b->distance <=> $a->distance
             ),
         );
 
-        return $ranking;
+        return $result;
     }
 
     /**
@@ -116,7 +129,7 @@ final readonly class SeasonResultRankingService
     /**
      * Step 1.x
      * @param array<int, int> $facultySet
-     * @param array<int, mixed> $ranking
+     * @param array<int, array{points: int, distance: int, faculty: int}> $ranking
      */
     private function populateRankingArray(
         array $facultySet,

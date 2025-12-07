@@ -9,7 +9,7 @@ use App\Dto\PasswordChangeDto;
 use App\Dto\User\PasswordResetDto;
 use App\Dto\User\UserEditDto;
 use App\Dto\User\UserLoginDto;
-use App\Dto\UserDto;
+use App\Dto\UserRegistrationDto;
 use App\Entity\User;
 use App\Notifications\EmailTemplate\ForgottenPasswordEmailTemplate;
 use App\Notifications\EmailTemplate\RegisterEmailTemplate;
@@ -33,7 +33,7 @@ final readonly class UserActions
     /**
      * @return array<string, array<string>>
      */
-    public function create(UserDto $dto): array
+    public function create(UserRegistrationDto $dto): array
     {
         $faculty = $this->facultyRepository->find($dto->faculty);
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components;
 
+use App\Dto\SeasonResult\SeasonResultRankDto;
 use App\Dto\SeasonResultDto;
 use App\Entity\Faculty;
 use App\Entity\Season;
@@ -16,9 +17,11 @@ final class SeasonDetail
     public Season $season;
     public string $title;
     public string $heading;
+
+    /** @var list<SeasonResultRankDto> */
     public array $ranking;
 
-    public int $totalDistance;
+    public int $totalDistance = 0;
 
     /** @var array<int, Faculty> */
     public array $faculties;
@@ -47,10 +50,8 @@ final class SeasonDetail
             $seasonResult,
         );
 
-        $this->totalDistance = \array_reduce(
-            $this->ranking,
-            static fn(int $carry, array $row): int => $row['distance'] + $carry,
-            0,
-        );
+        foreach ($this->ranking as $row) {
+            $this->totalDistance += $row->distance;
+        }
     }
 }
