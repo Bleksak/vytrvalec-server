@@ -12,6 +12,5 @@ final class ActivityCreateTranslationDto
     public function __construct(
         #[OA\Property]
         public TranslationObjectDto $name,
-    ) {
-    }
+    ) {}
 }

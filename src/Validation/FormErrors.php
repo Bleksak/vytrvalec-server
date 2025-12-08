@@ -25,7 +25,10 @@ final class FormErrors
             $errorIterator = $child->getErrors(true);
 
             foreach ($errorIterator as $error) {
-                \assert($error instanceof FormError, 'Error is not an iterator!');
+                \assert(
+                    $error instanceof FormError,
+                    'Error is not an iterator!',
+                );
                 $errors[$child->getName()][] = $error->getMessage();
             }
         }

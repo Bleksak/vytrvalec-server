@@ -71,6 +71,7 @@ return [
         'gdpr_tooltip' => 'Jméno, příjmení a emailová adresa jsou zpracovávány pouze pro nezbytné fungování aplikace a nejsou sdíleny s žádnou třetí stranou',
         'gdpr' => 'Souhlasím se zpracováním osobních údajů',
         'submit' => 'Registrovat',
+        'success' => 'Registrace proběhla úspěšně',
     ],
     'home' => [
         'intro' => 'Akce měsíční vytrvalec vznikla během zimního semestru v roce 2020. Tuto pohybovou soutěž připravil a zorganizoval Ústav tělesné výchovy a sportu ZČU s úmyslem rozhýbat studenty během distanční výuky, která probíhala na ZČU během koronavirové pandemie.',
@@ -101,6 +102,14 @@ return [
             'no_image' => 'Charita nemá obrázek',
             'visit' => 'Navštivte web charity',
             'raised' => 'Vybráno {money} Kč',
+        ],
+    ],
+    'user' => [
+        'faculty' => [
+            'invalid' => 'Byla zvolena neplatná fakulta',
+        ],
+        'email' => [
+            'not_unique' => 'Uživatel se zadanou e-mailovou adresou již existuje',
         ],
     ],
 ];

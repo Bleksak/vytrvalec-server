@@ -26,15 +26,16 @@ final class CharityController extends AbstractController
         private readonly CharityActions $action,
         private readonly CharityRepository $charityRepository,
         private readonly ImagePath $imagePath,
-    ) {
-    }
+    ) {}
 
     #[OA\Post(
         description: 'Create a new Charity',
         requestBody: new OA\RequestBody(
             required: true,
             description: 'The new charity object',
-            content: new OA\JsonContent(ref: new Model(type: CharityCreateDto::class)),
+            content: new OA\JsonContent(
+                ref: new Model(type: CharityCreateDto::class),
+            ),
         ),
         responses: [
             new OA\Response(
@@ -60,8 +61,9 @@ final class CharityController extends AbstractController
     )]
     #[Route('/api/charity', 'api_charity_create', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
-    public function create(#[MapRequestPayload] CharityCreateDto $charityCreateDto): Response
-    {
+    public function create(
+        #[MapRequestPayload] CharityCreateDto $charityCreateDto,
+    ): Response {
         $charity = $this->action->create($charityCreateDto);
 
         if (\is_array($charity)) {
@@ -87,7 +89,9 @@ final class CharityController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_OK,
                 description: 'OK',
-                content: new OA\JsonContent(ref: new Model(type: Charity::class)),
+                content: new OA\JsonContent(
+                    ref: new Model(type: Charity::class),
+                ),
             ),
             new OA\Response(
                 response: Response::HTTP_NOT_FOUND,
@@ -98,9 +102,7 @@ final class CharityController extends AbstractController
     #[Route('/api/charity/{charity}', 'api_charity_get', methods: ['GET'])]
     public function get(Charity $charity): Response
     {
-        return $this->json(
-            $charity->toResponseObject($this->imagePath)
-        );
+        return $this->json($charity->toResponseObject($this->imagePath));
     }
 
     #[OA\Patch(
@@ -114,7 +116,9 @@ final class CharityController extends AbstractController
         ],
         requestBody: new OA\RequestBody(
             required: false,
-            content: new OA\JsonContent(ref: new Model(type: CharityUpdateDto::class)),
+            content: new OA\JsonContent(
+                ref: new Model(type: CharityUpdateDto::class),
+            ),
         ),
         responses: [
             new OA\Response(
@@ -129,32 +133,35 @@ final class CharityController extends AbstractController
     )]
     #[Route('/api/charity/{charity}', 'api_charity_patch', methods: ['PATCH'])]
     #[IsGranted('ROLE_STAFF')]
-    public function updatePatch(Charity $charity, #[MapRequestPayload] CharityUpdateDto $charityEditDto): Response
-    {
+    public function updatePatch(
+        Charity $charity,
+        #[MapRequestPayload] CharityUpdateDto $charityEditDto,
+    ): Response {
         $this->action->update($charity, $charityEditDto);
 
         return new Response();
     }
 
-    #[OA\Get(description: 'Retrieve a collection of charities', responses: [
-        new OA\Response(
-            response: Response::HTTP_OK,
-            description: 'Collection of charities',
-            content: new OA\JsonContent(
-                type: 'array',
-                items: new OA\Items(ref: new Model(type: Charity::class)),
+    #[OA\Get(
+        description: 'Retrieve a collection of charities',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Collection of charities',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(ref: new Model(type: Charity::class)),
+                ),
             ),
-        ),
-    ])]
+        ],
+    )]
     #[Route('/api/charity', 'api_charity_index', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->json(
-            \array_map(
-                fn (Charity $charity): CharityGetResponseDto => $charity->toResponseObject($this->imagePath),
-                $this->charityRepository->findAll(),
-            )
-        );
+        return $this->json(\array_map(
+            fn(Charity $charity): CharityGetResponseDto => $charity->toResponseObject($this->imagePath),
+            $this->charityRepository->findAll(),
+        ));
     }
 
     #[OA\Delete(
@@ -173,7 +180,11 @@ final class CharityController extends AbstractController
             ),
         ],
     )]
-    #[Route('/api/charity/{charity}', 'api_charity_delete', methods: ['DELETE'])]
+    #[Route(
+        '/api/charity/{charity}',
+        'api_charity_delete',
+        methods: ['DELETE'],
+    )]
     #[IsGranted('ROLE_STAFF')]
     public function delete(Charity $charity): Response
     {

@@ -14,7 +14,11 @@ class CharityTranslation
     public private(set) string $locale;
 
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: Charity::class, inversedBy: 'translations', cascade: ['persist'])]
+    #[ORM\ManyToOne(
+        targetEntity: Charity::class,
+        inversedBy: 'translations',
+        cascade: ['persist'],
+    )]
     #[ORM\JoinColumn]
     public Charity $charity;
 

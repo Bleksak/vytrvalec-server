@@ -20,17 +20,26 @@ final class FacultyUpdateDto
     #[OA\Property(example: true)]
     public ?bool $visible;
 
-    #[Assert\Type(type: 'integer', message: 'invalid_value')]
+    #[Assert\Type(
+        type: 'integer',
+        message: 'invalid_value',
+    )]
     #[OA\Property(type: 'integer')]
     public ?int $parent;
 
-    #[Assert\Type(type: 'string', message: 'invalid_value')]
-    #[Assert\CssColor(formats: [
-        Assert\CssColor::HEX_LONG_WITH_ALPHA,
-        Assert\CssColor::HEX_LONG,
-        Assert\CssColor::HEX_SHORT_WITH_ALPHA,
-        Assert\CssColor::HEX_SHORT,
-    ], message: 'invalid')]
+    #[Assert\Type(
+        type: 'string',
+        message: 'invalid_value',
+    )]
+    #[Assert\CssColor(
+        formats: [
+            Assert\CssColor::HEX_LONG_WITH_ALPHA,
+            Assert\CssColor::HEX_LONG,
+            Assert\CssColor::HEX_SHORT_WITH_ALPHA,
+            Assert\CssColor::HEX_SHORT,
+        ],
+        message: 'invalid',
+    )]
     #[OA\Property(type: 'string')]
     public ?string $color;
 }

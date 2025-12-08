@@ -20,8 +20,8 @@ final readonly class ImageUploader
         private ImageRepository $imageRepository,
         string $projectDirectory,
     ) {
-        $this->publicDirectory = $projectDirectory.'/public';
-        $this->uploadDirectory = $this->publicDirectory.'/uploads';
+        $this->publicDirectory = $projectDirectory . '/public';
+        $this->uploadDirectory = $this->publicDirectory . '/uploads';
     }
 
     private function uploadSvg(UploadedFile $image, string $uniquePath): ?string
@@ -36,8 +36,11 @@ final readonly class ImageUploader
         return $uniquePath;
     }
 
-    private function uploadBasicImage(UploadedFile $image, string $uniquePath, string $absolutePath): ?string
-    {
+    private function uploadBasicImage(
+        UploadedFile $image,
+        string $uniquePath,
+        string $absolutePath,
+    ): ?string {
         $tmpPath = \sprintf('%s.tmp', $uniquePath);
         $newFile = $image->move($this->uploadDirectory, $tmpPath);
         $filePath = $newFile->getRealPath();
@@ -80,18 +83,33 @@ final readonly class ImageUploader
         $imageMimeType = $image->getMimeType() ?? '';
         $mimeType = MimeType::tryFrom($imageMimeType);
 
-        if ($mimeType === null || !\in_array($mimeType, $allowedMimeTypes, true)) {
+        if (
+            $mimeType === null
+            || !\in_array($mimeType, $allowedMimeTypes, true)
+        ) {
             return null;
         }
 
         do {
             $uniquePath = \uniqid(more_entropy: true);
-            $absolutePath = \sprintf('%s/%s', $this->uploadDirectory, $uniquePath);
+            $absolutePath = \sprintf(
+                '%s/%s',
+                $this->uploadDirectory,
+                $uniquePath,
+            );
         } while ($this->fs->exists($absolutePath));
 
         $filePath = match ($mimeType) {
-            MimeType::SVG => $this->uploadSvg($image, \sprintf('%s.%s', $uniquePath, 'svg')),
-            default => $this->uploadBasicImage($image, \sprintf('%s.%s', $uniquePath, 'webp'), \sprintf('%s.%s', $absolutePath, 'webp')),
+            MimeType::SVG => $this->uploadSvg($image, \sprintf(
+                '%s.%s',
+                $uniquePath,
+                'svg',
+            )),
+            default => $this->uploadBasicImage(
+                $image,
+                \sprintf('%s.%s', $uniquePath, 'webp'),
+                \sprintf('%s.%s', $absolutePath, 'webp'),
+            ),
         };
 
         if ($filePath === null) {

@@ -14,6 +14,5 @@ final readonly class ActivityResponseDto
         public ?string $icon,
         public bool $active,
         public int $minElevation,
-    ) {
-    }
+    ) {}
 }

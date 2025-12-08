@@ -40,5 +40,4 @@ final class CharityRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
 }

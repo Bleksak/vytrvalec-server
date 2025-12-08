@@ -14,6 +14,5 @@ final class CharityCreateTranslationDto
         public TranslationObjectDto $name,
         #[OA\Property]
         public TranslationObjectDto $description,
-    ) {
-    }
+    ) {}
 }

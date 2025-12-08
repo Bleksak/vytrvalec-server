@@ -12,13 +12,15 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'mv:fix-images-used-at', description: 'Fixes usedAt on all images')]
+#[AsCommand(
+    name: 'mv:fix-images-used-at',
+    description: 'Fixes usedAt on all images',
+)]
 final readonly class FixImagesUsedAtCommand
 {
     public function __construct(
         private EntityManagerInterface $em,
-    ) {
-    }
+    ) {}
 
     public function __invoke(SymfonyStyle $io): int
     {

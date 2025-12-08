@@ -18,6 +18,5 @@ final class ImageCreateResponseDto
         public \DateTime $uploadedAt,
         #[OA\Property]
         public ?\DateTime $usedAt,
-    ) {
-    }
+    ) {}
 }

@@ -1,49 +1,61 @@
-{{ form_start(registration) }}
+<div {{ attributes }}>
+    {{
+        form_start(
+            form,
+            {
+                attr: {
+                    'data-action': 'live#action:prevent',
+                    'data-live-action-param': 'save'
+                }
+            }
+        )
+    }}
 
-<fieldset>
-    {{ form_label(registration.faculty) }}
-    {{ form_widget(registration.faculty) }}
-    {{ form_errors(registration.faculty) }}
-</fieldset>
+    <fieldset>
+        {{ form_label(form.faculty) }}
+        {{ form_widget(form.faculty) }}
+        {{ form_errors(form.faculty) }}
+    </fieldset>
 
-<fieldset>
-    {{ form_label(registration.email) }}
-    {{ form_widget(registration.email) }}
-    {{ form_errors(registration.email) }}
-</fieldset>
+    <fieldset>
+        {{ form_label(form.email) }}
+        {{ form_widget(form.email) }}
+        {{ form_errors(form.email) }}
+    </fieldset>
 
-<fieldset>
-    {{ form_widget(registration.password) }}
-    {{ form_errors(registration.password) }}
-    {# TODO(@bleksak): Tady udelat PasswordProgress #}
-</fieldset>
+    <fieldset>
+        {{ form_widget(form.password) }}
+        {{ form_errors(form.password) }}
+        {# TODO(@bleksak): Tady udelat PasswordProgress #}
+    </fieldset>
 
-<fieldset>
-    {{ form_label(registration.first_name) }}
-    {{ form_widget(registration.first_name) }}
-    {{ form_errors(registration.first_name) }}
-</fieldset>
+    <fieldset>
+        {{ form_label(form.first_name) }}
+        {{ form_widget(form.first_name) }}
+        {{ form_errors(form.first_name) }}
+    </fieldset>
 
-<fieldset>
-    {{ form_label(registration.last_name) }}
-    {{ form_widget(registration.last_name) }}
-    {{ form_errors(registration.last_name) }}
-</fieldset>
+    <fieldset>
+        {{ form_label(form.last_name) }}
+        {{ form_widget(form.last_name) }}
+        {{ form_errors(form.last_name) }}
+    </fieldset>
 
-<fieldset>
-    {{ form_widget(registration.anonymize) }}
-    {{ form_label(registration.anonymize) }}
-    {{ form_errors(registration.anonymize) }}
-</fieldset>
+    <fieldset>
+        {{ form_widget(form.anonymize) }}
+        {{ form_label(form.anonymize) }}
+        {{ form_errors(form.anonymize) }}
+    </fieldset>
 
-<fieldset>
-    {{ form_widget(registration.gdpr) }}
-    {{ form_label(registration.gdpr) }}
-    {{ form_errors(registration.gdpr) }}
-</fieldset>
+    <fieldset>
+        {{ form_widget(form.gdpr) }}
+        {{ form_label(form.gdpr) }}
+        {{ form_errors(form.gdpr) }}
+    </fieldset>
 
-<fieldset>
-    {{ form_widget(registration.submit) }}
-</fieldset>
+    <fieldset>
+        {{ form_widget(form.submit) }}
+    </fieldset>
 
-{{ form_end(registration) }}
+    {{ form_end(form) }}
+</div>

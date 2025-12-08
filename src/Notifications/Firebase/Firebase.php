@@ -13,8 +13,7 @@ final readonly class Firebase
 {
     public function __construct(
         private Messaging $messaging,
-    ) {
-    }
+    ) {}
 
     public function send(AbstractFirebaseNotification $notification): bool
     {
@@ -22,18 +21,14 @@ final readonly class Firebase
             $this->messaging->send(
                 CloudMessage::new()
                     ->toToken($notification->to)
-                    ->withData(MessageData::fromArray(
-                        [
-                            'notification_type' => '',
-                        ]
-                    ))
-                    ->withNotification(
-                        Notification::create(
-                            $notification->title,
-                            $notification->message,
-                            null,
-                        )
-                    )
+                    ->withData(MessageData::fromArray([
+                        'notification_type' => '',
+                    ]))
+                    ->withNotification(Notification::create(
+                        $notification->title,
+                        $notification->message,
+                        null,
+                    )),
             );
         } catch (\Throwable) {
             return false;

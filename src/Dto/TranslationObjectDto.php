@@ -13,8 +13,7 @@ final class TranslationObjectDto
         public ?string $cs,
         #[OA\Property]
         public ?string $en,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, string|null>

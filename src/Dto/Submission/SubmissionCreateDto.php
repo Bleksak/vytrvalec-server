@@ -12,22 +12,37 @@ final class SubmissionCreateDto
 {
     #[OA\Property]
     #[Assert\GreaterThanOrEqual(0, message: 'negative')]
-    #[Assert\Type(type: 'integer', message: 'invalid')]
+    #[Assert\Type(
+        type: 'integer',
+        message: 'invalid',
+    )]
     public ?int $elevation = null;
 
     #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
+    #[Assert\NotBlank(
+        message: 'blank',
+        allowNull: false,
+    )]
     #[Assert\GreaterThanOrEqual(1, message: 'negative')]
-    #[Assert\Type(type: 'integer', message: 'invalid')]
+    #[Assert\Type(
+        type: 'integer',
+        message: 'invalid',
+    )]
     public int $distance;
 
     #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
+    #[Assert\NotBlank(
+        message: 'blank',
+        allowNull: false,
+    )]
     #[Assert\Uuid(message: 'invalid')]
     public Uuid $imageUuid;
 
     #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
+    #[Assert\NotBlank(
+        message: 'blank',
+        allowNull: false,
+    )]
     #[Assert\Type(type: 'integer')]
     #[Assert\GreaterThanOrEqual(1, message: 'negative')]
     public int $activityId;

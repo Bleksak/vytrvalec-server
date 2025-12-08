@@ -10,10 +10,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class PasswordResetDto
 {
     #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
+    #[Assert\NotBlank(
+        message: 'blank',
+        allowNull: false,
+    )]
     public string $password;
 
     #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
+    #[Assert\NotBlank(
+        message: 'blank',
+        allowNull: false,
+    )]
     public string $passwordResetToken;
 }
