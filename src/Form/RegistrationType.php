@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Dto\UserRegistrationDto;
 use App\Entity\Faculty;
+use App\Form\DataTransformers\FacultyEntityToIdDataTransformer;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -25,6 +27,9 @@ final class RegistrationType extends AbstractType
         private TranslatorInterface $translator,
     ) {}
 
+    /**
+     * @param array{faculties: array<int, Faculty>} $options
+     */
     #[\Override]
     public function buildForm(
         FormBuilderInterface $builder,
@@ -32,7 +37,7 @@ final class RegistrationType extends AbstractType
     ): void {
         $builder->add('faculty', EntityType::class, [
             'class' => Faculty::class,
-            'choices' => $options['faculties'] ?? [],
+            'choices' => $options['faculties'],
             'label' => 'registration.faculty',
             'choice_label' =>
                 fn(Faculty $faculty): ?string => $faculty->translations->get($this->localeSwitcher->getLocale())?->name,
@@ -48,18 +53,22 @@ final class RegistrationType extends AbstractType
             'second_name' => 'password_repeat',
             'first_options' => [
                 'label' => 'registration.password',
+                'always_empty' => false,
             ],
             'second_options' => [
                 'label' => 'registration.password_repeat',
+                'always_empty' => false,
             ],
         ]);
 
         $builder->add('first_name', TextType::class, [
             'label' => 'registration.first_name',
+            'property_path' => 'firstName',
         ]);
 
         $builder->add('last_name', TextType::class, [
             'label' => 'registration.last_name',
+            'property_path' => 'lastName',
         ]);
 
         $builder->add('submit', SubmitType::class, [
@@ -81,19 +90,22 @@ final class RegistrationType extends AbstractType
                     'registration.gdpr_tooltip',
                 ),
             ],
+            'property_path' => 'gdpr',
         ]);
 
         $builder->add('submit', SubmitType::class, [
             'label' => 'registration.submit',
         ]);
+
+        $builder->get('faculty')->addModelTransformer(
+            new FacultyEntityToIdDataTransformer($options['faculties']),
+        );
     }
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined('faculties');
-
-        // TODO(@bleksak): add dataclass
-        // $resolver->setDefault('data_class')
+        $resolver->setDefault('data_class', UserRegistrationDto::class);
     }
 }
