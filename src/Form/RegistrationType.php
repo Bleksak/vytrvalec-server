@@ -27,17 +27,17 @@ final class RegistrationType extends AbstractType
         private TranslatorInterface $translator,
     ) {}
 
-    /**
-     * @param array{faculties: array<int, Faculty>} $options
-     */
     #[\Override]
     public function buildForm(
         FormBuilderInterface $builder,
         array $options,
     ): void {
+        /** @var array<int, Faculty> */
+        $faculties = $options['faculties'] ?? [];
+
         $builder->add('faculty', EntityType::class, [
             'class' => Faculty::class,
-            'choices' => $options['faculties'],
+            'choices' => $faculties,
             'label' => 'registration.faculty',
             'choice_label' =>
                 fn(Faculty $faculty): ?string => $faculty->translations->get($this->localeSwitcher->getLocale())?->name,
@@ -98,7 +98,7 @@ final class RegistrationType extends AbstractType
         ]);
 
         $builder->get('faculty')->addModelTransformer(
-            new FacultyEntityToIdDataTransformer($options['faculties']),
+            new FacultyEntityToIdDataTransformer($faculties),
         );
     }
 

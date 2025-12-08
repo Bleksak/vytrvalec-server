@@ -19,6 +19,7 @@ final class InvalidFacultySelectedException extends RuntimeException implements
         ];
     }
 
+    #[\Override]
     public function toTranslatableMessage(): string
     {
         return 'user.faculty.invalid';

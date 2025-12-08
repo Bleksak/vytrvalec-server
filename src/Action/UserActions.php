@@ -37,7 +37,7 @@ final readonly class UserActions
      */
     public function create(UserRegistrationDto $dto): void
     {
-        assert(
+        \assert(
             $dto->email !== null
             && $dto->password !== null
             && $dto->firstName !== null
