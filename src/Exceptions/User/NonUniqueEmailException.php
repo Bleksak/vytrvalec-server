@@ -19,6 +19,7 @@ final class NonUniqueEmailException extends RuntimeException implements
         ];
     }
 
+    #[\Override]
     public function toTranslatableMessage(): string
     {
         return 'user.email.not_unique';

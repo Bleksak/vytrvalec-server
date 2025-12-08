@@ -8,7 +8,6 @@ use App\Action\UserActions;
 use App\Controller\IndexController;
 use App\Dto\UserRegistrationDto;
 use App\Entity\Faculty;
-use App\Exceptions\User\InvalidFacultySelectedException;
 use App\Exceptions\User\TranslatableExceptionInterface;
 use App\Form\RegistrationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
