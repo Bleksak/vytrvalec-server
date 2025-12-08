@@ -18,8 +18,7 @@ final readonly class CharityActions
         private CharityRepository $charityRepository,
         private SeasonRepository $seasonRepository,
         private ImageRepository $imageRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * @return Charity|array<string, string>
@@ -38,11 +37,7 @@ final readonly class CharityActions
             $image->setUsedAt(new \DateTime());
         }
 
-        $charity = new Charity(
-            $dto->translations,
-            $image,
-            $dto->website
-        );
+        $charity = new Charity($dto->translations, $image, $dto->website);
 
         $this->charityRepository->save($charity, true);
 
@@ -52,7 +47,8 @@ final readonly class CharityActions
     public function update(Charity $charity, CharityUpdateDto $dto): void
     {
         $nameTranslations = $dto->translations?->name?->toArray() ?? [];
-        $descriptionTranslations = $dto->translations?->description?->toArray() ?? [];
+        $descriptionTranslations = $dto->translations?->description?->toArray()
+        ?? [];
 
         foreach ($nameTranslations as $locale => $translation) {
             \assert($translation !== null, 'Translation cannot be null!');
@@ -64,7 +60,7 @@ final readonly class CharityActions
                     $charity,
                     $locale,
                     $translation,
-                    $descriptionTranslations[$locale] ?? ''
+                    $descriptionTranslations[$locale] ?? '',
                 );
                 $charity->addTranslation($charityTranslation);
             }

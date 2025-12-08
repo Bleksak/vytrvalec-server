@@ -35,12 +35,18 @@ final class SeasonCacheController extends AbstractController
             ),
         ],
     )]
-    #[Route('/api/cache/season/{season}', name: 'api_cache_season', methods: ['POST'])]
+    #[Route(
+        '/api/cache/season/{season}',
+        name: 'api_cache_season',
+        methods: ['POST'],
+    )]
     #[IsGranted('ROLE_STAFF')]
     public function cacheSeason(Season $season): Response
     {
         if ($season->isRunning()) {
-            return $this->json(['season' => 'still_running'], Response::HTTP_BAD_REQUEST);
+            return $this->json([
+                'season' => 'still_running',
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $this->action->cacheSeason($season);
@@ -64,7 +70,11 @@ final class SeasonCacheController extends AbstractController
             ),
         ],
     )]
-    #[Route('/api/cache/season/{season}', name: 'api_cache_check_season', methods: ['GET'])]
+    #[Route(
+        '/api/cache/season/{season}',
+        name: 'api_cache_check_season',
+        methods: ['GET'],
+    )]
     #[IsGranted('ROLE_STAFF')]
     public function isCached(Season $season): Response
     {

@@ -25,8 +25,11 @@ class FacultyMapping
     #[ORM\JoinColumn]
     public ?Faculty $parent = null;
 
-    public function __construct(Season $season, Faculty $faculty, ?Faculty $parent = null)
-    {
+    public function __construct(
+        Season $season,
+        Faculty $faculty,
+        ?Faculty $parent = null,
+    ) {
         $this->season = $season;
         $this->faculty = $faculty;
         $this->parent = $parent;
@@ -34,6 +37,10 @@ class FacultyMapping
 
     public function toResponseObject(): FacultyMappingResponseDto
     {
-        return new FacultyMappingResponseDto($this->season->getId(), $this->faculty->id, $this->parent?->id);
+        return new FacultyMappingResponseDto(
+            $this->season->getId(),
+            $this->faculty->id,
+            $this->parent?->id,
+        );
     }
 }

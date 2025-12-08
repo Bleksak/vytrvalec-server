@@ -26,8 +26,7 @@ final readonly class SubmissionActions
         private VytrvalecMailer $mailer,
         private ImageRepository $imageRepository,
         private ActivityRepository $activityRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, string>
@@ -83,7 +82,10 @@ final readonly class SubmissionActions
 
         $this->handleCacheUpdate($submission, $dto);
 
-        if ($dto->state && (!$submission->isReviewed() || !$submission->isAccepted())) {
+        if (
+            $dto->state
+            && (!$submission->isReviewed() || !$submission->isAccepted())
+        ) {
             // noop when already accepted, otherwise profile cache would stack
             $this->profileCacheRepository->addCache($submission);
         }
@@ -97,13 +99,13 @@ final readonly class SubmissionActions
             $now = new \DateTimeImmutable();
 
             if ($submission->getDate()->diff($now)->m < 2) {
-                $template = new SubmissionRejectedEmailTemplate($submission, $dto->message);
+                $template = new SubmissionRejectedEmailTemplate(
+                    $submission,
+                    $dto->message,
+                );
                 $template->replyTo = $issuer->getEmail();
 
-                $this->mailer->send(
-                    $submission->getUser(),
-                    $template,
-                );
+                $this->mailer->send($submission->getUser(), $template);
             }
         }
 
@@ -123,8 +125,10 @@ final readonly class SubmissionActions
     /**
      * @return array<string,string>
      */
-    public function update(Submission $submission, SubmissionEditDto $dto): array
-    {
+    public function update(
+        Submission $submission,
+        SubmissionEditDto $dto,
+    ): array {
         if ($submission->getUpdatedAt() !== $dto->updatedAt) {
             return ['updated_at' => 'mismatch'];
         }
@@ -172,7 +176,10 @@ final readonly class SubmissionActions
         Submission $submission,
         SubmissionStateDto $dto,
     ): void {
-        if ($dto->state && (!$submission->isReviewed() || !$submission->isAccepted())) {
+        if (
+            $dto->state
+            && (!$submission->isReviewed() || !$submission->isAccepted())
+        ) {
             // noop when already accepted, otherwise profile cache would stack
             $this->profileCacheRepository->addCache($submission);
         }

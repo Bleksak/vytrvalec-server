@@ -15,8 +15,7 @@ final readonly class VytrvalecMailer
         private MailerInterface $mailer,
         private string $clientUrl,
         private string $appBase,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, mixed>
@@ -36,7 +35,11 @@ final readonly class VytrvalecMailer
             return $this->clientUrl;
         }
 
-        return \sprintf('%s/unsubscribe/%s', $this->clientUrl, $emailUnsubscribeHash);
+        return \sprintf(
+            '%s/unsubscribe/%s',
+            $this->clientUrl,
+            $emailUnsubscribeHash,
+        );
     }
 
     /**
@@ -62,7 +65,10 @@ final readonly class VytrvalecMailer
             }
 
             if ($user->hasMailing() || $forceSend) {
-                $template->setContext('unsubscribe_link', $this->constructUnsubscribeLink($user));
+                $template->setContext(
+                    'unsubscribe_link',
+                    $this->constructUnsubscribeLink($user),
+                );
 
                 $mail = new VytrvalecEmail($email, $template);
                 if ($template->replyTo) {

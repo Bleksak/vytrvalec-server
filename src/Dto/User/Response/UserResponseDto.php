@@ -31,6 +31,5 @@ final readonly class UserResponseDto
         public FacultyResponseDto $faculty,
         #[OA\Property]
         public ?bool $anonymize,
-    ) {
-    }
+    ) {}
 }

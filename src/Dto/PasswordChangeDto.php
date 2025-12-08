@@ -8,10 +8,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class PasswordChangeDto
 {
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
+    #[Assert\NotBlank(
+        message: 'blank',
+        allowNull: false,
+    )]
     public string $oldPassword;
 
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
-    #[Assert\PasswordStrength(message: 'weak', minScore: 1)]
+    #[Assert\NotBlank(
+        message: 'blank',
+        allowNull: false,
+    )]
+    #[Assert\PasswordStrength(
+        message: 'weak',
+        minScore: 1,
+    )]
     public string $password;
 }

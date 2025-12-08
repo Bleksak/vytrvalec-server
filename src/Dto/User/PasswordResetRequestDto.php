@@ -10,7 +10,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class PasswordResetRequestDto
 {
     #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
+    #[Assert\NotBlank(
+        message: 'blank',
+        allowNull: false,
+    )]
     #[Assert\Email(message: 'invalid')]
     public string $email;
 }

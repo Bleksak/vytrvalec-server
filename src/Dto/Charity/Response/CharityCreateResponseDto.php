@@ -20,6 +20,5 @@ final class CharityCreateResponseDto
         public ?string $image = null,
         #[OA\Property]
         public ?string $website = null,
-    ) {
-    }
+    ) {}
 }

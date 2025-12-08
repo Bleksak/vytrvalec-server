@@ -30,7 +30,10 @@ final readonly class StatisticsActions
             $usersFrom2020
             + $usersFrom2021
             + $this->submissionRepository->sumCountUserGroupedByFaculties();
-        $activities = $this->activityRepository->getTotalStatistics($this->imagePath, $locale);
+        $activities = $this->activityRepository->getTotalStatistics(
+            $this->imagePath,
+            $locale,
+        );
 
         return new TotalStatisticsDto($users, $activities);
     }

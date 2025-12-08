@@ -8,10 +8,14 @@ use App\Entity\User;
 use App\Notifications\Firebase\AbstractFirebaseNotification;
 use Kreait\Firebase\Messaging\Message;
 
-final readonly class VytrvalecNotification extends AbstractFirebaseNotification implements Message
+final readonly class VytrvalecNotification extends
+    AbstractFirebaseNotification implements Message
 {
-    public function __construct(string|User $recipient, string $message, ?string $action = null)
-    {
+    public function __construct(
+        string|User $recipient,
+        string $message,
+        ?string $action = null,
+    ) {
         if ($recipient instanceof User) {
             $recipient = $recipient->getToken();
         }

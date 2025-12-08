@@ -15,8 +15,7 @@ final readonly class FacultyActions
 {
     public function __construct(
         private FacultyRepository $facultyRepository,
-    ) {
-    }
+    ) {}
 
     public function create(FacultyCreateDto $dto): int
     {
@@ -24,7 +23,7 @@ final readonly class FacultyActions
             $dto->translations,
             $dto->shortcut,
             $dto->visible,
-            $dto->color
+            $dto->color,
         );
 
         $this->facultyRepository->save($faculty, true);
@@ -45,7 +44,11 @@ final readonly class FacultyActions
             $facultyTranslation = $faculty->translations->get($locale);
 
             if ($facultyTranslation === null) {
-                $facultyTranslation = new FacultyTranslation($faculty, $locale, $translation);
+                $facultyTranslation = new FacultyTranslation(
+                    $faculty,
+                    $locale,
+                    $translation,
+                );
                 $faculty->addTranslation($facultyTranslation);
             }
 

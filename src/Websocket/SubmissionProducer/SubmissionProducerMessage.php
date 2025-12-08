@@ -16,8 +16,7 @@ final class SubmissionProducerMessage
         public SubmissionProducerMessageType $type,
         public ?SubmissionProducerMessageType $responseTo = null,
         public mixed $payload = null,
-    ) {
-    }
+    ) {}
 
     public static function handleInitialize(
         SubmissionProducerInitializeRequestPayload $payload,

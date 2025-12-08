@@ -13,6 +13,5 @@ final class SubmissionProducerClient
 
     public function __construct(
         public int $clientId,
-    ) {
-    }
+    ) {}
 }

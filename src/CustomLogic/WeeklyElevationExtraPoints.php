@@ -13,8 +13,7 @@ final readonly class WeeklyElevationExtraPoints implements ExtraPointsInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManagerInterface,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function getUniqueName(): string
@@ -31,7 +30,9 @@ final readonly class WeeklyElevationExtraPoints implements ExtraPointsInterface
     #[\Override]
     public function calculate(Season $season): array
     {
-        $query = $this->entityManagerInterface->getConnection()->prepare('
+        $query = $this->entityManagerInterface
+            ->getConnection()
+            ->prepare('
             WITH
                 sub AS (
                     SELECT MAX(s.elevation) as value, a.min_elevation, s.activity_id as activity_id, s.user_id as user_id
@@ -66,8 +67,12 @@ final readonly class WeeklyElevationExtraPoints implements ExtraPointsInterface
         $result = $query->executeQuery()->fetchAllAssociative();
 
         return \array_map(
-            static fn (array $row): ExtraPointsResultDto => new ExtraPointsResultDto(
-                new AnonymizedUser($row['first_name'], $row['last_name'], $row['anonymize']),
+            static fn(array $row): ExtraPointsResultDto => new ExtraPointsResultDto(
+                new AnonymizedUser(
+                    $row['first_name'],
+                    $row['last_name'],
+                    $row['anonymize'],
+                ),
                 $row['activity_id'],
                 $row['faculty_id'],
                 (int) $row['value'],
