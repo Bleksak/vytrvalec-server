@@ -1,0 +1,40 @@
+name: Mago CI
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+jobs:
+    mago:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                php-version: '8.4'
+                coverage: none
+                tools: composer
+              env:
+                  COMPOSER_ALLOW_SUPERUSER: 1
+
+            - name: Install PHP dependencies
+              run: composer install --no-interaction --prefer-dist
+
+            - name: Install Mago
+              run: |
+                curl --proto '=https' --tlsv1.2 -sSf https://carthage.software/mago.sh | bash
+                export PATH="$HOME/.mago/bin:$PATH"
+
+            - name: Run Mago Lint
+              run: mago lint --reporting-format=github
+
+            - name: Run Mago Format
+              run: mago format --check
+
+            - name: Run Mago Analyze
+              run: mago analyze --reporting-format=github
