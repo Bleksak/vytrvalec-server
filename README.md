@@ -18,7 +18,7 @@
        extension=xsl
        extension=pdo_mysql (For MySQL database)
        extension=sodium
-    
+
 ## Setup
 - Create submission images upload folder `mkdir public/uploads` - Otherwise you will not be able to upload images
 - `cp .env .env.local`
@@ -46,7 +46,7 @@
 ### Kubernetes
 - Install kubectl `paru -S kubectl`
 - You can follow this [instructions](https://helpdesk.zcu.cz/index.php/Kubernetes) or continue as in this readme
-- Create config file in `$HOME/.kube/config` as below 
+- Create config file in `$HOME/.kube/config` as below
 ```
   apiVersion: v1
   clusters:
@@ -69,16 +69,17 @@
     user:
       token: <token for gitlab-vytrvalec-kts>
   ```
-- Replace `<token for gitlab-vytrvalec-kts>` with token obtained from [Kubernetes Dashboard](https://dashboard.kube.zcu.cz/#/workloads?namespace=default) under vytrvalec-uts workspace -> config and storage -> secrets -> gitlab-vytrvalec-kts-token 
-  
+- Replace `<token for gitlab-vytrvalec-kts>` with token obtained from [Kubernetes Dashboard](https://dashboard.kube.zcu.cz/#/workloads?namespace=default) under vytrvalec-uts workspace -> config and storage -> secrets -> gitlab-vytrvalec-kts-token
+
   ![img.png](readme/img.png)
 
 - Now you can run commands like `kubectl exec ...`
 
 
-### Run before push 
-- `vendor/bin/phpstan analyze` - Static analysis
-- `vendor/bin/php-cs-fixer fix` - Formatting
+### Run before push
+- `vendor/bin/mago analyze` - Static analysis
+- `vendor/bin/mago lint` - Linter
+- `vendor/bin/mago format` - Formatting
 
 
 

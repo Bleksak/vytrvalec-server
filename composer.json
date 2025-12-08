@@ -86,6 +86,7 @@
     "twig/twig": "^3.21"
   },
   "require-dev": {
+    "carthage-software/mago": "^1.0.0",
     "phpunit/phpunit": "^12.3",
     "symfony/browser-kit": "8.0.*",
     "symfony/css-selector": "8.0.*",
@@ -98,6 +99,7 @@
   },
   "config": {
     "allow-plugins": {
+      "carthage-software/mago": true,
       "composer/package-versions-deprecated": true,
       "symfony/flex": true,
       "symfony/runtime": true
