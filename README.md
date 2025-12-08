@@ -80,6 +80,6 @@
 - `vendor/bin/mago analyze` - Static analysis
 - `vendor/bin/mago lint` - Linter
 - `vendor/bin/mago format` - Formatting
-
-
+- `vendor/bin/twig-cs-fixer` - Twig linter
+- `npx prettier "templates/**/*.html.twig" -w` - Twig formatter
 
