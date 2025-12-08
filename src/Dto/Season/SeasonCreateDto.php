@@ -29,7 +29,10 @@ final class SeasonCreateDto
 
     #[OA\Property]
     #[Assert\NotNull(message: 'blank')]
-    #[Assert\Type(type: 'bool', message: 'invalid')]
+    #[Assert\Type(
+        type: 'bool',
+        message: 'invalid',
+    )]
     public bool $notifyUsers;
 
     #[OA\Property(example: '2025-05-01')]

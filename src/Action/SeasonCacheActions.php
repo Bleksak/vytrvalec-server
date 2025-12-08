@@ -14,8 +14,7 @@ final readonly class SeasonCacheActions
     public function __construct(
         private SeasonCacheRepository $cacheRepository,
         private SeasonResultCalculator $seasonResult,
-    ) {
-    }
+    ) {}
 
     public function cacheSeason(Season $season): void
     {

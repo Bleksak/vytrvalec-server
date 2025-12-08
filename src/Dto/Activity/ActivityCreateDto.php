@@ -15,6 +15,9 @@ final class ActivityCreateDto
     #[OA\Property]
     public Uuid $icon;
 
-    #[OA\Property(example: 1500, description: 'Minimum elevation to be eligible to get extra points (in meters).')]
+    #[OA\Property(
+        example: 1500,
+        description: 'Minimum elevation to be eligible to get extra points (in meters).',
+    )]
     public int $minElevation;
 }

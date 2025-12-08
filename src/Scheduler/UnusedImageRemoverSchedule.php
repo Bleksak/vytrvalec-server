@@ -18,8 +18,7 @@ final readonly class UnusedImageRemoverSchedule
         private EntityManagerInterface $em,
         private Filesystem $fs,
         private LoggerInterface $logger,
-    ) {
-    }
+    ) {}
 
     public function __invoke(UnusedImageRemoverMessage $_message): void
     {

@@ -14,18 +14,19 @@ class FacultyTranslation
     public private(set) string $locale;
 
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: Faculty::class, inversedBy: 'translations', cascade: ['persist'])]
+    #[ORM\ManyToOne(
+        targetEntity: Faculty::class,
+        inversedBy: 'translations',
+        cascade: ['persist'],
+    )]
     #[ORM\JoinColumn]
     public Faculty $faculty;
 
     #[ORM\Column]
     public string $name;
 
-    public function __construct(
-        Faculty $faculty,
-        string $locale,
-        string $name,
-    ) {
+    public function __construct(Faculty $faculty, string $locale, string $name)
+    {
         $this->faculty = $faculty;
         $this->locale = $locale;
         $this->name = $name;

@@ -10,13 +10,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class UserLoginDto
 {
     #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
+    #[Assert\NotBlank(
+        message: 'blank',
+        allowNull: false,
+    )]
     #[Assert\Email(message: 'invalid')]
     public string $email;
 
     #[OA\Property]
     #[Assert\NotBlank(message: 'blank')]
-    #[Assert\PasswordStrength(message: 'invalid', minScore: Assert\PasswordStrength::STRENGTH_WEAK)]
+    #[Assert\PasswordStrength(
+        message: 'invalid',
+        minScore: Assert\PasswordStrength::STRENGTH_WEAK,
+    )]
     public string $password;
 
     #[OA\Property]

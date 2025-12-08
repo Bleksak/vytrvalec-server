@@ -18,8 +18,7 @@ final readonly class SeasonStartHandler
         private SeasonRepository $seasonRepository,
         private UserRepository $userRepository,
         private VytrvalecMailer $mailer,
-    ) {
-    }
+    ) {}
 
     public function __invoke(SeasonStartMessage $seasonStartMessage): void
     {

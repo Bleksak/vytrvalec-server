@@ -22,6 +22,5 @@ final readonly class FacultyResponseDto
         public ?int $parentId,
         #[OA\Property]
         public string $color,
-    ) {
-    }
+    ) {}
 }

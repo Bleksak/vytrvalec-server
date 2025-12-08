@@ -12,6 +12,5 @@ final class FacultyCreateTranslationDto
     public function __construct(
         #[OA\Property]
         public TranslationObjectDto $name,
-    ) {
-    }
+    ) {}
 }

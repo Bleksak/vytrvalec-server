@@ -10,11 +10,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class SubmissionStateDto
 {
     #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
+    #[Assert\NotBlank(
+        message: 'blank',
+        allowNull: false,
+    )]
     public ?\DateTime $updatedAt = null;
 
     #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
+    #[Assert\NotBlank(
+        message: 'blank',
+        allowNull: false,
+    )]
     public bool $state;
 
     #[OA\Property]

@@ -23,17 +23,15 @@ final readonly class SeasonQueryFilterRequestDto
     public function toArray(): array
     {
         /** @var array<string, int|string|\DateTime> */
-        return \array_filter(
-            [
-                SeasonQueryFilterType::Date->value => $this->date,
-                SeasonQueryFilterType::Week->value => $this->week,
-                SeasonQueryFilterType::Accepted->value => $this->accepted,
-                SeasonQueryFilterType::Reviewed->value => $this->reviewed,
-                SeasonQueryFilterType::User->value => $this->user,
-                SeasonQueryFilterType::Faculty->value => $this->faculty,
-                SeasonQueryFilterType::Activity->value => $this->activity,
-                SeasonQueryFilterType::Page->value => $this->page,
-            ],
-        );
+        return \array_filter([
+            SeasonQueryFilterType::Date->value => $this->date,
+            SeasonQueryFilterType::Week->value => $this->week,
+            SeasonQueryFilterType::Accepted->value => $this->accepted,
+            SeasonQueryFilterType::Reviewed->value => $this->reviewed,
+            SeasonQueryFilterType::User->value => $this->user,
+            SeasonQueryFilterType::Faculty->value => $this->faculty,
+            SeasonQueryFilterType::Activity->value => $this->activity,
+            SeasonQueryFilterType::Page->value => $this->page,
+        ]);
     }
 }
