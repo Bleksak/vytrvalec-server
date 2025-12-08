@@ -15,6 +15,8 @@ use App\Dto\User\UserEditDto;
 use App\Dto\User\UserLoginDto;
 use App\Dto\UserRegistrationDto;
 use App\Entity\User;
+use App\Exceptions\User\InvalidFacultySelectedException;
+use App\Exceptions\User\NonUniqueEmailException;
 use App\Repository\UserRepository;
 use App\Security\JWTPayload;
 use App\Utils\FeatureFlag;
@@ -292,18 +294,22 @@ final class UserController extends AbstractController
         //     'faculty' => 'integer'
         // ],
     )]
-    public function register(#[MapRequestPayload] UserRegistrationDto $dto): Response
-    {
+    public function register(
+        #[MapRequestPayload] UserRegistrationDto $dto,
+    ): Response {
         if ($this->isGranted(FeatureFlag::ROLE_USER->value)) {
             return $this->json(['auth' => [
                 'logged_in',
             ]], Response::HTTP_BAD_REQUEST);
         }
 
-        $errors = $this->action->create($dto);
-
-        if (\count($errors) !== 0) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        try {
+            $this->action->create($dto);
+        } catch (NonUniqueEmailException|InvalidFacultySelectedException $e) {
+            return $this->json(
+                $e->clientSideError(),
+                Response::HTTP_BAD_REQUEST,
+            );
         }
 
         return new Response(status: Response::HTTP_CREATED);
