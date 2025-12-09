@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Dto\User\UserLoginDto;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -23,6 +24,7 @@ final class LoginType extends AbstractType
         ]);
         $builder->add('password', PasswordType::class, [
             'label' => 'login.password',
+            'always_empty' => false,
         ]);
         $builder->add('submit', SubmitType::class, [
             'label' => 'login.submit',
@@ -32,6 +34,6 @@ final class LoginType extends AbstractType
     #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
-        parent::configureOptions($resolver);
+        $resolver->setDefault('data_class', UserLoginDto::class);
     }
 }

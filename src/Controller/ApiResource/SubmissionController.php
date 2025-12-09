@@ -84,7 +84,7 @@ final class SubmissionController extends AbstractController
         SeasonRepository $seasonRepository,
         #[MapRequestPayload] SubmissionCreateDto $submissionCreateDto,
     ): Response {
-        $season = $seasonRepository->getCurrent();
+        $season = $seasonRepository->findCurrentSeason();
 
         if ($season === null) {
             return $this->json(['season' => [

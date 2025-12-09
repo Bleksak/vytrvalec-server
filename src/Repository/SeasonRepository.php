@@ -44,7 +44,7 @@ final class SeasonRepository extends ServiceEntityRepository
         }
     }
 
-    public function getCurrent(): ?Season
+    public function findCurrentSeason(): ?Season
     {
         /** @var Season|null */
         return $this->createQueryBuilder('s')

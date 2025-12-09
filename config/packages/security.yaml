@@ -14,15 +14,20 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         api:
+            pattern: ^/api/
             lazy: true
-
             stateless: true
 
             provider: app_user_provider
 
             access_token:
                 token_handler: App\Security\AccessTokenHandler
+
         main:
+            pattern: ^/
+            lazy: true
+            provider: app_user_provider
+
             form_login:
                 login_path: app_login
                 check_path: app_login
