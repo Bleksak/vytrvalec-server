@@ -241,7 +241,10 @@ final readonly class UserActions
             throw new UserNotFoundException();
         }
 
-        if (!$this->hasher->isPasswordValid($user, $dto->password)) {
+        if (
+            $dto->password === null
+            || !$this->hasher->isPasswordValid($user, $dto->password)
+        ) {
             throw new PasswordInvalidException();
         }
 
