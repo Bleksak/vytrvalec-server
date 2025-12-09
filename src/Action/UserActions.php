@@ -139,12 +139,15 @@ final readonly class UserActions
         return [];
     }
 
+    /**
+     * @throws UserNotFoundException
+     */
     public function forgottenPasswordRequest(string $email): void
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
 
         if ($user === null) {
-            return;
+            throw new UserNotFoundException();
         }
 
         $userPasswordResetToken = \bin2hex(\random_bytes(90));

@@ -116,4 +116,10 @@ return [
             'not_unique' => 'Uživatel se zadanou e-mailovou adresou již existuje',
         ],
     ],
+    'validation' => [
+        'email' => [
+            'invalid' => 'Zadaný e-mail je neplatný',
+            'not_blank' => 'E-mail nesmí být prázdný',
+        ],
+    ],
 ];

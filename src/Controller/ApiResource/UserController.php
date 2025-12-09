@@ -178,7 +178,10 @@ final class UserController extends AbstractController
     public function forgottenPasswordRequest(
         #[MapRequestPayload] PasswordResetRequestDto $dto,
     ): Response {
-        $this->action->forgottenPasswordRequest($dto->email);
+        try {
+            $this->action->forgottenPasswordRequest($dto->email);
+        } finally {
+        }
 
         return new Response(status: Response::HTTP_OK);
     }
