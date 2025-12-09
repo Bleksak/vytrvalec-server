@@ -13,6 +13,8 @@ use App\Dto\UserRegistrationDto;
 use App\Entity\User;
 use App\Exceptions\User\InvalidFacultySelectedException;
 use App\Exceptions\User\NonUniqueEmailException;
+use App\Exceptions\User\PasswordInvalidException;
+use App\Exceptions\User\UserNotFoundException;
 use App\Notifications\EmailTemplate\ForgottenPasswordEmailTemplate;
 use App\Notifications\EmailTemplate\RegisterEmailTemplate;
 use App\Repository\FacultyRepository;
@@ -228,15 +230,22 @@ final readonly class UserActions
         $this->userRepository->save($user->anonymize(), true);
     }
 
-    public function login(UserLoginDto $dto): ?User
+    /**
+     * @throws UserNotFoundException
+     * @throws PasswordInvalidException
+     */
+    public function login(UserLoginDto $dto): User
     {
         $user = $this->userRepository->findOneBy(['email' => $dto->email]);
         if ($user === null) {
-            return null;
+            throw new UserNotFoundException();
         }
 
-        if (!$this->hasher->isPasswordValid($user, $dto->password)) {
-            return null;
+        if (
+            $dto->password === null
+            || !$this->hasher->isPasswordValid($user, $dto->password)
+        ) {
+            throw new PasswordInvalidException();
         }
 
         if ($dto->firebaseToken !== null) {

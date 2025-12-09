@@ -941,7 +941,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         enabled?: bool, // Default: false
  *     },
  *     html?: bool|array{
- *         enabled?: bool, // Default: false
+ *         enabled?: bool, // Default: true
  *     },
  *     markdown?: bool|array{
  *         enabled?: bool, // Default: false

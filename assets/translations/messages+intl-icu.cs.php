@@ -105,6 +105,10 @@ return [
         ],
     ],
     'user' => [
+        'login' => [
+            'not_found' => 'E-mail nebo heslo jsou nesprávné',
+            'success' => 'Přihlášení proběhlo úspěšně',
+        ],
         'faculty' => [
             'invalid' => 'Byla zvolena neplatná fakulta',
         ],
