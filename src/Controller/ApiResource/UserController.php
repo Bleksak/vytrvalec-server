@@ -17,6 +17,8 @@ use App\Dto\UserRegistrationDto;
 use App\Entity\User;
 use App\Exceptions\User\InvalidFacultySelectedException;
 use App\Exceptions\User\NonUniqueEmailException;
+use App\Exceptions\User\PasswordInvalidException;
+use App\Exceptions\User\UserNotFoundException;
 use App\Repository\UserRepository;
 use App\Security\JWTPayload;
 use App\Utils\FeatureFlag;
@@ -50,9 +52,9 @@ final class UserController extends AbstractController
         #[MapRequestPayload] UserLoginDto $dto,
         ParameterBagInterface $bag,
     ): Response {
-        $user = $this->action->login($dto);
-
-        if ($user === null) {
+        try {
+            $user = $this->action->login($dto);
+        } catch (PasswordInvalidException|UserNotFoundException) {
             return new Response(status: 404);
         }
 

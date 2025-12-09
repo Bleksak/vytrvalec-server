@@ -1,13 +1,29 @@
-{{ form_start(login) }}
-<fieldset>
-    {{ form_label(login.email) }}
-    {{ form_widget(login.email) }}
-    {{ form_errors(login.email) }}
+<div {{ attributes }}>
+    {{
+        form_start(
+            form,
+            {
+                attr: {
+                    'data-action': 'live#action:prevent',
+                    'data-live-action-param': 'login'
+                }
+            }
+        )
+    }}
+    <fieldset>
+        {{ form_label(form.email) }}
+        {{ form_widget(form.email) }}
+        {{ form_errors(form.email) }}
+    </fieldset>
 
-    {{ form_label(login.password) }}
-    {{ form_widget(login.password) }}
-    {{ form_errors(login.password) }}
+    <fieldset>
+        {{ form_label(form.password) }}
+        {{ form_widget(form.password) }}
+        {{ form_errors(form.password) }}
+    </fieldset>
 
-    {{ form_widget(login.submit) }}
-</fieldset>
-{{ form_end(login) }}
+    <fieldset>
+        {{ form_widget(form.submit) }}
+    </fieldset>
+    {{ form_end(form) }}
+</div>
