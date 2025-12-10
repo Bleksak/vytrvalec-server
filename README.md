@@ -75,6 +75,8 @@
 
 - Now you can run commands like `kubectl exec ...`
 
+### Plugins
+- If you are using JetBrains IDE install this [plugin](https://plugins.jetbrains.com/plugin/28437-mago) from xepozz.
 
 ### Run before push
 - `vendor/bin/mago analyze` - Static analysis
