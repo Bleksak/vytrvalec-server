@@ -17,7 +17,6 @@
     "easycorp/easyadmin-bundle": "^4.27",
     "firebase/php-jwt": "^6.11",
     "kreait/firebase-bundle": "^5.7",
-    "kreait/firebase-php": "*",
     "nelmio/api-doc-bundle": "*",
     "nelmio/cors-bundle": "^2.6",
     "phpdocumentor/reflection-docblock": "^5.6",
