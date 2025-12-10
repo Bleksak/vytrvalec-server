@@ -1,0 +1,20 @@
+<div
+    {{ attributes }}
+    class="toast-container"
+    data-controller="toast"
+    data-action="flash-added@window->live#action"
+    data-live-action-param="refresh"
+>
+    {% for id, message in this.visibleMessages %}
+        <div
+            id="toast-{{ id }}"
+            class="toast toast-{{ message.type }}"
+            role="alert"
+            data-id="{{ id }}"
+        >
+            <div class="toast-content">
+                <span class="toast-message">{{ message.message|trans }}</span>
+            </div>
+        </div>
+    {% endfor %}
+</div>
