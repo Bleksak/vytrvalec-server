@@ -9,6 +9,10 @@ use App\Controller\IndexController;
 use App\Dto\User\UserLoginDto;
 use App\Exceptions\User\UserNotFoundException;
 use App\Form\LoginType;
+use App\Utils\Toast\ToastContext;
+use App\Utils\Toast\ToastManager;
+use App\Utils\Toast\ToastType;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormInterface;
@@ -17,20 +21,26 @@ use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
+use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\ComponentWithFormTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\UX\LiveComponent\LiveResponder;
 
 #[AsLiveComponent]
 final class Login extends AbstractController
 {
     use DefaultActionTrait;
     use ComponentWithFormTrait;
+    use ComponentToolsTrait;
 
     #[LiveProp]
     public UserLoginDto $initialData;
 
     public function __construct(
         private Security $security,
+        private ToastManager $toastManager,
+        private LiveResponder $liveResponder,
+        private LoggerInterface $logger,
     ) {
         $this->initialData = new UserLoginDto();
     }
@@ -51,15 +61,23 @@ final class Login extends AbstractController
 
         try {
             $user = $action->login($data);
-
-            $this->security->login($user);
         } catch (InvalidPasswordException|UserNotFoundException) {
-            $this->addFlash('error', 'user.not_found');
+            $this->toastManager->add(
+                ToastType::Error,
+                ToastContext::Login,
+                'login.user_not_found',
+            );
 
             return null;
         }
 
-        $this->addFlash('success', 'user.login.success');
+        $this->security->login($user);
+        $this->toastManager->add(
+            ToastType::Success,
+            ToastContext::Login,
+            'login.success',
+        );
+
         return $this->redirectToRoute(IndexController::ROUTE);
     }
 }

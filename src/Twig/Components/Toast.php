@@ -4,50 +4,50 @@ declare(strict_types=1);
 
 namespace App\Twig\Components;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
+use Symfony\UX\LiveComponent\Attribute\LiveArg;
+use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\UX\LiveComponent\LiveResponder;
 
 #[AsLiveComponent]
-final class Toast
+final class Toast extends AbstractController
 {
     use DefaultActionTrait;
-    private const array TOAST_TYPES = ['success', 'error', 'alert', 'info', 'warning'];
 
-    #[LiveProp(writable: true)]
+    /** @var array<string, array{type: string, message: string, id: string}> */
+    #[LiveProp]
     public array $messages = [];
 
-    public function __construct(private RequestStack $requestStack) {}
+    public function __construct(
+        public LiveResponder $responder,
+    ) {}
 
-    public function mount(): void
-    {
-        $this->loadFlashMessages();
-    }
-
-    #[LiveAction]
-    public function refresh(): void
-    {
-        $this->loadFlashMessages();
-    }
-
-    public function getVisibleMessages(): array
-    {
-        return $this->messages;
-    }
-
-    private function loadFlashMessages(): void
-    {
-        $session = $this->requestStack->getSession();
-        $flashBag = $session->getFlashBag();
-        foreach (self::TOAST_TYPES as $type) {
-            foreach ($flashBag->get($type) as $message) {
-                $this->messages[] = [
-                    'type' => $type,
-                    'message' => $message,
-                ];
-            }
+    #[LiveListener('toast-add')]
+    public function toastAddedHandler(
+        #[LiveArg] string $type,
+        #[LiveArg] string $message,
+        #[LiveArg] string $id,
+    ): void {
+        if (
+            isset($this->messages[$id])
+            && $this->messages[$id]['type'] === $type
+        ) {
+            return;
         }
+
+        $this->messages[$id] = [
+            'type' => $type,
+            'id' => $id,
+            'message' => $message,
+        ];
+    }
+
+    #[LiveListener('toast-remove')]
+    public function toastRemoveHandler(#[LiveArg] string $id): void
+    {
+        unset($this->messages[$id]);
     }
 }

@@ -95,17 +95,17 @@
                     {% if not app.user %}
                         <li>
                             <button
-                                command="show-modal"
-                                commandfor="login-dialog"
+                                onclick="document.querySelector('#login-dialog').show();"
+                                {# command="show-modal" #}
+                                {# commandfor="login-dialog" #}
                             >
                                 {{ 'navbar.login'|trans }}
                             </button>
                         </li>
                         <li>
                             <button
+                                onclick="document.querySelector('#register-dialog').show();"
                                 class="secondary"
-                                command="show-modal"
-                                commandfor="register-dialog"
                             >
                                 {{ 'navbar.register'|trans }}
                             </button>
@@ -212,21 +212,22 @@
                 </footer>
             </article>
         </footer>
+        <twig:Toast />
+        {% if not is_granted('ROLE_USER') %}
+            <twig:Dialog id="login-dialog">
+                <twig:block name="header">
+                    {{ 'login.title'|trans }}
+                </twig:block>
+                <twig:Login />
+            </twig:Dialog>
+
+            <twig:Dialog id="register-dialog">
+                <twig:block name="header">
+                    {{ 'registration.title'|trans }}
+                </twig:block>
+
+                <twig:Registration :faculties="faculties" />
+            </twig:Dialog>
+        {% endif %}
     </body>
-
-    {% if not is_granted('ROLE_USER') %}
-        <twig:Dialog id="login-dialog">
-            <twig:block name="header">
-                {{ 'login.title'|trans }}
-            </twig:block>
-            <twig:Login />
-        </twig:Dialog>
-        <twig:Dialog id="register-dialog">
-            <twig:block name="header">
-                {{ 'registration.title'|trans }}
-            </twig:block>
-
-            <twig:Registration :faculties="faculties" />
-        </twig:Dialog>
-    {% endif %}
 </html>

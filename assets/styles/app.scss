@@ -239,3 +239,36 @@ header.dialog-header {
         max-width: calc(33.333% - 1rem);
     }
 }
+
+.toast {
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px #757575;
+}
+
+.toast-error {
+    background-color: red;
+}
+
+.toast-success {
+    background-color: green;
+}
+
+.toasts-anchor {
+    z-index: 9999;
+    position: fixed;
+
+    bottom: 10%;
+    right: 10%;
+    isolation: isolate;
+}
+.toasts {
+    position: relative;
+
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 20px;
+}

@@ -10,6 +10,9 @@ use App\Dto\UserRegistrationDto;
 use App\Entity\Faculty;
 use App\Exceptions\User\TranslatableExceptionInterface;
 use App\Form\RegistrationType;
+use App\Utils\Toast\ToastContext;
+use App\Utils\Toast\ToastManager;
+use App\Utils\Toast\ToastType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,8 +35,9 @@ final class Registration extends AbstractController
     #[LiveProp]
     public ?UserRegistrationDto $initialData = null;
 
-    public function __construct()
-    {
+    public function __construct(
+        private ToastManager $toastManager,
+    ) {
         $this->initialData = new UserRegistrationDto();
     }
 
@@ -64,12 +68,21 @@ final class Registration extends AbstractController
         try {
             $action->create($data);
         } catch (TranslatableExceptionInterface $e) {
-            $this->addFlash('error', $e->toTranslatableMessage());
+            $this->toastManager->add(
+                ToastType::Error,
+                ToastContext::Registration,
+                $e->toTranslatableMessage(),
+            );
 
             return null;
         }
 
-        $this->addFlash('success', 'registration.success');
+        $this->toastManager->add(
+            ToastType::Success,
+            ToastContext::Registration,
+            'registration.success',
+        );
+
         return $this->redirectToRoute(IndexController::ROUTE);
     }
 }
