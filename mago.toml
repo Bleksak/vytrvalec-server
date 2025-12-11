@@ -5,7 +5,15 @@ php-version = "8.5.0"
 [source]
 paths = ["src"]
 includes = ["vendor"]
-excludes = []
+excludes = [
+  "vendor/nikic/fast-route/test",
+  "vendor/composer/autoload_classmap.php",
+  "vendor/google/common-protos/metadata",
+  "vendor/google/gax/metadata",
+  "vendor/google/longrunning/metadata",
+  "vendor/symfony/cache/Traits/ValueWrapper.php",
+  "vendor/composer/autoload_static.php"
+]
 
 [formatter]
 print-width = 80
