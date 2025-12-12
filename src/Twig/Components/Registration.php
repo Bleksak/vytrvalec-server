@@ -80,8 +80,11 @@ final class Registration extends AbstractController
         $this->toastManager->add(
             ToastType::Success,
             ToastContext::Registration,
-            'registration.success',
+            message: 'registration.success',
+            addToFlash: true,
         );
+
+        $this->resetForm();
 
         return $this->redirectToRoute(IndexController::ROUTE);
     }

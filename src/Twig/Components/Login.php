@@ -7,6 +7,7 @@ namespace App\Twig\Components;
 use App\Action\UserActions;
 use App\Controller\IndexController;
 use App\Dto\User\UserLoginDto;
+use App\Exceptions\User\PasswordInvalidException;
 use App\Exceptions\User\UserNotFoundException;
 use App\Form\LoginType;
 use App\Utils\Toast\ToastContext;
@@ -17,7 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
@@ -61,11 +61,11 @@ final class Login extends AbstractController
 
         try {
             $user = $action->login($data);
-        } catch (InvalidPasswordException|UserNotFoundException) {
+        } catch (PasswordInvalidException|UserNotFoundException) {
             $this->toastManager->add(
                 ToastType::Error,
                 ToastContext::Login,
-                'login.user_not_found',
+                message: 'login.user_not_found',
             );
 
             return null;
@@ -75,8 +75,11 @@ final class Login extends AbstractController
         $this->toastManager->add(
             ToastType::Success,
             ToastContext::Login,
-            'login.success',
+            message: 'login.success',
+            addToFlash: true,
         );
+
+        $this->resetForm();
 
         return $this->redirectToRoute(IndexController::ROUTE);
     }
