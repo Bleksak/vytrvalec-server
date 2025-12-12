@@ -60,7 +60,7 @@ final class Toast extends AbstractController
     }
 
     #[PreReRender]
-    private function fillFromSession()
+    private function fillFromSession(): void
     {
         $session = $this->requestStack->getSession();
 
@@ -95,10 +95,6 @@ final class Toast extends AbstractController
 
                 $toastContext = $matches['toast_context'];
                 $toastType = $matches['toast_type'];
-
-                if ($toastContext === null || $toastType === null) {
-                    continue;
-                }
 
                 foreach ($messages as $message) {
                     $this->toastAddedHandler(
