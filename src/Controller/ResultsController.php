@@ -17,8 +17,8 @@ final class ResultsController extends AbstractController
     public const string ROUTE = 'results';
 
     public function __construct(
-        private FacultyRepository $facultyRepository,
-        private SeasonRepository $seasonRepository,
+        private readonly FacultyRepository $facultyRepository,
+        private readonly SeasonRepository $seasonRepository,
     ) {}
 
     public function __invoke(): Response

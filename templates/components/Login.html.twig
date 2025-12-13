@@ -21,6 +21,11 @@
         {{ form_widget(form.password) }}
         {{ form_errors(form.password) }}
     </fieldset>
+    <fieldset>
+        <button class="forgotten-password-button" type="button" onclick="document.querySelector('#login-dialog').close(); document.querySelector('#forgotten-password-dialog').show();">
+            {{ 'user.forgotten_password.prompt'|trans }}
+        </button>
+    </fieldset>
 
     <fieldset>
         {{ form_widget(form.submit) }}

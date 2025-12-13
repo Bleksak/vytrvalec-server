@@ -6,6 +6,7 @@ namespace App\Action;
 
 use App\Dto\EmailingChangeDto;
 use App\Dto\PasswordChangeDto;
+use App\Dto\User\ForgottenPasswordResetDto;
 use App\Dto\User\PasswordResetDto;
 use App\Dto\User\UserEditDto;
 use App\Dto\User\UserLoginDto;
@@ -21,6 +22,8 @@ use App\Repository\FacultyRepository;
 use App\Repository\UserRepository;
 use App\Services\VytrvalecMailer;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\EntityManagerInterface;
+use SensitiveParameter;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final readonly class UserActions
@@ -31,6 +34,7 @@ final readonly class UserActions
         private UserPasswordHasherInterface $hasher,
         private VytrvalecMailer $mailer,
         private string $clientUrl,
+        private EntityManagerInterface $em,
     ) {}
 
     /**
@@ -139,12 +143,15 @@ final readonly class UserActions
         return [];
     }
 
+    /**
+     * @throws UserNotFoundException
+     */
     public function forgottenPasswordRequest(string $email): void
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
 
         if ($user === null) {
-            return;
+            throw new UserNotFoundException();
         }
 
         $userPasswordResetToken = \bin2hex(\random_bytes(90));
@@ -159,28 +166,17 @@ final readonly class UserActions
             $this->clientUrl . '/reset-password/' . $userPasswordResetToken,
         );
 
-        $this->mailer->send($user, $mail, true);
+        $this->mailer->send($user, $mail, forceSend: true);
     }
 
-    /**
-     * @return array<int,string>
-     */
-    public function forgottenPasswordReset(PasswordResetDto $dto): array
-    {
-        $user = $this->userRepository->findOneBy([
-            'passwordResetToken' => $dto->passwordResetToken,
-        ]);
-
-        if ($user === null) {
-            return ['user_not_found'];
-        }
-
+    public function forgottenPasswordReset(
+        User $user,
+        #[SensitiveParameter] ForgottenPasswordResetDto|PasswordResetDto $dto,
+    ): void {
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
         $user->setPasswordResetToken(null);
 
         $this->userRepository->save($user, true);
-
-        return [];
     }
 
     public function updateAnonymization(User $user, bool $anonymize): void

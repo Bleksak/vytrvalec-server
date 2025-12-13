@@ -57,6 +57,7 @@ return [
         'email' => 'E-mail:',
         'password' => 'Heslo:',
         'submit' => 'Přihlásit',
+        'user_not_found' => 'Neplatný e-mail nebo heslo'
     ],
     'registration' => [
         'title' => 'Registrace',
@@ -114,6 +115,25 @@ return [
         ],
         'email' => [
             'not_unique' => 'Uživatel se zadanou e-mailovou adresou již existuje',
+        ],
+        'forgotten_password' => [
+            'prompt' => 'Zapomenuté heslo?',
+            'title' => 'Zapomenuté heslo',
+            'description' => 'Na e-mailovou adresu bude zaslán odkaz k obnovení hesla.',
+            'email' => 'E-mail:',
+            'submit' => 'Odeslat',
+            'password' => 'Nové heslo:',
+            'password_repeat' => 'Nové heslo znovu:',
+            'change' => 'Změnit heslo',
+        ],
+        'password_reset' => [
+            'success' => 'Heslo bylo úspěšně změněno',
+        ],
+    ],
+    'validation' => [
+        'email' => [
+            'invalid' => 'Zadaný e-mail je neplatný',
+            'not_blank' => 'E-mail nesmí být prázdný',
         ],
     ],
 ];
