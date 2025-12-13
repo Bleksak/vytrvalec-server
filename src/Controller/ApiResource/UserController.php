@@ -203,11 +203,13 @@ final class UserController extends AbstractController
     public function forgottenPasswordReset(
         #[MapRequestPayload] PasswordResetDto $dto,
     ): Response {
-        $errors = $this->action->forgottenPasswordReset($dto);
+        $user = $this->userRepository->findByPasswordResetToken($dto->passwordResetToken);
 
-        if (\count($errors) !== 0) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        if ($user === null) {
+            return $this->json(['user_not_found'], Response::HTTP_BAD_REQUEST);
         }
+
+        $this->action->forgottenPasswordReset($user, $dto);
 
         return new Response(status: Response::HTTP_OK);
     }

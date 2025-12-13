@@ -122,6 +122,12 @@ final class UserRepository extends ServiceEntityRepository implements
         return $this->findOneBy(['emailUnsubscribeHash' => $unsubscribeHash]);
     }
 
+    public function findByPasswordResetToken(
+        #[SensitiveParameter] string $passwordResetToken,
+    ): ?User {
+        return $this->findOneBy(['passwordResetToken' => $passwordResetToken]);
+    }
+
     /**
      * @return list<User>
      */

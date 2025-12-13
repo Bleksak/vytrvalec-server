@@ -19,11 +19,11 @@ final class ForgottenPasswordRequestType extends AbstractType
         array $options,
     ): void {
         $builder->add('email', EmailType::class, [
-            'label' => 'forgotten_password_request.email',
+            'label' => 'user.forgotten_password.email',
         ]);
 
         $builder->add('submit', SubmitType::class, [
-            'label' => 'forgotten_password_request.submit',
+            'label' => 'user.forgotten_password.submit',
         ]);
     }
 

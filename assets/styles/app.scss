@@ -272,3 +272,19 @@ header.dialog-header {
     flex-direction: column-reverse;
     gap: 20px;
 }
+
+.forgotten-password-button {
+    color: #444;
+    cursor: pointer;
+    background: none;
+    border: none;
+
+    &:hover {
+        color: #005cab;
+    }
+
+    padding: 0;
+}
+
+
+

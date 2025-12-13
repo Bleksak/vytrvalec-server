@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace App\Twig\Components;
 
 use App\Action\UserActions;
-use App\Controller\IndexController;
 use App\Dto\User\ForgottenPasswordRequestDto;
 use App\Form\ForgottenPasswordRequestType;
+use App\Utils\Toast\ToastContext;
+use App\Utils\Toast\ToastManager;
+use App\Utils\Toast\ToastType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentWithFormTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\UX\LiveComponent\LiveResponder;
 
 #[AsLiveComponent]
 final class ForgottenPasswordRequest extends AbstractController
@@ -29,6 +31,8 @@ final class ForgottenPasswordRequest extends AbstractController
 
     public function __construct(
         private Security $security,
+        private LiveResponder $liveResponder,
+        private ToastManager $toastManager,
     ) {
         $this->initialData = new ForgottenPasswordRequestDto();
     }
@@ -43,7 +47,7 @@ final class ForgottenPasswordRequest extends AbstractController
     }
 
     #[LiveAction]
-    public function login(UserActions $action): ?Response
+    public function submit(UserActions $action): void
     {
         $this->submitForm();
 
@@ -57,7 +61,13 @@ final class ForgottenPasswordRequest extends AbstractController
         } finally {
         }
 
-        $this->addFlash('success', 'user.login.success');
-        return $this->redirectToRoute(IndexController::ROUTE);
+        $this->toastManager->add(
+            ToastType::Success,
+            ToastContext::ForgottenPasswordRequest,
+            message: 'user.forgotten_password_request.success',
+        );
+
+        $this->liveResponder->dispatchBrowserEvent('dialog:close');
+        $this->resetForm();
     }
 }

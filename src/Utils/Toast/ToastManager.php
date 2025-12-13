@@ -13,8 +13,7 @@ final readonly class ToastManager
     public function __construct(
         private LiveResponder $liveResponder,
         private RequestStack $requestStack,
-    ) {
-    }
+    ) {}
 
     public function add(
         ToastType $type,
