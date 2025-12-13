@@ -40,7 +40,9 @@ final class ForgottenPasswordController extends AbstractController
         #[SensitiveParameter] string $passwordResetToken,
     ): Response {
         $user =
-            $this->userRepository->findByPasswordResetToken($passwordResetToken);
+            $this->userRepository->findByPasswordResetToken(
+                $passwordResetToken,
+            );
 
         if ($user === null) {
             throw $this->createNotFoundException(
@@ -66,7 +68,7 @@ final class ForgottenPasswordController extends AbstractController
             );
 
             return $this->redirectToRoute(IndexController::ROUTE);
-        } else if ($form->isSubmitted() && !$form->isValid()) {
+        } elseif ($form->isSubmitted() && !$form->isValid()) {
             $responseCode = Response::HTTP_BAD_REQUEST;
         }
 

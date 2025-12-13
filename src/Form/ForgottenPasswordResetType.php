@@ -15,6 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ForgottenPasswordResetType extends AbstractType
 {
+    #[\Override]
     public function buildForm(
         FormBuilderInterface $builder,
         array $options,
@@ -42,6 +43,7 @@ final class ForgottenPasswordResetType extends AbstractType
         ]);
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

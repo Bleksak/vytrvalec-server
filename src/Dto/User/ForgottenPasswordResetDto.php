@@ -17,6 +17,7 @@ final class ForgottenPasswordResetDto
 
     public function __construct(
         #[Assert\NotBlank(allowNull: false)]
+        #[\SensitiveParameter]
         public string $passwordResetToken,
     ) {}
 }
