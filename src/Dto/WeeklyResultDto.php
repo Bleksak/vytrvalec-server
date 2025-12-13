@@ -45,11 +45,6 @@ final class WeeklyResultDto
         return new self($data['week'], \array_map(
             static function (mixed $activity): ActivityResultDto {
                 \assert(
-                    \is_array($activity),
-                    'activity must be an array in WeeklyResultDto',
-                );
-
-                \assert(
                     isset($activity['activity'], $activity['results']),
                     'activity and results must be set in ActivityResultDto',
                 );

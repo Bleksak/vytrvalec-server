@@ -28,7 +28,6 @@ final class OutlierActivity
 
         return new self($data['activityId'], \array_map(
             static function (mixed $result): OutlierResult {
-                \assert(\is_array($result), 'result must be an array');
                 \assert(
                     isset(
                         $result['user'],

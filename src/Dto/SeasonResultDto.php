@@ -30,11 +30,6 @@ final class SeasonResultDto
         return new self(
             \array_map(static function (mixed $weeklyResult): WeeklyResultDto {
                 \assert(
-                    \is_array($weeklyResult),
-                    'weekly result must be an array in SeasonResultDto',
-                );
-
-                \assert(
                     isset($weeklyResult['week'], $weeklyResult['activities']),
                     'week and activities must be set in WeeklyResultDto',
                 );
@@ -42,14 +37,7 @@ final class SeasonResultDto
                 return WeeklyResultDto::fromCache($weeklyResult);
             }, $data['results']),
 
-            \array_map(static function (mixed $outlier): OutlierActivity {
-                \assert(
-                    \is_array($outlier),
-                    'outlier must be an array in SeasonResultDto',
-                );
-
-                return OutlierActivity::fromCache($outlier);
-            }, $data['outliers']),
+            \array_map(OutlierActivity::fromCache(...), $data['outliers']),
         );
     }
 }
