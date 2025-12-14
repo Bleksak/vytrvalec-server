@@ -68,6 +68,7 @@
     "symfony/twig-bridge": "8.0.*",
     "symfony/twig-bundle": "8.0.*",
     "symfony/uid": "8.0.*",
+    "symfony/ux-chartjs": "^2.31",
     "symfony/ux-icons": "^2.31",
     "symfony/ux-live-component": "^2.31",
     "symfony/ux-turbo": "^2.31",
