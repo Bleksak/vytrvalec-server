@@ -142,19 +142,16 @@ final class CharityController extends AbstractController
         return new Response();
     }
 
-    #[OA\Get(
-        description: 'Retrieve a collection of charities',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Collection of charities',
-                content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(ref: new Model(type: Charity::class)),
-                ),
+    #[OA\Get(description: 'Retrieve a collection of charities', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Collection of charities',
+            content: new OA\JsonContent(
+                type: 'array',
+                items: new OA\Items(ref: new Model(type: Charity::class)),
             ),
-        ],
-    )]
+        ),
+    ])]
     #[Route('/api/charity', 'api_charity_index', methods: ['GET'])]
     public function index(): Response
     {

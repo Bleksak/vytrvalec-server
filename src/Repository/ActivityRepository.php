@@ -119,4 +119,18 @@ final class ActivityRepository extends ServiceEntityRepository
             $activities,
         );
     }
+
+    /**
+     * @return array<int, Activity>
+     */
+    public function findAllWithTranslations(): array
+    {
+        /** @var array<int, Activity> */
+        return $this->createQueryBuilder('a')
+            ->join('a.translations', 'at')
+            ->addSelect('at')
+            ->indexBy('a', 'a.id')
+            ->getQuery()
+            ->getResult();
+    }
 }

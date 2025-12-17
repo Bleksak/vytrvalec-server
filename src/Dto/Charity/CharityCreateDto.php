@@ -11,20 +11,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class CharityCreateDto
 {
     #[OA\Property]
-    #[Assert\NotBlank(
-        message: 'blank',
-        allowNull: false,
-    )]
+    #[Assert\NotBlank(message: 'blank', allowNull: false)]
     public CharityCreateTranslationDto $translations;
 
-    #[OA\Property(
-        type: 'string',
-        example: 'https://davidagolias.cz/',
-    )]
-    #[Assert\Url(
-        requireTld: false,
-        message: 'invalid',
-    )]
+    #[OA\Property(type: 'string', example: 'https://davidagolias.cz/')]
+    #[Assert\Url(requireTld: false, message: 'invalid')]
     public ?string $website = null;
 
     #[OA\Property(

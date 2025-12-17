@@ -1,5 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-
+    {% if season_list is not empty %}
+        <twig:ResultsPage
+            :faculties="faculties"
+            :seasonList="season_list"
+            :activities="activities"
+        />
+    {% endif %}
 {% endblock body %}

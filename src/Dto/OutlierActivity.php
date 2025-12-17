@@ -11,7 +11,7 @@ namespace App\Dto;
 final class OutlierActivity
 {
     /**
-     * @param list<OutlierResult> $results
+     * @param array<int, OutlierResult> $results
      */
     public function __construct(
         public int $activityId,
@@ -41,5 +41,16 @@ final class OutlierActivity
             },
             $data['results'],
         ));
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'activityId' => $this->activityId,
+            'results' => \array_map(
+                static fn(OutlierResult $result): array => $result->toArray(),
+                $this->results,
+            ),
+        ];
     }
 }

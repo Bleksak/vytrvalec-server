@@ -20,10 +20,7 @@ final class ImageUploadFormType extends AbstractType
     ): void {
         $builder->add('image', FileType::class, [
             'constraints' => [
-                new Assert\NotBlank(
-                    message: 'blank',
-                    allowNull: false,
-                ),
+                new Assert\NotBlank(message: 'blank', allowNull: false),
                 new Assert\Image(
                     mimeTypesMessage: 'invalid',
                     maxSize: '15M',

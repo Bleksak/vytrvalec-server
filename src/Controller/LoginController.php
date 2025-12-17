@@ -9,10 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class LoginController extends AbstractController
 {
-    #[Route(
-        path: '/logout',
-        name: 'app_logout',
-    )]
+    #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
         throw new \LogicException(

@@ -35,4 +35,12 @@ final readonly class FacultyResultDto
 
         return new self($data['faculty'], $data['distance']);
     }
+
+    public function toArray(): array
+    {
+        return [
+            'faculty' => $this->faculty,
+            'distance' => $this->distance,
+        ];
+    }
 }

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\CustomLogic\SeasonResultCalculator;
+use App\Dto\ExtraPointsDto;
 use App\Dto\FacultyResultDto;
 use App\Dto\SeasonResult\SeasonResultRankDto;
+use App\Dto\SeasonResult\SeasonResultRankRowDto;
 use App\Dto\SeasonResultDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
@@ -34,15 +36,13 @@ final readonly class SeasonResultRankingService
     /**
      * @param int|null $week null => cela sezona
      * @param int|null $activity null => vsechny aktivity dohromady
-     *
-     * @return list<SeasonResultRankDto>
      */
     public function calculateSeasonResultRanking(
         Season $season,
         SeasonResultDto $seasonResult,
         ?int $activity = null,
         ?int $week = null,
-    ): array {
+    ): SeasonResultRankDto {
         // za kazdy tyden se udeluje stejny pocet bodu(N)
         // tzn pokud se v prvnim tydnu zucastni 7 fakult a ve druhem tydnu 12 fakult, rozdeluje se i za prvni tyden 12 bodu
         // QUESTION(@bleksak): Je tohle opravdu co oni chteji? Kdyz to delali rucne, tak to spocitali za 1. tyden 7 fakult => 7 bodu, 2 tyden 12 bodu, ale nepamatuju si to uz
@@ -62,6 +62,7 @@ final readonly class SeasonResultRankingService
         $facultySet = $this->createFacultySet($seasonResult);
 
         $ranking = [];
+        $extras = [];
 
         if ($week === null) {
             foreach ($seasonResult->results as $week => $weeklyResult) {
@@ -69,12 +70,13 @@ final readonly class SeasonResultRankingService
                     $facultySet,
                     $weeklyResult,
                     $ranking,
+                    $extras,
                     $activity,
                 );
             }
         } else {
             if ($week < 0 || $week >= $season->getWeekCount()) {
-                return [];
+                return new SeasonResultRankDto(0, 0, [], []);
             }
 
             $weeklyResult = $seasonResult->results[$week];
@@ -82,29 +84,44 @@ final readonly class SeasonResultRankingService
                 $facultySet,
                 $weeklyResult,
                 $ranking,
+                $extras,
                 $activity,
             );
         }
 
         $result = [];
 
+        $totalDistance = 0;
+        $totalPoints = 0;
+
         foreach ($ranking as $row) {
-            $result[] = new SeasonResultRankDto(
+            $result[] = new SeasonResultRankRowDto(
                 $row['faculty'],
                 $row['distance'],
                 $row['points'],
             );
+
+            $totalDistance += $row['distance'];
+            $totalPoints += $row['points'];
         }
 
         \usort(
             $result,
-            static fn(SeasonResultRankDto $a, SeasonResultRankDto $b): int => (
+            static fn(
+                SeasonResultRankRowDto $a,
+                SeasonResultRankRowDto $b,
+            ): int => (
                 $b->points <=> $a->points
                 ?: $b->distance <=> $a->distance
             ),
         );
 
-        return $result;
+        return new SeasonResultRankDto(
+            $totalDistance,
+            $totalPoints,
+            $result,
+            $extras,
+        );
     }
 
     /**
@@ -129,11 +146,13 @@ final readonly class SeasonResultRankingService
      * Step 1.x
      * @param array<int, int> $facultySet
      * @param array<int, array{points: int, distance: int, faculty: int}> $ranking
+     * @param list<ExtraPointsDto> $extras
      */
     private function populateRankingArray(
         array $facultySet,
         WeeklyResultDto $weeklyResult,
         array &$ranking,
+        array &$extras,
         ?int $allowedActivity = null,
     ): void {
         foreach ($weeklyResult->activities as $activityId => $activityResult) {
@@ -170,6 +189,7 @@ final readonly class SeasonResultRankingService
             foreach ($activityResult->extras as $extra) {
                 // TODO(@bleksak): tady vyresit jeste collect toho uzivatele
                 $ranking[$extra->faculty]['points'] += $extra->points;
+                $extras[] = $extra;
             }
         }
     }

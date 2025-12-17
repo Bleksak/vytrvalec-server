@@ -7,7 +7,7 @@ namespace App\Dto;
 final class ExtraPointsResultDto
 {
     public function __construct(
-        public AnonymizedUser $user,
+        public int $user,
         public int $activityId,
         public int $facultyId,
         public int $value,

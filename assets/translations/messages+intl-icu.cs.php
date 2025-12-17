@@ -57,7 +57,7 @@ return [
         'email' => 'E-mail:',
         'password' => 'Heslo:',
         'submit' => 'Přihlásit',
-        'user_not_found' => 'Neplatný e-mail nebo heslo'
+        'user_not_found' => 'Neplatný e-mail nebo heslo',
     ],
     'registration' => [
         'title' => 'Registrace',
@@ -128,6 +128,37 @@ return [
         ],
         'password_reset' => [
             'success' => 'Heslo bylo úspěšně změněno',
+        ],
+    ],
+    'results' => [
+        'week_picker' => [
+            'whole_season' => 'Celá sezóna',
+            'first_week' => 'První týden',
+            'second_week' => 'Druhý týden',
+            'third_week' => 'Třetí týden',
+            'fourth_week' => 'Čtvrtý týden',
+        ],
+        'user_count' => 'Počet účastníků',
+        'user_count_by_faculty' => 'Účastníci podle fakult',
+        'faculty' => 'Fakulta',
+        'distance' => 'Vzdálenost',
+        'points' => 'Počet bodů',
+        'total' => 'Celkem',
+        'extras' => [
+            'title' => 'Extra body',
+            'name' => 'Jméno',
+            'faculty' => 'Fakulta',
+            'category' => 'Kategorie',
+            'activity' => 'Aktivita',
+            'value' => 'Výkon',
+            'points' => 'Body',
+            'daily_distance' => 'Vzdálenost za den',
+            'weekly_distance' => 'Vzdálenost za týden',
+            'weekly_elevation' => 'Převýšení za týden',
+        ],
+        'outliers' => [
+            'title' => 'TOP účastníci',
+            'name' => 'Jméno',
         ],
     ],
     'validation' => [

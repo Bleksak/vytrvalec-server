@@ -25,18 +25,15 @@ final class StatisticsController extends AbstractController
         private readonly StatisticsActions $action,
     ) {}
 
-    #[OA\Get(
-        description: 'Retrieve all statistics',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Collection of statistics',
-                content: new OA\JsonContent(
-                    ref: new Model(type: TotalStatisticsDto::class),
-                ),
+    #[OA\Get(description: 'Retrieve all statistics', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Collection of statistics',
+            content: new OA\JsonContent(
+                ref: new Model(type: TotalStatisticsDto::class),
             ),
-        ],
-    )]
+        ),
+    ])]
     #[Route('/api/stats/total', name: 'stats_index', methods: ['GET'])]
     public function indexTotalStatistics(): Response
     {
@@ -75,21 +72,18 @@ final class StatisticsController extends AbstractController
         return $this->json($this->action->getUserCountByFaculties($season));
     }
 
-    #[OA\Get(
-        description: 'Retrieve the user profile statistics',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'User statistics',
-                content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: ProfileCacheSchema::class),
-                    ),
+    #[OA\Get(description: 'Retrieve the user profile statistics', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'User statistics',
+            content: new OA\JsonContent(
+                type: 'array',
+                items: new OA\Items(
+                    ref: new Model(type: ProfileCacheSchema::class),
                 ),
             ),
-        ],
-    )]
+        ),
+    ])]
     #[Route('/api/stats/{user}', name: 'stats_user_index', methods: ['GET'])]
     public function indexUserStatistics(?User $user = null): Response
     {

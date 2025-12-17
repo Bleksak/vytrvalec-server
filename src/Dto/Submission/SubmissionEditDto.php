@@ -10,17 +10,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class SubmissionEditDto
 {
     #[Assert\GreaterThanOrEqual(0, message: 'negative')]
-    #[Assert\Type(
-        type: 'integer',
-        message: 'invalid',
-    )]
+    #[Assert\Type(type: 'integer', message: 'invalid')]
     public ?int $elevation = null;
 
     #[Assert\GreaterThanOrEqual(1, message: 'negative')]
-    #[Assert\Type(
-        type: 'integer',
-        message: 'invalid',
-    )]
+    #[Assert\Type(type: 'integer', message: 'invalid')]
     public ?int $distance = null;
 
     #[Assert\Uuid(message: 'invalid')]
@@ -30,9 +24,6 @@ final class SubmissionEditDto
     #[Assert\GreaterThanOrEqual(1, message: 'negative')]
     public ?int $activityId = null;
 
-    #[Assert\NotBlank(
-        message: 'blank',
-        allowNull: false,
-    )]
+    #[Assert\NotBlank(message: 'blank', allowNull: false)]
     public \DateTime $updatedAt;
 }

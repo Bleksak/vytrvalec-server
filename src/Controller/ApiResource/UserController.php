@@ -43,11 +43,7 @@ final class UserController extends AbstractController
     ) {}
 
     #[OA\Post(description: 'Log the user in and generate a JWT token')]
-    #[Route(
-        path: '/api/user/login',
-        name: 'api_user_login',
-        methods: ['POST'],
-    )]
+    #[Route(path: '/api/user/login', name: 'api_user_login', methods: ['POST'])]
     public function login(
         #[MapRequestPayload] UserLoginDto $dto,
         ParameterBagInterface $bag,
@@ -76,15 +72,12 @@ final class UserController extends AbstractController
         );
     }
 
-    #[OA\Get(
-        description: 'Clears the JWT cookie. If user is not logged in, just no-op.',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Succesfully logged out',
-            ),
-        ],
-    )]
+    #[OA\Get(description: 'Clears the JWT cookie. If user is not logged in, just no-op.', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Succesfully logged out',
+        ),
+    ])]
     #[Route(
         path: '/api/user/logout',
         name: 'api_user_logout',
@@ -322,19 +315,16 @@ final class UserController extends AbstractController
         return new Response(status: Response::HTTP_CREATED);
     }
 
-    #[OA\Patch(
-        description: 'Update a user\'s password',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Succesfully updated',
-            ),
-            new OA\Response(
-                response: Response::HTTP_BAD_REQUEST,
-                description: 'Invalid data',
-            ),
-        ],
-    )]
+    #[OA\Patch(description: 'Update a user\'s password', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Succesfully updated',
+        ),
+        new OA\Response(
+            response: Response::HTTP_BAD_REQUEST,
+            description: 'Invalid data',
+        ),
+    ])]
     #[Route(
         path: '/api/user/change',
         name: 'api_user_update_password',
@@ -354,10 +344,7 @@ final class UserController extends AbstractController
         return new Response(status: Response::HTTP_OK);
     }
 
-    #[Route(
-        path: '/api/user/anonymize',
-        methods: ['POST'],
-    )]
+    #[Route(path: '/api/user/anonymize', methods: ['POST'])]
     public function setAccountAnonymization(
         #[CurrentUser] User $user,
         Request $request,
@@ -409,15 +396,12 @@ final class UserController extends AbstractController
         return new Response();
     }
 
-    #[OA\Patch(
-        description: 'Toggles user\'s e-mail delivery.',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Successfully toggled e-mailing',
-            ),
-        ],
-    )]
+    #[OA\Patch(description: 'Toggles user\'s e-mail delivery.', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Successfully toggled e-mailing',
+        ),
+    ])]
     #[Route(
         path: '/api/emailing',
         name: 'api_email_set_user',
@@ -467,11 +451,7 @@ final class UserController extends AbstractController
     }
 
     #[OA\Delete(description: 'Deletes (anonymizes) the current user')]
-    #[Route(
-        path: '/api/user',
-        name: 'api_user_delete',
-        methods: ['DELETE'],
-    )]
+    #[Route(path: '/api/user', name: 'api_user_delete', methods: ['DELETE'])]
     public function delete(#[CurrentUser] User $user): Response
     {
         $this->action->delete($user);

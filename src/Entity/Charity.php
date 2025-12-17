@@ -33,10 +33,7 @@ class Charity
     private ?Image $image = null;
 
     #[OA\Property]
-    #[ORM\Column(
-        length: 512,
-        nullable: true,
-    )]
+    #[ORM\Column(length: 512, nullable: true)]
     private ?string $website = null;
 
     /** @var Collection<string, CharityTranslation> */

@@ -45,6 +45,7 @@ no-shorthand-ternary = { enabled = false }
 assert-description = { enabled = false }
 
 ambiguous-function-call = {enabled=true}
+require-namespace = {enabled=true}
 
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000, enabled = false }

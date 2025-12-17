@@ -42,16 +42,26 @@ final class WeeklyResultDto
             'activities must be an array in WeeklyResultDto',
         );
 
-        return new self($data['week'], \array_map(
-            static function (mixed $activity): ActivityResultDto {
-                \assert(
-                    isset($activity['activity'], $activity['results']),
-                    'activity and results must be set in ActivityResultDto',
-                );
+        $activities = [];
 
-                return ActivityResultDto::fromCache($activity);
-            },
-            $data['activities'],
-        ));
+        foreach ($data['activities'] as $activityId => $activity) {
+            $activities[$activityId] = ActivityResultDto::fromCache($activity);
+        }
+
+        return new self($data['week'], $activities);
+    }
+
+    public function toArray(): array
+    {
+        $activities = [];
+
+        foreach ($this->activities as $idx => $activity) {
+            $activities[$idx] = $activity->toArray();
+        }
+
+        return [
+            'activities' => $activities,
+            'week' => $this->week,
+        ];
     }
 }

@@ -47,14 +47,11 @@ final class FacultyController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_BAD_REQUEST,
                 description: 'Bad request',
-                content: new OA\JsonContent(
-                    description: 'List of invalid fields and their respective errors delimited by |',
-                    example: [
-                        'name' => 'not_unique',
-                        'shortcut' => 'not_unique',
-                        'visible' => 'invalid_value',
-                    ],
-                ),
+                content: new OA\JsonContent(description: 'List of invalid fields and their respective errors delimited by |', example: [
+                    'name' => 'not_unique',
+                    'shortcut' => 'not_unique',
+                    'visible' => 'invalid_value',
+                ]),
             ),
         ],
     )]
@@ -95,15 +92,12 @@ final class FacultyController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_BAD_REQUEST,
                 description: 'Bad request',
-                content: new OA\JsonContent(
-                    description: 'List of invalid fields and their respective errors delimited by |',
-                    example: [
-                        'name' => 'not_unique',
-                        'shortcut' => 'not_unique',
-                        'visible' => 'invalid_value',
-                        'parent' => 'invalid_value',
-                    ],
-                ),
+                content: new OA\JsonContent(description: 'List of invalid fields and their respective errors delimited by |', example: [
+                    'name' => 'not_unique',
+                    'shortcut' => 'not_unique',
+                    'visible' => 'invalid_value',
+                    'parent' => 'invalid_value',
+                ]),
             ),
         ],
     )]
@@ -155,19 +149,16 @@ final class FacultyController extends AbstractController
         return $this->json($faculty);
     }
 
-    #[OA\Get(
-        description: 'Retrieve a collection of all Faculties',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'The Faculty information',
-                content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(ref: new Model(type: Faculty::class)),
-                ),
+    #[OA\Get(description: 'Retrieve a collection of all Faculties', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'The Faculty information',
+            content: new OA\JsonContent(
+                type: 'array',
+                items: new OA\Items(ref: new Model(type: Faculty::class)),
             ),
-        ],
-    )]
+        ),
+    ])]
     #[Route('/api/faculty', name: 'api_faculty_index', methods: ['GET'])]
     public function facultyList(): Response
     {

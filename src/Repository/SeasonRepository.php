@@ -74,7 +74,6 @@ final class SeasonRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('s')
             ->select('s', 'c', 'i', 'ct', 'sfm')
-            // Add a subquery instead of a join
             ->addSelect('(
             SELECT COUNT(sub2.id)
             FROM App\Entity\Submission sub2

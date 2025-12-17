@@ -9,7 +9,8 @@ use OpenApi\Attributes as OA;
 
 /**
  * @import-type FacultyResultDtoType from FacultyResultDto
- * @type ActivityResultDtoType = array{activity: int, results: array<int, FacultyResultDtoType>}
+ * @import-type ExtraPointsDtoType from ExtraPointsDto
+ * @type ActivityResultDtoType = array{activity: int, results: array<int, FacultyResultDtoType>, extras: list<ExtraPointsDtoType>}
  */
 final class ActivityResultDto
 {
@@ -32,7 +33,7 @@ final class ActivityResultDto
             type: 'array',
             items: new OA\Items(ref: new Model(type: FacultyResultDto::class)),
         )]
-        public readonly array $results,
+        public array $results,
     ) {}
 
     /**
@@ -48,6 +49,32 @@ final class ActivityResultDto
                 FacultyResultDto::fromCache($facultyResult);
         }
 
-        return new self($data['activity'], $facultyResults);
+        $result = new self($data['activity'], $facultyResults);
+        $extras = [];
+
+        foreach ($data['extras'] as $extra) {
+            $extras[] = ExtraPointsDto::fromCache($extra);
+        }
+
+        $result->extras = $extras;
+
+        return $result;
+    }
+
+    public function toArray(): array
+    {
+        $results = [];
+        foreach ($this->results as $idx => $result) {
+            $results[$idx] = $result->toArray();
+        }
+
+        return [
+            'results' => $results,
+            'activity' => $this->activity,
+            'extras' => \array_map(
+                static fn(ExtraPointsDto $extraPoints): array => $extraPoints->toArray(),
+                $this->extras,
+            ),
+        ];
     }
 }

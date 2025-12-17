@@ -158,19 +158,16 @@ final class ActivityController extends AbstractController
         return new Response(status: Response::HTTP_OK);
     }
 
-    #[OA\Get(
-        description: 'Retrieve all activities',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Collection of activites',
-                content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(ref: new Model(type: Activity::class)),
-                ),
+    #[OA\Get(description: 'Retrieve all activities', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Collection of activites',
+            content: new OA\JsonContent(
+                type: 'array',
+                items: new OA\Items(ref: new Model(type: Activity::class)),
             ),
-        ],
-    )]
+        ),
+    ])]
     #[Route('/api/activity', name: 'activity_index', methods: ['GET'])]
     public function index(ImagePath $imagePath): Response
     {

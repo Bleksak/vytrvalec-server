@@ -9,9 +9,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class ImageUploadDto
 {
-    #[OA\Property(
-        type: 'string',
-        format: 'binary',
-    )]
+    #[OA\Property(type: 'string', format: 'binary')]
     public UploadedFile $image;
 }

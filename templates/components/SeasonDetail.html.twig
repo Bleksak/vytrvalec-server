@@ -4,7 +4,7 @@
             <h1>{{ title|trans }}</h1>
 
             {% if heading %}
-                {{ heading }}
+                {{ heading|raw }}
             {% endif %}
         </div>
         <div class="grid">
@@ -16,8 +16,8 @@
                     })
                 }}
             </span>
-            <div class="grid">
-                {% for row in ranking|slice(0, 3) %}
+            <div class="grid" data-skip-morph>
+                {% for row in ranking.rows|slice(0, 3) %}
                     <div
                         style="background-color: {{
                         faculties[row.faculty].color
@@ -49,7 +49,7 @@
         </div>
     </twig:Heading>
     <div class="grid season-detail-charity-grid">
-        <div class="season-detail-charity-image-container">
+        <div class="season-detail-charity-image-container" data-skip-morph>
             {% if season.charity.image %}
                 <img
                     src="{{ season.charity.image.path }}"
@@ -64,7 +64,7 @@
             {% endif %}
         </div>
         <section class="season-detail-charity">
-            <article>
+            <article data-skip-morph>
                 <h2>{{ season.charity.translations[app.locale].name }}</h2>
                 {% if
                     season.charity.translations[app.locale].description is not empty %}
@@ -103,7 +103,7 @@
                 <span>
                     {{
                         'season_detail.charity.raised'|trans({
-                            money: (totalDistance / 1000)|number_format
+                            money: (ranking.totalDistance / 1000)|number_format
                         })
                     }}
                 </span>

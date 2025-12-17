@@ -26,6 +26,7 @@ final readonly class SeasonResultCalculator
     {
         $weeks = $season->getWeekCount();
         $results = [];
+        $users = [];
 
         /** @var list<ExtraPointsInterface> */
         $extraPointsClasses = [
@@ -73,13 +74,27 @@ final readonly class SeasonResultCalculator
                             $cls->getUniqueName(),
                             $extra->value,
                             $cls->reward(),
+                            $extra->activityId,
                         );
+
+                    $users[$extra->user] = $extra->user;
                 }
             }
         }
 
         $topThree = $this->submissionRepository->findOutliers($season);
 
-        return new SeasonResultDto($results, $topThree);
+        foreach ($topThree as $outlier) {
+            foreach ($outlier->results as $outlierResult) {
+                // TODO(@bleksak): Ten if statement smazat po migraci dat na produkci
+                if (!\is_int($outlierResult->user)) {
+                    continue;
+                }
+
+                $users[$outlierResult->user] = $outlierResult->user;
+            }
+        }
+
+        return new SeasonResultDto($results, $topThree, \array_values($users));
     }
 }

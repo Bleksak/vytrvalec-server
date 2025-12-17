@@ -39,23 +39,20 @@ final class SeasonController extends AbstractController
         private readonly ImagePath $imagePath,
     ) {}
 
-    #[OA\Post(
-        description: 'Create a new Season',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Season created',
-            ),
-            new OA\Response(
-                response: Response::HTTP_FORBIDDEN,
-                description: 'Unauthorized access',
-            ),
-            new OA\Response(
-                response: Response::HTTP_BAD_REQUEST,
-                description: 'Bad request',
-            ),
-        ],
-    )]
+    #[OA\Post(description: 'Create a new Season', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Season created',
+        ),
+        new OA\Response(
+            response: Response::HTTP_FORBIDDEN,
+            description: 'Unauthorized access',
+        ),
+        new OA\Response(
+            response: Response::HTTP_BAD_REQUEST,
+            description: 'Bad request',
+        ),
+    ])]
     #[Route('/api/season', name: 'api_season_create', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
     public function create(
@@ -74,22 +71,19 @@ final class SeasonController extends AbstractController
         );
     }
 
-    #[OA\Get(
-        description: 'Retrieve currently running season',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'The running season',
-                content: new OA\JsonContent(
-                    ref: new Model(type: SeasonWithoutSubmissionsSchema::class),
-                ),
+    #[OA\Get(description: 'Retrieve currently running season', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'The running season',
+            content: new OA\JsonContent(
+                ref: new Model(type: SeasonWithoutSubmissionsSchema::class),
             ),
-            new OA\Response(
-                response: Response::HTTP_NOT_FOUND,
-                description: 'Season is currently not running',
-            ),
-        ],
-    )]
+        ),
+        new OA\Response(
+            response: Response::HTTP_NOT_FOUND,
+            description: 'Season is currently not running',
+        ),
+    ])]
     #[Route(
         '/api/season/current',
         name: 'api_season_current',
@@ -111,10 +105,7 @@ final class SeasonController extends AbstractController
             new OA\Parameter(
                 name: 'season',
                 in: 'path',
-                schema: new OA\Schema(
-                    type: 'integer',
-                    example: 1,
-                ),
+                schema: new OA\Schema(type: 'integer', example: 1),
             ),
         ],
         responses: [
@@ -159,10 +150,7 @@ final class SeasonController extends AbstractController
             new OA\Parameter(
                 name: 'season',
                 in: 'path',
-                schema: new OA\Schema(
-                    type: 'integer',
-                    example: 1,
-                ),
+                schema: new OA\Schema(type: 'integer', example: 1),
             ),
         ],
         responses: [
@@ -204,10 +192,7 @@ final class SeasonController extends AbstractController
             new OA\Parameter(
                 name: 'season',
                 in: 'path',
-                schema: new OA\Schema(
-                    type: 'integer',
-                    example: 1,
-                ),
+                schema: new OA\Schema(type: 'integer', example: 1),
             ),
         ],
         responses: [
@@ -250,21 +235,18 @@ final class SeasonController extends AbstractController
         ));
     }
 
-    #[OA\Get(
-        description: 'Retrieve all past seasons',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'The running season',
-                content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: SeasonWithoutSubmissionsSchema::class),
-                    ),
+    #[OA\Get(description: 'Retrieve all past seasons', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'The running season',
+            content: new OA\JsonContent(
+                type: 'array',
+                items: new OA\Items(
+                    ref: new Model(type: SeasonWithoutSubmissionsSchema::class),
                 ),
             ),
-        ],
-    )]
+        ),
+    ])]
     #[Route(
         '/api/season/past',
         name: 'api_season_index_past',
@@ -286,10 +268,7 @@ final class SeasonController extends AbstractController
             new OA\Parameter(
                 name: 'season',
                 in: 'path',
-                schema: new OA\Schema(
-                    type: 'integer',
-                    example: 1,
-                ),
+                schema: new OA\Schema(type: 'integer', example: 1),
             ),
         ],
         responses: [
@@ -312,21 +291,18 @@ final class SeasonController extends AbstractController
         return $this->json($season->toResponseObject($this->imagePath));
     }
 
-    #[OA\Get(
-        description: 'Retrieve all Seasons',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'All Seasons',
-                content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: SeasonIndexResponseDto::class),
-                    ),
+    #[OA\Get(description: 'Retrieve all Seasons', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'All Seasons',
+            content: new OA\JsonContent(
+                type: 'array',
+                items: new OA\Items(
+                    ref: new Model(type: SeasonIndexResponseDto::class),
                 ),
             ),
-        ],
-    )]
+        ),
+    ])]
     #[Route('/api/season', name: 'api_season_index', methods: ['GET'])]
     public function index(): Response
     {

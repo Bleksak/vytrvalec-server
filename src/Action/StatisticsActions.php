@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Action;
 
+use App\Dto\Statistics\UserCountGroupedByFacultyTotal;
 use App\Dto\TotalStatisticsDto;
-use App\Dto\UserCountByFacultyStatistics;
 use App\Entity\Season;
 use App\Repository\ActivityRepository;
 use App\Repository\SubmissionRepository;
@@ -38,10 +38,7 @@ final readonly class StatisticsActions
         return new TotalStatisticsDto($users, $activities);
     }
 
-    /**
-     * @return array<UserCountByFacultyStatistics>
-     */
-    public function getUserCountByFaculties(Season $season): array
+    public function getUserCountByFaculties(Season $season): UserCountGroupedByFacultyTotal
     {
         return $this->userRepository->countUserGroupedByFaculties($season);
     }

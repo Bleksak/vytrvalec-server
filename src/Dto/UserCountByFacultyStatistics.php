@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Dto;
 
-// use App\Entity\Faculty;
 use OpenApi\Attributes as OA;
 
 final class UserCountByFacultyStatistics

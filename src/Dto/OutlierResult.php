@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Dto;
 
 /**
- * @type OutlierResultDtoType = array{user: array{firstName: string, lastName: null|string, anonymize: null|bool|int}, facultyId: int, value: int}
+ * @import-type AnonymizedUserDtoType from AnonymizedUser
+ * @type OutlierResultDtoType = array{user: int|AnonymizedUserDtoType, facultyId: int, value: int}
  */
 final class OutlierResult
 {
     public function __construct(
-        public AnonymizedUser $user,
+        public int|AnonymizedUser $user,
         public int $facultyId,
         public int $value,
     ) {}
@@ -20,15 +21,21 @@ final class OutlierResult
      */
     public static function fromCache(array $data): self
     {
-        $lastName = $data['user']['lastName'] ?? null;
-        $anonymize = $data['user']['anonymize'] ?? true;
-
-        $user = new AnonymizedUser(
-            $data['user']['firstName'],
-            $lastName,
-            $anonymize,
-        );
+        $user = \is_int($data['user'])
+            ? $data['user']
+            : AnonymizedUser::fromArray($data['user']);
 
         return new self($user, $data['facultyId'], $data['value']);
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'user' => \is_int($this->user)
+                ? $this->user
+                : $this->user->toArray(),
+            'facultyId' => $this->facultyId,
+            'value' => $this->value,
+        ];
     }
 }

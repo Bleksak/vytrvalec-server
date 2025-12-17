@@ -6,10 +6,16 @@ namespace App\Utils;
 
 abstract class AbstractProperty
 {
-    public static function isInitialized(object $class, string $field): bool
+    /**
+     * @template T of object
+     *
+     * @param T $object
+     * @param key-of<properties-of<T>> $field
+     */
+    public static function isInitialized(object $object, string $field): bool
     {
-        $property = new \ReflectionProperty($class::class, $field);
+        $property = new \ReflectionProperty($object::class, $field);
 
-        return $property->isInitialized($class);
+        return $property->isInitialized($object);
     }
 }

@@ -11,10 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Index(
-    columns: ['used_at'],
-    name: 'idx_used_at',
-)]
+#[ORM\Index(columns: ['used_at'], name: 'idx_used_at')]
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
 class Image
 {

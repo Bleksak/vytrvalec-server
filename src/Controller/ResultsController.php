@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Dto\Season\SeasonIndexDto;
+use App\Entity\Season;
+use App\Repository\ActivityRepository;
 use App\Repository\FacultyRepository;
 use App\Repository\SeasonRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,14 +22,22 @@ final class ResultsController extends AbstractController
     public function __construct(
         private readonly FacultyRepository $facultyRepository,
         private readonly SeasonRepository $seasonRepository,
+        private readonly ActivityRepository $activityRepository,
     ) {}
 
     public function __invoke(): Response
     {
+        $seasonList = \array_map(
+            static fn(SeasonIndexDto $seasonIndex): Season => $seasonIndex->season,
+            $this->seasonRepository->findOrdered(),
+        );
+
+        $activities = $this->activityRepository->findAllWithTranslations();
+
         return $this->render('results.html.twig', [
             'faculties' => $this->facultyRepository->findAllWithTranslations(),
-            //TODO(@bleksak): tady to udelat potom jinak mozna
-            'current_season' => $this->seasonRepository->findCurrentSeason(),
+            'activities' => $activities,
+            'season_list' => $seasonList,
         ]);
     }
 }

@@ -303,18 +303,15 @@ final class SubmissionController extends AbstractController
         return $this->json($submission->getUpdatedAt());
     }
 
-    #[OA\Get(
-        description: 'Extract submission for given seasons',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Submissions for the season',
-                content: new JsonContent(
-                    ref: new Model(type: ExtractSubmissionDto::class),
-                ),
+    #[OA\Get(description: 'Extract submission for given seasons', responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Submissions for the season',
+            content: new JsonContent(
+                ref: new Model(type: ExtractSubmissionDto::class),
             ),
-        ],
-    )]
+        ),
+    ])]
     #[Route(
         '/api/extract/submissions',
         'api_extract_submissions',

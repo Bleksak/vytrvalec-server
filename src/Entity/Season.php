@@ -17,10 +17,7 @@ use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]
-#[ORM\Index(
-    columns: ['start'],
-    name: 'date_index',
-)]
+#[ORM\Index(columns: ['start'], name: 'date_index')]
 class Season
 {
     #[OA\Property(example: 1)]
@@ -47,10 +44,7 @@ class Season
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(
-        mappedBy: 'season',
-        targetEntity: Submission::class,
-    )]
+    #[ORM\OneToMany(mappedBy: 'season', targetEntity: Submission::class)]
     private Collection $submissions;
 
     /**

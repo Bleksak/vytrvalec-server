@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Dto\AnonymizedUser;
 use App\Dto\Extract\ExtractSubmissionDto;
 use App\Dto\OutlierActivity;
 use App\Dto\OutlierResult;
@@ -238,13 +237,10 @@ final class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return list<OutlierActivity>
+     * @return array<int, OutlierActivity>
      */
-    public function findOutliers(
-        Season $season,
-        int $n = 3,
-        bool $shouldAnonymize = true,
-    ): array {
+    public function findOutliers(Season $season, int $n = 3): array
+    {
         $query = $this->getEntityManager()
             ->getConnection()
             ->prepare('
@@ -263,7 +259,7 @@ final class SubmissionRepository extends ServiceEntityRepository
                         AS row_num
                         FROM sub
                     )
-                SELECT value, activity_id, user_id, COALESCE(f.parent_id, u.faculty_id) AS faculty_id, u.first_name, u.last_name, u.anonymize
+                SELECT value, activity_id, user_id, COALESCE(f.parent_id, u.faculty_id) AS faculty_id
                 FROM sorted s
                 INNER JOIN user u ON u.id = s.user_id
                 INNER JOIN faculty f ON u.faculty_id = f.id
@@ -276,7 +272,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $query->bindValue(3, $n);
 
         /**
-         * @var list<array{activity_id: int, anonymize: bool, first_name: string, last_name: string, faculty_id: int, value: string}> $result
+         * @var list<array{activity_id: int, user_id: int, faculty_id: int, value: string}> $result
          */
         $result = $query->executeQuery()->fetchAllAssociative();
 
@@ -287,14 +283,8 @@ final class SubmissionRepository extends ServiceEntityRepository
                 $activities[$row['activity_id']] = [];
             }
 
-            $anonymize = $shouldAnonymize ? $row['anonymize'] : false;
-
             $activities[$row['activity_id']][] = new OutlierResult(
-                new AnonymizedUser(
-                    $row['first_name'],
-                    $row['last_name'],
-                    $anonymize,
-                ),
+                $row['user_id'],
                 $row['faculty_id'],
                 (int) $row['value'],
             );
@@ -303,7 +293,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $outlierActivity = [];
 
         foreach ($activities as $id => $results) {
-            $outlierActivity[] = new OutlierActivity($id, $results);
+            $outlierActivity[$id] = new OutlierActivity($id, $results);
         }
 
         return $outlierActivity;

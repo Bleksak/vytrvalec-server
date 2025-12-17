@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\Statistics\UserCountGroupedByFacultyTotal;
 use App\Dto\UserCountByFacultyStatistics;
 use App\Entity\Season;
 use App\Entity\Submission;
@@ -63,10 +64,7 @@ final class UserRepository extends ServiceEntityRepository implements
         $this->save($user, true);
     }
 
-    /**
-     * @return list<UserCountByFacultyStatistics>
-     */
-    public function countUserGroupedByFaculties(Season $season): array
+    public function countUserGroupedByFaculties(Season $season): UserCountGroupedByFacultyTotal
     {
         $queryBuilder = $this->createQueryBuilder('u');
 
@@ -95,13 +93,19 @@ final class UserRepository extends ServiceEntityRepository implements
             ->getQuery()
             ->getResult();
 
-        return \array_map(
-            static fn(array $row): UserCountByFacultyStatistics => new UserCountByFacultyStatistics(
+        $total = 0;
+        $users = [];
+
+        foreach ($rows as $row) {
+            $users[] = new UserCountByFacultyStatistics(
                 $row['id'],
                 $row['count'],
-            ),
-            $rows,
-        );
+            );
+
+            $total += $row['count'];
+        }
+
+        return new UserCountGroupedByFacultyTotal($users, $total);
     }
 
     /**
@@ -143,5 +147,20 @@ final class UserRepository extends ServiceEntityRepository implements
     public function findOneByEmail(string $email): ?User
     {
         return $this->findOneBy(['email' => $email]);
+    }
+
+    /**
+     * @param list<int> $ids
+     * @return list<User>
+     */
+    public function findByIds(array $ids): array
+    {
+        /** @var list<User> */
+        return $this->createQueryBuilder('u')
+            ->select('u')
+            ->where('u.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
     }
 }

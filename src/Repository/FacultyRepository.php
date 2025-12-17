@@ -42,11 +42,11 @@ final class FacultyRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return list<Faculty>
+     * @return array<int, Faculty>
      */
     public function findAllWithTranslations(): array
     {
-        /** @var list<Faculty> */
+        /** @var array<int, Faculty> */
         return $this->createQueryBuilder('f')
             ->join('f.translations', 'ft')
             ->addSelect('ft')

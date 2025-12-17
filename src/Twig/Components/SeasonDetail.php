@@ -18,10 +18,7 @@ final class SeasonDetail
     public string $title;
     public string $heading;
 
-    /** @var list<SeasonResultRankDto> */
-    public array $ranking;
-
-    public int $totalDistance = 0;
+    public SeasonResultRankDto $ranking;
 
     /** @var array<int, Faculty> */
     public array $faculties;
@@ -49,9 +46,5 @@ final class SeasonDetail
             $season,
             $seasonResult,
         );
-
-        foreach ($this->ranking as $row) {
-            $this->totalDistance += $row->distance;
-        }
     }
 }
