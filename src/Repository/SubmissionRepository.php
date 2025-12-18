@@ -197,9 +197,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         /**
          * @var Paginator<Submission>
          */
-        $paginator = new Paginator($queryBuilder->getQuery());
-
-        return $paginator;
+        return new Paginator($queryBuilder->getQuery());
     }
 
     /**

@@ -30,12 +30,7 @@ services:
 
     App\Services\VytrvalecMailer:
         arguments:
-            $clientUrl: '%client_url%'
             $appBase: '%app_base%'
-
-    App\Action\UserActions:
-        arguments:
-            $clientUrl: '%client_url%'
 
     App\Security\AccessTokenHandler:
         arguments:

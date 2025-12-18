@@ -18,8 +18,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route(
+    '/forgotten-password/{passwordResetToken}',
+    name: self::ROUTE,
+    methods: [Request::METHOD_GET, Request::METHOD_POST],
+)]
 final class ForgottenPasswordController extends AbstractController
 {
+    public const string ROUTE = 'user:forgotten-password';
+
     public function __construct(
         private readonly UserActions $action,
         private readonly ToastManager $toastManager,
@@ -30,11 +37,6 @@ final class ForgottenPasswordController extends AbstractController
     /**
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    #[Route(
-        '/forgotten-password/{passwordResetToken}',
-        name: 'forgotten_password',
-        methods: [Request::METHOD_GET, Request::METHOD_POST],
-    )]
     public function __invoke(
         Request $request,
         #[SensitiveParameter] string $passwordResetToken,

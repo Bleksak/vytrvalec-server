@@ -151,7 +151,6 @@ final readonly class FixCacheV2Command
             $userids = $usersWithSubmissions;
         }
 
-        $user = $userids['0'] ?? 0;
-        return $user;
+        return $userids['0'] ?? 0;
     }
 }

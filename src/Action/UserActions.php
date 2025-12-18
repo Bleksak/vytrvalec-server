@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Action;
 
+use App\Controller\ForgottenPasswordController;
 use App\Dto\EmailingChangeDto;
 use App\Dto\PasswordChangeDto;
 use App\Dto\User\ForgottenPasswordResetDto;
@@ -22,9 +23,8 @@ use App\Repository\FacultyRepository;
 use App\Repository\UserRepository;
 use App\Services\VytrvalecMailer;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\EntityManagerInterface;
-use SensitiveParameter;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final readonly class UserActions
 {
@@ -33,8 +33,7 @@ final readonly class UserActions
         private FacultyRepository $facultyRepository,
         private UserPasswordHasherInterface $hasher,
         private VytrvalecMailer $mailer,
-        private string $clientUrl,
-        private EntityManagerInterface $em,
+        private UrlGeneratorInterface $urlGenerator,
     ) {}
 
     /**
@@ -161,17 +160,16 @@ final readonly class UserActions
         $this->userRepository->save($user, true);
 
         $mail = new ForgottenPasswordEmailTemplate();
-        $mail->setContext(
-            'password_reset_link',
-            $this->clientUrl . '/reset-password/' . $userPasswordResetToken,
-        );
+        $mail->setContext('password_reset_link', $this->urlGenerator->generate(ForgottenPasswordController::ROUTE, [
+            'passwordResetToken' => $userPasswordResetToken,
+        ]));
 
         $this->mailer->send($user, $mail, forceSend: true);
     }
 
     public function forgottenPasswordReset(
         User $user,
-        #[SensitiveParameter] ForgottenPasswordResetDto|PasswordResetDto $dto,
+        #[\SensitiveParameter] ForgottenPasswordResetDto|PasswordResetDto $dto,
     ): void {
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
         $user->setPasswordResetToken(null);
@@ -193,7 +191,7 @@ final readonly class UserActions
         }
 
         $user->setMailing(false);
-        $user->setEmailUnsubscribeHash(null);
+        $user->resetEmailUnsubscribeHash();
 
         $this->userRepository->save($user, true);
 
@@ -207,13 +205,6 @@ final readonly class UserActions
         }
 
         $user->setMailing($dto->mailing);
-
-        $unsubscribeHash = null;
-        if ($user->hasMailing()) {
-            $unsubscribeHash = \bin2hex(\random_bytes(90));
-        }
-
-        $user->setEmailUnsubscribeHash($unsubscribeHash);
 
         $this->userRepository->save($user, true);
     }

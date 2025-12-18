@@ -298,16 +298,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getEmailUnsubscribeHash(): ?string
+    public function getEmailUnsubscribeHash(): string
     {
+        if ($this->emailUnsubscribeHash === null) {
+            $this->emailUnsubscribeHash = \bin2hex(\random_bytes(90));
+        }
+
         return $this->emailUnsubscribeHash;
     }
 
-    public function setEmailUnsubscribeHash(?string $emailUnsubscribeHash): static
+    public function resetEmailUnsubscribeHash(): void
     {
-        $this->emailUnsubscribeHash = $emailUnsubscribeHash;
-
-        return $this;
+        $this->emailUnsubscribeHash = null;
     }
 
     public function getLocale(): string
@@ -324,10 +326,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function anonymize(): static
     {
+        $this->resetEmailUnsubscribeHash();
+
         $this->setLastName('')
             ->setMailing(false)
             ->setAnonymization(true)
-            ->setEmailUnsubscribeHash(null)
             ->setToken(null)
             ->setPasswordResetToken(null);
 

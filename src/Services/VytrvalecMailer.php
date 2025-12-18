@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Controller\EmailUnsubscribeController;
 use App\Entity\User;
 use App\Notifications\AbstractEmailTemplate;
 use App\Notifications\VytrvalecEmail;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final readonly class VytrvalecMailer
 {
     public function __construct(
         private MailerInterface $mailer,
-        private string $clientUrl,
+        private UrlGeneratorInterface $urlGeneratorInterface,
         private string $appBase,
     ) {}
 
@@ -31,15 +33,9 @@ final readonly class VytrvalecMailer
     {
         $emailUnsubscribeHash = $user->getEmailUnsubscribeHash();
 
-        if ($emailUnsubscribeHash === null) {
-            return $this->clientUrl;
-        }
-
-        return \sprintf(
-            '%s/unsubscribe/%s',
-            $this->clientUrl,
-            $emailUnsubscribeHash,
-        );
+        return $this->urlGeneratorInterface->generate(EmailUnsubscribeController::ROUTE, [
+            'emailUnsubscribeHash' => $emailUnsubscribeHash,
+        ]);
     }
 
     /**
