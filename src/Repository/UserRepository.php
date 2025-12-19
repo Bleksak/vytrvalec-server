@@ -75,7 +75,8 @@ final class UserRepository extends ServiceEntityRepository implements
                 $queryBuilder
                     ->expr()
                     ->exists(
-                        $this->getEntityManager()
+                        $this
+                            ->getEntityManager()
                             ->createQueryBuilder()
                             ->select('1')
                             ->from(Submission::class, 's')
@@ -114,7 +115,8 @@ final class UserRepository extends ServiceEntityRepository implements
     public function findAllForMailing(): array
     {
         /** @var list<User> */
-        return $this->createQueryBuilder('u')
+        return $this
+            ->createQueryBuilder('u')
             ->select('u')
             ->where('u.mailing = 1')
             ->getQuery()
@@ -138,7 +140,8 @@ final class UserRepository extends ServiceEntityRepository implements
     public function findAllNotDeleted(): array
     {
         /** @var list<User> */
-        return $this->createQueryBuilder('u')
+        return $this
+            ->createQueryBuilder('u')
             ->where('u.email IS NOT NULL')
             ->getQuery()
             ->getResult();
@@ -156,7 +159,8 @@ final class UserRepository extends ServiceEntityRepository implements
     public function findByIds(array $ids): array
     {
         /** @var list<User> */
-        return $this->createQueryBuilder('u')
+        return $this
+            ->createQueryBuilder('u')
             ->select('u')
             ->where('u.id IN (:ids)')
             ->setParameter('ids', $ids)

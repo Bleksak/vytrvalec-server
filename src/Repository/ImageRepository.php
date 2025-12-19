@@ -49,7 +49,8 @@ final class ImageRepository extends ServiceEntityRepository
         $weekAgo = new \DateTime()->sub(new \DateInterval('P1W'));
 
         /** @var list<Image> */
-        return $this->createQueryBuilder('i')
+        return $this
+            ->createQueryBuilder('i')
             ->select('i')
             ->where('i.usedAt IS NULL')
             ->andWhere('i.uploadedAt <= :weekAgo')

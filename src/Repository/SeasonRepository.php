@@ -47,7 +47,8 @@ final class SeasonRepository extends ServiceEntityRepository
     public function findCurrentSeason(): ?Season
     {
         /** @var Season|null */
-        return $this->createQueryBuilder('s')
+        return $this
+            ->createQueryBuilder('s')
             ->where('s.start <= :now')
             ->andWhere('s.end >= :now')
             ->setParameter('now', new \DateTimeImmutable())
@@ -59,7 +60,8 @@ final class SeasonRepository extends ServiceEntityRepository
     public function getLast(): ?Season
     {
         /** @var Season|null */
-        return $this->createQueryBuilder('s')
+        return $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->orderBy('s.end', 'ASC')
             ->setMaxResults(1)
@@ -72,7 +74,8 @@ final class SeasonRepository extends ServiceEntityRepository
      */
     public function findOrdered(): array
     {
-        $qb = $this->createQueryBuilder('s')
+        $qb = $this
+            ->createQueryBuilder('s')
             ->select('s', 'c', 'i', 'ct', 'sfm')
             ->addSelect('(
             SELECT COUNT(sub2.id)
@@ -106,7 +109,8 @@ final class SeasonRepository extends ServiceEntityRepository
     public function findPast(): array
     {
         /** @var list<Season> */
-        return $this->createQueryBuilder('s')
+        return $this
+            ->createQueryBuilder('s')
             ->addSelect('s')
             ->addSelect('sc')
             ->addSelect('sci')
@@ -127,7 +131,8 @@ final class SeasonRepository extends ServiceEntityRepository
         $endDate = new \DateTimeImmutable($dateTime->format('Y-m-t'));
 
         /** @var Season|null */
-        return $this->createQueryBuilder('s')
+        return $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->where('s.start BETWEEN :startDate AND :endDate')
             ->setParameter('startDate', $startDate)
@@ -138,7 +143,8 @@ final class SeasonRepository extends ServiceEntityRepository
 
     public function countSeasonsByCharity(Charity $charity): int
     {
-        return (int) $this->createQueryBuilder('s')
+        return (int) $this
+            ->createQueryBuilder('s')
             ->select('COUNT(s)')
             ->where('s.charity = :charity')
             ->setParameter('charity', $charity)

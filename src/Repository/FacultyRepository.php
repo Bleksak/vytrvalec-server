@@ -47,7 +47,8 @@ final class FacultyRepository extends ServiceEntityRepository
     public function findAllWithTranslations(): array
     {
         /** @var array<int, Faculty> */
-        return $this->createQueryBuilder('f')
+        return $this
+            ->createQueryBuilder('f')
             ->join('f.translations', 'ft')
             ->addSelect('ft')
             ->indexBy('f', 'f.id')

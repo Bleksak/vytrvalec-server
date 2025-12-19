@@ -328,7 +328,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->resetEmailUnsubscribeHash();
 
-        $this->setLastName('')
+        $this
+            ->setLastName('')
             ->setMailing(false)
             ->setAnonymization(true)
             ->setToken(null)

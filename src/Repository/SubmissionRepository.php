@@ -56,7 +56,8 @@ final class SubmissionRepository extends ServiceEntityRepository
      */
     public function findAllByUser(User $user, int $page, int $limit): Paginator
     {
-        $query = $this->createQueryBuilder('s')
+        $query = $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->addSelect('i')
             ->leftJoin('s.image', 'i')
@@ -84,7 +85,8 @@ final class SubmissionRepository extends ServiceEntityRepository
         int $page,
         int $limit,
     ): Paginator {
-        $query = $this->createQueryBuilder('s')
+        $query = $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->join('s.image', 'i')
             ->addSelect('i.path as image')
@@ -147,7 +149,8 @@ final class SubmissionRepository extends ServiceEntityRepository
         SeasonQueryFilterRequestDto $queryFilter,
         int $limit,
     ): Paginator {
-        $queryBuilder = $this->createQueryBuilder('s')
+        $queryBuilder = $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->join('s.image', 'i')
             ->where('s.season = :seasonId')
@@ -206,7 +209,8 @@ final class SubmissionRepository extends ServiceEntityRepository
     public function getResultsForWeek(Season $season, int $week): array
     {
         /** @var list<array{distance: int, faculty: int, activity: int}> */
-        $result = $this->createQueryBuilder('s')
+        $result = $this
+            ->createQueryBuilder('s')
             ->select(
                 'sum(s.distance) as distance, COALESCE(IDENTITY(f.parent), IDENTITY(u.faculty)) as faculty, IDENTITY(s.activity) as activity',
             )
@@ -239,7 +243,8 @@ final class SubmissionRepository extends ServiceEntityRepository
      */
     public function findOutliers(Season $season, int $n = 3): array
     {
-        $query = $this->getEntityManager()
+        $query = $this
+            ->getEntityManager()
             ->getConnection()
             ->prepare('
                 WITH
@@ -300,7 +305,8 @@ final class SubmissionRepository extends ServiceEntityRepository
     public function sumCountUserGroupedByFaculties(): int
     {
         /** @var list<int> */
-        $result = $this->createQueryBuilder('s')
+        $result = $this
+            ->createQueryBuilder('s')
             ->select('count(distinct s.user) as count')
             ->where('s.accepted = 1')
             ->groupBy('s.season')
@@ -317,7 +323,8 @@ final class SubmissionRepository extends ServiceEntityRepository
         ImagePath $imagePath,
         ?int $season = null,
     ): array {
-        $qb = $this->createQueryBuilder('ss')
+        $qb = $this
+            ->createQueryBuilder('ss')
             ->select('ss, i')
             ->join('ss.image', 'i')
             ->where('ss.reviewed = 1')
@@ -353,7 +360,8 @@ final class SubmissionRepository extends ServiceEntityRepository
     public function getTotalStatistics(): array
     {
         /** @var list<array{activity: int, distance: int}> */
-        return $this->createQueryBuilder('s')
+        return $this
+            ->createQueryBuilder('s')
             ->select(
                 'IDENTITY(s.activity) as activity, SUM(s.distance) AS distance',
             )

@@ -40,7 +40,8 @@ final class SeasonCacheRepository extends ServiceEntityRepository
     public function findLastN(int $n): array
     {
         /** @var list<Cache> */
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->join('c.season', 's')
             ->orderBy('s.start', 'DESC')
             ->setMaxResults($n)
@@ -50,7 +51,8 @@ final class SeasonCacheRepository extends ServiceEntityRepository
 
     public function isCached(Season $season): bool
     {
-        return (bool) $this->createQueryBuilder('c')
+        return (bool) $this
+            ->createQueryBuilder('c')
             ->select('CASE WHEN COUNT(c.season) > 0 THEN 1 ELSE 0 END')
             ->where('c.season = :season')
             ->setParameter('season', $season)
@@ -61,7 +63,8 @@ final class SeasonCacheRepository extends ServiceEntityRepository
     public function findBySeason(Season $season): ?Cache
     {
         /** @var Cache|null */
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->select('c')
             ->where('c.season = :season')
             ->setParameter('season', $season)

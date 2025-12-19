@@ -86,7 +86,8 @@ final class ActivityRepository extends ServiceEntityRepository
             $activityListWithDistances,
         );
 
-        $query = $this->createQueryBuilder('a')
+        $query = $this
+            ->createQueryBuilder('a')
             ->addSelect('a as activity')
             ->addSelect('at')
             ->addSelect('ai')
@@ -126,7 +127,8 @@ final class ActivityRepository extends ServiceEntityRepository
     public function findAllWithTranslations(): array
     {
         /** @var array<int, Activity> */
-        return $this->createQueryBuilder('a')
+        return $this
+            ->createQueryBuilder('a')
             ->join('a.translations', 'at')
             ->addSelect('at')
             ->indexBy('a', 'a.id')
