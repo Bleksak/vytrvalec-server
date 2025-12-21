@@ -23,6 +23,7 @@ method-chain-breaking-style = "next_line"
 null-type-hint = "question"
 always-break-attribute-named-argument-lists = true
 method-brace-style = "next_line"
+empty-line-between-same-symbols = true
 
 [linter]
 integrations = ["symfony", "amphp", "phpunit", "doctrine"]
@@ -43,6 +44,9 @@ no-variable-variable = { enabled = true }
 no-else-clause = { enabled = false }
 no-shorthand-ternary = { enabled = false }
 assert-description = { enabled = false }
+trait-name = { psr = true }
+interface-name = { psr = true }
+class-name = { psr = true }
 
 ambiguous-function-call = {enabled=true}
 require-namespace = {enabled=true}
