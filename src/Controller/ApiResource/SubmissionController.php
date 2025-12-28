@@ -60,11 +60,11 @@ final class SubmissionController extends AbstractController
         #[CurrentUser] User $user,
         Submission $submission,
     ): Response {
-        if (!$user->hasRole('ROLE_STAFF') && $user !== $submission->getUser()) {
+        if (!$user->hasRole('ROLE_STAFF') && $user !== $submission->user) {
             return new Response(status: Response::HTTP_FORBIDDEN);
         }
 
-        if ($submission->isReviewed() && $submission->isAccepted()) {
+        if ($submission->reviewed && $submission->accepted) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
@@ -149,15 +149,11 @@ final class SubmissionController extends AbstractController
     )]
     public function list(#[CurrentUser] User $user): Response
     {
-        $submissions = $this->submissionRepository->findAllByUser(
-            $user,
-            1,
-            5000,
-        );
+        $submissions = $this->submissionRepository->findAllByUser($user);
 
         return $this->json(\array_map(
             fn(Submission $submission): SubmissionResponseDto => $submission->toResponseObject($this->imagePath),
-            \iterator_to_array($submissions),
+            $submissions,
         ));
     }
 
@@ -182,9 +178,9 @@ final class SubmissionController extends AbstractController
 
         foreach ($submissions as $submission) {
             $submissionResponse[] = $submission->toResponseObject($this->imagePath);
-            $user = $submission->getUser();
+            $user = $submission->user;
 
-            $userId = $user->getId();
+            $userId = $user->id;
 
             if (!isset($userResponse[$userId])) {
                 $userResponse[$userId] = $user->toResponseObject();
@@ -234,7 +230,7 @@ final class SubmissionController extends AbstractController
         Submission $submission,
         #[MapRequestPayload] SubmissionEditDto $submissionEditDto,
     ): Response {
-        if ($submission->isAccepted()) {
+        if ($submission->accepted) {
             return $this->json(['submission' => [
                 'accepted',
             ]], Response::HTTP_BAD_REQUEST);
@@ -244,7 +240,7 @@ final class SubmissionController extends AbstractController
         // v roce 2025 se ji pokusi upravit -> zobrazi se v submission pageru
         // -> neni mozne zjistit jestli je z roku 2024/2025
         // -> acceptne se -> zmeni vysledky z predchozich let
-        if (!$submission->getSeason()->isRunning()) {
+        if (!$submission->season->isRunning()) {
             return $this->json(['season' => [
                 'no_season',
             ]], Response::HTTP_BAD_REQUEST);
@@ -253,7 +249,7 @@ final class SubmissionController extends AbstractController
         // 1. uzivatel da edit, admin vidi starou verzi
         // 2. chceme, aby admin dostal error, ze vidi starou verzi a musi to zkontrolovat znovu
 
-        if ($user !== $submission->getUser()) {
+        if ($user !== $submission->user) {
             return $this->json([], Response::HTTP_NOT_FOUND);
         }
 
@@ -300,7 +296,7 @@ final class SubmissionController extends AbstractController
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json($submission->getUpdatedAt());
+        return $this->json($submission->updatedAt);
     }
 
     #[OA\Get(description: 'Extract submission for given seasons', responses: [

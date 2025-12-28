@@ -16,6 +16,4 @@ use OpenApi\Attributes as OA;
     new OA\Property(property: 'distance', type: 'integer'),
     new OA\Property(property: 'elevation', type: 'integer'),
 ])]
-final class ProfileCacheSchema
-{
-}
+final class ProfileCacheSchema {}

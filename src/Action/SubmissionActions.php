@@ -44,11 +44,11 @@ final readonly class SubmissionActions
 
         $image = $this->imageRepository->find($dto->imageUuid);
 
-        if ($image === null || $image->getUsedAt() !== null) {
+        if ($image === null || $image->usedAt !== null) {
             return ['image' => 'invalid'];
         }
 
-        $image->setUsedAt(new \DateTime());
+        $image->usedAt = new \DateTime();
 
         $submission = new Submission(
             $user,
@@ -74,18 +74,15 @@ final readonly class SubmissionActions
         Submission $submission,
         SubmissionStateDto $dto,
     ): array {
-        if ($dto->updatedAt !== $submission->getUpdatedAt()) {
+        if ($dto->updatedAt !== $submission->updatedAt) {
             return ['mismatch_updated_at'];
         }
 
-        $submission->setMessage($dto->message);
+        $submission->message = $dto->message;
 
         $this->handleCacheUpdate($submission, $dto);
 
-        if (
-            $dto->state
-            && (!$submission->isReviewed() || !$submission->isAccepted())
-        ) {
+        if ($dto->state && (!$submission->reviewed || !$submission->accepted)) {
             // noop when already accepted, otherwise profile cache would stack
             $this->profileCacheRepository->addCache($submission);
         }
@@ -98,19 +95,19 @@ final readonly class SubmissionActions
 
             $now = new \DateTimeImmutable();
 
-            if ($submission->getDate()->diff($now)->m < 2) {
+            if ($submission->date->diff($now)->m < 2) {
                 $template = new SubmissionRejectedEmailTemplate(
                     $submission,
                     $dto->message,
                 );
-                $template->replyTo = $issuer->getEmail();
+                $template->replyTo = $issuer->email;
 
-                $this->mailer->send($submission->getUser(), $template);
+                $this->mailer->send($submission->user, $template);
             }
         }
 
-        $submission->setReviewed(true);
-        $submission->setAccepted($dto->state);
+        $submission->reviewed = true;
+        $submission->accepted = $dto->state;
 
         $this->submissionRepository->save($submission, true);
 
@@ -129,29 +126,32 @@ final readonly class SubmissionActions
         Submission $submission,
         SubmissionEditDto $dto,
     ): array {
-        if ($submission->getUpdatedAt() !== $dto->updatedAt) {
+        if ($submission->updatedAt !== $dto->updatedAt) {
             return ['updated_at' => 'mismatch'];
         }
 
         if ($dto->imageUuid !== null) {
             $image = $this->imageRepository->find($dto->imageUuid);
 
-            if ($image === null || $image->getUsedAt() !== null) {
+            if ($image === null || $image->usedAt !== null) {
                 return ['image' => 'invalid'];
             }
 
-            $oldImage = $submission->getImage();
-            $image->setUsedAt(new \DateTime());
-            $submission->setImage($image);
-            $oldImage?->setUsedAt(null);
+            $oldImage = $submission->image;
+            $image->usedAt = new \DateTime();
+            $submission->image = $image;
+
+            if ($oldImage !== null) {
+                $oldImage->usedAt = null;
+            }
         }
 
         if ($dto->distance !== null) {
-            $submission->setDistance($dto->distance);
+            $submission->distance = $dto->distance;
         }
 
         if ($dto->elevation !== null) {
-            $submission->setElevation($dto->elevation);
+            $submission->elevation = $dto->elevation;
         }
 
         if ($dto->activityId !== null) {
@@ -161,11 +161,11 @@ final readonly class SubmissionActions
                 return ['activity_id' => 'invalid'];
             }
 
-            $submission->setActivity($activity);
+            $submission->activity = $activity;
         }
 
-        $submission->setMessage('');
-        $submission->setReviewed(false);
+        $submission->message = '';
+        $submission->reviewed = false;
 
         $this->submissionRepository->save($submission, true);
 
@@ -176,10 +176,7 @@ final readonly class SubmissionActions
         Submission $submission,
         SubmissionStateDto $dto,
     ): void {
-        if (
-            $dto->state
-            && (!$submission->isReviewed() || !$submission->isAccepted())
-        ) {
+        if ($dto->state && (!$submission->reviewed || !$submission->accepted)) {
             // noop when already accepted, otherwise profile cache would stack
             $this->profileCacheRepository->addCache($submission);
         }

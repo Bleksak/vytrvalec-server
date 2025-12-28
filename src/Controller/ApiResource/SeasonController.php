@@ -177,10 +177,10 @@ final class SeasonController extends AbstractController
         SeasonResultCalculator $result,
         SeasonCacheRepository $cacheRepository,
     ): Response {
-        $cache = $cacheRepository->findOneBy(['season' => $season->getId()]);
+        $cache = $cacheRepository->findOneBy(['season' => $season->id]);
 
         if ($cache !== null) {
-            return $this->json($cache->getData());
+            return $this->json($cache->data);
         }
 
         return $this->json($result->calculate($season));

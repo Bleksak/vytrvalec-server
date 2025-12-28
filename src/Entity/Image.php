@@ -13,20 +13,20 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Index(columns: ['used_at'], name: 'idx_used_at')]
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
-class Image
+final class Image
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME)]
-    private Uuid $uuid;
+    public private(set) Uuid $uuid;
 
     #[ORM\Column(length: 512)]
-    private string $path;
+    public private(set) string $path;
 
     #[ORM\Column]
-    private \DateTime $uploadedAt;
+    public \DateTime $uploadedAt;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTime $usedAt = null;
+    public ?\DateTime $usedAt = null;
 
     #[ORM\Column(enumType: MimeType::class)]
     public ?MimeType $originalMimeType;
@@ -40,18 +40,6 @@ class Image
         $this->usedAt = null;
     }
 
-    public function getUuid(): Uuid
-    {
-        return $this->uuid;
-    }
-
-    public function setUuid(Uuid $uuid): static
-    {
-        $this->uuid = $uuid;
-
-        return $this;
-    }
-
     public function getPath(?ImagePath $imagePath = null): string
     {
         if ($imagePath === null) {
@@ -59,36 +47,5 @@ class Image
         }
 
         return $imagePath->fullPath($this->path);
-    }
-
-    public function setPath(string $path): static
-    {
-        $this->path = $path;
-
-        return $this;
-    }
-
-    public function getUploadedAt(): \DateTime
-    {
-        return $this->uploadedAt;
-    }
-
-    public function setUploadedAt(\DateTime $uploadedAt): static
-    {
-        $this->uploadedAt = $uploadedAt;
-
-        return $this;
-    }
-
-    public function getUsedAt(): ?\DateTime
-    {
-        return $this->usedAt;
-    }
-
-    public function setUsedAt(?\DateTime $usedAt): static
-    {
-        $this->usedAt = $usedAt;
-
-        return $this;
     }
 }

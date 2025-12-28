@@ -11,45 +11,23 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SeasonCacheRepository::class)]
-class Cache
+final class Cache
 {
     #[ORM\Id]
     #[ORM\OneToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private Season $season;
+    public Season $season;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private \DateTime $createdAt;
+    public \DateTime $createdAt;
 
     #[ORM\Column(type: SeasonResultType::NAME)]
-    private SeasonResultDto $data;
+    public SeasonResultDto $data;
 
     public function __construct(Season $season, SeasonResultDto $data)
     {
         $this->createdAt = new \DateTime();
         $this->season = $season;
         $this->data = $data;
-    }
-
-    public function getSeason(): Season
-    {
-        return $this->season;
-    }
-
-    public function getData(): SeasonResultDto
-    {
-        return $this->data;
-    }
-
-    public function setData(SeasonResultDto $data): self
-    {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): \DateTimeInterface
-    {
-        return $this->createdAt;
     }
 }

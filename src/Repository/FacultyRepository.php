@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\Faculty;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -44,15 +45,25 @@ final class FacultyRepository extends ServiceEntityRepository
     /**
      * @return array<int, Faculty>
      */
-    public function findAllWithTranslations(): array
+    public function findAllWithTranslations(?string $locale = null): array
     {
-        /** @var array<int, Faculty> */
-        return $this
+        $query = $this
             ->createQueryBuilder('f')
-            ->join('f.translations', 'ft')
             ->addSelect('ft')
-            ->indexBy('f', 'f.id')
-            ->getQuery()
-            ->getResult();
+            ->indexBy('f', 'f.id');
+
+        if ($locale !== null) {
+            $query->innerJoin(
+                'f.translations',
+                'ft',
+                Join::WITH,
+                'ft.locale = :locale',
+            )->setParameter('locale', $locale);
+        } else {
+            $query->innerJoin('f.translations', 'ft');
+        }
+
+        /** @var array<int, Faculty> */
+        return $query->getQuery()->getResult();
     }
 }

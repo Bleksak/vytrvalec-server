@@ -18,34 +18,34 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]
 #[ORM\Index(columns: ['start'], name: 'date_index')]
-class Season
+final class Season
 {
     #[OA\Property(example: 1)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    public int $id;
 
     #[OA\Property(example: '2025-04-01')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
-    private \DateTime $start;
+    public \DateTime $start;
 
     #[OA\Property(example: '2025-05-01')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\Date]
-    private \DateTime $end;
+    public \DateTime $end;
 
     #[OA\Property]
     #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
-    private Charity $charity;
+    public Charity $charity;
 
     /**
      * @var Collection<int, Submission>
      */
     #[ORM\OneToMany(mappedBy: 'season', targetEntity: Submission::class)]
-    private Collection $submissions;
+    public Collection $submissions;
 
     /**
      * @var Collection<int, FacultyMapping>
@@ -55,7 +55,7 @@ class Season
         mappedBy: 'season',
         orphanRemoval: true,
     )]
-    private Collection $facultyMappings;
+    public Collection $facultyMappings;
 
     public function __construct(
         \DateTime $start,
@@ -69,52 +69,11 @@ class Season
         $this->facultyMappings = new ArrayCollection();
     }
 
-    public function getId(): int
-    {
-        return $this->id ?? 0;
-    }
-
-    public function getStart(): \DateTime
-    {
-        return $this->start;
-    }
-
-    public function setStart(\DateTime $start): self
-    {
-        $this->start = $start;
-
-        return $this;
-    }
-
-    public function getEnd(): \DateTime
-    {
-        return $this->end;
-    }
-
-    public function setEnd(\DateTime $end): self
-    {
-        $this->end = $end;
-
-        return $this;
-    }
-
-    public function getCharity(): Charity
-    {
-        return $this->charity;
-    }
-
-    public function setCharity(Charity $charity): self
-    {
-        $this->charity = $charity;
-
-        return $this;
-    }
-
     public function addSubmission(Submission $submission): self
     {
         if (!$this->submissions->contains($submission)) {
             $this->submissions->add($submission);
-            $submission->setSeason($this);
+            $submission->season = $this;
         }
 
         return $this;
@@ -135,16 +94,16 @@ class Season
     public function isRunning(): bool
     {
         $today = new \DateTimeImmutable();
-        $start = \DateTimeImmutable::createFromInterface($this->getStart());
-        $end = \DateTimeImmutable::createFromInterface($this->getEnd());
+        $start = \DateTimeImmutable::createFromInterface($this->start);
+        $end = \DateTimeImmutable::createFromInterface($this->end);
 
         return $today >= $start && $today <= $end;
     }
 
     public function getWeekCount(): int
     {
-        $start = \DateTimeImmutable::createFromInterface($this->getStart());
-        $end = \DateTimeImmutable::createFromInterface($this->getEnd());
+        $start = \DateTimeImmutable::createFromInterface($this->start);
+        $end = \DateTimeImmutable::createFromInterface($this->end);
 
         $diff = $end->diff($start);
         \assert(
@@ -155,14 +114,6 @@ class Season
         $weeks = \intdiv($diff->days + 1, 7);
 
         return $weeks === 0 ? 1 : $weeks;
-    }
-
-    /**
-     * @return Collection<int, FacultyMapping>
-     */
-    public function getFacultyMappings(): Collection
-    {
-        return $this->facultyMappings;
     }
 
     public function addFacultyMapping(FacultyMapping $facultyMapping): static

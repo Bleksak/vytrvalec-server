@@ -30,11 +30,11 @@ final readonly class CharityActions
         if ($dto->imageUuid !== null) {
             $image = $this->imageRepository->find($dto->imageUuid);
 
-            if ($image === null || $image->getUsedAt() !== null) {
+            if ($image === null || $image->usedAt !== null) {
                 return ['image' => 'invalid'];
             }
 
-            $image->setUsedAt(new \DateTime());
+            $image->usedAt = new \DateTime();
         }
 
         $charity = new Charity($dto->translations, $image, $dto->website);
@@ -89,15 +89,18 @@ final readonly class CharityActions
         if ($dto->image !== null) {
             $image = $this->imageRepository->find($dto->image);
 
-            if ($image !== null && $image->getUsedAt() === null) {
-                $oldImage = $charity->getImage();
-                $charity->setImage($image);
-                $image->setUsedAt(new \DateTime());
-                $oldImage?->setUsedAt(null);
+            if ($image !== null && $image->usedAt === null) {
+                $oldImage = $charity->image;
+                $charity->image = $image;
+                $image->usedAt = new \DateTime();
+
+                if ($oldImage !== null) {
+                    $oldImage->usedAt = null;
+                }
             }
         }
 
-        $charity->setWebsite($dto->website ?? $charity->getWebsite());
+        $charity->website = $dto->website ?? $charity->website;
 
         $this->charityRepository->save($charity, true);
     }

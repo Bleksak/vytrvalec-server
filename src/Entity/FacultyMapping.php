@@ -38,7 +38,7 @@ class FacultyMapping
     public function toResponseObject(): FacultyMappingResponseDto
     {
         return new FacultyMappingResponseDto(
-            $this->season->getId(),
+            $this->season->id,
             $this->faculty->id,
             $this->parent?->id,
         );

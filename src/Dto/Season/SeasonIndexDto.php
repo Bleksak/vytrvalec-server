@@ -20,15 +20,15 @@ final readonly class SeasonIndexDto
     public function toResponseObject(?ImagePath $imagePath = null): SeasonIndexResponseDto
     {
         return new SeasonIndexResponseDto(
-            $this->season->getId(),
-            $this->season->getCharity()->toResponseObject($imagePath),
-            $this->season->getStart(),
-            $this->season->getEnd(),
+            $this->season->id,
+            $this->season->charity->toResponseObject($imagePath),
+            $this->season->start,
+            $this->season->end,
             $this->canDelete,
             $this->season->isRunning(),
             \array_map(
                 static fn(FacultyMapping $mapping): FacultyMappingResponseDto => $mapping->toResponseObject(),
-                $this->season->getFacultyMappings()->toArray(),
+                $this->season->facultyMappings->toArray(),
             ),
         );
     }

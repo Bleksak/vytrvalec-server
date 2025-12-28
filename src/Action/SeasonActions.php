@@ -76,6 +76,8 @@ final readonly class SeasonActions
 
         $this->entityManager->commit();
 
+        // TODO(@bleksak): send notifications
+        //
         // if ($dto->season->notificationDate !== null) {
         //     $stamps[] = DelayStamp::delayUntil($dto->season->start);
         //     $this->messageBus->dispatch(

@@ -84,7 +84,7 @@ final readonly class UserActions
     {
         // update all fields that are not null
         if ($dto->email !== null) {
-            $user->setEmail($dto->email);
+            $user->email = $dto->email;
         }
 
         if ($dto->firstName !== null) {
@@ -108,7 +108,7 @@ final readonly class UserActions
         }
 
         if ($dto->roles !== null && \count($dto->roles) !== 0) {
-            $user->setRoles($dto->roles);
+            $user->roles = $dto->roles;
         }
 
         try {
@@ -179,7 +179,7 @@ final readonly class UserActions
 
     public function updateAnonymization(User $user, bool $anonymize): void
     {
-        $user->setAnonymization($anonymize);
+        $user->anonymize = $anonymize;
         $this->userRepository->save($user, true);
     }
 

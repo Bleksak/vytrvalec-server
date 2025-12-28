@@ -21,7 +21,7 @@ final class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    public int $id;
+    public private(set) int $id;
 
     #[OA\Property]
     #[ORM\ManyToOne]

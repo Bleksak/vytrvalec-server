@@ -24,6 +24,4 @@ use OpenApi\Attributes as OA;
     ),
     new OA\Property(property: 'charity', ref: new Model(type: Charity::class)),
 ])]
-final class SeasonWithoutSubmissionsSchema
-{
-}
+final class SeasonWithoutSubmissionsSchema {}

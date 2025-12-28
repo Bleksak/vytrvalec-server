@@ -52,7 +52,11 @@
         <div class="season-detail-charity-image-container" data-skip-morph>
             {% if season.charity.image %}
                 <img
-                    src="{{ season.charity.image.path }}"
+                    src="{{
+                    season.charity.image.path is defined
+                        ? absolute_url(season.charity.image.path)
+                        : ''
+                    }}"
                     alt="{{ season.charity.translations[app.locale].name }}"
                     class="season-detail-charity-image"
                 />

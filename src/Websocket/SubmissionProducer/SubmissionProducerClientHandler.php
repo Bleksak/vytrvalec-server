@@ -68,7 +68,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
         $freeListLock = $this->freeListMutex->acquire();
 
         $oldSubmissions = \array_map(
-            static fn(Submission $submission): int => $submission->getId(),
+            static fn(Submission $submission): int => $submission->id,
             $this->submissions,
         );
 
@@ -82,7 +82,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
         $toMerge = \array_filter(
             \array_diff_key($newSubmissions, $this->submissions),
             static fn(Submission $submission): bool => (
-                $submission->isReviewed() === false
+                $submission->reviewed === false
             ),
         );
 
@@ -240,7 +240,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
 
                         $submission =
                             $this->submissions[$customClient->submissionId];
-                        $user = $submission->getUser();
+                        $user = $submission->user;
 
                         $response = new SubmissionProducerMessage(
                             SubmissionProducerMessageType::Success,
@@ -283,8 +283,8 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
                         $submission =
                             $this->submissions[$customClient->submissionId];
 
-                        $submission->setReviewed(true);
-                        $submission->setAccepted($payload->accepted);
+                        $submission->reviewed = true;
+                        $submission->accepted = $payload->accepted;
 
                         $this->submissionRepository->save($submission, true);
 

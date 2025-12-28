@@ -57,7 +57,7 @@ final class UserController extends AbstractController
         $expirationTime = \time() + (10 * 365 * 24 * 60 * 60); // 10 years expiration
 
         $payload = new JWTPayload(
-            $user->getId(),
+            $user->id,
             $user->getUserIdentifier(),
             $expirationTime,
         );

@@ -15,13 +15,13 @@ use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: CharityRepository::class)]
-class Charity
+final class Charity
 {
     #[OA\Property]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    public private(set) int $id;
 
     #[OA\Property]
     #[ORM\ManyToOne]
@@ -30,11 +30,11 @@ class Charity
         referencedColumnName: 'uuid',
         name: 'image_uuid',
     )]
-    private ?Image $image = null;
+    public ?Image $image = null;
 
     #[OA\Property]
     #[ORM\Column(length: 512, nullable: true)]
-    private ?string $website = null;
+    public ?string $website = null;
 
     /** @var Collection<string, CharityTranslation> */
     #[ORM\OneToMany(
@@ -68,35 +68,6 @@ class Charity
                 ),
             );
         }
-    }
-
-    public function getId(): int
-    {
-        return $this->id ?? 0;
-    }
-
-    public function getImage(): ?Image
-    {
-        return $this->image;
-    }
-
-    public function setImage(Image $image): self
-    {
-        $this->image = $image;
-
-        return $this;
-    }
-
-    public function getWebsite(): ?string
-    {
-        return $this->website;
-    }
-
-    public function setWebsite(?string $website): self
-    {
-        $this->website = $website;
-
-        return $this;
     }
 
     public function addTranslation(CharityTranslation $translation): void

@@ -30,7 +30,7 @@ final readonly class SeasonStartHandler
 
         $now = new \DateTimeImmutable();
 
-        if ($season->getStart()->diff($now)->days !== 0) {
+        if ($season->start->diff($now)->days !== 0) {
             return;
         }
 

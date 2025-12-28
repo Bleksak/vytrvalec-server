@@ -1,0 +1,100 @@
+<div class="submission-card">
+    <div class="submission-card-image-wrapper">
+        <img
+            class="submission-card-preview"
+            loading="lazy"
+            src="{{
+            submission.image.path is defined
+                ? absolute_url(submission.image.path)
+                : ''
+            }}"
+            alt="Náhled"
+            title="Náhled"
+            onerror="this.onerror = null;this.src='{{
+            absolute_url(
+                asset('images/image-not-found.png')
+            )
+            }}';"
+        />
+        <div class="submission-card-overlay top">
+            <div class="submission-card-row">
+                <div class="submission-card-stack">
+                    <div
+                        class="submission-state submission-state-{{
+                        submission.state.value
+                        }}"
+                    >
+                        <span class="submission-state-text">
+                            {{
+                                ('submission.state.'
+                                    ~ submission.state.value)|trans
+                            }}
+                        </span>
+                    </div>
+                    {% if submission.message %}
+                        <twig:ux:icon
+                            name="lucide:comment"
+                            width="24"
+                            height="24"
+                            class="submission-card-icon"
+                        />
+                    {% endif %}
+                </div>
+                <div class="submission-card-meta-item">
+                    <twig:ux:icon
+                        name="lucide:calendar"
+                        width="24"
+                        height="24"
+                        class="submission-card-icon"
+                    />
+                    <span>{{ submission.date|format_date }}</span>
+                </div>
+                <img
+                    class="submission-card-icon filter-white"
+                    src="{{ submission.activity.icon.getPath() }}"
+                    alt="{{
+                    submission.activity.translations[app.locale].name
+                    }}"
+                />
+            </div>
+        </div>
+
+        <div class="submission-card-overlay bottom">
+            <div class="submission-card-row submission-card-meta">
+                <div class="submission-card-meta-item">
+                    <twig:ux:icon
+                        name="lucide:ruler-dimension-line"
+                        width="24"
+                        height="24"
+                        class="submission-card-icon"
+                    />
+                    <span>
+                        {{ (submission.distance / 1000)|number_format(2) }} km
+                    </span>
+                </div>
+                <div class="submission-card-meta-item">
+                    <twig:ux:icon
+                        name="lucide:mountain"
+                        width="24"
+                        height="24"
+                        class="submission-card-icon"
+                    />
+                    <span>{{ submission.elevation }} m</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="submission-card-buttons">
+            {% if submission.editable %}
+                <button>
+                    <twig:ux:icon name="lucide:pencil" width="24" height="24" />
+                </button>
+                <button class="delete">
+                    <twig:ux:icon name="lucide:trash" width="24" height="24" />
+                </button>
+            {% else %}
+                <button>{{ 'submission.preview'|trans }}</button>
+            {% endif %}
+        </div>
+    </div>
+</div>

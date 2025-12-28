@@ -52,29 +52,21 @@ final class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Paginator<Submission>
+     * @return list<Submission>
      */
-    public function findAllByUser(User $user, int $page, int $limit): Paginator
+    public function findAllByUser(User $user): array
     {
-        $query = $this
+        /** @var list<Submission> */
+        return $this
             ->createQueryBuilder('s')
             ->select('s')
             ->addSelect('i')
             ->leftJoin('s.image', 'i')
             ->where('s.user = :user')
             ->addOrderBy('s.date', 'DESC')
-            ->setParameter('user', $user);
-
-        /**
-         * @var Paginator<Submission>
-         */
-        $paginator = new Paginator($query);
-        $paginator
+            ->setParameter('user', $user)
             ->getQuery()
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit);
-
-        return $paginator;
+            ->getResult();
     }
 
     /**
@@ -92,7 +84,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->addSelect('i.path as image')
             ->where('s.season = :seasonId')
             ->orderBy('s.date', 'DESC')
-            ->setParameter('seasonId', $season->getId());
+            ->setParameter('seasonId', $season->id);
 
         /**
          * @var Paginator<Submission>
@@ -135,7 +127,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $indexed = [];
 
         foreach ($result as $row) {
-            $indexed[$row->getId()] = $row;
+            $indexed[$row->id] = $row;
         }
 
         return $indexed;
@@ -155,7 +147,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->join('s.image', 'i')
             ->where('s.season = :seasonId')
             ->join('s.user', 'u')
-            ->setParameter('seasonId', $season->getId())
+            ->setParameter('seasonId', $season->id)
             ->setFirstResult(0)
             ->setMaxResults($limit)
             ->addOrderBy('s.date', 'ASC')
@@ -271,7 +263,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             ');
 
         $query->bindValue(1, true);
-        $query->bindValue(2, $season->getId());
+        $query->bindValue(2, $season->id);
         $query->bindValue(3, $n);
 
         /**
@@ -343,12 +335,12 @@ final class SubmissionRepository extends ServiceEntityRepository
 
         return \array_map(
             static fn(Submission $submission): ExtractSubmissionDto => new ExtractSubmissionDto(
-                $submission->getActivity()->id,
-                $submission->getSeason()->getId(),
-                $submission->isAccepted(),
-                $submission->getDistance(),
-                $submission->getElevation(),
-                $submission->getImage()?->getPath($imagePath) ?? '',
+                $submission->activity->id,
+                $submission->season->id,
+                $submission->accepted,
+                $submission->distance,
+                $submission->elevation,
+                $submission->image?->getPath($imagePath) ?? '',
             ),
             $result,
         );

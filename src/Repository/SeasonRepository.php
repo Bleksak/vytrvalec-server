@@ -9,6 +9,7 @@ use App\Entity\Charity;
 use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -150,5 +151,30 @@ final class SeasonRepository extends ServiceEntityRepository
             ->setParameter('charity', $charity)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /** @return array<int, Season> */
+    public function findAllVisible(?string $locale = null): array
+    {
+        $query = $this
+            ->createQueryBuilder('s')
+            ->addSelect('sc')
+            ->addSelect('sct')
+            ->indexBy('s', 's.id')
+            ->innerJoin('s.charity', 'sc');
+
+        if ($locale !== null) {
+            $query->innerJoin(
+                'sc.translations',
+                'sct',
+                Join::WITH,
+                'sct.locale = :locale',
+            )->setParameter('locale', $locale);
+        } else {
+            $query->innerJoin('sc.translations', 'sct');
+        }
+
+        /** @var array<int, Season> */
+        return $query->getQuery()->getResult();
     }
 }

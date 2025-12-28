@@ -7,6 +7,4 @@ namespace App\Scheduler;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 
 #[AsMessage]
-final class UnusedImageRemoverMessage
-{
-}
+final class UnusedImageRemoverMessage {}

@@ -1,5 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}
+    {{ 'results.title'|trans }}
+{% endblock title %}
+
 {% block body %}
     {% if season_list is not empty %}
         <twig:ResultsPage

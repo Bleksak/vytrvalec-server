@@ -23,11 +23,12 @@ final readonly class SeasonResultRankingService
 
     public function getSeasonResult(Season $season): SeasonResultDto
     {
-        $cache = $this->seasonCacheRepository->findOneBy(['season' =>
-            $season->getId()]);
+        $cache = $this->seasonCacheRepository->findOneBy([
+            'season' => $season->id,
+        ]);
 
         if ($cache !== null) {
-            return $cache->getData();
+            return $cache->data;
         }
 
         return $this->seasonResultCalculator->calculate($season);

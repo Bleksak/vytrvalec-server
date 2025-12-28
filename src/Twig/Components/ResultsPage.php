@@ -104,7 +104,7 @@ final class ResultsPage
             $this->users = [];
 
             foreach ($userList as $user) {
-                $this->users[$user->getId()] = $user->toAnonymizedUser();
+                $this->users[$user->id] = $user->toAnonymizedUser();
             }
         }
 

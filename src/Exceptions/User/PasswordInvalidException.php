@@ -6,6 +6,4 @@ namespace App\Exceptions\User;
 
 use RuntimeException;
 
-final class PasswordInvalidException extends RuntimeException
-{
-}
+final class PasswordInvalidException extends RuntimeException {}

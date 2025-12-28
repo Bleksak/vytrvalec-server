@@ -1,8 +1,8 @@
 {
     "$schema": "/phpactor.schema.json",
-    "language_server_phpstan.enabled": true,
+    "language_server_phpstan.enabled": false,
     "symfony.enabled": true,
-    "language_server_php_cs_fixer.enabled": true,
+    "language_server_php_cs_fixer.enabled": false,
     "indexer.exclude_patterns": [
         "/vendor/**/Tests/**/*",
         "/vendor/**/tests/**/*",

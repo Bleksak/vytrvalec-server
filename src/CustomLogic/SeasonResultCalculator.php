@@ -63,7 +63,7 @@ final readonly class SeasonResultCalculator
             }
         }
 
-        if ($season->getEnd() > new DateTime('2022-01-01')) {
+        if ($season->end > new DateTime('2022-01-01')) {
             foreach ($extraPointsClasses as $cls) {
                 $extras = $cls->calculate($season);
                 foreach ($extras as $extra) {

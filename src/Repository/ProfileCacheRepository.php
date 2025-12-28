@@ -8,6 +8,7 @@ use App\Entity\ProfileCache;
 use App\Entity\Submission;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -37,20 +38,17 @@ final class ProfileCacheRepository extends ServiceEntityRepository
     public function addCache(Submission $submission, bool $flush = false): void
     {
         $profileCache = $this->findOneBy([
-            'user' => $submission->getUser(),
-            'activity' => $submission->getActivity(),
+            'user' => $submission->user,
+            'activity' => $submission->activity,
         ]);
+
         $profileCache ??= new ProfileCache(
-            $submission->getUser(),
-            $submission->getActivity(),
+            $submission->user,
+            $submission->activity,
         );
 
-        $newDistance =
-            $profileCache->getDistance() + $submission->getDistance();
-        $newElevation =
-            $profileCache->getElevation() + $submission->getElevation();
-
-        $profileCache->setDistance($newDistance)->setElevation($newElevation);
+        $profileCache->distance += $submission->distance;
+        $profileCache->elevation += $submission->elevation;
 
         $this->save($profileCache, $flush);
     }
@@ -60,19 +58,13 @@ final class ProfileCacheRepository extends ServiceEntityRepository
         bool $flush = false,
     ): void {
         $profileCache = $this->findOneBy([
-            'user' => $submission->getUser(),
-            'activity' => $submission->getActivity(),
+            'user' => $submission->user,
+            'activity' => $submission->activity,
         ]);
 
         if ($profileCache !== null) {
-            $newDistance =
-                $profileCache->getDistance() - $submission->getDistance();
-            $newElevation =
-                $profileCache->getElevation() - $submission->getElevation();
-
-            $profileCache
-                ->setDistance($newDistance)
-                ->setElevation($newElevation);
+            $profileCache->distance -= $submission->distance;
+            $profileCache->elevation -= $submission->elevation;
 
             $this->save($profileCache, $flush);
         }
@@ -88,7 +80,7 @@ final class ProfileCacheRepository extends ServiceEntityRepository
         }
 
         foreach ($cachesByUser as $cache) {
-            $activity = $cache->getActivity();
+            $activity = $cache->activity;
 
             /**
              * @var SubmissionRepository
@@ -103,16 +95,48 @@ final class ProfileCacheRepository extends ServiceEntityRepository
             $distance = 0;
 
             foreach ($submissions as $submission) {
-                $distance += $submission->getDistance();
-                $elevation += $submission->getElevation();
+                $distance += $submission->distance;
+                $elevation += $submission->elevation;
             }
 
-            $cache->setDistance($distance);
-            $cache->setElevation($elevation);
+            $cache->distance = $distance;
+            $cache->elevation = $elevation;
 
             $this->save($cache);
         }
 
         $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @return list<ProfileCache>
+     */
+    public function findAllByUserWithActivities(
+        User $user,
+        ?string $locale = null,
+    ): array {
+        $query = $this
+            ->createQueryBuilder('pc')
+            ->addSelect('pca')
+            ->addSelect('pcai')
+            ->addSelect('pcat')
+            ->andWhere('pc.user = :user')
+            ->setParameter('user', $user)
+            ->innerJoin('pc.activity', 'pca')
+            ->leftJoin('pca.icon', 'pcai');
+
+        if ($locale !== null) {
+            $query->innerJoin(
+                'pca.translations',
+                'pcat',
+                Join::WITH,
+                'pcat.locale = :locale',
+            )->setParameter('locale', $locale);
+        } else {
+            $query->innerJoin('pca.translations', 'pcat');
+        }
+
+        /** @var list<ProfileCache> */
+        return $query->getQuery()->getResult();
     }
 }

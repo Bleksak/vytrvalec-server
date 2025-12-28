@@ -25,38 +25,41 @@ class LocalOCRTest extends KernelTestCase
         ], limit: 30);
 
         foreach ($accepted as $submission) {
-            if ($submission->getImage() === null) {
+            if ($submission->image === null) {
                 continue;
             }
 
-            if($submission->getImage()->getPath() !== '/uploads/660afe10ac0a99.65032747.jpg') {
+            if (
+                $submission->image->getPath()
+                !== '/uploads/660afe10ac0a99.65032747.jpg'
+            ) {
                 continue;
             }
 
-            $features = $checker->readSubmissionImageData($submission->getImage());
+            $features = $checker->readSubmissionImageData($submission->image);
 
             if ($features === null) {
                 continue;
             }
 
-            printf("image: %s%s", $submission->getImage()->getPath(), \PHP_EOL);
+            printf('image: %s%s', $submission->image->getPath(), \PHP_EOL);
 
             printf(
                 'Features->date: %s vs real: %s%s',
                 $features->date?->format('d-m-Y') ?? 'null',
-                $submission->getDate()->format('d-m-Y'),
+                $submission->date->format('d-m-Y'),
                 \PHP_EOL,
             );
             printf(
                 'Features->distance: %d m vs real: %d m%s',
                 ($features->distance * 1000) ?? 'null',
-                $submission->getDistance(),
+                $submission->distance,
                 \PHP_EOL,
             );
             printf(
                 'Features->elevation: %d m vs real: %d m%s',
                 $features->elevation ?? 'null',
-                $submission->getElevation(),
+                $submission->elevation,
                 \PHP_EOL,
             );
 

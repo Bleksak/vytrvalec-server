@@ -6,6 +6,4 @@ namespace App\Exceptions\User;
 
 use RuntimeException;
 
-final class UserNotFoundException extends RuntimeException
-{
-}
+final class UserNotFoundException extends RuntimeException {}

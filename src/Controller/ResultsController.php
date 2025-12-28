@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Translation\LocaleSwitcher;
 
 #[Route('/results', name: self::ROUTE, methods: [Request::METHOD_GET])]
 final class ResultsController extends AbstractController
@@ -23,6 +24,7 @@ final class ResultsController extends AbstractController
         private readonly FacultyRepository $facultyRepository,
         private readonly SeasonRepository $seasonRepository,
         private readonly ActivityRepository $activityRepository,
+        private readonly LocaleSwitcher $localeSwitcher,
     ) {}
 
     public function __invoke(): Response
@@ -32,12 +34,16 @@ final class ResultsController extends AbstractController
             $this->seasonRepository->findOrdered(),
         );
 
-        $activities = $this->activityRepository->findAllWithTranslations();
+        $activities = $this->activityRepository->findAllWithTranslations($this->localeSwitcher->getLocale());
+
+        // NOTE: Tohle funguje protoze je povoleno aby byla aktivni pouze jedna sezona
+        $currentSeason = $seasonList[0]?->isRunning() ? $seasonList[0] : null;
 
         return $this->render('results.html.twig', [
             'faculties' => $this->facultyRepository->findAllWithTranslations(),
             'activities' => $activities,
             'season_list' => $seasonList,
+            'current_season' => $currentSeason,
         ]);
     }
 }

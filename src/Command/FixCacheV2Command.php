@@ -36,7 +36,7 @@ final readonly class FixCacheV2Command
 
         foreach ($caches as $cache) {
             $newWeeklyResults = [];
-            $data = $cache->getData();
+            $data = $cache->data;
             $users = [];
 
             foreach ($data->results as $week) {
@@ -51,7 +51,7 @@ final readonly class FixCacheV2Command
                     $activity->results = $newFacultyResults;
                     foreach ($activity->extras as $extra) {
                         $userId = $this->findUserForAnonymizedUsers(
-                            $cache->getSeason(),
+                            $cache->season,
                             $extra->faculty,
                             $extra->user,
                         );
@@ -67,7 +67,7 @@ final readonly class FixCacheV2Command
                 $newWeeklyResults[$week->week] = $week;
             }
 
-            $topThree = $this->submissionRepository->findOutliers($cache->getSeason());
+            $topThree = $this->submissionRepository->findOutliers($cache->season);
 
             $data->outliers = $topThree;
 
@@ -78,12 +78,10 @@ final readonly class FixCacheV2Command
                 }
             }
 
-            $cache->setData(
-                new SeasonResultDto(
-                    $newWeeklyResults,
-                    $data->outliers,
-                    \array_values($users),
-                ),
+            $cache->data = new SeasonResultDto(
+                $newWeeklyResults,
+                $data->outliers,
+                \array_values($users),
             );
 
             $this->seasonCacheRepository->save($cache, false);
@@ -119,7 +117,7 @@ final readonly class FixCacheV2Command
         $userids = [];
 
         foreach ($users as $user) {
-            $userids[] = $user->getId();
+            $userids[] = $user->id;
         }
 
         if (\count($userids) > 1) {

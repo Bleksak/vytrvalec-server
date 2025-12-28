@@ -72,10 +72,10 @@ final class ImageController extends AbstractController
 
         return $this->json(
             new ImageCreateResponseDto(
-                $image->getUuid(),
+                $image->uuid,
                 $image->getPath($this->imagePath),
-                $image->getUploadedAt(),
-                $image->getUsedAt(),
+                $image->uploadedAt,
+                $image->usedAt,
             ),
         );
     }

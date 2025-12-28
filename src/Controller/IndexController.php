@@ -36,7 +36,7 @@ final class IndexController extends AbstractController
             ? null
             : $this->seasonResultService->getSeasonResult($lastSeason);
 
-        $faculties = $this->facultyRepository->findAllWithTranslations();
+        $faculties = $this->facultyRepository->findAllWithTranslations($localeSwitcher->getLocale());
 
         $currentSeason = $this->seasonRepository->findCurrentSeason();
 

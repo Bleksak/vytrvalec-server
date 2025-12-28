@@ -336,3 +336,235 @@ header.dialog-header {
 .text-right {
     text-align: right;
 }
+
+.faculty-tag {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+
+    background-color: red;
+
+    span {
+        line-height: 1.5rem;
+        font-weight: bolder;
+        font-size: 1.1rem;
+        color: white;
+    }
+}
+
+.profile {
+    &-user-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 1rem;
+    }
+    &-user {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    &-heading {
+        margin: 0;
+    }
+
+    &-statistics-row {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        span {
+            font-size: 1.4rem;
+            font-weight: normal;
+        }
+    }
+
+    &-submissions {
+        gap: 1rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, max-content));
+        justify-content: flex-start;
+    }
+
+    @media (max-width: 48em) {
+        &-submissions {
+            grid-template-columns: minmax(200px, 300px);
+            justify-content: center;
+        }
+    }
+}
+
+.submission-card {
+    width: 300px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    background: #111;
+    position: relative;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
+    &-image-wrapper {
+        position: relative;
+    }
+
+    &-preview {
+        width: 100%;
+        aspect-ratio: 1/1;
+        object-fit: cover;
+        display: block;
+        transition: filter 0.3s ease;
+        filter: brightness(50%);
+    }
+
+    &-overlay {
+        position: absolute;
+        left: 0;
+        right: 0;
+        padding: 10px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #f5f5f5;
+
+        &.top {
+            top: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.55),
+                transparent
+            );
+        }
+
+        &.bottom {
+            bottom: 0;
+            background: linear-gradient(
+                to top,
+                rgba(0, 0, 0, 0.55),
+                transparent
+            );
+        }
+    }
+
+    &-row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &-stack {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    &-meta {
+        justify-content: space-around;
+    }
+
+    &-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.9rem;
+    }
+
+    &-icon {
+        width: 18px;
+        height: 18px;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+    }
+
+    &:hover &-buttons {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    &:hover &-overlay {
+        color: #ffffff;
+        font-weight: bold;
+    }
+
+    &:hover &-preview {
+        filter: brightness(85%);
+    }
+
+    &-buttons > button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        background: #005cab;
+        color: white;
+        transition:
+            background 0.2s ease,
+            transform 0.2s ease;
+    }
+
+    &-buttons {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.9);
+        display: flex;
+        gap: 10px;
+        opacity: 0;
+        transition:
+            opacity 0.25s ease,
+            transform 0.25s ease;
+    }
+
+    &-buttons > button:hover {
+        background: #0072d4;
+        transform: translateY(-2px);
+    }
+
+    &-buttons > .delete {
+        background: #d32f2f;
+    }
+
+    &-buttons > .delete:hover {
+        background: #f44336;
+    }
+}
+
+.submission-state {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+
+    &-pending {
+        background-color: #ffc107;
+    }
+
+    &-accepted {
+        background-color: #28a745;
+    }
+
+    &-rejected {
+        background-color: #dc3545;
+    }
+}
+
+.submission-state-text {
+    color: #fff;
+    white-space: nowrap;
+    letter-spacing: 0.25px;
+}

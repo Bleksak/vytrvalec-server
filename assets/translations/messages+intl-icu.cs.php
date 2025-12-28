@@ -131,6 +131,7 @@ return [
         ],
     ],
     'results' => [
+        'title' => 'Výsledky | Měsíční Vytrvalec',
         'week_picker' => [
             'whole_season' => 'Celá sezóna',
             'first_week' => 'První týden',
@@ -160,6 +161,19 @@ return [
             'title' => 'TOP účastníci',
             'name' => 'Jméno',
         ],
+    ],
+    'profile' => [
+        'title' => 'Profil | Měsíční Vytrvalec',
+        'header' => 'Profil',
+        'no_submissions' => 'Profil nemá zatím žádnou aktivitu',
+    ],
+    'submission' => [
+        'state' => [
+            'accepted' => 'Schváleno',
+            'rejected' => 'Zamítnuto',
+            'pending' => 'Zpracovává se',
+        ],
+        'preview' => 'Náhled',
     ],
     'validation' => [
         'email' => [

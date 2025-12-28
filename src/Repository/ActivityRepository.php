@@ -124,15 +124,25 @@ final class ActivityRepository extends ServiceEntityRepository
     /**
      * @return array<int, Activity>
      */
-    public function findAllWithTranslations(): array
+    public function findAllWithTranslations(?string $locale = null): array
     {
-        /** @var array<int, Activity> */
-        return $this
+        $query = $this
             ->createQueryBuilder('a')
-            ->join('a.translations', 'at')
             ->addSelect('at')
-            ->indexBy('a', 'a.id')
-            ->getQuery()
-            ->getResult();
+            ->indexBy('a', 'a.id');
+
+        if ($locale !== null) {
+            $query->innerJoin(
+                'a.translations',
+                'at',
+                Join::WITH,
+                'at.locale = :locale',
+            )->setParameter('locale', $locale);
+        } else {
+            $query->innerJoin('a.translations', 'at');
+        }
+
+        /** @var array<int, Activity> */
+        return $query->getQuery()->getResult();
     }
 }

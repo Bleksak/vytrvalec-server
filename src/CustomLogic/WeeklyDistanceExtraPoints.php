@@ -50,7 +50,7 @@ final readonly class WeeklyDistanceExtraPoints implements ExtraPointsInterface
 
         $query->bindValue(1, self::getWeek());
         $query->bindValue(2, true);
-        $query->bindValue(3, $season->getId());
+        $query->bindValue(3, $season->id);
 
         /**
          * @var list<array{user_id: int, activity_id: int, faculty_id: int, value: string}> $result

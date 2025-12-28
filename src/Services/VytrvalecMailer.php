@@ -54,7 +54,7 @@ final readonly class VytrvalecMailer
         $template->mergeContext($this->getContext());
 
         foreach ($recipient as $user) {
-            $email = $user->getEmail();
+            $email = $user->email;
 
             if ($email === null) {
                 continue;
