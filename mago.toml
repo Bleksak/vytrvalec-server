@@ -12,7 +12,7 @@ excludes = [
   "vendor/google/gax/metadata",
   "vendor/google/longrunning/metadata",
   "vendor/symfony/cache/Traits/ValueWrapper.php",
-  "vendor/composer/autoload_static.php"
+  "vendor/composer/autoload_static.php",
 ]
 
 [formatter]
@@ -29,14 +29,14 @@ empty-line-between-same-symbols = true
 integrations = ["symfony", "amphp", "phpunit", "doctrine"]
 
 [linter.rules]
-too-many-properties = {"enabled" = false}
-too-many-methods = {"enabled" = false}
-kan-defect = {"enabled" = false}
-excessive-parameter-list = {"enabled" = false}
-cyclomatic-complexity = {"enabled" = false}
-no-assign-in-condition = {enabled = false}
-no-boolean-flag-parameter = {enabled=false}
-prefer-arrow-function = {enabled=true}
+too-many-properties = { "enabled" = false }
+too-many-methods = { "enabled" = false }
+kan-defect = { "enabled" = false }
+excessive-parameter-list = { "enabled" = false }
+cyclomatic-complexity = { "enabled" = false }
+no-assign-in-condition = { enabled = false }
+no-boolean-flag-parameter = { enabled = false }
+prefer-arrow-function = { enabled = true }
 yoda-conditions = { enabled = false }
 sensitive-parameter = { enabled = true }
 no-redundant-use = { enabled = true }
@@ -48,8 +48,8 @@ trait-name = { psr = true }
 interface-name = { psr = true }
 class-name = { psr = true }
 
-ambiguous-function-call = {enabled=true}
-require-namespace = {enabled=true}
+ambiguous-function-call = { enabled = true }
+require-namespace = { enabled = true }
 
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000, enabled = false }
