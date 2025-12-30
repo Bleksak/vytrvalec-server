@@ -19,6 +19,7 @@
     "generate-api-arktype": "npx typed-openapi http://vytrvalec.local/api/doc.json --output ./api.ts --runtime arktype --default-fetcher axios"
   },
   "dependencies": {
+    "@symfony/ux-live-component": "^2.31.0",
     "sass": "^1.93.2",
     "sass-loader": "^16.0.5",
     "typed-openapi": "^2.2.2"
