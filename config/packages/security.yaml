@@ -29,7 +29,7 @@ security:
             provider: app_user_provider
 
             form_login:
-                login_path: app_login
+                login_path: index
                 check_path: app_login
                 enable_csrf: true
             logout:

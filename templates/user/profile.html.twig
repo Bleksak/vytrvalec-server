@@ -57,8 +57,7 @@
             </section>
         </main>
     </article>
-    <article>
-        {# TODO(bleksak): Tady dodelat ten loop + SubmissionCard #}
+    <article data-controller="profile-submission-list">
         {% for season_id, submissions in season_list %}
             <twig:Heading>
                 <h2>
@@ -80,5 +79,21 @@
         {% else %}
             { 'profile.no_submissions'|trans }
         {% endfor %}
+
+        <twig:Dialog id="submission-edit-dialog">
+            <twig:block name="header">
+                {{ 'submission.edit.title'|trans }}
+            </twig:block>
+
+            <twig:SubmissionPreviewDialog :submissions="submissions" data-profile-submission-list-target="edit" />
+        </twig:Dialog>
+
+        <twig:Dialog id="submission-preview-dialog">
+            <twig:block name="header">
+                {{ 'submission.preview.title'|trans }}
+            </twig:block>
+
+            <twig:SubmissionPreviewDialog :submissions="submissions" data-profile-submission-list-target="preview" />
+        </twig:Dialog>
     </article>
 {% endblock body %}

@@ -51,7 +51,7 @@ final class ProfileController extends AbstractController
                 $seasonMap[$submission->season->id] = [];
             }
 
-            $seasonMap[$submission->season->id][] = $submission;
+            $seasonMap[$submission->season->id][$submission->id] = $submission;
         }
 
         $seasons = $this->seasonRepository->findAllVisible();
@@ -62,6 +62,7 @@ final class ProfileController extends AbstractController
             'season_list' => $seasonMap,
             'seasons' => $seasons,
             'image_path' => $imagePath,
+            'submissions' => $submissions,
         ]);
     }
 }

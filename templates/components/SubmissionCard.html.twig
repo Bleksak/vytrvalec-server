@@ -86,14 +86,16 @@
 
         <div class="submission-card-buttons">
             {% if submission.editable %}
-                <button>
+                <button data-action="click->profile-submission-list#edit" data-profile-submission-list-submission-id-param="{{ submission.id }}">
                     <twig:ux:icon name="lucide:pencil" width="24" height="24" />
                 </button>
-                <button class="delete">
+                <button data-action="click->profile-submission-list#delete" data-profile-submission-list-submission-id-param="{{ submission.id }}">
                     <twig:ux:icon name="lucide:trash" width="24" height="24" />
                 </button>
             {% else %}
-                <button>{{ 'submission.preview'|trans }}</button>
+                <button data-action="click->profile-submission-list#preview" data-profile-submission-list-submission-id-param="{{ submission.id }}">
+                    {{ 'submission.preview.button_label'|trans }}
+                </button>
             {% endif %}
         </div>
     </div>

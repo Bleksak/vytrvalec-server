@@ -61,6 +61,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->createQueryBuilder('s')
             ->select('s')
             ->addSelect('i')
+            ->indexBy('s', 's.id')
             ->leftJoin('s.image', 'i')
             ->where('s.user = :user')
             ->addOrderBy('s.date', 'DESC')

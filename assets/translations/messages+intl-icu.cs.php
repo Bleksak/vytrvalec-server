@@ -173,7 +173,17 @@ return [
             'rejected' => 'Zamítnuto',
             'pending' => 'Zpracovává se',
         ],
-        'preview' => 'Náhled',
+        'edit' => [
+            'title' => 'Upravit aktivitu',
+        ],
+        'preview' => [
+            'button_label' => 'Náhled',
+            'title' => 'Náhled aktivity',
+        ],
+        'comment' => 'Komentář',
+        'distance' => 'Vzdálenost',
+        'elevation' => 'Převýšení',
+        'activity' => 'Aktivita',
     ],
     'validation' => [
         'email' => [
