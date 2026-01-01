@@ -15,13 +15,13 @@ final class ProfileCache
     #[OA\Property]
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'profileCaches')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn]
     public private(set) User $user;
 
     #[OA\Property]
     #[ORM\Id]
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn]
     public private(set) Activity $activity;
 
     #[OA\Property]

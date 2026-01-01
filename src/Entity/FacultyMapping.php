@@ -13,12 +13,12 @@ class FacultyMapping
 {
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'facultyMappings')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn]
     public Season $season;
 
     #[ORM\Id]
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn]
     public Faculty $faculty;
 
     #[ORM\ManyToOne]

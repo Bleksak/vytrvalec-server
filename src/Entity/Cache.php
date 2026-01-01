@@ -15,7 +15,7 @@ final class Cache
 {
     #[ORM\Id]
     #[ORM\OneToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn]
     public Season $season;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
