@@ -58,6 +58,7 @@ return [
         'password' => 'Heslo:',
         'submit' => 'Přihlásit',
         'user_not_found' => 'Neplatný e-mail nebo heslo',
+        'success' => 'Přihlášení proběhlo úspěšně',
     ],
     'registration' => [
         'title' => 'Registrace',
@@ -190,5 +191,9 @@ return [
             'invalid' => 'Zadaný e-mail je neplatný',
             'not_blank' => 'E-mail nesmí být prázdný',
         ],
+    ],
+    'image_upload' => [
+        'dropzone_text' => 'Přetáhněte soubor sem nebo klikněte pro výběr',
+        'choose_file' => 'Vybrat soubor',
     ],
 ];

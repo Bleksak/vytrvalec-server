@@ -8,8 +8,12 @@
                 {% endif %}
                 </fieldset>
 
-                {# TODO: Image Preview #}
-                {# <ImageForm bind:imageUuid imageUrl={submission.image} {disabled} /> #}
+                <fieldset>
+                    <twig:ImageUpload
+                        :image="currentSubmission.image.path ?? null"
+                        disabled
+                    />
+                </fieldset>
 
                 <fieldset>
                     <label for="distance">

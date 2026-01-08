@@ -1,0 +1,29 @@
+<div {{ attributes }}>
+    <div
+        data-controller="image-upload"
+        data-image-upload-disabled-value="{{ disabled }}"
+        class="image-upload-dropzone"
+        role="button"
+        tabindex="0"
+    >
+        <div class="image-upload-dropzone-inner {{ image ? '' : 'no-image' }}">
+            <img
+                data-image-upload-target="image"
+                src="{{ image ? absolute_url(image) : absolute_url(asset('/images/file-input-icon.svg')) }}"
+                alt="File input"
+            />
+
+            <div class="image-upload-dropzone-text" data-image-upload-target="dropzone-text" style="display: {{ image ? 'none' : 'block' }};">
+                {{ 'image_upload.dropzone_text'|trans }}
+            </div>
+
+            {% if not disabled %}
+                <button class="secondary" type="button" data-action-target="click->image-upload#chooseFile">
+                    {{ 'image_upload.choose_file'|trans }}
+                </button>
+            {% endif %}
+        </div>
+
+        <input type="file" accept="image/*" data-image-upload-target="input" class="hidden">
+    </div>
+</div>

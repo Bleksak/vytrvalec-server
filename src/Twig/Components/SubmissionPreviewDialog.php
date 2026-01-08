@@ -9,12 +9,14 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
+use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 #[AsLiveComponent]
 final class SubmissionPreviewDialog
 {
     use DefaultActionTrait;
+    use ComponentToolsTrait;
 
     /**
      * @var array<int, Submission>
@@ -39,6 +41,12 @@ final class SubmissionPreviewDialog
     public function setSubmission(
         #[LiveArg('submission_id')] int $submissionId,
     ): void {
-        $this->currentSubmission = $this->submissions[$submissionId] ?? null;
+        $submission = $this->submissions[$submissionId] ?? null;
+
+        $this->emit('updateImage', [
+            'image' => $submission->image?->getPath(),
+        ]);
+
+        $this->currentSubmission = $submission;
     }
 }
