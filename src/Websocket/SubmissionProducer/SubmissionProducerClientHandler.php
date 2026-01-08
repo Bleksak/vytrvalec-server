@@ -138,9 +138,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
         try {
             while ($message = $client->receive()) {
                 $buffer = $message->buffer();
-                /**
-                 * @var SubmissionProducerMessage
-                 */
+
                 $message = $this->serializer->deserialize(
                     $buffer,
                     SubmissionProducerMessage::class,
