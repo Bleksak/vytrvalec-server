@@ -64,7 +64,7 @@ export default class extends Controller {
         };
     };
 
-    chooseFile(event, disabled) {
+    chooseFile(_, disabled) {
         if (!disabled) {
             this.inputTarget.click()
         }

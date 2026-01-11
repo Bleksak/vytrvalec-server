@@ -1,0 +1,5 @@
+<section {{ attributes }} class="profile-submissions">
+    {% for submission in submissions %}
+        <twig:SubmissionCard id="submission-{{ submission.id }}" :submission="submission" />
+    {% endfor %}
+</section>

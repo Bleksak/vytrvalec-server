@@ -58,6 +58,7 @@
         </main>
     </article>
     <article data-controller="profile-submission-list">
+        {# TODO: Tady je bug, kdyz uzivatel smaze vsechny submissions ze season, tak by se mela smazat i sezona #}
         {% for season_id, submissions in season_list %}
             <twig:Heading>
                 <h2>
@@ -71,11 +72,7 @@
                     )
                 </h2>
             </twig:Heading>
-            <section class="profile-submissions">
-                {% for submission in submissions %}
-                    <twig:SubmissionCard :submission="submission" />
-                {% endfor %}
-            </section>
+            <twig:SubmissionCardGrid :submissions="submissions" />
         {% else %}
             { 'profile.no_submissions'|trans }
         {% endfor %}
