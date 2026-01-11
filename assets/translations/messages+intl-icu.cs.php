@@ -176,6 +176,10 @@ return [
         ],
         'edit' => [
             'title' => 'Upravit aktivitu',
+            'distance' => 'Vzdálenost (km):',
+            'elevation' => 'Převýšení (m):',
+            'activity' => 'Aktivita:',
+            'submit' => 'Uložit',
         ],
         'preview' => [
             'button_label' => 'Náhled',

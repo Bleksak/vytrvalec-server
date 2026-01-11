@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Dto\Submission;
 
+use App\Entity\Activity;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class SubmissionEditDto
+final class SubmissionServerEditDto
 {
     public function __construct(
         #[Assert\GreaterThanOrEqual(1, message: 'negative')]
@@ -21,9 +22,8 @@ final class SubmissionEditDto
         #[Assert\Uuid(message: 'invalid')]
         public ?Uuid $imageUuid = null,
 
-        #[Assert\Type(type: 'integer')]
-        #[Assert\GreaterThanOrEqual(1, message: 'negative')]
-        public ?int $activityId = null,
+        #[Assert\NotBlank(message: 'blank', allowNull: false)]
+        public ?Activity $activity = null,
 
         #[Assert\NotBlank(message: 'blank', allowNull: false)]
         public ?\DateTime $updatedAt = null,

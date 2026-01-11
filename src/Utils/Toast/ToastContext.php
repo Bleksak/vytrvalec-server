@@ -13,4 +13,5 @@ enum ToastContext: string
     case Registration = 'toast-registration';
     case ForgottenPasswordRequest = 'forgotten-password-request';
     case PasswordReset = 'password-reset';
+    case ImageUpload = 'image-upload';
 }

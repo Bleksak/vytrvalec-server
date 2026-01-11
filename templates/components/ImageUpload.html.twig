@@ -1,7 +1,7 @@
 <div {{ attributes }}>
     <div
         data-controller="image-upload"
-        data-image-upload-disabled-value="{{ disabled }}"
+        data-image-upload-disabled-value="{{ disabled ? 1 : 0 }}"
         class="image-upload-dropzone"
         role="button"
         tabindex="0"
@@ -13,7 +13,7 @@
                 alt="File input"
             />
 
-            <div class="image-upload-dropzone-text" data-image-upload-target="dropzone-text" style="display: {{ image ? 'none' : 'block' }};">
+            <div class="image-upload-dropzone-text" data-image-upload-target="dropzoneText" style="display: {{ image ? 'none' : 'block' }};">
                 {{ 'image_upload.dropzone_text'|trans }}
             </div>
 
@@ -24,6 +24,11 @@
             {% endif %}
         </div>
 
-        <input type="file" accept="image/*" data-image-upload-target="input" class="hidden">
+        <input 
+            name="image"
+            type="file"
+            accept="image/*"
+            data-image-upload-target="input"
+            class="hidden"
     </div>
 </div>

@@ -82,7 +82,7 @@
                 {{ 'submission.edit.title'|trans }}
             </twig:block>
 
-            <twig:SubmissionPreviewDialog :submissions="submissions" data-profile-submission-list-target="edit" />
+            <twig:SubmissionEditDialog :submissions="submissions" :activities="activities" data-profile-submission-list-target="edit" />
         </twig:Dialog>
 
         <twig:Dialog id="submission-preview-dialog">

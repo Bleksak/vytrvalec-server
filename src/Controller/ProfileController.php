@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\ActivityRepository;
 use App\Repository\ProfileCacheRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
@@ -29,6 +30,7 @@ final class ProfileController extends AbstractController
         private readonly ProfileCacheRepository $profileCacheRepository,
         private readonly SubmissionRepository $submissionRepository,
         private readonly LocaleSwitcher $localeSwitcher,
+        private readonly ActivityRepository $activityRepository,
     ) {}
 
     public function __invoke(
@@ -37,7 +39,6 @@ final class ProfileController extends AbstractController
     ): Response {
         $currentSeason = $this->seasonRepository->findCurrentSeason();
 
-        // NOTE: This fetches all activities, so we don't need to re-fetch them later
         $profileCache = $this->profileCacheRepository->findAllByUserWithActivities(
             $user,
             $this->localeSwitcher->getLocale(),
@@ -63,6 +64,7 @@ final class ProfileController extends AbstractController
             'seasons' => $seasons,
             'image_path' => $imagePath,
             'submissions' => $submissions,
+            'activities' => $this->activityRepository->findAllWithTranslations($this->localeSwitcher->getLocale()),
         ]);
     }
 }

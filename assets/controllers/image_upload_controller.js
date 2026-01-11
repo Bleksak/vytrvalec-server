@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { getComponent } from '@symfony/ux-live-component';
 
 export default class extends Controller {
     static targets = ['image', 'input', 'dropzoneText']
@@ -13,18 +14,36 @@ export default class extends Controller {
         this.updateImagePreview = this.updateImagePreview.bind(this);
     }
 
+    async initialize() {
+        this.component = await getComponent(this.element.parentElement);
+    }
+
     connect() {
-        this.element.addEventListener('click', (e) => this.chooseFile(e, this.disabledValue));
         this.element.addEventListener('dragenter', (e) => e.preventDefault());
         this.element.addEventListener('dragover', (e) => e.preventDefault());
         this.element.addEventListener('dragleave', (e) => e.preventDefault());
-        this.element.addEventListener('drop', this.handleDrop);
+
+        if (!this.disabledValue) {
+            this.element.addEventListener('click', this.chooseFile);
+            this.element.addEventListener('drop', this.handleDrop);
+            this.inputTarget.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                this.updateImagePreview(file);
+                this.handleUpload();
+            });
+        }
+    }
+
+    async handleUpload() {
+        this.component.files('image', this.inputTarget);
+        await this.component.action('submit');
     }
 
     /**
      * @param {DragEvent} event
      */
     handleDrop(event) {
+        event.preventDefault();
         const dt = event.dataTransfer;
         if (dt === null) {
             return;
@@ -39,8 +58,9 @@ export default class extends Controller {
 
         let fileList = new DataTransfer();
         fileList.items.add(file);
-        uploadedFiles = fileList.files;
+        this.inputTarget.files = files;
 
+        this.handleUpload();
         this.updateImagePreview(file);
     }
 
@@ -64,9 +84,9 @@ export default class extends Controller {
         };
     };
 
-    chooseFile(_, disabled) {
-        if (!disabled) {
-            this.inputTarget.click()
+    chooseFile(event) {
+        if (!this.disabledValue) {
+            this.inputTarget.click();
         }
     }
 }
