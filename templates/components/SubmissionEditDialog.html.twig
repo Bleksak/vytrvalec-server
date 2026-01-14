@@ -1,6 +1,13 @@
 <div {{ attributes }}>
     {% if currentSubmission is not null %}
-        {{ form_start(form) }}
+        {{ form_start(form, 
+            {
+                attr: {
+                    'data-action': 'live#action:prevent',
+                    'data-live-action-param': 'submit'
+                }
+            }
+        ) }}
             {% if currentSubmission.message %}
                 <fieldset>
                     <p>{{ 'submission.comment'|trans }}</p>

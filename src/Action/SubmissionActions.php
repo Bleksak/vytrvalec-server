@@ -6,6 +6,7 @@ namespace App\Action;
 
 use App\Dto\Submission\SubmissionCreateDto;
 use App\Dto\Submission\SubmissionEditDto;
+use App\Dto\Submission\SubmissionServerEditDto;
 use App\Dto\Submission\SubmissionStateDto;
 use App\Entity\Season;
 use App\Entity\Submission;
@@ -124,16 +125,18 @@ final readonly class SubmissionActions
      */
     public function update(
         Submission $submission,
-        SubmissionEditDto $dto,
+        SubmissionServerEditDto|SubmissionEditDto $dto,
     ): array {
-        if ($submission->updatedAt !== $dto->updatedAt) {
+        if (
+            $submission->updatedAt->getTimestamp() !== $dto->updatedAt?->getTimestamp()
+        ) {
             return ['updated_at' => 'mismatch'];
         }
 
         if ($dto->imageUuid !== null) {
             $image = $this->imageRepository->find($dto->imageUuid);
 
-            if ($image === null || $image->usedAt !== null) {
+            if ($image === null || ($image->usedAt !== null && $submission->image !== $image)) {
                 return ['image' => 'invalid'];
             }
 
@@ -154,7 +157,15 @@ final readonly class SubmissionActions
             $submission->elevation = $dto->elevation;
         }
 
-        if ($dto->activityId !== null) {
+        if (
+            $dto instanceof SubmissionServerEditDto
+            && $dto->activity !== null
+        ) {
+            $submission->activity = $dto->activity;
+        } elseif (
+            $dto instanceof SubmissionEditDto
+            && $dto->activityId !== null
+        ) {
             $activity = $this->activityRepository->find($dto->activityId);
 
             if ($activity === null) {

@@ -180,6 +180,7 @@ return [
             'elevation' => 'Převýšení (m):',
             'activity' => 'Aktivita:',
             'submit' => 'Uložit',
+            'success' => 'Aktivita byla úspěšně upravena',
         ],
         'preview' => [
             'button_label' => 'Náhled',

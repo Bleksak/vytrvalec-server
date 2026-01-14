@@ -72,7 +72,7 @@
                     )
                 </h2>
             </twig:Heading>
-            <twig:SubmissionCardGrid :submissions="submissions" />
+            <twig:SubmissionCardGrid key="season-{{ season_id }}" :seasonId="season_id" :submissions="submissions" />
         {% else %}
             { 'profile.no_submissions'|trans }
         {% endfor %}
@@ -82,7 +82,7 @@
                 {{ 'submission.edit.title'|trans }}
             </twig:block>
 
-            <twig:SubmissionEditDialog :submissions="submissions" :activities="activities" data-profile-submission-list-target="edit" />
+            <twig:SubmissionEditDialog :activities="activities" data-profile-submission-list-target="edit" />
         </twig:Dialog>
 
         <twig:Dialog id="submission-preview-dialog">
@@ -90,7 +90,7 @@
                 {{ 'submission.preview.title'|trans }}
             </twig:block>
 
-            <twig:SubmissionPreviewDialog :submissions="submissions" data-profile-submission-list-target="preview" />
+            <twig:SubmissionPreviewDialog data-profile-submission-list-target="preview" />
         </twig:Dialog>
     </article>
 {% endblock body %}

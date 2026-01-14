@@ -1,5 +1,5 @@
 <section {{ attributes }} class="profile-submissions">
     {% for submission in submissions %}
-        <twig:SubmissionCard id="submission-{{ submission.id }}" :submission="submission" />
+        <twig:SubmissionCard key="submission-{{ submission.id }}-{{ submission.updatedAt.timestamp }}" :submission="submission" />
     {% endfor %}
 </section>

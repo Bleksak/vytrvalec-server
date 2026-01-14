@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Twig\Components;
 
 use App\Entity\Submission;
+use App\Repository\SubmissionRepository;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -18,30 +19,18 @@ final class SubmissionPreviewDialog
     use DefaultActionTrait;
     use ComponentToolsTrait;
 
-    /**
-     * @var array<int, Submission>
-     **/
-    #[LiveProp]
-    public array $submissions = [];
-
     #[LiveProp]
     public ?Submission $currentSubmission = null;
 
-    public function __construct() {}
-
-    /**
-     * @param array<int, Submission> $submissions
-     */
-    public function mount(array $submissions): void
-    {
-        $this->submissions = $submissions;
-    }
+    public function __construct(
+        private SubmissionRepository $submissionRepository,
+    ) {}
 
     #[LiveAction]
     public function setSubmission(
         #[LiveArg('submission_id')] int $submissionId,
     ): void {
-        $submission = $this->submissions[$submissionId] ?? null;
+        $submission = $this->submissionRepository->find($submissionId);
 
         $this->emit('updateImage', [
             'image' => $submission->image?->getPath(),
