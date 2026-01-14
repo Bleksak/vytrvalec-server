@@ -17,7 +17,7 @@ final class SubmissionCardGrid
 {
     use DefaultActionTrait;
 
-    /** @var non-empty-array<int, Submission> */
+    /** @var array<int, Submission> */
     #[LiveProp(writable: true)]
     public array $submissions;
 
@@ -45,10 +45,14 @@ final class SubmissionCardGrid
             return;
         }
 
-        $this->submissions[$submissionId] =
-            $this->submissionRepository->find($submissionId);
+        $submission = $this->submissionRepository->find($submissionId);
 
-        krsort($this->submissions);
+        if ($submission === null) {
+            return;
+        }
+
+        $this->submissions[$submissionId] = $submission;
+        \krsort($this->submissions);
     }
 
     #[LiveListener('submission-delete')]
