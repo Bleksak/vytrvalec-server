@@ -136,7 +136,10 @@ final readonly class SubmissionActions
         if ($dto->imageUuid !== null) {
             $image = $this->imageRepository->find($dto->imageUuid);
 
-            if ($image === null || ($image->usedAt !== null && $submission->image !== $image)) {
+            if (
+                $image === null
+                || $image->usedAt !== null && $submission->image !== $image
+            ) {
                 return ['image' => 'invalid'];
             }
 
