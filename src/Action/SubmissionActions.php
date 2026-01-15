@@ -151,6 +151,11 @@ final readonly class SubmissionActions
 
     public function delete(Submission $submission): void
     {
+        if ($submission->image !== null) {
+            $submission->image->usedAt = null;
+            $this->imageRepository->save($submission->image);
+        }
+
         $this->submissionRepository->remove($submission, true);
     }
 

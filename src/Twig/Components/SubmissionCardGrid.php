@@ -60,6 +60,7 @@ final class SubmissionCardGrid
         #[LiveArg('submission_id')] int $submissionId,
     ): void {
         unset($this->submissions[$submissionId]);
+        \krsort($this->submissions);
     }
 
     #[LiveListener('submission-create')]
