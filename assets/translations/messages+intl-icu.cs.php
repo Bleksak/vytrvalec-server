@@ -174,6 +174,12 @@ return [
             'rejected' => 'Zamítnuto',
             'pending' => 'Zpracovává se',
         ],
+        'create' => [
+            'title' => 'Nahrát aktivitu',
+            'success' => 'Aktivita byla úspěšně nahrána',
+            'no_season' => 'Momentálně neběží žádná sezóna',
+            'error' => 'Při nahrávání aktivity došlo k chybě',
+        ],
         'edit' => [
             'title' => 'Upravit aktivitu',
             'distance' => 'Vzdálenost (km):',

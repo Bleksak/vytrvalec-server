@@ -118,7 +118,7 @@
                         </li>
                         {% if current_season %}
                             <li>
-                                <button>{{ 'navbar.submission'|trans }}</button>
+                                <button onclick="document.querySelector('#submission-dialog').show()">{{ 'navbar.submission'|trans }}</button>
                             </li>
                         {% endif %}
                         <li>
@@ -227,6 +227,14 @@
                 </twig:block>
 
                 <twig:Registration :faculties="faculties" />
+            </twig:Dialog>
+        {% else %}
+            <twig:Dialog id="submission-dialog">
+                <twig:block name="header">
+                    {{ 'submission.create.title'|trans }}
+                </twig:block>
+
+                <twig:SubmissionUpload />
             </twig:Dialog>
         {% endif %}
     </body>

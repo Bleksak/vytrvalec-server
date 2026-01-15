@@ -15,4 +15,5 @@ enum ToastContext: string
     case PasswordReset = 'password-reset';
     case ImageUpload = 'image-upload';
     case SubmissionEdit = 'submission-edit';
+    case SubmissionCreate = 'submission-create';
 }

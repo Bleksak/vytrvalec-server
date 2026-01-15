@@ -1,0 +1,16 @@
+<div {{ attributes }}>
+    {{ form_start(form, 
+        {
+            attr: {
+                'data-action': 'live#action:prevent',
+                'data-live-action-param': 'submit'
+            }
+        }
+    ) }}
+        <fieldset>
+            <twig:ImageUpload :image="currentSubmission.image.path ?? null" :allowedMimeTypes="allowedMimeTypes" />
+        </fieldset>
+
+        {{ form_rest(form) }}
+    {{ form_end(form) }}
+</div>

@@ -6,8 +6,10 @@ namespace App\Action;
 
 use App\Dto\Submission\SubmissionCreateDto;
 use App\Dto\Submission\SubmissionEditDto;
+use App\Dto\Submission\SubmissionServerCreateDto;
 use App\Dto\Submission\SubmissionServerEditDto;
 use App\Dto\Submission\SubmissionStateDto;
+use App\Entity\Activity;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -65,6 +67,38 @@ final readonly class SubmissionActions
         $this->submissionRepository->save($submission, true);
 
         return [];
+    }
+
+    public function createServer(
+        SubmissionServerCreateDto $dto,
+        User $user,
+        Season $season,
+    ): ?Submission {
+        $activity = $dto->activity;
+        \assert($activity instanceof Activity);
+
+        $image = $this->imageRepository->find($dto->imageUuid);
+
+        if ($image === null || $image->usedAt !== null) {
+            return null;
+        }
+
+        $image->usedAt = new \DateTime();
+
+        $submission = new Submission(
+            $user,
+            $activity,
+            $season,
+            $image,
+            $dto->distance ?? 0,
+            new DateTime(),
+            // $dto->date,
+            $dto->elevation ?? 0,
+        );
+
+        $this->submissionRepository->save($submission, true);
+
+        return $submission;
     }
 
     /**

@@ -61,4 +61,23 @@ final class SubmissionCardGrid
     ): void {
         unset($this->submissions[$submissionId]);
     }
+
+    #[LiveListener('submission-create')]
+    public function createListener(
+        #[LiveArg('submission_id')] int $submissionId,
+        #[LiveArg('season_id')] int $seasonId,
+    ): void {
+        if ($seasonId !== $this->seasonId) {
+            return;
+        }
+
+        $submission = $this->submissionRepository->find($submissionId);
+
+        if ($submission === null) {
+            return;
+        }
+
+        $this->submissions[$submissionId] = $submission;
+        \krsort($this->submissions);
+    }
 }
