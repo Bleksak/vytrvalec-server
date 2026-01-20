@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ 'account.title'|trans }}
+{% endblock title %}
+
+{% block body %}
+    <article>
+        <twig:Heading>
+            <div class="profile-user">
+                <h1 class="profile-heading">
+                    {{ app.user.firstName }}
+                    {{ app.user.lastName }}
+                </h1>
+                <twig:FacultyTag :faculty="app.user.faculty" />
+            </div>
+        </twig:Heading>
+        <main>
+            {{ form_start(edit) }}
+            <section class="grid">
+                <div class="email">
+                    <strong>{{ 'account.email'|trans }}:</strong>
+                    <span>{{ app.user.email }}</span>
+                </div>
+
+                <div class="mailing">
+                    <label>
+                        <strong>{{ field_label(edit.mailing) }}: </strong>
+                        {{ form_widget(edit.mailing) }}
+                    </label>
+                </div>
+            </section>
+            <hr />
+
+            <section>
+                <h2>{{ 'account.edit.password_change'|trans }}</h2>
+                <fieldset>
+                    <label>
+                        <strong>{{ field_label(edit.current_password) }}: </strong>
+                        {{ form_widget(edit.current_password) }}
+                    </label>
+                    <label>
+                        <strong>{{ field_label(edit.password.children.new_password) }}:</strong>
+                    </label>
+                    {{ form_widget(edit.password.children.new_password) }}
+
+                    <strong>{{ field_label(edit.password.children.new_password_repeat) }}:</strong>
+                    {{ form_widget(edit.password.children.new_password_repeat) }}
+                </fieldset>
+
+                <div class="note">
+                    <strong>{{ 'account.note'|trans }}</strong>
+                </div>
+
+                <hr />
+
+                <section class="danger-zone">
+                    <h3>{{ 'account.danger_zone'|trans }}</h3>
+                    <fieldset>
+                        <label>
+                            <strong data-tooltip="{{ 'account.anonymize_tooltip'|trans }}">
+                                {{ field_label(edit.anonymize) }}:
+                            </strong>
+                            {{ form_widget(edit.anonymize) }}
+                        </label>
+                    </fieldset>
+
+                    <fieldset>
+                        <button class="secondary" type="button" onclick="delete_dialog.showModal()">{{ 'account.delete.button'|trans }}</button>
+                    </fieldset>
+                </section>
+                {{ form_row(edit.submit) }}
+            </section>
+
+            {{ form_end(edit) }}
+
+            <twig:Dialog id="delete_dialog">
+                <twig:block name="header">
+                    {{ 'account.delete.title'|trans }}
+                </twig:block>
+
+                <section>
+                    <p><strong>{{ 'account.delete.text1'|trans }}</strong></p>
+                    <p>{{ 'account.delete.text2'|trans }}</p>
+                    <p>{{ 'account.delete.text3'|trans }}</p>
+                    <p>{{ 'account.delete.text4'|trans }}</p>
+
+                    {{ form_start(delete) }}
+                        {{ form_widget(delete.submit) }}
+                    {{ form_end(delete) }}
+                </section>
+            </twig:Dialog>
+
+        </main>
+    </article>
+{% endblock body %}

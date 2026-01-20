@@ -15,7 +15,7 @@
                     </h1>
                     <twig:FacultyTag :faculty="app.user.faculty" />
                 </div>
-                <a href="/account" title="Nastavení účtu">
+                <a href="{{ path('user:account') }}" title="Nastavení účtu">
                     <twig:ux:icon
                         name="lucide:settings"
                         width="24"

@@ -599,3 +599,22 @@ header.dialog-header {
     width: 60%;
     text-align: center;
 }
+
+.danger-zone {
+    border: 2px dashed #e74c3c;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #e74c3c1a;
+    color: #e74c3c;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    
+    h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: inherit;
+    }
+}
+
