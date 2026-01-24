@@ -5,33 +5,44 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\CustomLogic\SeasonResultCalculator;
+use App\Dto\AnonymizedUser;
 use App\Dto\ExtraPointsDto;
 use App\Dto\FacultyResultDto;
 use App\Dto\SeasonResult\SeasonResultRankDto;
 use App\Dto\SeasonResult\SeasonResultRankRowDto;
-use App\Dto\SeasonResultDto;
+use App\Dto\SeasonResultWithUsersDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
+use App\Entity\User;
 use App\Repository\SeasonCacheRepository;
+use App\Repository\UserRepository;
 
 final readonly class SeasonResultRankingService
 {
     public function __construct(
         private SeasonCacheRepository $seasonCacheRepository,
         private SeasonResultCalculator $seasonResultCalculator,
+        private UserRepository $userRepository,
     ) {}
 
-    public function getSeasonResult(Season $season): SeasonResultDto
+    public function getSeasonResult(Season $season): SeasonResultWithUsersDto
     {
         $cache = $this->seasonCacheRepository->findOneBy([
             'season' => $season->id,
         ]);
 
-        if ($cache !== null) {
-            return $cache->data;
+        $data = $cache?->data;
+
+        if ($data === null) {
+            $data = $this->seasonResultCalculator->calculate($season);
         }
 
-        return $this->seasonResultCalculator->calculate($season);
+        $users = \array_map(
+            static fn(User $user): AnonymizedUser => $user->toAnonymizedUser(),
+            $this->userRepository->findByIds(\array_values($data->users)),
+        );
+
+        return new SeasonResultWithUsersDto($data, $users);
     }
 
     /**
@@ -40,7 +51,7 @@ final readonly class SeasonResultRankingService
      */
     public function calculateSeasonResultRanking(
         Season $season,
-        SeasonResultDto $seasonResult,
+        SeasonResultWithUsersDto $seasonResult,
         ?int $activity = null,
         ?int $week = null,
     ): SeasonResultRankDto {
@@ -128,7 +139,7 @@ final readonly class SeasonResultRankingService
     /**
      * @return array<int, int>
      */
-    private function createFacultySet(SeasonResultDto $seasonResult): array
+    private function createFacultySet(SeasonResultWithUsersDto $seasonResult): array
     {
         $facultySet = [];
 
@@ -188,7 +199,6 @@ final readonly class SeasonResultRankingService
             }
 
             foreach ($activityResult->extras as $extra) {
-                // TODO(@bleksak): tady vyresit jeste collect toho uzivatele
                 $ranking[$extra->faculty]['points'] += $extra->points;
                 $extras[] = $extra;
             }

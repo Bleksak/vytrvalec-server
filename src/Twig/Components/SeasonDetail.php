@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Twig\Components;
 
 use App\Dto\SeasonResult\SeasonResultRankDto;
-use App\Dto\SeasonResultDto;
+use App\Dto\SeasonResultWithUsersDto;
 use App\Entity\Faculty;
 use App\Entity\Season;
 use App\Services\SeasonResultRankingService;
@@ -32,7 +32,7 @@ final class SeasonDetail
      */
     public function mount(
         Season $season,
-        SeasonResultDto $seasonResult,
+        SeasonResultWithUsersDto $seasonResult,
         array $faculties,
         string $title = 'season_detail.title',
         string $heading = '',

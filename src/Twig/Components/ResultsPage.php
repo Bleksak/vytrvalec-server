@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Twig\Components;
 
-use App\Dto\AnonymizedUser;
 use App\Dto\SeasonResult\SeasonResultRankDto;
-use App\Dto\SeasonResultDto;
+use App\Dto\SeasonResultWithUsersDto;
 use App\Dto\Statistics\UserCountGroupedByFacultyTotal;
 use App\Entity\Activity;
 use App\Entity\Faculty;
@@ -29,7 +28,7 @@ final class ResultsPage
 
     public Season $currentSeason;
 
-    public SeasonResultDto $currentSeasonResult;
+    public SeasonResultWithUsersDto $currentSeasonResult;
 
     public SeasonResultRankDto $seasonResultRanking;
 
@@ -55,10 +54,6 @@ final class ResultsPage
 
     #[LiveProp(writable: true)]
     public int $currentWeekIndex = 0;
-
-    /** @var array<int, AnonymizedUser> */
-    #[LiveProp(writable: false, useSerializerForHydration: true)]
-    public array $users = [];
 
     #[LiveProp(writable: false, useSerializerForHydration: true)]
     public Chart $chart;
@@ -100,12 +95,6 @@ final class ResultsPage
             $this->currentSeasonResult = $this->seasonResultRankingService->getSeasonResult($this->currentSeason);
             $this->userFacultyStatistics =
                 $this->userRepository->countUserGroupedByFaculties($newSeason);
-            $userList = $this->userRepository->findByIds($this->currentSeasonResult->users);
-            $this->users = [];
-
-            foreach ($userList as $user) {
-                $this->users[$user->id] = $user->toAnonymizedUser();
-            }
         }
 
         $this->recalculateRanking();

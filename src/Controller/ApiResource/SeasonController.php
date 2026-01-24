@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller\ApiResource;
 
 use App\Action\SeasonActions;
-use App\CustomLogic\SeasonResultCalculator;
 use App\Dto\Season\Request\SeasonQueryFilterRequestDto;
 use App\Dto\Season\Response\SeasonIndexResponseDto;
 use App\Dto\Season\SeasonIndexDto;
@@ -14,11 +13,11 @@ use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use App\Entity\Submission;
-use App\Repository\SeasonCacheRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Schema\SeasonWithoutSubmissionsSchema;
 use App\Services\ImagePath;
+use App\Services\SeasonResultRankingService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,14 +26,12 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[OA\Tag(name: 'Season')]
 final class SeasonController extends AbstractController
 {
     public function __construct(
         private readonly SeasonRepository $seasonRepository,
-        private readonly NormalizerInterface $normalizer,
         private readonly SeasonActions $action,
         private readonly ImagePath $imagePath,
     ) {}
@@ -174,16 +171,9 @@ final class SeasonController extends AbstractController
     )]
     public function result(
         Season $season,
-        SeasonResultCalculator $result,
-        SeasonCacheRepository $cacheRepository,
+        SeasonResultRankingService $resultRankingService,
     ): Response {
-        $cache = $cacheRepository->findOneBy(['season' => $season->id]);
-
-        if ($cache !== null) {
-            return $this->json($cache->data);
-        }
-
-        return $this->json($result->calculate($season));
+        return $this->json($resultRankingService->getSeasonResult($season));
     }
 
     #[OA\Get(
