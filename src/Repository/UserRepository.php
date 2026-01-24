@@ -160,7 +160,7 @@ final class UserRepository extends ServiceEntityRepository implements
     {
         /** @var list<User> */
         return $this
-            ->createQueryBuilder('u')
+            ->createQueryBuilder('u', 'u.id')
             ->select('u')
             ->where('u.id IN (:ids)')
             ->setParameter('ids', $ids)
