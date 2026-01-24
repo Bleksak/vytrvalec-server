@@ -12,6 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class AccountDeleteFormType extends AbstractType
 {
+    #[\Override]
     public function buildForm(
         FormBuilderInterface $builder,
         array $options,
@@ -23,6 +24,7 @@ final class AccountDeleteFormType extends AbstractType
         ]);
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
     }

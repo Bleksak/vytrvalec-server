@@ -14,7 +14,10 @@ final class AccountEditDto
         #[Assert\NotBlank]
         public bool $anonymize,
 
+        #[\SensitiveParameter]
         public string $currentPassword = '',
+
+        #[\SensitiveParameter]
         public string $newPassword = '',
     ) {}
 }

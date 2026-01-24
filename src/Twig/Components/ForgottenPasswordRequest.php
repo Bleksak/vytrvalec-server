@@ -11,7 +11,6 @@ use App\Utils\Toast\ToastContext;
 use App\Utils\Toast\ToastManager;
 use App\Utils\Toast\ToastType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -30,7 +29,6 @@ final class ForgottenPasswordRequest extends AbstractController
     public ForgottenPasswordRequestDto $initialData;
 
     public function __construct(
-        private Security $security,
         private LiveResponder $liveResponder,
         private ToastManager $toastManager,
     ) {

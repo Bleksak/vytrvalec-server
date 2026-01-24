@@ -14,7 +14,6 @@ use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\Attribute\PreReRender;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
-use Symfony\UX\LiveComponent\LiveResponder;
 
 #[AsLiveComponent]
 final class Toast extends AbstractController
@@ -26,7 +25,6 @@ final class Toast extends AbstractController
     public array $messages = [];
 
     public function __construct(
-        private LiveResponder $responder,
         private ToastManager $_toastManager,
         private RequestStack $requestStack,
     ) {

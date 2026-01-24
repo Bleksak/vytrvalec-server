@@ -13,7 +13,6 @@ use App\Form\LoginType;
 use App\Utils\Toast\ToastContext;
 use App\Utils\Toast\ToastManager;
 use App\Utils\Toast\ToastType;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormInterface;
@@ -24,7 +23,6 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\ComponentWithFormTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
-use Symfony\UX\LiveComponent\LiveResponder;
 
 #[AsLiveComponent]
 final class Login extends AbstractController
@@ -39,8 +37,6 @@ final class Login extends AbstractController
     public function __construct(
         private Security $security,
         private ToastManager $toastManager,
-        private LiveResponder $liveResponder,
-        private LoggerInterface $logger,
     ) {
         $this->initialData = new UserLoginDto();
     }

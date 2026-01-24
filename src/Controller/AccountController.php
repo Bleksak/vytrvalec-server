@@ -30,7 +30,7 @@ final class AccountController extends AbstractController
 
         $editForm = $this->createForm(
             AccountEditFormType::class,
-            new AccountEditDto($user->mailing, $user->anonymize),
+            new AccountEditDto($user->mailing, $user->anonymize ?? true),
         );
 
         $deleteForm = $this->createForm(AccountDeleteFormType::class);

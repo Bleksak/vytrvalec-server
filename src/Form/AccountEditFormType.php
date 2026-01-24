@@ -12,14 +12,10 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AccountEditFormType extends AbstractType
 {
-    public function __construct(
-        private TranslatorInterface $translator,
-    ) {}
-
+    #[\Override]
     public function buildForm(
         FormBuilderInterface $builder,
         array $options,
@@ -68,6 +64,7 @@ final class AccountEditFormType extends AbstractType
         ]);
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', AccountEditDto::class);

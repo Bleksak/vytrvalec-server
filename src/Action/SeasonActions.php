@@ -11,7 +11,6 @@ use App\Entity\Season;
 use App\Repository\FacultyMappingRepository;
 use App\Repository\SeasonRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 final readonly class SeasonActions
 {
@@ -19,7 +18,6 @@ final readonly class SeasonActions
         private SeasonRepository $seasonRepository,
         private FacultyMappingRepository $facultyMappingRepository,
         private CharityActions $charityAction,
-        private MessageBusInterface $messageBus,
         private EntityManagerInterface $entityManager,
     ) {}
 

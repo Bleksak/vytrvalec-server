@@ -11,7 +11,6 @@ use App\Entity\User;
 use App\Form\SubmissionCreateFormType;
 use App\Repository\ActivityRepository;
 use App\Repository\SeasonRepository;
-use App\Repository\SubmissionRepository;
 use App\Utils\MimeType;
 use App\Utils\Toast\ToastContext;
 use App\Utils\Toast\ToastManager;
@@ -48,11 +47,10 @@ final class SubmissionUpload extends AbstractController
 
     public function __construct(
         private SubmissionActions $submissionActions,
-        private SubmissionRepository $submissionRepository,
         private ActivityRepository $activityRepository,
         private SeasonRepository $seasonRepository,
-        private LocaleSwitcher $localeSwitcher,
         private ToastManager $toastManager,
+        LocaleSwitcher $localeSwitcher,
     ) {
         $this->activities = $this->activityRepository->findAllWithTranslations($localeSwitcher->getLocale());
 
