@@ -35,5 +35,7 @@ final class SubmissionResponseDto
         public \DateTime $updatedAt,
         #[OA\Property(example: 'Dobrej vykon lil bro')]
         public string $message = '',
+        #[OA\Property]
+        public ?string $imageUuid,
     ) {}
 }
