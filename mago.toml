@@ -4,7 +4,7 @@ php-version = "8.5.0"
 
 [source]
 paths = ["src"]
-includes = ["vendor"]
+includes = ["vendor", "var"]
 excludes = [
   "vendor/nikic/fast-route/test",
   "vendor/composer/autoload_classmap.php",
@@ -55,13 +55,22 @@ literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000, enabled = false }
 
 [analyzer]
-find-unused-definitions = true
 find-unused-expressions = true
+find-unused-definitions = true
 analyze-dead-code = true
+memoize-properties = true
 allow-possibly-undefined-array-keys = false
-perform-heuristic-checks = true
-check-throws = false
+check-throws = false # NOTE: we cannot use this because symfony abuses exceptions
+check-missing-override = true
+find-unused-parameters = true
+strict-list-index-checks = true
 check-missing-type-hints = true
 check-closure-missing-type-hints = true
 check-arrow-function-missing-type-hints = true
 register-super-globals = true
+trust-existence-checks = true
+check-property-initialization = false # NOTE: We cannot use this until the issues with it are fixed or more configuration is added
+check-use-statements = true
+
+class-initializers = ["__construct", "setContainer"]
+plugins = ["standard", "std", "php-stdlib"]

@@ -46,6 +46,7 @@ final class ResultsPage
     #[LiveProp(writable: false)]
     public array $seasonList;
 
+    /** @var non-negative-int */
     #[LiveProp(writable: true)]
     public int $currentSeasonIndex = 0;
 

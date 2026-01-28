@@ -32,6 +32,10 @@ final class SubmissionPreviewDialog
     ): void {
         $submission = $this->submissionRepository->find($submissionId);
 
+        if ($submission === null) {
+            return;
+        }
+
         $this->emit('updateImage', [
             'image' => $submission->image?->getPath(),
         ]);

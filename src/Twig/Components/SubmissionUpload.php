@@ -58,10 +58,7 @@ final class SubmissionUpload extends AbstractController
             static fn(MimeType $mimeType): string => $mimeType->value,
             MimeType::default(),
         );
-    }
 
-    public function mount(): void
-    {
         $this->initialData = new SubmissionServerCreateDto();
     }
 

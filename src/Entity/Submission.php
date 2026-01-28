@@ -113,6 +113,7 @@ final class Submission
         }
 
         $this->week = \intdiv($days, num2: 7);
+        $this->updatedAt = new \DateTime();
     }
 
     public function getState(): SubmissionState
