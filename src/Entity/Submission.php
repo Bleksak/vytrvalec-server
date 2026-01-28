@@ -147,8 +147,8 @@ final class Submission
             $this->activity->id,
             $this->date,
             $this->updatedAt,
+            $this->image?->uuid->toString(),
             $this->message,
-            $this->image?->uuid->toString()
         );
     }
 }
