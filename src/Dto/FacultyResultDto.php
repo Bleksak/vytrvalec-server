@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
 /**
  * @type FacultyResultDtoType = array{faculty: int, distance: int}
  */
-final readonly class FacultyResultDto
+final class FacultyResultDto
 {
     public function __construct(
         #[OA\Property(example: 1)]

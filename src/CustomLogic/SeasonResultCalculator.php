@@ -10,6 +10,7 @@ use App\Dto\FacultyResultDto;
 use App\Dto\SeasonResultDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
+use App\Repository\FacultyMappingRepository;
 use App\Repository\SubmissionRepository;
 use DateTime;
 
@@ -17,6 +18,7 @@ final readonly class SeasonResultCalculator
 {
     public function __construct(
         private SubmissionRepository $submissionRepository,
+        private FacultyMappingRepository $facultyMappingRepository,
         private DailyDistanceExtraPoints $dailyDistanceExtraPoints,
         private WeeklyDistanceExtraPoints $weeklyDistanceExtraPoints,
         private WeeklyElevationExtraPoints $weeklyElevationExtraPoints,
@@ -24,6 +26,9 @@ final readonly class SeasonResultCalculator
 
     public function calculate(Season $season): SeasonResultDto
     {
+        $facultyParentRoots =
+            $this->facultyMappingRepository->findRootsBySeason($season);
+
         $weeks = $season->getWeekCount();
         $results = [];
         $users = [];
@@ -45,8 +50,16 @@ final readonly class SeasonResultCalculator
             $activities = [];
 
             foreach ($weeklyResult as $result) {
-                $activities[$result->activity][$result->faculty] =
-                    new FacultyResultDto($result->faculty, $result->distance);
+                $actualFaculty =
+                    $facultyParentRoots[$result->faculty] ?? $result->faculty;
+
+                if (!isset($activities[$result->activity][$actualFaculty])) {
+                    $activities[$result->activity][$actualFaculty] =
+                        new FacultyResultDto($actualFaculty, 0);
+                }
+
+                $activities[$result->activity][$actualFaculty]->distance +=
+                    $result->distance;
             }
 
             $activityResult = [];
@@ -67,10 +80,14 @@ final readonly class SeasonResultCalculator
             foreach ($extraPointsClasses as $cls) {
                 $extras = $cls->calculate($season);
                 foreach ($extras as $extra) {
+                    $facultyId =
+                        $facultyParentRoots[$extra->facultyId]
+                        ?? $extra->facultyId;
+
                     $results[$cls->getWeek()]->activities[$extra->activityId]->extras[] =
                         new ExtraPointsDto(
                             $extra->user,
-                            $extra->facultyId,
+                            $facultyId,
                             $cls->getUniqueName(),
                             $extra->value,
                             $cls->reward(),
