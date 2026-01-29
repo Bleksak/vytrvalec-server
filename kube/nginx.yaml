@@ -73,6 +73,8 @@ spec:
       - name: vytrvalec-web
         imagePullPolicy: Always
         image: ipmil.civ.zcu.cz:4567/kiv/vytrvalec-server/app:${CI_COMMIT_SHORT_SHA}
+        ports:
+          - containerPort: 1337
         volumeMounts:
           - name: shared-files
             mountPath: /var/www/vytrvalec
