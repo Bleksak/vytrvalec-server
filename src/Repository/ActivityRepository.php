@@ -94,8 +94,9 @@ final class ActivityRepository extends ServiceEntityRepository
             ->where('a.id IN (:ids)')
             ->setParameter('ids', $activities)
             ->innerJoin('a.icon', 'ai')
-            ->addGroupBy('a.id');
-
+            ->addGroupBy('a')
+            ->addGroupBy('ai')
+            ->addGroupBy('at');
         if ($locale !== null) {
             $query->innerJoin(
                 'a.translations',
