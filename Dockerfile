@@ -7,3 +7,5 @@ COPY . .
 
 RUN npm install
 RUN composer install --no-interaction && composer dump -o
+
+EXPOSE 1337
