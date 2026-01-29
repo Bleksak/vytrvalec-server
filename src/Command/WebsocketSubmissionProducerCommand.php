@@ -57,6 +57,7 @@ final readonly class WebsocketSubmissionProducerCommand
         $server = SocketHttpServer::createForDirectAccess($this->logger);
         $server->expose(new InternetAddress('127.0.0.1', $this->port));
         $server->expose(new InternetAddress('[::1]', $this->port));
+        $server->expose(new InternetAddress('vytrvalec.uts.zcu.cz', $this->port));
 
         $errorHandler = new DefaultErrorHandler();
 
