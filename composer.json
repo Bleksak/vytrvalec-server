@@ -8,6 +8,7 @@
     "ext-ctype": "*",
     "ext-iconv": "*",
     "ext-imagick": "*",
+    "ext-pcntl": "*",
     "amphp/http-server-router": "^2.0",
     "amphp/log": "^2.0",
     "amphp/websocket-server": "^4.0",
