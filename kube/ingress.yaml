@@ -6,10 +6,10 @@ metadata:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/proxy-body-size: 100M
     nginx.ingress.kubernetes.io/proxy-buffer-size: 16k
-    nginx.org/server-snippets: |
-      location / {
-          return 404;
-      }
+    # nginx.org/server-snippets: |
+    #   location / {
+    #       return 404;
+    #   }
 spec:
   tls:
     - hosts:
@@ -68,10 +68,11 @@ data:
         }
 
         location /ws {
-            proxy_pass http://localhost:1337;
+            proxy_pass http://127.0.0.1:1337;
+
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
+            proxy_set_header Connection "Upgrade";
             proxy_set_header Host $host;
         }
 
