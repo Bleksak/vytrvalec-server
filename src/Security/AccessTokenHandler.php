@@ -21,13 +21,19 @@ final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
     ) {}
 
     #[\Override]
-    public function getUserBadgeFrom(#[SensitiveParameter] string $accessToken): UserBadge
-    {
+    public function getUserBadgeFrom(
+        #[SensitiveParameter] string $accessToken,
+    ): UserBadge {
         try {
-            $payload = JWT::decode($accessToken, new Key($this->secret, 'HS256'));
+            $payload = JWT::decode(
+                $accessToken,
+                new Key($this->secret, 'HS256'),
+            );
 
-            /** @var JWTPayload */
-            $payload = $this->denormalizer->denormalize($payload, JWTPayload::class);
+            $payload = $this->denormalizer->denormalize(
+                $payload,
+                JWTPayload::class,
+            );
 
             return new UserBadge($payload->user);
         } catch (\Throwable) {

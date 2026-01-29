@@ -1,0 +1,50 @@
+<div {{ attributes }}>
+    {% if currentSubmission is not null %}
+        <form>
+            <fieldset>
+            {% if currentSubmission.message %}
+                <p>{{ 'submission.comment'|trans }}</p>
+                    <span>{{ currentSubmission.message }}</span>
+                {% endif %}
+                </fieldset>
+
+                <fieldset>
+                    <twig:ImageUpload
+                        :image="currentSubmission.image.path ?? null"
+                        disabled
+                    />
+                </fieldset>
+
+                <fieldset>
+                    <label for="distance">
+                        {{ 'submission.distance'|trans }} (km):
+                    </label>
+                    <input
+                        type="text"
+                        name="distance"
+                        id="distance"
+                        disabled
+                        value="{{ currentSubmission.distance / 1000 }}"
+                    />
+                </fieldset>
+
+            <fieldset>
+                <label for="elevation">
+                    {{ 'submission.elevation'|trans }} (m):
+                </label>
+                <input type="text" name="elevation" id="elevation" disabled value="{{ currentSubmission.elevation }}" />
+            </fieldset>
+
+            <fieldset>
+                <label for="activity">
+                    {{ 'submission.activity'|trans }}:
+                </label>
+                <select name="activity" id="activity" disabled>
+                    <option value="{{ currentSubmission.activity.id }}">
+                        {{ currentSubmission.activity.translations[app.locale].name }}
+                    </option>
+                </select>
+            </fieldset>
+        </form>
+    {% endif %}
+</div>

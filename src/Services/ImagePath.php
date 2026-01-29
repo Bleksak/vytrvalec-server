@@ -10,15 +10,14 @@ final readonly class ImagePath
 {
     public function __construct(
         private string $applicationPath,
-    ) {
-    }
+    ) {}
 
     public function fullPath(string|Image $image): string
     {
         if (\is_string($image)) {
-            return $this->applicationPath.$image;
+            return $this->applicationPath . $image;
         }
 
-        return $this->applicationPath.$image->getPath();
+        return $this->applicationPath . $image->getPath();
     }
 }

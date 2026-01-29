@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Dto\AnonymizedUser;
 use App\Dto\User\Response\UserResponseDto;
 use App\Repository\UserRepository;
 use App\Utils\FeatureFlag;
-use Deprecated;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -22,54 +22,41 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     columns: ['email_unsubscribe_hash'],
     name: 'email_unsubscribe_hash',
 )]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+final class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    public private(set) int $id;
 
-    #[ORM\Column(
-        length: 180,
-        unique: true,
-        nullable: true,
-    )]
-    private ?string $email = null;
+    #[ORM\Column(length: 180, unique: true, nullable: true)]
+    public ?string $email = null;
 
     /**
      * @var array<string>
      */
-    #[OA\Property(
-        type: 'array',
-        items: new OA\Items(type: 'string'),
-    )]
+    #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
     #[ORM\Column(type: 'json')]
-    private array $roles = [];
+    public array $roles = [];
 
     #[ORM\Column]
-    private string $password;
+    public string $password;
 
     #[ORM\Column]
-    private bool $banned = false;
+    public bool $banned = false;
 
     #[ORM\Column(options: ['default' => 1])]
-    private bool $mailing = true;
+    public bool $mailing = true;
 
-    #[ORM\Column(
-        type: 'string',
-        length: 255,
-    )]
-    private string $firstName;
+    #[ORM\Column(type: 'string', length: 255)]
+    public string $firstName;
 
-    #[ORM\Column(
-        type: 'string',
-        length: 255,
-    )]
-    private string $lastName;
+    #[ORM\Column(type: 'string', length: 255)]
+    public string $lastName;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private Faculty $faculty;
+    public Faculty $faculty;
 
     /**
      * @var Collection<int, Submission>
@@ -79,40 +66,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         targetEntity: Submission::class,
         orphanRemoval: true,
     )]
-    private Collection $submissions;
+    public Collection $submissions;
 
-    #[ORM\Column(
-        length: 255,
-        nullable: true,
-    )]
-    private ?string $token = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    public ?string $token = null;
 
     /**
      * @var Collection<int, ProfileCache>
      */
-    #[ORM\OneToMany(
-        mappedBy: 'user',
-        targetEntity: ProfileCache::class,
-    )]
-    private Collection $profileCaches;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProfileCache::class)]
+    public Collection $profileCaches;
 
-    #[ORM\Column(
-        length: 255,
-        nullable: true,
-    )]
-    private ?string $passwordResetToken = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    public ?string $passwordResetToken = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $anonymize = false;
+    public ?bool $anonymize = false;
 
-    #[ORM\Column(
-        length: 255,
-        nullable: true,
-    )]
-    private ?string $emailUnsubscribeHash = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    public ?string $emailUnsubscribeHash = null;
 
     #[ORM\Column(length: 8)]
-    private string $locale = 'cs_CZ';
+    public string $locale = 'cs_CZ';
 
     /**
      * @param array<string> $roles
@@ -139,35 +114,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->token = $token;
         $this->emailUnsubscribeHash = \bin2hex(\random_bytes(90));
         $this->locale = $locale;
-    }
-
-    public function getId(): int
-    {
-        return $this->id ?? 0;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    public function setAnonymization(bool $value): self
-    {
-        $this->anonymize = $value;
-
-        return $this;
-    }
-
-    public function shouldAnonymize(): ?bool
-    {
-        return $this->anonymize;
     }
 
     #[\Override]
@@ -197,16 +143,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function hasRole(string $roleName): bool
     {
         return \in_array($roleName, $this->getRoles(), true);
-    }
-
-    /**
-     * @param string[] $roles
-     */
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-
-        return $this;
     }
 
     #[\Override]
@@ -310,12 +246,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->profileCaches;
     }
 
-    #[Deprecated('do not use')]
-    #[\Override]
-    public function eraseCredentials(): void
-    {
-    }
-
     public function getPasswordResetToken(): ?string
     {
         return $this->passwordResetToken;
@@ -329,16 +259,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getEmailUnsubscribeHash(): ?string
+    public function getEmailUnsubscribeHash(): string
     {
+        if ($this->emailUnsubscribeHash === null) {
+            $this->emailUnsubscribeHash = \bin2hex(\random_bytes(90));
+        }
+
         return $this->emailUnsubscribeHash;
     }
 
-    public function setEmailUnsubscribeHash(?string $emailUnsubscribeHash): static
+    public function resetEmailUnsubscribeHash(): void
     {
-        $this->emailUnsubscribeHash = $emailUnsubscribeHash;
-
-        return $this;
+        $this->emailUnsubscribeHash = null;
     }
 
     public function getLocale(): string
@@ -355,10 +287,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function anonymize(): static
     {
-        $this->setLastName('')
+        $this->resetEmailUnsubscribeHash();
+        $this->anonymize = true;
+
+        $this
+            ->setLastName('')
             ->setMailing(false)
-            ->setAnonymization(true)
-            ->setEmailUnsubscribeHash(null)
             ->setToken(null)
             ->setPasswordResetToken(null);
 
@@ -375,15 +309,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function toResponseObject(): UserResponseDto
     {
         return new UserResponseDto(
-            $this->getId(),
-            $this->getEmail(),
-            $this->getRoles(),
-            $this->isBanned(),
-            $this->hasMailing(),
-            $this->getFirstName(),
-            $this->getLastName(),
-            $this->getFaculty()->toResponseObject(),
-            $this->shouldAnonymize(),
+            $this->id,
+            $this->email,
+            $this->roles,
+            $this->banned,
+            $this->mailing,
+            $this->firstName,
+            $this->lastName,
+            $this->faculty->toResponseObject(),
+            $this->anonymize,
+        );
+    }
+
+    public function toAnonymizedUser(): AnonymizedUser
+    {
+        return new AnonymizedUser(
+            $this->firstName,
+            $this->lastName,
+            $this->anonymize,
         );
     }
 }

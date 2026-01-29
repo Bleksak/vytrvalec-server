@@ -20,10 +20,16 @@ final class MobileController extends AbstractController
         new OA\Response(
             description: 'Version object',
             response: Response::HTTP_OK,
-            content: new OA\JsonContent(ref: new Model(type: MobileVersionResponseDto::class)),
+            content: new OA\JsonContent(
+                ref: new Model(type: MobileVersionResponseDto::class),
+            ),
         ),
     ])]
-    #[Route('/api/mobile/version', name: 'app_mobile_version', methods: ['GET'])]
+    #[Route(
+        '/api/mobile/version',
+        name: 'app_mobile_version',
+        methods: ['GET'],
+    )]
     public function version(): Response
     {
         return $this->json(new MobileVersionResponseDto(

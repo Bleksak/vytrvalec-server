@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Controller\EmailUnsubscribeController;
 use App\Entity\User;
 use App\Notifications\AbstractEmailTemplate;
 use App\Notifications\VytrvalecEmail;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final readonly class VytrvalecMailer
 {
     public function __construct(
         private MailerInterface $mailer,
-        private string $clientUrl,
+        private UrlGeneratorInterface $urlGeneratorInterface,
         private string $appBase,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, mixed>
@@ -32,11 +33,9 @@ final readonly class VytrvalecMailer
     {
         $emailUnsubscribeHash = $user->getEmailUnsubscribeHash();
 
-        if ($emailUnsubscribeHash === null) {
-            return $this->clientUrl;
-        }
-
-        return \sprintf('%s/unsubscribe/%s', $this->clientUrl, $emailUnsubscribeHash);
+        return $this->urlGeneratorInterface->generate(EmailUnsubscribeController::ROUTE, [
+            'emailUnsubscribeHash' => $emailUnsubscribeHash,
+        ]);
     }
 
     /**
@@ -55,14 +54,17 @@ final readonly class VytrvalecMailer
         $template->mergeContext($this->getContext());
 
         foreach ($recipient as $user) {
-            $email = $user->getEmail();
+            $email = $user->email;
 
             if ($email === null) {
                 continue;
             }
 
             if ($user->hasMailing() || $forceSend) {
-                $template->setContext('unsubscribe_link', $this->constructUnsubscribeLink($user));
+                $template->setContext(
+                    'unsubscribe_link',
+                    $this->constructUnsubscribeLink($user),
+                );
 
                 $mail = new VytrvalecEmail($email, $template);
                 if ($template->replyTo) {

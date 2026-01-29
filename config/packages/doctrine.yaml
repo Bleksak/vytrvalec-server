@@ -15,16 +15,11 @@ doctrine:
         types:
             season_result: App\Types\SeasonResultType
     orm:
-        enable_native_lazy_objects: true
-        enable_lazy_ghost_objects: true
-        auto_generate_proxy_classes: false
-        report_fields_where_declared: true
         validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
         controller_resolver:
             enabled: true
-            auto_mapping: false
         mappings:
             App:
                 is_bundle: false
@@ -40,9 +35,6 @@ when@test:
 when@prod:
     doctrine:
         orm:
-            enable_native_lazy_objects: true
-            auto_generate_proxy_classes: false
-            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
             query_cache_driver:
                 type: pool
                 pool: doctrine.system_cache_pool

@@ -14,14 +14,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class ImageUploadFormType extends AbstractType
 {
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
+    public function buildForm(
+        FormBuilderInterface $builder,
+        array $options,
+    ): void {
         $builder->add('image', FileType::class, [
             'constraints' => [
-                new Assert\NotBlank(
-                    message: 'blank',
-                    allowNull: false,
-                ),
+                new Assert\NotBlank(message: 'blank', allowNull: false),
                 new Assert\Image(
                     mimeTypesMessage: 'invalid',
                     maxSize: '15M',

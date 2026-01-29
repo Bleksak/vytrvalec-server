@@ -7,14 +7,18 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class CharityTranslation
+final class CharityTranslation
 {
     #[ORM\Id]
     #[ORM\Column]
     public private(set) string $locale;
 
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: Charity::class, inversedBy: 'translations', cascade: ['persist'])]
+    #[ORM\ManyToOne(
+        targetEntity: Charity::class,
+        inversedBy: 'translations',
+        cascade: ['persist'],
+    )]
     #[ORM\JoinColumn]
     public Charity $charity;
 

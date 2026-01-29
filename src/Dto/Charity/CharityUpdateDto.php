@@ -16,7 +16,10 @@ final class CharityUpdateDto
     #[Assert\Url(requireTld: false, message: 'invalid')]
     public ?string $website = null;
 
-    #[OA\Property(type: 'string', example: '019629dc-7636-7593-b215-50cec5259e2f')]
+    #[OA\Property(
+        type: 'string',
+        example: '019629dc-7636-7593-b215-50cec5259e2f',
+    )]
     #[Assert\Type(type: 'string', message: 'invalid')]
     public ?string $image = null;
 }

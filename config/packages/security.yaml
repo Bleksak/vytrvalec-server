@@ -13,15 +13,29 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        main:
+        api:
+            pattern: ^/api/
             lazy: true
-
             stateless: true
 
             provider: app_user_provider
 
             access_token:
                 token_handler: App\Security\AccessTokenHandler
+
+        main:
+            pattern: ^/
+            lazy: true
+            provider: app_user_provider
+
+            form_login:
+                login_path: index
+                check_path: app_login
+                enable_csrf: true
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                # target: app_any_route
     role_hierarchy:
         ROLE_STAFF: ROLE_USER
         ROLE_ADMIN: [ROLE_USER, ROLE_STAFF]

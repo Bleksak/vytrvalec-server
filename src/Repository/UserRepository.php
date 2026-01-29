@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\Statistics\UserCountGroupedByFacultyTotal;
 use App\Dto\UserCountByFacultyStatistics;
 use App\Entity\Season;
 use App\Entity\Submission;
@@ -18,9 +19,9 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  * @extends ServiceEntityRepository<User>
  *
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
- * @method User|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
+ * @method User|null findOneBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null)
  * @method User[]    findAll()
- * @method User[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
+ * @method User[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class UserRepository extends ServiceEntityRepository implements
     PasswordUpgraderInterface
@@ -63,10 +64,7 @@ final class UserRepository extends ServiceEntityRepository implements
         $this->save($user, true);
     }
 
-    /**
-     * @return list<UserCountByFacultyStatistics>
-     */
-    public function countUserGroupedByFaculties(Season $season): array
+    public function countUserGroupedByFaculties(Season $season): UserCountGroupedByFacultyTotal
     {
         $queryBuilder = $this->createQueryBuilder('u');
 
@@ -77,7 +75,8 @@ final class UserRepository extends ServiceEntityRepository implements
                 $queryBuilder
                     ->expr()
                     ->exists(
-                        $this->getEntityManager()
+                        $this
+                            ->getEntityManager()
                             ->createQueryBuilder()
                             ->select('1')
                             ->from(Submission::class, 's')
@@ -95,13 +94,19 @@ final class UserRepository extends ServiceEntityRepository implements
             ->getQuery()
             ->getResult();
 
-        return \array_map(
-            static fn(array $row): UserCountByFacultyStatistics => new UserCountByFacultyStatistics(
+        $total = 0;
+        $users = [];
+
+        foreach ($rows as $row) {
+            $users[] = new UserCountByFacultyStatistics(
                 $row['id'],
                 $row['count'],
-            ),
-            $rows,
-        );
+            );
+
+            $total += $row['count'];
+        }
+
+        return new UserCountGroupedByFacultyTotal($users, $total);
     }
 
     /**
@@ -110,7 +115,8 @@ final class UserRepository extends ServiceEntityRepository implements
     public function findAllForMailing(): array
     {
         /** @var list<User> */
-        return $this->createQueryBuilder('u')
+        return $this
+            ->createQueryBuilder('u')
             ->select('u')
             ->where('u.mailing = 1')
             ->getQuery()
@@ -122,13 +128,20 @@ final class UserRepository extends ServiceEntityRepository implements
         return $this->findOneBy(['emailUnsubscribeHash' => $unsubscribeHash]);
     }
 
+    public function findByPasswordResetToken(
+        #[SensitiveParameter] string $passwordResetToken,
+    ): ?User {
+        return $this->findOneBy(['passwordResetToken' => $passwordResetToken]);
+    }
+
     /**
      * @return list<User>
      */
     public function findAllNotDeleted(): array
     {
         /** @var list<User> */
-        return $this->createQueryBuilder('u')
+        return $this
+            ->createQueryBuilder('u')
             ->where('u.email IS NOT NULL')
             ->getQuery()
             ->getResult();
@@ -137,5 +150,21 @@ final class UserRepository extends ServiceEntityRepository implements
     public function findOneByEmail(string $email): ?User
     {
         return $this->findOneBy(['email' => $email]);
+    }
+
+    /**
+     * @param list<int> $ids
+     * @return list<User>
+     */
+    public function findByIds(array $ids): array
+    {
+        /** @var list<User> */
+        return $this
+            ->createQueryBuilder('u', 'u.id')
+            ->select('u')
+            ->where('u.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
     }
 }

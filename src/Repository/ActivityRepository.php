@@ -18,12 +18,14 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Activity|null find($id, $lockMode = null, $lockVersion = null)
  * @method Activity|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method Activity[]    findAll()
- * @method Activity[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
+ * @method Activity[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class ActivityRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        private readonly SubmissionRepository $submissionRepository,
+        ManagerRegistry $registry,
+    ) {
         parent::__construct($registry, Activity::class);
     }
 
@@ -54,35 +56,93 @@ final class ActivityRepository extends ServiceEntityRepository
                 ->select($qb->expr()->count('a'))
                 ->from(Submission::class, 's')
                 ->where(['s.activity = :activity'])
-                ->setParameter('activity', $activity->getId())
+                ->setParameter('activity', $activity->id)
                 ->getQuery()
                 ->getSingleScalarResult(),
         );
     }
 
     /**
-     * @return array<ActivityStatisticsDto>
+     * @return list<ActivityStatisticsDto>
      */
-    public function getTotalStatistics(?ImagePath $imagePath = null): array
-    {
-        /**
-         * @var array<array{0: Activity, distance: string}> $data
-         */
-        $data = $this->createQueryBuilder('a')
+    public function getTotalStatistics(
+        ?ImagePath $imagePath = null,
+        ?string $locale = null,
+    ): array {
+        $activityListWithDistances =
+            $this->submissionRepository->getTotalStatistics();
+
+        $indexMap = [];
+
+        foreach ($activityListWithDistances as $activityWithDistance) {
+            $activityId = $activityWithDistance['activity'];
+            $distance = $activityWithDistance['distance'];
+
+            $indexMap[$activityId] = (int) $distance;
+        }
+
+        $activities = \array_map(
+            static fn(array $row): int => $row['activity'],
+            $activityListWithDistances,
+        );
+
+        $query = $this
+            ->createQueryBuilder('a')
             ->addSelect('a as activity')
-            ->addSelect('SUM(s.distance) as distance')
-            ->join(Submission::class, 's', Join::WITH, 's.activity = a')
-            ->where('s.accepted = 1')
-            ->groupBy('s.activity')
-            ->getQuery()
-            ->getResult();
+            ->addSelect('at')
+            ->addSelect('ai')
+            ->where('a.id IN (:ids)')
+            ->setParameter('ids', $activities)
+            ->innerJoin('a.icon', 'ai')
+            ->addGroupBy('a.id');
+
+        if ($locale !== null) {
+            $query->innerJoin(
+                'a.translations',
+                'at',
+                Join::WITH,
+                'at.locale = :locale',
+            )->setParameter('locale', $locale);
+        } else {
+            $query->innerJoin('a.translations', 'at');
+        }
+
+        /**
+         * @var list<Activity>
+         */
+        $activities = $query->getQuery()->getResult();
 
         return \array_map(
-            static fn (array $row): ActivityStatisticsDto => new ActivityStatisticsDto(
-                $row[0]->toResponseObject($imagePath),
-                (int) $row['distance'],
+            static fn(Activity $row): ActivityStatisticsDto => new ActivityStatisticsDto(
+                $row->toResponseObject($imagePath),
+                $indexMap[$row->id],
             ),
-            $data,
+            $activities,
         );
+    }
+
+    /**
+     * @return array<int, Activity>
+     */
+    public function findAllWithTranslations(?string $locale = null): array
+    {
+        $query = $this
+            ->createQueryBuilder('a')
+            ->addSelect('at')
+            ->indexBy('a', 'a.id');
+
+        if ($locale !== null) {
+            $query->innerJoin(
+                'a.translations',
+                'at',
+                Join::WITH,
+                'at.locale = :locale',
+            )->setParameter('locale', $locale);
+        } else {
+            $query->innerJoin('a.translations', 'at');
+        }
+
+        /** @var array<int, Activity> */
+        return $query->getQuery()->getResult();
     }
 }

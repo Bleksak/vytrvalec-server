@@ -19,10 +19,7 @@ final class SeasonCreateDto
     #[Assert\NotBlank(allowNull: false)]
     public \DateTime $end;
 
-    #[OA\Property(
-        type: 'integer',
-        example: '1',
-    )]
+    #[OA\Property(type: 'integer', example: '1')]
     #[Assert\Type('integer')]
     #[Assert\NotBlank(allowNull: false)]
     public int $charityId;

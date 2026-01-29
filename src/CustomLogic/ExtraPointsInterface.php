@@ -16,7 +16,7 @@ interface ExtraPointsInterface
     public static function getWeek(): int;
 
     /**
-     * @return array<int, ExtraPointsResultDto>
+     * @return list<ExtraPointsResultDto>
      */
     public function calculate(Season $season): array;
 }

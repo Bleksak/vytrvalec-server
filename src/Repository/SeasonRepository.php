@@ -9,15 +9,16 @@ use App\Entity\Charity;
 use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Season>
  *
  * @method Season|null find($id, $lockMode = null, $lockVersion = null)
- * @method Season|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
+ * @method Season|null findOneBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null)
  * @method Season[]    findAll()
- * @method Season[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
+ * @method Season[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class SeasonRepository extends ServiceEntityRepository
 {
@@ -44,10 +45,11 @@ final class SeasonRepository extends ServiceEntityRepository
         }
     }
 
-    public function getCurrent(): ?Season
+    public function findCurrentSeason(): ?Season
     {
         /** @var Season|null */
-        return $this->createQueryBuilder('s')
+        return $this
+            ->createQueryBuilder('s')
             ->where('s.start <= :now')
             ->andWhere('s.end >= :now')
             ->setParameter('now', new \DateTimeImmutable())
@@ -59,7 +61,8 @@ final class SeasonRepository extends ServiceEntityRepository
     public function getLast(): ?Season
     {
         /** @var Season|null */
-        return $this->createQueryBuilder('s')
+        return $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->orderBy('s.end', 'ASC')
             ->setMaxResults(1)
@@ -72,9 +75,9 @@ final class SeasonRepository extends ServiceEntityRepository
      */
     public function findOrdered(): array
     {
-        $qb = $this->createQueryBuilder('s')
+        $qb = $this
+            ->createQueryBuilder('s')
             ->select('s', 'c', 'i', 'ct', 'sfm')
-            // Add a subquery instead of a join
             ->addSelect('(
             SELECT COUNT(sub2.id)
             FROM App\Entity\Submission sub2
@@ -107,8 +110,15 @@ final class SeasonRepository extends ServiceEntityRepository
     public function findPast(): array
     {
         /** @var list<Season> */
-        return $this->createQueryBuilder('s')
-            ->select('s')
+        return $this
+            ->createQueryBuilder('s')
+            ->addSelect('s')
+            ->addSelect('sc')
+            ->addSelect('sci')
+            ->addSelect('sct')
+            ->innerJoin('s.charity', 'sc')
+            ->innerJoin('sc.image', 'sci')
+            ->innerJoin('sc.translations', 'sct')
             ->where('s.end < :now')
             ->orderBy('s.start', 'DESC')
             ->setParameter('now', new \DateTimeImmutable())
@@ -122,7 +132,8 @@ final class SeasonRepository extends ServiceEntityRepository
         $endDate = new \DateTimeImmutable($dateTime->format('Y-m-t'));
 
         /** @var Season|null */
-        return $this->createQueryBuilder('s')
+        return $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->where('s.start BETWEEN :startDate AND :endDate')
             ->setParameter('startDate', $startDate)
@@ -133,11 +144,37 @@ final class SeasonRepository extends ServiceEntityRepository
 
     public function countSeasonsByCharity(Charity $charity): int
     {
-        return (int) $this->createQueryBuilder('s')
+        return (int) $this
+            ->createQueryBuilder('s')
             ->select('COUNT(s)')
             ->where('s.charity = :charity')
             ->setParameter('charity', $charity)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /** @return array<int, Season> */
+    public function findAllVisible(?string $locale = null): array
+    {
+        $query = $this
+            ->createQueryBuilder('s')
+            ->addSelect('sc')
+            ->addSelect('sct')
+            ->indexBy('s', 's.id')
+            ->innerJoin('s.charity', 'sc');
+
+        if ($locale !== null) {
+            $query->innerJoin(
+                'sc.translations',
+                'sct',
+                Join::WITH,
+                'sct.locale = :locale',
+            )->setParameter('locale', $locale);
+        } else {
+            $query->innerJoin('sc.translations', 'sct');
+        }
+
+        /** @var array<int, Season> */
+        return $query->getQuery()->getResult();
     }
 }

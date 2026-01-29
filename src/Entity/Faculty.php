@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: FacultyRepository::class)]
-class Faculty
+final class Faculty
 {
     #[OA\Property(example: 1)]
     #[ORM\Id]
@@ -37,7 +37,12 @@ class Faculty
     public string $color;
 
     /** @var Collection<string, FacultyTranslation> */
-    #[ORM\OneToMany(mappedBy: 'faculty', targetEntity: FacultyTranslation::class, cascade: ['persist', 'remove'], indexBy: 'locale')]
+    #[ORM\OneToMany(
+        mappedBy: 'faculty',
+        targetEntity: FacultyTranslation::class,
+        cascade: ['persist', 'remove'],
+        indexBy: 'locale',
+    )]
     public Collection $translations;
 
     public function __construct(
@@ -55,7 +60,11 @@ class Faculty
         foreach ($translations->name->toArray() as $locale => $value) {
             \assert($value !== null, 'Hodnota překladu nesmí být null');
 
-            $this->addTranslation(new FacultyTranslation($this, $locale, $value));
+            $this->addTranslation(new FacultyTranslation(
+                $this,
+                $locale,
+                $value,
+            ));
         }
     }
 
@@ -70,18 +79,11 @@ class Faculty
     {
         return new FacultyResponseDto(
             $this->id,
-            TranslationObjectDto::fromArray(
-                \array_combine(
-                    \array_map(
-                        fn(FacultyTranslation $translation): string => $translation->locale,
-                        $this->translations->toArray(),
-                    ),
-                    \array_map(
-                        fn(FacultyTranslation $translation): string => $translation->name,
-                        $this->translations->toArray(),
-                    ),
-                ),
-            ),
+            TranslationObjectDto::fromArray(\array_column(
+                $this->translations->toArray(),
+                'name',
+                'locale',
+            )),
             $this->shortcut,
             $this->visible,
             $this->parent?->id,

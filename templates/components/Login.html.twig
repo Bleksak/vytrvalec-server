@@ -1,0 +1,34 @@
+<div {{ attributes }}>
+    {{
+        form_start(
+            form,
+            {
+                attr: {
+                    'data-action': 'live#action:prevent',
+                    'data-live-action-param': 'login'
+                }
+            }
+        )
+    }}
+    <fieldset>
+        {{ form_label(form.email) }}
+        {{ form_widget(form.email) }}
+        {{ form_errors(form.email) }}
+    </fieldset>
+
+    <fieldset>
+        {{ form_label(form.password) }}
+        {{ form_widget(form.password) }}
+        {{ form_errors(form.password) }}
+    </fieldset>
+    <fieldset>
+        <button class="forgotten-password-button" type="button" onclick="document.querySelector('#login-dialog').close(); document.querySelector('#forgotten-password-dialog').show();">
+            {{ 'user.forgotten_password.prompt'|trans }}
+        </button>
+    </fieldset>
+
+    <fieldset>
+        {{ form_widget(form.submit) }}
+    </fieldset>
+    {{ form_end(form) }}
+</div>

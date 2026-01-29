@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Image|null find($id, $lockMode = null, $lockVersion = null)
  * @method Image|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method Image[]    findAll()
- * @method Image[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
+ * @method Image[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class ImageRepository extends ServiceEntityRepository
 {
@@ -49,7 +49,8 @@ final class ImageRepository extends ServiceEntityRepository
         $weekAgo = new \DateTime()->sub(new \DateInterval('P1W'));
 
         /** @var list<Image> */
-        return $this->createQueryBuilder('i')
+        return $this
+            ->createQueryBuilder('i')
             ->select('i')
             ->where('i.usedAt IS NULL')
             ->andWhere('i.uploadedAt <= :weekAgo')

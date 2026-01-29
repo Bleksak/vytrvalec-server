@@ -8,6 +8,7 @@ use App\Entity\ProfileCache;
 use App\Entity\Submission;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ProfileCache|null find($id, $lockMode = null, $lockVersion = null)
  * @method ProfileCache|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
  * @method ProfileCache[]    findAll()
- * @method ProfileCache[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
+ * @method ProfileCache[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class ProfileCacheRepository extends ServiceEntityRepository
 {
@@ -36,26 +37,34 @@ final class ProfileCacheRepository extends ServiceEntityRepository
 
     public function addCache(Submission $submission, bool $flush = false): void
     {
-        $profileCache = $this->findOneBy(['user' => $submission->getUser(), 'activity' => $submission->getActivity()]);
-        $profileCache ??= new ProfileCache($submission->getUser(), $submission->getActivity());
+        $profileCache = $this->findOneBy([
+            'user' => $submission->user,
+            'activity' => $submission->activity,
+        ]);
 
-        $newDistance = $profileCache->getDistance() + $submission->getDistance();
-        $newElevation = $profileCache->getElevation() + $submission->getElevation();
+        $profileCache ??= new ProfileCache(
+            $submission->user,
+            $submission->activity,
+        );
 
-        $profileCache->setDistance($newDistance)->setElevation($newElevation);
+        $profileCache->distance += $submission->distance;
+        $profileCache->elevation += $submission->elevation;
 
         $this->save($profileCache, $flush);
     }
 
-    public function removeCache(Submission $submission, bool $flush = false): void
-    {
-        $profileCache = $this->findOneBy(['user' => $submission->getUser(), 'activity' => $submission->getActivity()]);
+    public function removeCache(
+        Submission $submission,
+        bool $flush = false,
+    ): void {
+        $profileCache = $this->findOneBy([
+            'user' => $submission->user,
+            'activity' => $submission->activity,
+        ]);
 
         if ($profileCache !== null) {
-            $newDistance = $profileCache->getDistance() - $submission->getDistance();
-            $newElevation = $profileCache->getElevation() - $submission->getElevation();
-
-            $profileCache->setDistance($newDistance)->setElevation($newElevation);
+            $profileCache->distance -= $submission->distance;
+            $profileCache->elevation -= $submission->elevation;
 
             $this->save($profileCache, $flush);
         }
@@ -71,28 +80,63 @@ final class ProfileCacheRepository extends ServiceEntityRepository
         }
 
         foreach ($cachesByUser as $cache) {
-            $activity = $cache->getActivity();
+            $activity = $cache->activity;
 
             /**
              * @var SubmissionRepository
              */
             $submissionRepository = $this->getEntityManager()->getRepository(Submission::class);
-            $submissions = $submissionRepository->findBy(['activity' => $activity, 'user' => $user]);
+            $submissions = $submissionRepository->findBy([
+                'activity' => $activity,
+                'user' => $user,
+            ]);
 
             $elevation = 0;
             $distance = 0;
 
             foreach ($submissions as $submission) {
-                $distance += $submission->getDistance();
-                $elevation += $submission->getElevation();
+                $distance += $submission->distance;
+                $elevation += $submission->elevation;
             }
 
-            $cache->setDistance($distance);
-            $cache->setElevation($elevation);
+            $cache->distance = $distance;
+            $cache->elevation = $elevation;
 
             $this->save($cache);
         }
 
         $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @return list<ProfileCache>
+     */
+    public function findAllByUserWithActivities(
+        User $user,
+        ?string $locale = null,
+    ): array {
+        $query = $this
+            ->createQueryBuilder('pc')
+            ->addSelect('pca')
+            ->addSelect('pcai')
+            ->addSelect('pcat')
+            ->andWhere('pc.user = :user')
+            ->setParameter('user', $user)
+            ->innerJoin('pc.activity', 'pca')
+            ->leftJoin('pca.icon', 'pcai');
+
+        if ($locale !== null) {
+            $query->innerJoin(
+                'pca.translations',
+                'pcat',
+                Join::WITH,
+                'pcat.locale = :locale',
+            )->setParameter('locale', $locale);
+        } else {
+            $query->innerJoin('pca.translations', 'pcat');
+        }
+
+        /** @var list<ProfileCache> */
+        return $query->getQuery()->getResult();
     }
 }

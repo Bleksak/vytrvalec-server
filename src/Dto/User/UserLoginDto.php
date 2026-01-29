@@ -12,12 +12,15 @@ final class UserLoginDto
     #[OA\Property]
     #[Assert\NotBlank(message: 'blank', allowNull: false)]
     #[Assert\Email(message: 'invalid')]
-    public string $email;
+    public ?string $email = null;
 
     #[OA\Property]
-    #[Assert\NotBlank(message: 'blank')]
-    #[Assert\PasswordStrength(message: 'invalid', minScore: Assert\PasswordStrength::STRENGTH_WEAK)]
-    public string $password;
+    #[Assert\NotBlank(message: 'blank', allowNull: false)]
+    #[Assert\PasswordStrength(
+        message: 'invalid',
+        minScore: Assert\PasswordStrength::STRENGTH_WEAK,
+    )]
+    public ?string $password = null;
 
     #[OA\Property]
     public ?string $firebaseToken = null;

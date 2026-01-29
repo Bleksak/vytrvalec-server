@@ -13,8 +13,12 @@ use App\Dto\User\Response\UserLoginResponseDto;
 use App\Dto\User\Response\UserResponseDto;
 use App\Dto\User\UserEditDto;
 use App\Dto\User\UserLoginDto;
-use App\Dto\UserDto;
+use App\Dto\UserRegistrationDto;
 use App\Entity\User;
+use App\Exceptions\User\InvalidFacultySelectedException;
+use App\Exceptions\User\NonUniqueEmailException;
+use App\Exceptions\User\PasswordInvalidException;
+use App\Exceptions\User\UserNotFoundException;
 use App\Repository\UserRepository;
 use App\Security\JWTPayload;
 use App\Utils\FeatureFlag;
@@ -36,23 +40,24 @@ final class UserController extends AbstractController
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly UserActions $action,
-    ) {
-    }
+    ) {}
 
     #[OA\Post(description: 'Log the user in and generate a JWT token')]
     #[Route(path: '/api/user/login', name: 'api_user_login', methods: ['POST'])]
-    public function login(#[MapRequestPayload] UserLoginDto $dto, ParameterBagInterface $bag): Response
-    {
-        $user = $this->action->login($dto);
-
-        if ($user === null) {
+    public function login(
+        #[MapRequestPayload] UserLoginDto $dto,
+        ParameterBagInterface $bag,
+    ): Response {
+        try {
+            $user = $this->action->login($dto);
+        } catch (PasswordInvalidException|UserNotFoundException) {
             return new Response(status: 404);
         }
 
         $expirationTime = \time() + (10 * 365 * 24 * 60 * 60); // 10 years expiration
 
         $payload = new JWTPayload(
-            $user->getId(),
+            $user->id,
             $user->getUserIdentifier(),
             $expirationTime,
         );
@@ -62,7 +67,9 @@ final class UserController extends AbstractController
 
         $jwt = JWT::encode($payload->toArray(), $key, alg: 'HS256');
 
-        return $this->json(new UserLoginResponseDto($user->toResponseObject(), $jwt));
+        return $this->json(
+            new UserLoginResponseDto($user->toResponseObject(), $jwt),
+        );
     }
 
     #[OA\Get(description: 'Clears the JWT cookie. If user is not logged in, just no-op.', responses: [
@@ -71,7 +78,12 @@ final class UserController extends AbstractController
             description: 'Succesfully logged out',
         ),
     ])]
-    #[Route(path: '/api/user/logout', name: 'api_user_logout', methods: ['GET'], env: 'dev')]
+    #[Route(
+        path: '/api/user/logout',
+        name: 'api_user_logout',
+        methods: ['GET'],
+        env: 'dev',
+    )]
     public function logout(): Response
     {
         $response = new Response(status: Response::HTTP_OK);
@@ -83,7 +95,7 @@ final class UserController extends AbstractController
     #[Route(
         path: '/api/user/count',
         name: 'api_user_count',
-        methods: ['GET']
+        methods: ['GET'],
         // documentation: 'Retrieve count of <code>User</code> entities',
         // responses: [
         //     Response::HTTP_OK => [
@@ -100,7 +112,7 @@ final class UserController extends AbstractController
     #[Route(
         path: '/api/user/current',
         name: 'api_user_current_profile',
-        methods: ['GET']
+        methods: ['GET'],
         // documentation: 'Retrieve a <code>User</code> entity',
         // responses: [
         //     Response::HTTP_OK => [
@@ -136,7 +148,9 @@ final class UserController extends AbstractController
         requestBody: new OA\RequestBody(
             description: 'Contains the e-mail address of the request',
             required: true,
-            content: new OA\JsonContent(ref: new Model(type: PasswordResetDto::class)),
+            content: new OA\JsonContent(
+                ref: new Model(type: PasswordResetDto::class),
+            ),
         ),
         responses: [
             new OA\Response(
@@ -149,10 +163,18 @@ final class UserController extends AbstractController
             ),
         ],
     )]
-    #[Route(path: '/api/user/password/{lang}', name: 'api_user_forgotten_password_request', methods: ['POST'])]
-    public function forgottenPasswordRequest(#[MapRequestPayload] PasswordResetRequestDto $dto): Response
-    {
-        $this->action->forgottenPasswordRequest($dto->email);
+    #[Route(
+        path: '/api/user/password/{lang}',
+        name: 'api_user_forgotten_password_request',
+        methods: ['POST'],
+    )]
+    public function forgottenPasswordRequest(
+        #[MapRequestPayload] PasswordResetRequestDto $dto,
+    ): Response {
+        try {
+            $this->action->forgottenPasswordRequest($dto->email);
+        } finally {
+        }
 
         return new Response(status: Response::HTTP_OK);
     }
@@ -160,7 +182,7 @@ final class UserController extends AbstractController
     #[Route(
         path: '/api/user/reset-password',
         name: 'api_user_forgotten_password',
-        methods: ['POST']
+        methods: ['POST'],
         // documentation: 'Resets the users\' password if the token is valid',
         // responses: [
         //     Response::HTTP_OK => [
@@ -171,13 +193,16 @@ final class UserController extends AbstractController
         //     ]
         // ]
     )]
-    public function forgottenPasswordReset(#[MapRequestPayload] PasswordResetDto $dto): Response
-    {
-        $errors = $this->action->forgottenPasswordReset($dto);
+    public function forgottenPasswordReset(
+        #[MapRequestPayload] PasswordResetDto $dto,
+    ): Response {
+        $user = $this->userRepository->findByPasswordResetToken($dto->passwordResetToken);
 
-        if (\count($errors) !== 0) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        if ($user === null) {
+            return $this->json(['user_not_found'], Response::HTTP_BAD_REQUEST);
         }
+
+        $this->action->forgottenPasswordReset($user, $dto);
 
         return new Response(status: Response::HTTP_OK);
     }
@@ -185,7 +210,7 @@ final class UserController extends AbstractController
     #[Route(
         path: '/api/user/{user}',
         name: 'api_user_profile',
-        methods: ['GET']
+        methods: ['GET'],
         // documentation: 'Retrieve a <code>User</code> entity',
         // responses: [
         //     Response::HTTP_OK => [
@@ -204,8 +229,10 @@ final class UserController extends AbstractController
         //     Response::HTTP_FORBIDDEN => ['message' => 'Unauthorized access'],
         // ],
     )]
-    public function userData(#[CurrentUser] User $currentUser, User $user): Response
-    {
+    public function userData(
+        #[CurrentUser] User $currentUser,
+        User $user,
+    ): Response {
         if (!$this->isGranted(FeatureFlag::ROLE_STAFF->value)) {
             $user = $currentUser;
         }
@@ -216,7 +243,7 @@ final class UserController extends AbstractController
     #[Route(
         path: '/api/user',
         name: 'api_user_list',
-        methods: ['GET']
+        methods: ['GET'],
         // documentation: 'Retrieve all <code>User</code> entities',
         // responses: [
         //     Response::HTTP_OK => [
@@ -240,18 +267,16 @@ final class UserController extends AbstractController
     #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
     public function userList(): Response
     {
-        return $this->json(
-            \array_map(
-                static fn (User $user): UserResponseDto => $user->toResponseObject(),
-                $this->userRepository->findAllNotDeleted(),
-            )
-        );
+        return $this->json(\array_map(
+            static fn(User $user): UserResponseDto => $user->toResponseObject(),
+            $this->userRepository->findAllNotDeleted(),
+        ));
     }
 
     #[Route(
         path: '/api/user',
         name: 'api_user_register',
-        methods: ['POST']
+        methods: ['POST'],
         // documentation: 'Creates a new <code>User</code> entity',
         // responses: [
         //     Response::HTTP_CREATED => [
@@ -269,16 +294,22 @@ final class UserController extends AbstractController
         //     'faculty' => 'integer'
         // ],
     )]
-    public function register(#[MapRequestPayload] UserDto $dto): Response
-    {
+    public function register(
+        #[MapRequestPayload] UserRegistrationDto $dto,
+    ): Response {
         if ($this->isGranted(FeatureFlag::ROLE_USER->value)) {
-            return $this->json(['auth' => ['logged_in']], Response::HTTP_BAD_REQUEST);
+            return $this->json(['auth' => [
+                'logged_in',
+            ]], Response::HTTP_BAD_REQUEST);
         }
 
-        $errors = $this->action->create($dto);
-
-        if (\count($errors) !== 0) {
-            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        try {
+            $this->action->create($dto);
+        } catch (NonUniqueEmailException|InvalidFacultySelectedException $e) {
+            return $this->json(
+                $e->clientSideError(),
+                Response::HTTP_BAD_REQUEST,
+            );
         }
 
         return new Response(status: Response::HTTP_CREATED);
@@ -294,13 +325,15 @@ final class UserController extends AbstractController
             description: 'Invalid data',
         ),
     ])]
-    #[Route(path: '/api/user/change', name: 'api_user_update_password', methods: ['PATCH'])]
+    #[Route(
+        path: '/api/user/change',
+        name: 'api_user_update_password',
+        methods: ['PATCH'],
+    )]
     #[IsGranted(FeatureFlag::ROLE_USER->value)]
     public function updatePassword(
-        #[MapRequestPayload]
-        PasswordChangeDto $dto,
-        #[CurrentUser]
-        User $currentUser,
+        #[MapRequestPayload] PasswordChangeDto $dto,
+        #[CurrentUser] User $currentUser,
     ): Response {
         $errors = $this->action->updatePassword($currentUser, $dto);
 
@@ -312,9 +345,14 @@ final class UserController extends AbstractController
     }
 
     #[Route(path: '/api/user/anonymize', methods: ['POST'])]
-    public function setAccountAnonymization(#[CurrentUser] User $user, Request $request): Response
-    {
-        $anonymizeValue = \boolval($request->getPayload()->get(key: 'anonymize', default: false));
+    public function setAccountAnonymization(
+        #[CurrentUser] User $user,
+        Request $request,
+    ): Response {
+        $anonymizeValue = \boolval($request->getPayload()->get(
+            key: 'anonymize',
+            default: false,
+        ));
         $this->action->updateAnonymization($user, $anonymizeValue);
 
         return new Response();
@@ -344,7 +382,11 @@ final class UserController extends AbstractController
             ),
         ],
     )]
-    #[Route(path: '/api/unsubscribe/{unsubscribeHash}', name: 'api_email_unsubscribe', methods: ['GET'])]
+    #[Route(
+        path: '/api/unsubscribe/{unsubscribeHash}',
+        name: 'api_email_unsubscribe',
+        methods: ['GET'],
+    )]
     public function unsubscribe(string $unsubscribeHash): Response
     {
         if (!$this->action->disableMailing($unsubscribeHash)) {
@@ -360,12 +402,14 @@ final class UserController extends AbstractController
             description: 'Successfully toggled e-mailing',
         ),
     ])]
-    #[Route(path: '/api/emailing', name: 'api_email_set_user', methods: ['PATCH'])]
+    #[Route(
+        path: '/api/emailing',
+        name: 'api_email_set_user',
+        methods: ['PATCH'],
+    )]
     public function setMailing(
-        #[CurrentUser]
-        User $user,
-        #[MapRequestPayload]
-        EmailingChangeDto $emailingChangeDto,
+        #[CurrentUser] User $user,
+        #[MapRequestPayload] EmailingChangeDto $emailingChangeDto,
     ): Response {
         $this->action->toggleMailing($user, $emailingChangeDto);
 
@@ -375,7 +419,7 @@ final class UserController extends AbstractController
     #[Route(
         path: '/api/user/{user}',
         name: 'api_user_patch',
-        methods: ['PATCH']
+        methods: ['PATCH'],
         // documentation: 'Updates a <code>User</code> entity',
         // responses: [
         //     Response::HTTP_OK => [
@@ -397,8 +441,10 @@ final class UserController extends AbstractController
         // ],
     )]
     #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
-    public function update(#[MapRequestPayload] UserEditDto $dto, User $user): Response
-    {
+    public function update(
+        #[MapRequestPayload] UserEditDto $dto,
+        User $user,
+    ): Response {
         $this->action->update($user, $dto);
 
         return new Response(status: Response::HTTP_OK);

@@ -24,15 +24,16 @@ final class FacultyController extends AbstractController
     public function __construct(
         private readonly FacultyActions $action,
         private readonly FacultyRepository $facultyRepository,
-    ) {
-    }
+    ) {}
 
     #[OA\Post(
         description: 'Create a new Faculty',
         requestBody: new OA\RequestBody(
             description: 'The new faculty',
             required: true,
-            content: new OA\JsonContent(ref: new Model(type: FacultyCreateDto::class)),
+            content: new OA\JsonContent(
+                ref: new Model(type: FacultyCreateDto::class),
+            ),
         ),
         responses: [
             new OA\Response(
@@ -46,14 +47,11 @@ final class FacultyController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_BAD_REQUEST,
                 description: 'Bad request',
-                content: new OA\JsonContent(
-                    description: 'List of invalid fields and their respective errors delimited by |',
-                    example: [
-                        'name' => 'not_unique',
-                        'shortcut' => 'not_unique',
-                        'visible' => 'invalid_value',
-                    ],
-                ),
+                content: new OA\JsonContent(description: 'List of invalid fields and their respective errors delimited by |', example: [
+                    'name' => 'not_unique',
+                    'shortcut' => 'not_unique',
+                    'visible' => 'invalid_value',
+                ]),
             ),
         ],
     )]
@@ -78,7 +76,9 @@ final class FacultyController extends AbstractController
         requestBody: new OA\RequestBody(
             description: 'The updated Faculty',
             required: true,
-            content: new OA\JsonContent(ref: new Model(type: FacultyUpdateDto::class)),
+            content: new OA\JsonContent(
+                ref: new Model(type: FacultyUpdateDto::class),
+            ),
         ),
         responses: [
             new OA\Response(
@@ -92,22 +92,25 @@ final class FacultyController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_BAD_REQUEST,
                 description: 'Bad request',
-                content: new OA\JsonContent(
-                    description: 'List of invalid fields and their respective errors delimited by |',
-                    example: [
-                        'name' => 'not_unique',
-                        'shortcut' => 'not_unique',
-                        'visible' => 'invalid_value',
-                        'parent' => 'invalid_value',
-                    ],
-                ),
+                content: new OA\JsonContent(description: 'List of invalid fields and their respective errors delimited by |', example: [
+                    'name' => 'not_unique',
+                    'shortcut' => 'not_unique',
+                    'visible' => 'invalid_value',
+                    'parent' => 'invalid_value',
+                ]),
             ),
         ],
     )]
-    #[Route('/api/faculty/{faculty}', name: 'api_faculty_update', methods: ['PATCH'])]
+    #[Route(
+        '/api/faculty/{faculty}',
+        name: 'api_faculty_update',
+        methods: ['PATCH'],
+    )]
     #[IsGranted('ROLE_STAFF')]
-    public function updatePatch(#[MapRequestPayload] FacultyUpdateDto $facultyDto, Faculty $faculty): Response
-    {
+    public function updatePatch(
+        #[MapRequestPayload] FacultyUpdateDto $facultyDto,
+        Faculty $faculty,
+    ): Response {
         $errors = $this->action->update($faculty, $facultyDto);
 
         if (\count($errors) !== 0) {
@@ -130,11 +133,17 @@ final class FacultyController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_OK,
                 description: 'The Faculty information',
-                content: new OA\JsonContent(ref: new Model(type: Faculty::class)),
+                content: new OA\JsonContent(
+                    ref: new Model(type: Faculty::class),
+                ),
             ),
         ],
     )]
-    #[Route('/api/faculty/{faculty}', name: 'api_faculty_get', methods: ['GET'])]
+    #[Route(
+        '/api/faculty/{faculty}',
+        name: 'api_faculty_get',
+        methods: ['GET'],
+    )]
     public function faculty(Faculty $faculty): Response
     {
         return $this->json($faculty);
@@ -153,12 +162,10 @@ final class FacultyController extends AbstractController
     #[Route('/api/faculty', name: 'api_faculty_index', methods: ['GET'])]
     public function facultyList(): Response
     {
-        return $this->json(
-            \array_map(
-                static fn (Faculty $faculty): FacultyResponseDto => $faculty->toResponseObject(),
-                $this->facultyRepository->findAll(),
-            ),
-        );
+        return $this->json(\array_map(
+            static fn(Faculty $faculty): FacultyResponseDto => $faculty->toResponseObject(),
+            $this->facultyRepository->findAll(),
+        ));
     }
 
     #[OA\Delete(
@@ -177,7 +184,11 @@ final class FacultyController extends AbstractController
             ),
         ],
     )]
-    #[Route('/api/faculty/{faculty}', 'api_faculty_delete', methods: ['DELETE'])]
+    #[Route(
+        '/api/faculty/{faculty}',
+        'api_faculty_delete',
+        methods: ['DELETE'],
+    )]
     #[IsGranted('ROLE_STAFF')]
     public function delete(Faculty $faculty): Response
     {

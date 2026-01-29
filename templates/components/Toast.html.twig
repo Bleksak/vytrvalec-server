@@ -1,0 +1,16 @@
+<div {{ attributes }} class="toasts-anchor" data-turbo="false">
+    <div class="toasts">
+        {% for message in messages %}
+            <div
+                id="{{ message.id }}"
+                class="toast toast-{{ message.type }}"
+                role="alert"
+                data-controller="toast"
+            >
+                <div class="toast-content">
+                    <span class="toast-message">{{ message.message|trans }}</span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

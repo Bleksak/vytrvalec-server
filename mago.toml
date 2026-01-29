@@ -4,8 +4,16 @@ php-version = "8.5.0"
 
 [source]
 paths = ["src"]
-includes = ["vendor"]
-excludes = []
+includes = ["vendor", "var"]
+excludes = [
+  "vendor/nikic/fast-route/test",
+  "vendor/composer/autoload_classmap.php",
+  "vendor/google/common-protos/metadata",
+  "vendor/google/gax/metadata",
+  "vendor/google/longrunning/metadata",
+  "vendor/symfony/cache/Traits/ValueWrapper.php",
+  "vendor/composer/autoload_static.php",
+]
 
 [formatter]
 print-width = 80
@@ -15,37 +23,54 @@ method-chain-breaking-style = "next_line"
 null-type-hint = "question"
 always-break-attribute-named-argument-lists = true
 method-brace-style = "next_line"
+empty-line-between-same-symbols = true
 
 [linter]
 integrations = ["symfony", "amphp", "phpunit", "doctrine"]
 
 [linter.rules]
-too-many-properties = {"enabled" = false}
-too-many-methods = {"enabled" = false}
-kan-defect = {"enabled" = false}
-excessive-parameter-list = {"enabled" = false}
-cyclomatic-complexity = {"enabled" = false}
-no-assign-in-condition = {enabled = false}
-no-boolean-flag-parameter = {enabled=false}
-prefer-arrow-function = {enabled=true}
+too-many-properties = { "enabled" = false }
+too-many-methods = { "enabled" = false }
+kan-defect = { "enabled" = false }
+excessive-parameter-list = { "enabled" = false }
+cyclomatic-complexity = { "enabled" = false }
+no-assign-in-condition = { enabled = false }
+no-boolean-flag-parameter = { enabled = false }
+prefer-arrow-function = { enabled = true }
 yoda-conditions = { enabled = false }
 sensitive-parameter = { enabled = true }
 no-redundant-use = { enabled = true }
 no-variable-variable = { enabled = true }
+no-else-clause = { enabled = false }
+no-shorthand-ternary = { enabled = false }
+assert-description = { enabled = false }
+trait-name = { psr = true }
+interface-name = { psr = true }
+class-name = { psr = true }
 
-ambiguous-function-call = {enabled=true}
+ambiguous-function-call = { enabled = true }
+require-namespace = { enabled = true }
 
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000, enabled = false }
 
 [analyzer]
-find-unused-definitions = true
 find-unused-expressions = true
+find-unused-definitions = true
 analyze-dead-code = true
+memoize-properties = true
 allow-possibly-undefined-array-keys = false
-perform-heuristic-checks = true
-check-throws = false
+check-throws = false # NOTE: we cannot use this because symfony abuses exceptions
+check-missing-override = true
+find-unused-parameters = true
+strict-list-index-checks = true
 check-missing-type-hints = true
 check-closure-missing-type-hints = true
 check-arrow-function-missing-type-hints = true
 register-super-globals = true
+trust-existence-checks = true
+check-property-initialization = false # NOTE: We cannot use this until the issues with it are fixed or more configuration is added
+check-use-statements = true
+
+class-initializers = ["__construct", "setContainer"]
+plugins = ["standard", "std", "php-stdlib"]

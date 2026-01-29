@@ -10,8 +10,7 @@ final readonly class JWTPayload
         public int $kid,
         public string $user,
         public int $exp,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string,mixed>

@@ -18,8 +18,7 @@ final readonly class SeasonStartHandler
         private SeasonRepository $seasonRepository,
         private UserRepository $userRepository,
         private VytrvalecMailer $mailer,
-    ) {
-    }
+    ) {}
 
     public function __invoke(SeasonStartMessage $seasonStartMessage): void
     {
@@ -31,7 +30,7 @@ final readonly class SeasonStartHandler
 
         $now = new \DateTimeImmutable();
 
-        if ($season->getStart()->diff($now)->days !== 0) {
+        if ($season->start->diff($now)->days !== 0) {
             return;
         }
 

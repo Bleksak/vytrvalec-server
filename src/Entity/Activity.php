@@ -21,7 +21,7 @@ final class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    public ?int $id = null;
+    public private(set) int $id;
 
     #[OA\Property]
     #[ORM\ManyToOne]
@@ -69,55 +69,6 @@ final class Activity
         }
     }
 
-    public function getId(): int
-    {
-        return $this->id ?? 0;
-    }
-
-    public function isActive(): bool
-    {
-        return $this->active;
-    }
-
-    public function setActive(bool $active): self
-    {
-        $this->active = $active;
-
-        return $this;
-    }
-
-    public function getMinElevation(): int
-    {
-        return $this->minElevation;
-    }
-
-    public function setMinElevation(int $minElevation): self
-    {
-        $this->minElevation = $minElevation;
-
-        return $this;
-    }
-
-    public function setIcon(?Image $icon): self
-    {
-        $this->icon = $icon;
-
-        return $this;
-    }
-
-    public function getIcon(): ?Image
-    {
-        return $this->icon;
-    }
-
-    /**
-     * @return Collection<string, ActivityTranslation>
-     */
-    public function getTranslations(): Collection
-    {
-        return $this->translations;
-    }
-
     public function addTranslation(ActivityTranslation $translation): void
     {
         if (!$this->translations->containsKey($translation->locale)) {
@@ -128,15 +79,15 @@ final class Activity
     public function toResponseObject(?ImagePath $imagePath): ActivityResponseDto
     {
         return new ActivityResponseDto(
-            $this->getId(),
+            $this->id,
             TranslationObjectDto::fromArray(\array_column(
                 $this->translations->toArray(),
                 'name',
                 'locale',
             )),
-            $this->getIcon()?->getPath($imagePath),
-            $this->isActive(),
-            $this->getMinElevation(),
+            $this->icon?->getPath($imagePath),
+            $this->active,
+            $this->minElevation,
         );
     }
 }

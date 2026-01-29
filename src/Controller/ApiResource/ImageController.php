@@ -14,7 +14,6 @@ use App\Validation\FormErrors;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -26,8 +25,7 @@ final class ImageController extends AbstractController
     public function __construct(
         private readonly ImageUploader $imageUploader,
         private readonly ImagePath $imagePath,
-    ) {
-    }
+    ) {}
 
     #[OA\Post(
         description: 'Upload an image to the server',
@@ -39,7 +37,9 @@ final class ImageController extends AbstractController
             new OA\Response(
                 description: 'Image uploaded successfully',
                 response: Response::HTTP_OK,
-                content: new OA\JsonContent(ref: new Model(type: ImageCreateResponseDto::class)),
+                content: new OA\JsonContent(
+                    ref: new Model(type: ImageCreateResponseDto::class),
+                ),
             ),
         ],
     )]
@@ -61,7 +61,10 @@ final class ImageController extends AbstractController
 
         /** @var ImageUploadDto */
         $formData = $form->getData();
-        $image = $this->imageUploader->uploadImage($formData->image, MimeType::all());
+        $image = $this->imageUploader->uploadImage(
+            $formData->image,
+            MimeType::all(),
+        );
 
         if ($image === null) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
@@ -69,11 +72,11 @@ final class ImageController extends AbstractController
 
         return $this->json(
             new ImageCreateResponseDto(
-                $image->getUuid(),
+                $image->uuid,
                 $image->getPath($this->imagePath),
-                $image->getUploadedAt(),
-                $image->getUsedAt(),
-            )
+                $image->uploadedAt,
+                $image->usedAt,
+            ),
         );
     }
 }

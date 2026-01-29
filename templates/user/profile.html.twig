@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ 'profile.title'|trans }}
+{% endblock title %}
+
+{% block body %}
+    <article>
+        <twig:Heading>
+            <div class="profile-user-row">
+                <div class="profile-user">
+                    <h1 class="profile-heading">
+                        {{ app.user.firstName }}
+                        {{ app.user.lastName }}
+                    </h1>
+                    <twig:FacultyTag :faculty="app.user.faculty" />
+                </div>
+                <a href="{{ path('user:account') }}" title="Nastavení účtu">
+                    <twig:ux:icon
+                        name="lucide:settings"
+                        width="24"
+                        height="24"
+                    />
+                </a>
+            </div>
+        </twig:Heading>
+        <main>
+            <section class="grid">
+                {% for cache in profile_cache %}
+                    <div>
+                        <h5>
+                            {{ cache.activity.translations[app.locale].name }}
+                        </h5>
+                        <div class="profile-statistics-row">
+                            <twig:ux:icon
+                                name="lucide:ruler-dimension-line"
+                                width="24"
+                                height="24"
+                                class="filter-blue"
+                            />
+                            <span>
+                                {{ (cache.distance / 1000)|number_format(2) }} km
+                            </span>
+                        </div>
+
+                        <div class="profile-statistics-row">
+                            <twig:ux:icon
+                                name="lucide:mountain"
+                                width="24"
+                                height="24"
+                                class="filter-blue"
+                            />
+                            <span>{{ cache.elevation }} m</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </section>
+        </main>
+    </article>
+    <article data-controller="profile-submission-list">
+        {# TODO: Tady je bug, kdyz uzivatel smaze vsechny submissions ze season, tak by se mela smazat i sezona #}
+        {% for season_id, submissions in season_list %}
+            <twig:Heading>
+                <h2>
+                    {{
+                        seasons[season_id].charity.translations[app.locale].name
+                    }}
+                    (
+                    {{
+                        seasons[season_id].start|format_date(dateformat: 'long')
+                    }}
+                    )
+                </h2>
+            </twig:Heading>
+            <twig:SubmissionCardGrid key="season-{{ season_id }}" :seasonId="season_id" :submissions="submissions" />
+        {% else %}
+            { 'profile.no_submissions'|trans }
+        {% endfor %}
+
+        <twig:Dialog id="submission-edit-dialog">
+            <twig:block name="header">
+                {{ 'submission.edit.title'|trans }}
+            </twig:block>
+
+            <twig:SubmissionEditDialog :activities="activities" data-profile-submission-list-target="edit" />
+        </twig:Dialog>
+
+        <twig:Dialog id="submission-preview-dialog">
+            <twig:block name="header">
+                {{ 'submission.preview.title'|trans }}
+            </twig:block>
+
+            <twig:SubmissionPreviewDialog data-profile-submission-list-target="preview" />
+        </twig:Dialog>
+    </article>
+{% endblock body %}

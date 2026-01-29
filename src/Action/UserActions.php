@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace App\Action;
 
+use App\Controller\ForgottenPasswordController;
 use App\Dto\EmailingChangeDto;
 use App\Dto\PasswordChangeDto;
+use App\Dto\User\ForgottenPasswordResetDto;
 use App\Dto\User\PasswordResetDto;
 use App\Dto\User\UserEditDto;
 use App\Dto\User\UserLoginDto;
-use App\Dto\UserDto;
+use App\Dto\UserRegistrationDto;
 use App\Entity\User;
+use App\Exceptions\User\InvalidFacultySelectedException;
+use App\Exceptions\User\NonUniqueEmailException;
+use App\Exceptions\User\PasswordInvalidException;
+use App\Exceptions\User\UserNotFoundException;
 use App\Notifications\EmailTemplate\ForgottenPasswordEmailTemplate;
 use App\Notifications\EmailTemplate\RegisterEmailTemplate;
 use App\Repository\FacultyRepository;
@@ -18,6 +24,7 @@ use App\Repository\UserRepository;
 use App\Services\VytrvalecMailer;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final readonly class UserActions
 {
@@ -26,32 +33,48 @@ final readonly class UserActions
         private FacultyRepository $facultyRepository,
         private UserPasswordHasherInterface $hasher,
         private VytrvalecMailer $mailer,
-        private string $clientUrl,
-    ) {
-    }
+        private UrlGeneratorInterface $urlGenerator,
+    ) {}
 
     /**
-     * @return array<string, array<string>>
+     * @throws NonUniqueEmailException
+     * @throws InvalidFacultySelectedException
      */
-    public function create(UserDto $dto): array
+    public function create(UserRegistrationDto $dto): void
     {
+        \assert(
+            $dto->email !== null
+            && $dto->password !== null
+            && $dto->firstName !== null
+            && $dto->lastName !== null
+            && $dto->faculty !== null
+            && $dto->anonymize !== null
+            && $dto->gdpr !== null,
+        );
+
         $faculty = $this->facultyRepository->find($dto->faculty);
 
         if ($faculty === null) {
-            return ['faculty' => ['invalid']];
+            throw new InvalidFacultySelectedException();
         }
 
-        $user = new User($dto->email, $dto->firstName, $dto->lastName, $faculty, $dto->anonymize);
+        $user = new User(
+            $dto->email,
+            $dto->firstName,
+            $dto->lastName,
+            $faculty,
+            $dto->anonymize,
+        );
+
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
 
         try {
             $this->userRepository->save($user, true);
-            $this->mailer->send($user, new RegisterEmailTemplate());
-        } catch (UniqueConstraintViolationException $e) {
-            return ['email' => ['not_unique']];
+        } catch (UniqueConstraintViolationException) {
+            throw new NonUniqueEmailException();
         }
 
-        return [];
+        $this->mailer->send($user, new RegisterEmailTemplate());
     }
 
     /**
@@ -61,7 +84,7 @@ final readonly class UserActions
     {
         // update all fields that are not null
         if ($dto->email !== null) {
-            $user->setEmail($dto->email);
+            $user->email = $dto->email;
         }
 
         if ($dto->firstName !== null) {
@@ -85,12 +108,12 @@ final readonly class UserActions
         }
 
         if ($dto->roles !== null && \count($dto->roles) !== 0) {
-            $user->setRoles($dto->roles);
+            $user->roles = $dto->roles;
         }
 
         try {
             $this->userRepository->save($user, true);
-        } catch (UniqueConstraintViolationException $e) {
+        } catch (UniqueConstraintViolationException) {
             return ['email' => ['not_unique']];
         }
 
@@ -100,13 +123,18 @@ final readonly class UserActions
     /**
      * @return array<string, array<int, string>>
      */
-    public function updatePassword(User $currentUser, PasswordChangeDto $dto): array
-    {
+    public function updatePassword(
+        User $currentUser,
+        PasswordChangeDto $dto,
+    ): array {
         if (!$this->hasher->isPasswordValid($currentUser, $dto->oldPassword)) {
             return ['old_password' => ['mismatch']];
         }
 
-        $hashedPassword = $this->hasher->hashPassword($currentUser, $dto->password);
+        $hashedPassword = $this->hasher->hashPassword(
+            $currentUser,
+            $dto->password,
+        );
         $currentUser->setPassword($hashedPassword);
 
         $this->userRepository->save($currentUser, true);
@@ -114,12 +142,15 @@ final readonly class UserActions
         return [];
     }
 
+    /**
+     * @throws UserNotFoundException
+     */
     public function forgottenPasswordRequest(string $email): void
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
 
         if ($user === null) {
-            return;
+            throw new UserNotFoundException();
         }
 
         $userPasswordResetToken = \bin2hex(\random_bytes(90));
@@ -129,33 +160,26 @@ final readonly class UserActions
         $this->userRepository->save($user, true);
 
         $mail = new ForgottenPasswordEmailTemplate();
-        $mail->setContext('password_reset_link', $this->clientUrl.'/reset-password/'.$userPasswordResetToken);
+        $mail->setContext('password_reset_link', $this->urlGenerator->generate(ForgottenPasswordController::ROUTE, [
+            'passwordResetToken' => $userPasswordResetToken,
+        ]));
 
-        $this->mailer->send($user, $mail, true);
+        $this->mailer->send($user, $mail, forceSend: true);
     }
 
-    /**
-     * @return array<int,string>
-     */
-    public function forgottenPasswordReset(PasswordResetDto $dto): array
-    {
-        $user = $this->userRepository->findOneBy(['passwordResetToken' => $dto->passwordResetToken]);
-
-        if ($user === null) {
-            return ['user_not_found'];
-        }
-
+    public function forgottenPasswordReset(
+        User $user,
+        #[\SensitiveParameter] ForgottenPasswordResetDto|PasswordResetDto $dto,
+    ): void {
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
         $user->setPasswordResetToken(null);
 
         $this->userRepository->save($user, true);
-
-        return [];
     }
 
     public function updateAnonymization(User $user, bool $anonymize): void
     {
-        $user->setAnonymization($anonymize);
+        $user->anonymize = $anonymize;
         $this->userRepository->save($user, true);
     }
 
@@ -167,7 +191,7 @@ final readonly class UserActions
         }
 
         $user->setMailing(false);
-        $user->setEmailUnsubscribeHash(null);
+        $user->resetEmailUnsubscribeHash();
 
         $this->userRepository->save($user, true);
 
@@ -182,13 +206,6 @@ final readonly class UserActions
 
         $user->setMailing($dto->mailing);
 
-        $unsubscribeHash = null;
-        if ($user->hasMailing()) {
-            $unsubscribeHash = \bin2hex(\random_bytes(90));
-        }
-
-        $user->setEmailUnsubscribeHash($unsubscribeHash);
-
         $this->userRepository->save($user, true);
     }
 
@@ -200,15 +217,22 @@ final readonly class UserActions
         $this->userRepository->save($user->anonymize(), true);
     }
 
-    public function login(UserLoginDto $dto): ?User
+    /**
+     * @throws UserNotFoundException
+     * @throws PasswordInvalidException
+     */
+    public function login(UserLoginDto $dto): User
     {
         $user = $this->userRepository->findOneBy(['email' => $dto->email]);
         if ($user === null) {
-            return null;
+            throw new UserNotFoundException();
         }
 
-        if (!$this->hasher->isPasswordValid($user, $dto->password)) {
-            return null;
+        if (
+            $dto->password === null
+            || !$this->hasher->isPasswordValid($user, $dto->password)
+        ) {
+            throw new PasswordInvalidException();
         }
 
         if ($dto->firebaseToken !== null) {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Dto\AnonymizedUser;
 use App\Dto\Extract\ExtractSubmissionDto;
 use App\Dto\OutlierActivity;
 use App\Dto\OutlierResult;
@@ -23,9 +22,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Submission>
  *
  * @method Submission|null find($id, $lockMode = null, $lockVersion = null)
- * @method Submission|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
+ * @method Submission|null findOneBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null)
  * @method Submission[]    findAll()
- * @method Submission[]    findBy(mixed[] $criteria, mixed[] $orderBy = null, $limit = null, $offset = null)
+ * @method Submission[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class SubmissionRepository extends ServiceEntityRepository
 {
@@ -53,28 +52,22 @@ final class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Paginator<Submission>
+     * @return list<Submission>
      */
-    public function findAllByUser(User $user, int $page, int $limit): Paginator
+    public function findAllByUser(User $user): array
     {
-        $query = $this->createQueryBuilder('s')
+        /** @var list<Submission> */
+        return $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->addSelect('i')
+            ->indexBy('s', 's.id')
             ->leftJoin('s.image', 'i')
             ->where('s.user = :user')
             ->addOrderBy('s.date', 'DESC')
-            ->setParameter('user', $user);
-
-        /**
-         * @var Paginator<Submission>
-         */
-        $paginator = new Paginator($query);
-        $paginator
+            ->setParameter('user', $user)
             ->getQuery()
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit);
-
-        return $paginator;
+            ->getResult();
     }
 
     /**
@@ -85,13 +78,14 @@ final class SubmissionRepository extends ServiceEntityRepository
         int $page,
         int $limit,
     ): Paginator {
-        $query = $this->createQueryBuilder('s')
+        $query = $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->join('s.image', 'i')
             ->addSelect('i.path as image')
             ->where('s.season = :seasonId')
             ->orderBy('s.date', 'DESC')
-            ->setParameter('seasonId', $season->getId());
+            ->setParameter('seasonId', $season->id);
 
         /**
          * @var Paginator<Submission>
@@ -134,7 +128,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $indexed = [];
 
         foreach ($result as $row) {
-            $indexed[$row->getId()] = $row;
+            $indexed[$row->id] = $row;
         }
 
         return $indexed;
@@ -148,12 +142,13 @@ final class SubmissionRepository extends ServiceEntityRepository
         SeasonQueryFilterRequestDto $queryFilter,
         int $limit,
     ): Paginator {
-        $queryBuilder = $this->createQueryBuilder('s')
+        $queryBuilder = $this
+            ->createQueryBuilder('s')
             ->select('s')
             ->join('s.image', 'i')
             ->where('s.season = :seasonId')
             ->join('s.user', 'u')
-            ->setParameter('seasonId', $season->getId())
+            ->setParameter('seasonId', $season->id)
             ->setFirstResult(0)
             ->setMaxResults($limit)
             ->addOrderBy('s.date', 'ASC')
@@ -198,9 +193,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         /**
          * @var Paginator<Submission>
          */
-        $paginator = new Paginator($queryBuilder->getQuery());
-
-        return $paginator;
+        return new Paginator($queryBuilder->getQuery());
     }
 
     /**
@@ -209,15 +202,16 @@ final class SubmissionRepository extends ServiceEntityRepository
     public function getResultsForWeek(Season $season, int $week): array
     {
         /** @var list<array{distance: int, faculty: int, activity: int}> */
-        $result = $this->createQueryBuilder('s')
+        $result = $this
+            ->createQueryBuilder('s')
             ->select(
                 'sum(s.distance) as distance, COALESCE(IDENTITY(f.parent), IDENTITY(u.faculty)) as faculty, IDENTITY(s.activity) as activity',
             )
             ->innerJoin('s.user', 'u')
             ->innerJoin('u.faculty', 'f')
-            ->where('s.week = :week')
-            ->andWhere('s.accepted = 1')
             ->andWhere('s.season = :season')
+            ->andWhere('s.week = :week')
+            ->andWhere('s.accepted = 1')
             ->groupBy('activity')
             ->addGroupBy('faculty')
             ->orderBy('activity', 'asc')
@@ -238,14 +232,12 @@ final class SubmissionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return list<OutlierActivity>
+     * @return array<int, OutlierActivity>
      */
-    public function findOutliers(
-        Season $season,
-        int $n = 3,
-        bool $shouldAnonymize = true,
-    ): array {
-        $query = $this->getEntityManager()
+    public function findOutliers(Season $season, int $n = 3): array
+    {
+        $query = $this
+            ->getEntityManager()
             ->getConnection()
             ->prepare('
                 WITH
@@ -263,7 +255,7 @@ final class SubmissionRepository extends ServiceEntityRepository
                         AS row_num
                         FROM sub
                     )
-                SELECT value, activity_id, user_id, COALESCE(f.parent_id, u.faculty_id) AS faculty_id, u.first_name, u.last_name, u.anonymize
+                SELECT value, activity_id, user_id, COALESCE(f.parent_id, u.faculty_id) AS faculty_id
                 FROM sorted s
                 INNER JOIN user u ON u.id = s.user_id
                 INNER JOIN faculty f ON u.faculty_id = f.id
@@ -272,11 +264,11 @@ final class SubmissionRepository extends ServiceEntityRepository
             ');
 
         $query->bindValue(1, true);
-        $query->bindValue(2, $season->getId());
+        $query->bindValue(2, $season->id);
         $query->bindValue(3, $n);
 
         /**
-         * @var list<array{activity_id: int, anonymize: bool, first_name: string, last_name: string, faculty_id: int, value: string}> $result
+         * @var list<array{activity_id: int, user_id: int, faculty_id: int, value: string}> $result
          */
         $result = $query->executeQuery()->fetchAllAssociative();
 
@@ -287,14 +279,8 @@ final class SubmissionRepository extends ServiceEntityRepository
                 $activities[$row['activity_id']] = [];
             }
 
-            $anonymize = $shouldAnonymize ? $row['anonymize'] : false;
-
             $activities[$row['activity_id']][] = new OutlierResult(
-                new AnonymizedUser(
-                    $row['first_name'],
-                    $row['last_name'],
-                    $anonymize,
-                ),
+                $row['user_id'],
                 $row['faculty_id'],
                 (int) $row['value'],
             );
@@ -303,7 +289,7 @@ final class SubmissionRepository extends ServiceEntityRepository
         $outlierActivity = [];
 
         foreach ($activities as $id => $results) {
-            $outlierActivity[] = new OutlierActivity($id, $results);
+            $outlierActivity[$id] = new OutlierActivity($id, $results);
         }
 
         return $outlierActivity;
@@ -312,7 +298,8 @@ final class SubmissionRepository extends ServiceEntityRepository
     public function sumCountUserGroupedByFaculties(): int
     {
         /** @var list<int> */
-        $result = $this->createQueryBuilder('s')
+        $result = $this
+            ->createQueryBuilder('s')
             ->select('count(distinct s.user) as count')
             ->where('s.accepted = 1')
             ->groupBy('s.season')
@@ -329,7 +316,8 @@ final class SubmissionRepository extends ServiceEntityRepository
         ImagePath $imagePath,
         ?int $season = null,
     ): array {
-        $qb = $this->createQueryBuilder('ss')
+        $qb = $this
+            ->createQueryBuilder('ss')
             ->select('ss, i')
             ->join('ss.image', 'i')
             ->where('ss.reviewed = 1')
@@ -348,14 +336,31 @@ final class SubmissionRepository extends ServiceEntityRepository
 
         return \array_map(
             static fn(Submission $submission): ExtractSubmissionDto => new ExtractSubmissionDto(
-                $submission->getActivity()->getId(),
-                $submission->getSeason()->getId(),
-                $submission->isAccepted(),
-                $submission->getDistance(),
-                $submission->getElevation(),
-                $submission->getImage()?->getPath($imagePath) ?? '',
+                $submission->activity->id,
+                $submission->season->id,
+                $submission->accepted,
+                $submission->distance,
+                $submission->elevation,
+                $submission->image?->getPath($imagePath) ?? '',
             ),
             $result,
         );
+    }
+
+    /**
+     * @return list<array{activity: int, distance: int}>
+     */
+    public function getTotalStatistics(): array
+    {
+        /** @var list<array{activity: int, distance: int}> */
+        return $this
+            ->createQueryBuilder('s')
+            ->select(
+                'IDENTITY(s.activity) as activity, SUM(s.distance) AS distance',
+            )
+            ->where('s.accepted = 1')
+            ->groupBy('s.activity')
+            ->getQuery()
+            ->getResult();
     }
 }

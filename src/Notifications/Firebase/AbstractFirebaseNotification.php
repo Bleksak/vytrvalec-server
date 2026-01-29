@@ -13,6 +13,6 @@ abstract readonly class AbstractFirebaseNotification
         public string $to,
         public string $title,
         public string $message,
-        public null|string $action = null,
+        public ?string $action = null,
     ) {}
 }

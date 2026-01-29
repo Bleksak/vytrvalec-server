@@ -1,0 +1,25 @@
+<div {{ attributes }}>
+    {% if currentSubmission is not null %}
+        {{ form_start(form, 
+            {
+                attr: {
+                    'data-action': 'live#action:prevent',
+                    'data-live-action-param': 'submit'
+                }
+            }
+        ) }}
+            {% if currentSubmission.message %}
+                <fieldset>
+                    <p>{{ 'submission.comment'|trans }}</p>
+                    <span>{{ currentSubmission.message }}</span>
+                </fieldset>
+            {% endif %}
+
+            <fieldset>
+                <twig:ImageUpload :image="currentSubmission.image.path ?? null" :allowedMimeTypes="allowedMimeTypes" />
+            </fieldset>
+
+            {{ form_rest(form) }}
+        {{ form_end(form) }}
+    {% endif %}
+</div>

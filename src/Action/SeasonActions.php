@@ -8,14 +8,9 @@ use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
 use App\Entity\Faculty;
 use App\Entity\FacultyMapping;
 use App\Entity\Season;
-
-
 use App\Repository\FacultyMappingRepository;
 use App\Repository\SeasonRepository;
 use Doctrine\ORM\EntityManagerInterface;
-
-use Symfony\Component\Messenger\MessageBusInterface;
-
 
 final readonly class SeasonActions
 {
@@ -23,7 +18,6 @@ final readonly class SeasonActions
         private SeasonRepository $seasonRepository,
         private FacultyMappingRepository $facultyMappingRepository,
         private CharityActions $charityAction,
-        private MessageBusInterface $messageBus,
         private EntityManagerInterface $entityManager,
     ) {}
 
@@ -56,7 +50,10 @@ final readonly class SeasonActions
         $this->seasonRepository->save($season, true);
 
         foreach ($dto->facultyMapping as $mapping) {
-            $faculty = $this->entityManager->getReference(Faculty::class, $mapping->faculty);
+            $faculty = $this->entityManager->getReference(
+                Faculty::class,
+                $mapping->faculty,
+            );
 
             if ($faculty === null) {
                 continue;
@@ -64,7 +61,10 @@ final readonly class SeasonActions
 
             $parent = $mapping->parent === null
                 ? null
-                : $this->entityManager->getReference(Faculty::class, $mapping->parent);
+                : $this->entityManager->getReference(
+                    Faculty::class,
+                    $mapping->parent,
+                );
 
             $mapping = new FacultyMapping($season, $faculty, $parent);
             $this->facultyMappingRepository->save($mapping, false);
@@ -74,6 +74,8 @@ final readonly class SeasonActions
 
         $this->entityManager->commit();
 
+        // TODO(@bleksak): send notifications
+        //
         // if ($dto->season->notificationDate !== null) {
         //     $stamps[] = DelayStamp::delayUntil($dto->season->start);
         //     $this->messageBus->dispatch(

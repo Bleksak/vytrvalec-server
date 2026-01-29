@@ -14,21 +14,23 @@ final readonly class SeasonCacheActions
     public function __construct(
         private SeasonCacheRepository $cacheRepository,
         private SeasonResultCalculator $seasonResult,
-    ) {
-    }
+    ) {}
 
     public function cacheSeason(Season $season): void
     {
         $now = new \DateTime();
 
-        if ($season->getEnd() > $now) {
+        if ($season->end > $now) {
             return;
         }
 
         $cache = $this->cacheRepository->findBySeason($season);
         $result = $this->seasonResult->calculate($season);
 
-        $cache?->setData($result);
+        if ($cache !== null) {
+            $cache->data = $result;
+        }
+
         $cache ??= new Cache($season, $result);
 
         $this->cacheRepository->save($cache, true);

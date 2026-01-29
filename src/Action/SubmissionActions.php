@@ -6,7 +6,10 @@ namespace App\Action;
 
 use App\Dto\Submission\SubmissionCreateDto;
 use App\Dto\Submission\SubmissionEditDto;
+use App\Dto\Submission\SubmissionServerCreateDto;
+use App\Dto\Submission\SubmissionServerEditDto;
 use App\Dto\Submission\SubmissionStateDto;
+use App\Entity\Activity;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -26,8 +29,7 @@ final readonly class SubmissionActions
         private VytrvalecMailer $mailer,
         private ImageRepository $imageRepository,
         private ActivityRepository $activityRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, string>
@@ -45,11 +47,11 @@ final readonly class SubmissionActions
 
         $image = $this->imageRepository->find($dto->imageUuid);
 
-        if ($image === null || $image->getUsedAt() !== null) {
+        if ($image === null || $image->usedAt !== null) {
             return ['image' => 'invalid'];
         }
 
-        $image->setUsedAt(new \DateTime());
+        $image->usedAt = new \DateTime();
 
         $submission = new Submission(
             $user,
@@ -67,6 +69,38 @@ final readonly class SubmissionActions
         return [];
     }
 
+    public function createServer(
+        SubmissionServerCreateDto $dto,
+        User $user,
+        Season $season,
+    ): ?Submission {
+        $activity = $dto->activity;
+        \assert($activity instanceof Activity);
+
+        $image = $this->imageRepository->find($dto->imageUuid);
+
+        if ($image === null || $image->usedAt !== null) {
+            return null;
+        }
+
+        $image->usedAt = new \DateTime();
+
+        $submission = new Submission(
+            $user,
+            $activity,
+            $season,
+            $image,
+            $dto->distance ?? 0,
+            new DateTime(),
+            // $dto->date,
+            $dto->elevation ?? 0,
+        );
+
+        $this->submissionRepository->save($submission, true);
+
+        return $submission;
+    }
+
     /**
      * @return array<int,string>
      */
@@ -75,20 +109,20 @@ final readonly class SubmissionActions
         Submission $submission,
         SubmissionStateDto $dto,
     ): array {
-        if ($dto->updatedAt !== $submission->getUpdatedAt()) {
+        if ($dto->updatedAt !== $submission->updatedAt) {
             return ['mismatch_updated_at'];
         }
 
-        $submission->setMessage($dto->message);
+        $submission->message = $dto->message;
 
         $this->handleCacheUpdate($submission, $dto);
 
-        if ($dto->state && (!$submission->isReviewed() || !$submission->isAccepted())) {
+        if ($dto->state && (!$submission->reviewed || !$submission->accepted)) {
             // noop when already accepted, otherwise profile cache would stack
             $this->profileCacheRepository->addCache($submission);
         }
 
-        // TODO(@jvelek): Ted mi doslo, ze tady se da frajerovi zaspamovat email kdyby kutak furt schvaloval a zamital aktivitu :D
+        // TODO(@bleksak): Ted mi doslo, ze tady se da frajerovi zaspamovat email kdyby kutak furt schvaloval a zamital aktivitu :D
         if (!$dto->state) {
             // if ($submission->getUser()->getToken() !== null) {
             //     $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));
@@ -96,19 +130,19 @@ final readonly class SubmissionActions
 
             $now = new \DateTimeImmutable();
 
-            if ($submission->getDate()->diff($now)->m < 2) {
-                $template = new SubmissionRejectedEmailTemplate($submission, $dto->message);
-                $template->replyTo = $issuer->getEmail();
-
-                $this->mailer->send(
-                    $submission->getUser(),
-                    $template,
+            if ($submission->date->diff($now)->m < 2) {
+                $template = new SubmissionRejectedEmailTemplate(
+                    $submission,
+                    $dto->message,
                 );
+                $template->replyTo = $issuer->email;
+
+                $this->mailer->send($submission->user, $template);
             }
         }
 
-        $submission->setReviewed(true);
-        $submission->setAccepted($dto->state);
+        $submission->reviewed = true;
+        $submission->accepted = $dto->state;
 
         $this->submissionRepository->save($submission, true);
 
@@ -117,51 +151,74 @@ final readonly class SubmissionActions
 
     public function delete(Submission $submission): void
     {
+        if ($submission->image !== null) {
+            $submission->image->usedAt = null;
+            $this->imageRepository->save($submission->image);
+        }
+
         $this->submissionRepository->remove($submission, true);
     }
 
     /**
      * @return array<string,string>
      */
-    public function update(Submission $submission, SubmissionEditDto $dto): array
-    {
-        if ($submission->getUpdatedAt() !== $dto->updatedAt) {
+    public function update(
+        Submission $submission,
+        SubmissionServerEditDto|SubmissionEditDto $dto,
+    ): array {
+        if (
+            $submission->updatedAt->getTimestamp() !== $dto->updatedAt?->getTimestamp()
+        ) {
             return ['updated_at' => 'mismatch'];
         }
 
         if ($dto->imageUuid !== null) {
             $image = $this->imageRepository->find($dto->imageUuid);
 
-            if ($image === null || $image->getUsedAt() !== null) {
+            if (
+                $image === null
+                || $image->usedAt !== null && $submission->image !== $image
+            ) {
                 return ['image' => 'invalid'];
             }
 
-            $oldImage = $submission->getImage();
-            $image->setUsedAt(new \DateTime());
-            $submission->setImage($image);
-            $oldImage?->setUsedAt(null);
+            $oldImage = $submission->image;
+            $image->usedAt = new \DateTime();
+            $submission->image = $image;
+
+            if ($oldImage !== null) {
+                $oldImage->usedAt = null;
+            }
         }
 
         if ($dto->distance !== null) {
-            $submission->setDistance($dto->distance);
+            $submission->distance = $dto->distance;
         }
 
         if ($dto->elevation !== null) {
-            $submission->setElevation($dto->elevation);
+            $submission->elevation = $dto->elevation;
         }
 
-        if ($dto->activityId !== null) {
+        if (
+            $dto instanceof SubmissionServerEditDto
+            && $dto->activity !== null
+        ) {
+            $submission->activity = $dto->activity;
+        } elseif (
+            $dto instanceof SubmissionEditDto
+            && $dto->activityId !== null
+        ) {
             $activity = $this->activityRepository->find($dto->activityId);
 
             if ($activity === null) {
                 return ['activity_id' => 'invalid'];
             }
 
-            $submission->setActivity($activity);
+            $submission->activity = $activity;
         }
 
-        $submission->setMessage('');
-        $submission->setReviewed(false);
+        $submission->message = '';
+        $submission->reviewed = false;
 
         $this->submissionRepository->save($submission, true);
 
@@ -172,7 +229,7 @@ final readonly class SubmissionActions
         Submission $submission,
         SubmissionStateDto $dto,
     ): void {
-        if ($dto->state && (!$submission->isReviewed() || !$submission->isAccepted())) {
+        if ($dto->state && (!$submission->reviewed || !$submission->accepted)) {
             // noop when already accepted, otherwise profile cache would stack
             $this->profileCacheRepository->addCache($submission);
         }

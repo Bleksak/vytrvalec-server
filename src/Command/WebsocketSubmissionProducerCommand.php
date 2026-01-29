@@ -24,11 +24,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 use function Amp\trapSignal;
 
-#[AsCommand(name: 'mv:ws-submission-producer', description: 'Produces submissions for websocket consumer')]
+#[AsCommand(
+    name: 'mv:ws-submission-producer',
+    description: 'Produces submissions for websocket consumer',
+)]
 final readonly class WebsocketSubmissionProducerCommand
 {
     /** @var int<0, 65535> */
-    private readonly int $port;
+    private int $port;
 
     public function __construct(
         private LoggerInterface $logger,
@@ -57,7 +60,11 @@ final readonly class WebsocketSubmissionProducerCommand
 
         $errorHandler = new DefaultErrorHandler();
 
-        $acceptor = new AllowOriginAcceptor(['http://localhost:3000', 'http://127.0.0.1:3000', 'http://[::1]/:3000']);
+        $acceptor = new AllowOriginAcceptor([
+            'http://localhost:3000',
+            'http://127.0.0.1:3000',
+            'http://[::1]/:3000',
+        ]);
 
         $clientHandler = new SubmissionProducerClientHandler(
             $this->submissionRepository,
@@ -68,7 +75,12 @@ final readonly class WebsocketSubmissionProducerCommand
             $this->imagePath,
         );
 
-        $websocket = new Websocket($server, $this->logger, $acceptor, $clientHandler);
+        $websocket = new Websocket(
+            $server,
+            $this->logger,
+            $acceptor,
+            $clientHandler,
+        );
 
         $router = new Router($server, $this->logger, $errorHandler);
         $router->addRoute('GET', '/ws', $websocket);
@@ -78,7 +90,10 @@ final readonly class WebsocketSubmissionProducerCommand
 
         $signal = trapSignal([SIGINT, SIGTERM]);
 
-        $this->logger->info(\sprintf('Received signald %d, stopping HTTP server', $signal));
+        $this->logger->info(\sprintf(
+            'Received signald %d, stopping HTTP server',
+            $signal,
+        ));
 
         $server->stop();
 

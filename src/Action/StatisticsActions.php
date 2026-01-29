@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Action;
 
+use App\Dto\Statistics\UserCountGroupedByFacultyTotal;
 use App\Dto\TotalStatisticsDto;
-use App\Dto\UserCountByFacultyStatistics;
 use App\Entity\Season;
 use App\Repository\ActivityRepository;
 use App\Repository\SubmissionRepository;
@@ -21,21 +21,25 @@ final readonly class StatisticsActions
         private ImagePath $imagePath,
     ) {}
 
-    public function getTotalStatistics(): TotalStatisticsDto
+    public function getTotalStatistics(?string $locale = null): TotalStatisticsDto
     {
         $usersFrom2020 = 1024;
         $usersFrom2021 = 357;
 
-        $users = $usersFrom2020 + $usersFrom2021 + $this->submissionRepository->sumCountUserGroupedByFaculties();
-        $activities = $this->activityRepository->getTotalStatistics($this->imagePath);
+        $users =
+            $usersFrom2020
+            + $usersFrom2021
+            + $this->submissionRepository->sumCountUserGroupedByFaculties();
+
+        $activities = $this->activityRepository->getTotalStatistics(
+            $this->imagePath,
+            $locale,
+        );
 
         return new TotalStatisticsDto($users, $activities);
     }
 
-    /**
-     * @return array<UserCountByFacultyStatistics>
-     */
-    public function getUserCountByFaculties(Season $season): array
+    public function getUserCountByFaculties(Season $season): UserCountGroupedByFacultyTotal
     {
         return $this->userRepository->countUserGroupedByFaculties($season);
     }

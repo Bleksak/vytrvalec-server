@@ -11,17 +11,11 @@ final readonly class FacultyMappingDto
 {
     public function __construct(
         #[OA\Property(type: 'integer')]
-        #[Assert\NotBlank(
-            message: 'blank',
-            allowNull: false,
-        )]
+        #[Assert\NotBlank(message: 'blank', allowNull: false)]
         public int $faculty,
 
         #[OA\Property(type: 'integer')]
-        #[Assert\NotBlank(
-            message: 'blank',
-            allowNull: true,
-        )]
+        #[Assert\NotBlank(message: 'blank', allowNull: true)]
         public ?int $parent,
     ) {}
 }

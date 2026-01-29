@@ -1,0 +1,5 @@
+symfonycasts_sass:
+    sass_options:
+        load_path:
+            - '%kernel.project_dir%/vendor/picocss/pico/scss'
+    binary: 'node_modules/.bin/sass'

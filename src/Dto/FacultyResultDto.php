@@ -6,7 +6,10 @@ namespace App\Dto;
 
 use OpenApi\Attributes as OA;
 
-final readonly class FacultyResultDto
+/**
+ * @type FacultyResultDtoType = array{faculty: int, distance: int}
+ */
+final class FacultyResultDto
 {
     public function __construct(
         #[OA\Property(example: 1)]
@@ -14,4 +17,30 @@ final readonly class FacultyResultDto
         #[OA\Property(example: 2250)]
         public int $distance,
     ) {}
+
+    /**
+     * @param FacultyResultDtoType $data
+     */
+    public static function fromCache(array $data): self
+    {
+        \assert(
+            \is_int($data['faculty']),
+            'faculty must be an integer in FacultyResultDto',
+        );
+
+        \assert(
+            \is_int($data['distance']),
+            'distance must be an integer in FacultyResultDto',
+        );
+
+        return new self($data['faculty'], $data['distance']);
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'faculty' => $this->faculty,
+            'distance' => $this->distance,
+        ];
+    }
 }

@@ -17,7 +17,7 @@ enum MimeType: string
     case SVG = 'image/svg+xml';
 
     /**
-     * @return array<MimeType>
+     * @return list<MimeType>
      */
     public static function default(MimeType ...$additionalTypes): array
     {
@@ -35,7 +35,7 @@ enum MimeType: string
     }
 
     /**
-     * @return array<MimeType>
+     * @return list<MimeType>
      */
     public static function all(): array
     {

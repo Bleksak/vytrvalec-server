@@ -7,61 +7,47 @@ namespace App\Entity;
 use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Repository\SubmissionRepository;
 use App\Services\ImagePath;
+use App\Utils\SubmissionState;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
-#[ORM\Index(
-    columns: ['week'],
-    name: 'week_index',
-)]
+#[ORM\Index(columns: ['week'], name: 'week_index')]
 #[ORM\HasLifecycleCallbacks]
-class Submission
+final class Submission
 {
     #[OA\Property(example: 1)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    public private(set) int $id;
 
     #[OA\Property(example: true)]
     #[ORM\Column]
-    private bool $accepted = false;
+    public bool $accepted = false;
 
-    #[OA\Property(
-        type: 'integer',
-        example: 1,
-    )]
+    #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
-    private Season $season;
+    public Season $season;
 
-    #[OA\Property(
-        type: 'integer',
-        example: 1,
-    )]
+    #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
-    private User $user;
+    public private(set) User $user;
 
-    #[OA\Property(
-        type: 'integer',
-        example: 1500,
-    )]
+    #[OA\Property(type: 'integer', example: 1500)]
     #[ORM\Column(type: Types::BIGINT)]
-    private int $elevation;
+    public int $elevation;
 
-    #[OA\Property(
-        type: 'integer',
-        example: 1500,
-    )]
+    #[OA\Property(type: 'integer', example: 1500)]
     #[ORM\Column(type: Types::BIGINT)]
-    private int $distance;
+    public int $distance;
 
     #[OA\Property(example: true)]
     #[ORM\Column]
-    private bool $reviewed = false;
+    public bool $reviewed = false;
 
     #[OA\Property]
     #[ORM\ManyToOne]
@@ -70,39 +56,28 @@ class Submission
         referencedColumnName: 'uuid',
         name: 'image_uuid',
     )]
-    private ?Image $image;
+    public ?Image $image;
 
     #[OA\Property(example: 2)]
     #[ORM\Column]
-    private int $week;
+    public int $week;
 
-    #[OA\Property(
-        type: 'integer',
-        example: 1,
-    )]
+    #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private Activity $activity;
+    public Activity $activity;
 
-    #[OA\Property(
-        type: 'string',
-        format: 'date',
-        example: '2025-04-11',
-    )]
+    #[OA\Property(type: 'string', format: 'date', example: '2025-04-11')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private \DateTime $date;
+    public \DateTime $date;
 
-    #[OA\Property(
-        type: 'string',
-        format: 'date-time',
-        example: 1,
-    )]
+    #[OA\Property(type: 'string', format: 'date-time', example: 1)]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private \DateTime $updatedAt;
+    public \DateTime $updatedAt;
 
     #[OA\Property(example: 'Dobrej vykon lil bro')]
     #[ORM\Column(length: 512)]
-    private string $message = '';
+    public string $message = '';
 
     #[ORM\PrePersist]
     #[ORM\PreUpdate]
@@ -130,118 +105,7 @@ class Submission
         $this->elevation = $elevation;
         $this->message = '';
 
-        $this->calculateWeek();
-    }
-
-    public function getId(): int
-    {
-        return $this->id ?? 0;
-    }
-
-    public function isAccepted(): bool
-    {
-        return $this->accepted;
-    }
-
-    public function setAccepted(bool $accepted): self
-    {
-        $this->accepted = $accepted;
-
-        return $this;
-    }
-
-    public function getSeason(): Season
-    {
-        return $this->season;
-    }
-
-    public function setSeason(Season $season): self
-    {
-        $this->season = $season;
-
-        return $this;
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    public function getElevation(): int
-    {
-        return (int) $this->elevation;
-    }
-
-    public function setElevation(int $elevation): self
-    {
-        $this->elevation = $elevation;
-
-        return $this;
-    }
-
-    public function getDistance(): int
-    {
-        return $this->distance;
-    }
-
-    public function setDistance(int $distance): self
-    {
-        $this->distance = $distance;
-
-        return $this;
-    }
-
-    public function isReviewed(): bool
-    {
-        return $this->reviewed;
-    }
-
-    public function setReviewed(bool $reviewed): self
-    {
-        $this->reviewed = $reviewed;
-
-        return $this;
-    }
-
-    public function getImage(): ?Image
-    {
-        return $this->image;
-    }
-
-    public function setImage(Image $image): self
-    {
-        $this->image = $image;
-
-        return $this;
-    }
-
-    public function getActivity(): Activity
-    {
-        return $this->activity;
-    }
-
-    public function setActivity(Activity $activity): self
-    {
-        $this->activity = $activity;
-
-        return $this;
-    }
-
-    public function getDate(): \DateTime
-    {
-        return $this->date;
-    }
-
-    public function calculateWeek(): int
-    {
-        $sub = $this->getDate()->diff($this->getSeason()->getStart());
+        $sub = $this->date->diff($this->season->start);
         $days = $sub->days;
 
         if ($days === false) {
@@ -249,55 +113,42 @@ class Submission
         }
 
         $this->week = \intdiv($days, num2: 7);
-
-        return $this->week;
+        $this->updatedAt = new \DateTime();
     }
 
-    public function getWeek(): int
+    public function getState(): SubmissionState
     {
-        return $this->week;
+        if ($this->reviewed === false) {
+            return SubmissionState::Pending;
+        }
+
+        return $this->accepted
+            ? SubmissionState::Accepted
+            : SubmissionState::Rejected;
     }
 
-    public function setWeek(int $week): static
+    public function isEditable(): bool
     {
-        $this->week = $week;
-
-        return $this;
-    }
-
-    public function getMessage(): string
-    {
-        return $this->message;
-    }
-
-    public function setMessage(string $message): static
-    {
-        $this->message = $message;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): \DateTime
-    {
-        return $this->updatedAt;
+        return $this->reviewed === false || $this->accepted === false;
     }
 
     public function toResponseObject(?ImagePath $imagePath): SubmissionResponseDto
     {
         return new SubmissionResponseDto(
-            $this->getId(),
-            $this->isAccepted(),
-            $this->getSeason()->getId(),
-            $this->getUser()->getId(),
-            $this->getElevation(),
-            $this->getDistance(),
-            $this->isReviewed(),
-            $this->getImage()?->getPath($imagePath),
-            $this->getWeek(),
-            $this->getActivity()->getId(),
-            $this->getDate(),
-            $this->getUpdatedAt(),
-            $this->getMessage(),
+            $this->id,
+            $this->accepted,
+            $this->season->id,
+            $this->user->id,
+            $this->elevation,
+            $this->distance,
+            $this->reviewed,
+            $this->image?->getPath($imagePath),
+            $this->week,
+            $this->activity->id,
+            $this->date,
+            $this->updatedAt,
+            $this->image?->uuid->toString(),
+            $this->message,
         );
     }
 }

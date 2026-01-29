@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="%lang%">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" href="{{ asset('images/favicon.png') }}" />
+        <meta name="apple-itunes-app" content="app-id=6743554661" />
+        <meta
+            name="description"
+            content="Akce měsíční vytrvalec vznikla během zimního semestru v roce 2020. Tuto pohybovou soutěž připravil a zorganizoval Ústav tělesné výchovy a sportu ZČU s úmyslem rozhýbat studenty během distanční výuky, která probíhala na ZČU během koronavirové pandemie."
+        />
+
+        <meta
+            name="keywords"
+            content="měsíční, vytrvalec, akce, pohyb, sport, běh, chůze, zču, západočeská univerzita, plzeň, fakulta, katedra, soutěž, měsíční vytrvalec, výzva"
+        />
+
+        <meta name="author" content="Ústav tělesné výchovy a sportu ZČU" />
+
+        <title>
+            {% block title %}
+                Měsíční Vytrvalec
+            {% endblock title %}
+        </title>
+
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('styles/app.scss') }}" />
+        {% endblock stylesheets %}
+
+        {% block javascripts %}
+            {% block importmap %}
+                {{ importmap('app') }}
+            {% endblock importmap %}
+        {% endblock javascripts %}
+    </head>
+
+    <body>
+        <header class="main-header">
+            <nav class="navbar">
+                <ul>
+                    <li>
+                        <a
+                            href="{{ path('index') }}"
+                            aria-label="Hlavní stránka Měsíčního Vytrvalce"
+                        >
+                            <img
+                                class="vytrvalec-logo"
+                                src="{{ asset('/images/zcu-logo.png') }}"
+                                title="Logo ZČU"
+                                alt="Logo ZČU"
+                            />
+                        </a>
+                    </li>
+                </ul>
+
+                <button class="menu-toggle">
+                    <twig:ux:icon name="lucide:menu" />
+                </button>
+
+                <ul class="menu-content">
+                    <li>
+                        <button class="locale-change-btn">
+                            {% if app.request.locale == 'cs' %}
+                                <img
+                                    class="locale-flag"
+                                    src="{{ asset('/images/lang/cs.svg') }}"
+                                    alt="cs"
+                                />
+                            {% else %}
+                                <img
+                                    class="locale-flag"
+                                    src="{{ asset('/images/lang/en.svg') }}"
+                                    alt="en"
+                                />
+                            {% endif %}
+                        </button>
+                    </li>
+                    {% if is_granted('ROLE_STAFF') %}
+                        <li>
+                            <a href="/administration">
+                                {{ 'navbar.administration'|trans }}
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{ path('rules') }}">
+                            {{ 'navbar.rules'|trans }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('results') }}">
+                            {{ 'navbar.results'|trans }}
+                        </a>
+                    </li>
+
+                    {% if not app.user %}
+                        <li>
+                            <button
+                                onclick="document.querySelector('#login-dialog').show();"
+                                {# command="show-modal" #}
+                                {# commandfor="login-dialog" #}
+                            >
+                                {{ 'navbar.login'|trans }}
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                onclick="document.querySelector('#register-dialog').show();"
+                                class="secondary"
+                            >
+                                {{ 'navbar.register'|trans }}
+                            </button>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{{ path('user:profile') }}">
+                                {{ 'navbar.profile'|trans }}
+                            </a>
+                        </li>
+                        {% if current_season %}
+                            <li>
+                                <button onclick="document.querySelector('#submission-dialog').show()">{{ 'navbar.submission'|trans }}</button>
+                            </li>
+                        {% endif %}
+                        <li>
+                            <form
+                                method="POST"
+                                action="{{ path('app_logout') }}"
+                            >
+                                <input
+                                    type="submit"
+                                    class="secondary"
+                                    value="{{ 'navbar.logout'|trans }}"
+                                />
+                            </form>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            {% block body %}
+
+            {% endblock body %}
+        </main>
+
+        <footer class="container">
+            <article>
+                <p>
+                    Měsíční vytrvalec · oficiální stránka akce<br />
+                    <a href="mailto:{{ support_contact_email }}">
+                        {{ support_contact_email }}
+                    </a>
+                </p>
+
+                <nav>
+                    <ul>
+                        <li>
+                            <a href="{{ uts_url }}">{{ 'footer.uts'|trans }}</a>
+                        </li>
+                        <li>
+                            <a href="{{ zcu_url }}">Západočeská univerzita</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <p>
+                    <a target="_blank" href="{{ facebook_url }}">
+                        <img
+                            src="{{ asset('images/facebook.svg') }}"
+                            alt="Facebook"
+                            title="Facebook"
+                            width="24"
+                            height="24"
+                        />
+                    </a>
+                    <a target="_blank" href="{{ instagram_url }}">
+                        <img
+                            src="{{ asset('images/instagram.svg') }}"
+                            alt="Instagram"
+                            title="Instagram"
+                            width="24"
+                            height="24"
+                        />
+                    </a>
+                    <a target="_blank" href="{{ uts_url }}">
+                        <img
+                            src="{{ asset('images/web.svg') }}"
+                            alt="Web"
+                            title="Web"
+                            width="24"
+                            height="24"
+                        />
+                    </a>
+                    <a target="_blank" href="{{ discord_url }}">
+                        <img
+                            src="{{ asset('images/discord.svg') }}"
+                            alt="Discord"
+                            title="Discord"
+                            width="24"
+                            height="24"
+                        />
+                    </a>
+                </p>
+
+                <footer>
+                    <small>
+                        © Západočeská univerzita v Plzni 2020–2025 ·
+                        {{ 'footer.managed_by'|trans }}: Jiří Velek, Alena
+                        Kašparová
+                    </small>
+                </footer>
+            </article>
+        </footer>
+        <twig:Toast />
+        {% if not is_granted('ROLE_USER') %}
+            <twig:Dialog id="login-dialog">
+                <twig:block name="header">
+                    {{ 'login.title'|trans }}
+                </twig:block>
+                <twig:Login />
+            </twig:Dialog>
+
+            <twig:Dialog id="register-dialog">
+                <twig:block name="header">
+                    {{ 'registration.title'|trans }}
+                </twig:block>
+
+                <twig:Registration :faculties="faculties" />
+            </twig:Dialog>
+        {% else %}
+            <twig:Dialog id="submission-dialog">
+                <twig:block name="header">
+                    {{ 'submission.create.title'|trans }}
+                </twig:block>
+
+                <twig:SubmissionUpload />
+            </twig:Dialog>
+        {% endif %}
+    </body>
+</html>
+

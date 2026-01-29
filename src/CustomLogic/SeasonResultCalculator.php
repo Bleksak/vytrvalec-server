@@ -10,6 +10,7 @@ use App\Dto\FacultyResultDto;
 use App\Dto\SeasonResultDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
+use App\Repository\FacultyMappingRepository;
 use App\Repository\SubmissionRepository;
 use DateTime;
 
@@ -17,6 +18,7 @@ final readonly class SeasonResultCalculator
 {
     public function __construct(
         private SubmissionRepository $submissionRepository,
+        private FacultyMappingRepository $facultyMappingRepository,
         private DailyDistanceExtraPoints $dailyDistanceExtraPoints,
         private WeeklyDistanceExtraPoints $weeklyDistanceExtraPoints,
         private WeeklyElevationExtraPoints $weeklyElevationExtraPoints,
@@ -24,8 +26,12 @@ final readonly class SeasonResultCalculator
 
     public function calculate(Season $season): SeasonResultDto
     {
+        $facultyParentRoots =
+            $this->facultyMappingRepository->findRootsBySeason($season);
+
         $weeks = $season->getWeekCount();
         $results = [];
+        $users = [];
 
         /** @var list<ExtraPointsInterface> */
         $extraPointsClasses = [
@@ -39,17 +45,21 @@ final readonly class SeasonResultCalculator
                 $season,
                 $i,
             );
+
+            /** @var array<int, array<int, FacultyResultDto>> */
             $activities = [];
 
             foreach ($weeklyResult as $result) {
-                if (!\array_key_exists($result->activity, $activities)) {
-                    $activities[$result->activity] = [];
+                $actualFaculty =
+                    $facultyParentRoots[$result->faculty] ?? $result->faculty;
+
+                if (!isset($activities[$result->activity][$actualFaculty])) {
+                    $activities[$result->activity][$actualFaculty] =
+                        new FacultyResultDto($actualFaculty, 0);
                 }
 
-                $activities[$result->activity][] = new FacultyResultDto(
-                    $result->faculty,
-                    $result->distance,
-                );
+                $activities[$result->activity][$actualFaculty]->distance +=
+                    $result->distance;
             }
 
             $activityResult = [];
@@ -66,30 +76,42 @@ final readonly class SeasonResultCalculator
             }
         }
 
-        if ($season->getEnd() > new DateTime('2022-01-01')) {
+        if ($season->end > new DateTime('2022-01-01')) {
             foreach ($extraPointsClasses as $cls) {
                 $extras = $cls->calculate($season);
                 foreach ($extras as $extra) {
+                    $facultyId =
+                        $facultyParentRoots[$extra->facultyId]
+                        ?? $extra->facultyId;
+
                     $results[$cls->getWeek()]->activities[$extra->activityId]->extras[] =
                         new ExtraPointsDto(
                             $extra->user,
-                            $extra->facultyId,
+                            $facultyId,
                             $cls->getUniqueName(),
                             $extra->value,
                             $cls->reward(),
+                            $extra->activityId,
                         );
+
+                    $users[$extra->user] = $extra->user;
                 }
             }
         }
 
-        $results = \array_values($results);
-
         $topThree = $this->submissionRepository->findOutliers($season);
 
-        foreach ($results as $result) {
-            $result->activities = \array_values($result->activities);
+        foreach ($topThree as $outlier) {
+            foreach ($outlier->results as $outlierResult) {
+                // TODO(@bleksak): Ten if statement smazat po migraci dat na produkci
+                if (!\is_int($outlierResult->user)) {
+                    continue;
+                }
+
+                $users[$outlierResult->user] = $outlierResult->user;
+            }
         }
 
-        return new SeasonResultDto($results, $topThree);
+        return new SeasonResultDto($results, $topThree, \array_values($users));
     }
 }

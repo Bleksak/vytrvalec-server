@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\CustomLogic;
 
-use App\Dto\AnonymizedUser;
 use App\Dto\ExtraPointsResultDto;
 use App\Entity\Season;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,8 +12,7 @@ final readonly class DailyDistanceExtraPoints implements ExtraPointsInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManagerInterface,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function getUniqueName(): string
@@ -31,7 +29,9 @@ final readonly class DailyDistanceExtraPoints implements ExtraPointsInterface
     #[\Override]
     public function calculate(Season $season): array
     {
-        $query = $this->entityManagerInterface->getConnection()->prepare('
+        $query = $this->entityManagerInterface
+            ->getConnection()
+            ->prepare('
             WITH
                 sub AS (
                     SELECT SUM(s.distance) as value, s.activity_id as activity_id, s.user_id as user_id, s.date
@@ -56,16 +56,16 @@ final readonly class DailyDistanceExtraPoints implements ExtraPointsInterface
 
         $query->bindValue(1, self::getWeek());
         $query->bindValue(2, true);
-        $query->bindValue(3, $season->getId());
+        $query->bindValue(3, $season->id);
 
         /**
-         * @var list<array{first_name: string, last_name: string, anonymize: bool|null, activity_id: int, faculty_id: int, value: string}> $result
+         * @var list<array{user_id: int, activity_id: int, faculty_id: int, value: string}> $result
          */
         $result = $query->executeQuery()->fetchAllAssociative();
 
         return \array_map(
-            static fn (array $row): ExtraPointsResultDto => new ExtraPointsResultDto(
-                new AnonymizedUser($row['first_name'], $row['last_name'], $row['anonymize']),
+            static fn(array $row): ExtraPointsResultDto => new ExtraPointsResultDto(
+                $row['user_id'],
                 $row['activity_id'],
                 $row['faculty_id'],
                 (int) $row['value'],
