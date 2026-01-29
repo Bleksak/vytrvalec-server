@@ -5,5 +5,5 @@ COPY docker/supervisor.ini /etc/supervisor.d/supervisor.ini
 WORKDIR /app
 COPY . .
 
-RUN npm install && npm run build
+RUN npm install
 RUN composer install --no-interaction && composer dump -o
