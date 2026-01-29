@@ -1,4 +1,4 @@
-FROM bleksak/php-production:8.4.6
+FROM jirivelek/php-prod-image:8.4.6
 
 COPY docker/supervisor.ini /etc/supervisor.d/supervisor.ini
 
