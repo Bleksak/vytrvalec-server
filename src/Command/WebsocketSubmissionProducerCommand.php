@@ -64,6 +64,7 @@ final readonly class WebsocketSubmissionProducerCommand
             'http://localhost:3000',
             'http://127.0.0.1:3000',
             'http://[::1]/:3000',
+            'https://vytrvalec.uts.zcu.cz',
         ]);
 
         $clientHandler = new SubmissionProducerClientHandler(
