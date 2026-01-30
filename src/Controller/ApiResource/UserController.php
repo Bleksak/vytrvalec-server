@@ -20,6 +20,7 @@ use App\Exceptions\User\NonUniqueEmailException;
 use App\Exceptions\User\PasswordInvalidException;
 use App\Exceptions\User\UserNotFoundException;
 use App\Repository\UserRepository;
+use App\Security\AccessTokenHandler;
 use App\Security\JWTPayload;
 use App\Utils\FeatureFlag;
 use Firebase\JWT\JWT;
@@ -60,6 +61,7 @@ final class UserController extends AbstractController
             $user->id,
             $user->getUserIdentifier(),
             $expirationTime,
+            AccessTokenHandler::VERSION,
         );
 
         /** @var string */

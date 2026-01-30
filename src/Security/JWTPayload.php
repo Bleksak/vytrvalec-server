@@ -10,6 +10,7 @@ final readonly class JWTPayload
         public int $kid,
         public string $user,
         public int $exp,
+        public string $version,
     ) {}
 
     /**
@@ -21,6 +22,7 @@ final readonly class JWTPayload
             'kid' => $this->kid,
             'user' => $this->user,
             'exp' => $this->exp,
+            'version' => $this->version,
         ];
     }
 }

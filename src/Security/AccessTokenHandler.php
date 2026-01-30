@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use Composer\Semver\Semver;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use SensitiveParameter;
@@ -15,6 +16,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
 {
+    public const string VERSION = '1.0.0';
+
     public function __construct(
         private DenormalizerInterface $denormalizer,
         #[SensitiveParameter]
@@ -42,6 +45,10 @@ final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
             $currentTimestamp = new \DateTime()->getTimestamp();
 
             if ($payload->exp < $currentTimestamp) {
+                throw new AuthenticationExpiredException();
+            }
+
+            if (!Semver::satisfies($payload->version, '^' . self::VERSION)) {
                 throw new AuthenticationExpiredException();
             }
 
