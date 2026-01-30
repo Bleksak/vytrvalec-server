@@ -7,6 +7,7 @@ namespace App\Security;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use SensitiveParameter;
+use Symfony\Component\Security\Core\Exception\AuthenticationExpiredException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -20,6 +21,9 @@ final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
         private string $secret,
     ) {}
 
+    /**
+     * @throws BadCredentialsException|AuthenticationExpiredException
+     */
     #[\Override]
     public function getUserBadgeFrom(
         #[SensitiveParameter] string $accessToken,
@@ -34,6 +38,12 @@ final readonly class AccessTokenHandler implements AccessTokenHandlerInterface
                 $payload,
                 JWTPayload::class,
             );
+
+            $currentTimestamp = new \DateTime()->getTimestamp();
+
+            if ($payload->exp < $currentTimestamp) {
+                throw new AuthenticationExpiredException();
+            }
 
             return new UserBadge($payload->user);
         } catch (\Throwable) {
