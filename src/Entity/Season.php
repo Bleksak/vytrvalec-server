@@ -146,6 +146,7 @@ final class Season
             $this->end,
             $this->canDelete(),
             $this->isRunning(),
+            $this->isTest,
             \array_map(
                 static fn(FacultyMapping $mapping): FacultyMappingResponseDto => $mapping->toResponseObject(),
                 $this->facultyMappings->toArray(),

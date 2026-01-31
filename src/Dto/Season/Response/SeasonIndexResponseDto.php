@@ -21,6 +21,7 @@ final readonly class SeasonIndexResponseDto
         public \DateTime $end,
         public bool $canDelete,
         public bool $isRunning,
+        public bool $isTest,
         public array $facultyMapping,
     ) {}
 }

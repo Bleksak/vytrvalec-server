@@ -26,6 +26,7 @@ final readonly class SeasonIndexDto
             $this->season->end,
             $this->canDelete,
             $this->season->isRunning(),
+            $this->season->isTest,
             \array_map(
                 static fn(FacultyMapping $mapping): FacultyMappingResponseDto => $mapping->toResponseObject(),
                 $this->season->facultyMappings->toArray(),
