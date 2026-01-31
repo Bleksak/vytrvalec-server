@@ -9,7 +9,7 @@ use App\Dto\Season\Request\SeasonQueryFilterRequestDto;
 use App\Dto\Season\Response\SeasonIndexResponseDto;
 use App\Dto\Season\SeasonIndexDto;
 use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
-use App\Dto\Submission\Response\SubmissionResponseDto;
+use App\Dto\Submission\Response\AdministrationSubmissionListResponseDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use App\Entity\Submission;
@@ -214,7 +214,8 @@ final class SeasonController extends AbstractController
         );
 
         return $this->json(\array_map(
-            static fn(Submission $submission): SubmissionResponseDto => $submission->toResponseObject(
+            static fn(Submission $submission): AdministrationSubmissionListResponseDto => AdministrationSubmissionListResponseDto::fromSubmission(
+                $submission,
                 $imagePath,
             ),
             \iterator_to_array($results),

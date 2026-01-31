@@ -144,10 +144,11 @@ final class SubmissionRepository extends ServiceEntityRepository
     ): Paginator {
         $queryBuilder = $this
             ->createQueryBuilder('s')
-            ->select('s')
+            ->select('s', 'u', 'f', 'i')
             ->join('s.image', 'i')
             ->where('s.season = :seasonId')
             ->join('s.user', 'u')
+            ->join('u.faculty', 'f')
             ->setParameter('seasonId', $season->id)
             ->setFirstResult(0)
             ->setMaxResults($limit)
@@ -362,5 +363,20 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->groupBy('s.activity')
             ->getQuery()
             ->getResult();
+    }
+
+    public function removeBySeason(Season $season, bool $flush = false): void
+    {
+        $this
+            ->createQueryBuilder('s')
+            ->delete()
+            ->where('s.season = :season')
+            ->setParameter('season', $season)
+            ->getQuery()
+            ->execute();
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

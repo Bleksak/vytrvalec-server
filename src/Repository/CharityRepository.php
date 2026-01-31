@@ -6,7 +6,6 @@ namespace App\Repository;
 
 use App\Entity\Charity;
 use App\Entity\CharityTranslation;
-use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
