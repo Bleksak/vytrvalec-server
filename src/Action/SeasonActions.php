@@ -9,9 +9,12 @@ use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
 use App\Entity\Faculty;
 use App\Entity\FacultyMapping;
 use App\Entity\Season;
+use App\Exceptions\Season\SeasonCannotBeDeletedException;
 use App\Exceptions\SeasonConfiguration\FacultyMappingCycleException;
+use App\Repository\CharityRepository;
 use App\Repository\FacultyMappingRepository;
 use App\Repository\SeasonRepository;
+use App\Repository\SubmissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class SeasonActions
@@ -21,6 +24,8 @@ final readonly class SeasonActions
         private FacultyMappingRepository $facultyMappingRepository,
         private CharityActions $charityAction,
         private EntityManagerInterface $entityManager,
+        private SubmissionRepository $submissionRepository,
+        private CharityRepository $charityRepository,
     ) {}
 
     /**
@@ -110,5 +115,23 @@ final readonly class SeasonActions
         // $this->messageBus->dispatch(new Envelope(new SeasonEndMessage($season->getId()), $stamps));
 
         return $season;
+    }
+
+    public function delete(Season $season): void
+    {
+        if (!$season->canDelete()) {
+            throw new SeasonCannotBeDeletedException();
+        }
+
+        $this->entityManager->beginTransaction();
+
+        if ($season->isTest) {
+            $this->facultyMappingRepository->removeBySeason($season);
+            $this->charityRepository->remove($season->charity);
+        }
+
+        $this->seasonRepository->remove($season, true);
+
+        $this->entityManager->commit();
     }
 }

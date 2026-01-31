@@ -92,4 +92,19 @@ class FacultyMappingRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    public function removeBySeason(Season $season, bool $flush = false): void
+    {
+        $this
+            ->createQueryBuilder('fm')
+            ->delete('fm')
+            ->where('fm.season = :season')
+            ->setParameter('season', $season)
+            ->getQuery()
+            ->execute();
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }

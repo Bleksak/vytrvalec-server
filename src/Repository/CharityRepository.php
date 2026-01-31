@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Charity;
+use App\Entity\CharityTranslation;
+use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -34,6 +36,15 @@ final class CharityRepository extends ServiceEntityRepository
 
     public function remove(Charity $entity, bool $flush = false): void
     {
+        $this
+            ->getEntityManager()
+            ->createQueryBuilder()
+            ->delete(CharityTranslation::class, 'ct')
+            ->where('ct.charity = :charity')
+            ->setParameter('charity', $entity)
+            ->getQuery()
+            ->execute();
+
         $this->getEntityManager()->remove($entity);
 
         if ($flush) {

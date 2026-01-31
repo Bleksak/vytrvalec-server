@@ -95,6 +95,10 @@ final class Season
      */
     public function canDelete(): bool
     {
+        if ($this->isTest) {
+            return true;
+        }
+
         return $this->submissions->isEmpty();
     }
 

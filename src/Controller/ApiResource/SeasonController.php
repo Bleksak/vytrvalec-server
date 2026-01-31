@@ -132,11 +132,7 @@ final class SeasonController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function delete(Season $season): Response
     {
-        if (!$season->canDelete()) {
-            return new Response(status: Response::HTTP_BAD_REQUEST);
-        }
-
-        $this->seasonRepository->remove($season, true);
+        $this->action->delete($season);
 
         return new Response(status: Response::HTTP_OK);
     }
