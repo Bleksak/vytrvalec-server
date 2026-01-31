@@ -90,6 +90,9 @@ final class Season
         return $this;
     }
 
+    /**
+     * WARNING: This method is not safe to use, when the submissions are not already fetched. It will cause another query to the database.
+     */
     public function canDelete(): bool
     {
         return $this->submissions->isEmpty();

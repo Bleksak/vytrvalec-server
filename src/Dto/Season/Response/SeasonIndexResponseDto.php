@@ -12,7 +12,7 @@ final readonly class SeasonIndexResponseDto
     /**
      * TODO(@bleksak): when possible, change to list<FacultyMappingResponseDto>
      *
-     * @param array<FacultyMappingResponseDto> $facultyMapping
+     * @param array<int, FacultyMappingResponseDto> $facultyMapping
      */
     public function __construct(
         public int $id,
