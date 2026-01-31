@@ -40,8 +40,6 @@ final class ResultsFindOutliersCommand
             $io->writeln('Aktivita ID: ' . $outlier->activityId);
 
             foreach ($outlier->results as $result) {
-                \assert(\is_int($result->user));
-
                 $user = $this->userRepository->find($result->user);
 
                 if ($user === null) {

@@ -103,11 +103,6 @@ final readonly class SeasonResultCalculator
 
         foreach ($topThree as $outlier) {
             foreach ($outlier->results as $outlierResult) {
-                // TODO(@bleksak): Ten if statement smazat po migraci dat na produkci
-                if (!\is_int($outlierResult->user)) {
-                    continue;
-                }
-
                 $users[$outlierResult->user] = $outlierResult->user;
             }
         }

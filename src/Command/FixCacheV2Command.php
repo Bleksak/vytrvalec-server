@@ -73,7 +73,6 @@ final readonly class FixCacheV2Command
 
             foreach ($data->outliers as $outlier) {
                 foreach ($outlier->results as $outlierResult) {
-                    \assert(\is_int($outlierResult->user));
                     $users[$outlierResult->user] = $outlierResult->user;
                 }
             }
