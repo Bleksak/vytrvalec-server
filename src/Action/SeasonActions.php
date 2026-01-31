@@ -127,6 +127,7 @@ final readonly class SeasonActions
 
         if ($season->isTest) {
             $this->facultyMappingRepository->removeBySeason($season);
+            $this->submissionRepository->removeBySeason($season);
             $this->charityRepository->remove($season->charity);
         }
 
