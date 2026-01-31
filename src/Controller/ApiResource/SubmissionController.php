@@ -14,6 +14,7 @@ use App\Dto\Submission\SubmissionStateDto;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
+use App\Exceptions\User\UserBannedException;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Services\ImagePath;
@@ -84,6 +85,10 @@ final class SubmissionController extends AbstractController
         SeasonRepository $seasonRepository,
         #[MapRequestPayload] SubmissionCreateDto $submissionCreateDto,
     ): Response {
+        if ($user->banned) {
+            throw new UserBannedException();
+        }
+
         $season = $seasonRepository->findCurrentSeason();
 
         if ($season === null) {
