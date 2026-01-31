@@ -41,6 +41,10 @@ final class Season
     #[ORM\JoinColumn(nullable: false)]
     public Charity $charity;
 
+    #[OA\Property]
+    #[ORM\Column(type: Types::BOOLEAN)]
+    public bool $isTest = false;
+
     /**
      * @var Collection<int, Submission>
      */
