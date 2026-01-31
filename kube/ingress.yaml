@@ -64,9 +64,6 @@ data:
             proxy_busy_buffers_size 512k;
             proxy_buffers 4 512k;
             proxy_buffer_size 256k;
-
-            
-            error_page 502 = @static;
         }
 
         location /ws {
@@ -81,7 +78,7 @@ data:
         location ~ ^/api/ {
             try_files $uri /index.php$is_args$args;
         }
-        
+
         location /uploads/ {
             try_files $uri $uri/ /index.php$is_args$args;
         }
@@ -100,11 +97,32 @@ data:
         location ~ \.php$ {
             return 404;
         }
-        
+
         location @static {
           try_files $uri /index.html =502;
         }
 
         error_log /var/log/nginx/project_error.log warn;
         access_log /var/log/nginx/project_access.log;
+
+        location = /404.html {
+            internal;
+        }
+
+        location = /500.html {
+            internal;
+        }
+
+        location = /502.html {
+            internal;
+        }
+
+        location = /503.html {
+            internal;
+        }
+
+        error_page 502 = /502.html;
+        error_page 503 = /503.html;
+        error_page 500 = /500.html;
+        error_page 404 = /404.html;
     }
