@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="cs">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chyba serveru | Měsíční Vytrvalec</title>
+    <meta name="description" content="Server je momentálne nedostupný. Zkuste to prosím později.">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --background: oklch(0.18 0.02 250);
+            --foreground: oklch(0.98 0 0);
+            --primary: oklch(0.65 0.18 145);
+            --primary-foreground: oklch(0.15 0 0);
+            --secondary: oklch(0.28 0.03 250);
+            --muted-foreground: oklch(0.65 0.02 250);
+            --border: oklch(0.32 0.03 250);
+            --radius: 0.625rem;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .page {
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .track-lines {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .track-line {
+            position: absolute;
+            left: 0;
+            height: 1px;
+            width: 100%;
+            background-color: var(--border);
+        }
+
+        .particles {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8rem;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background-color: var(--primary);
+            opacity: 0.2;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: translateY(-20px) scale(1.1);
+                opacity: 0.6;
+            }
+        }
+
+        .corner {
+            position: absolute;
+            width: 4rem;
+            height: 4rem;
+            border-color: var(--primary);
+            border-style: solid;
+            border-width: 0;
+            opacity: 0.2;
+        }
+
+        .corner-tl {
+            top: 1rem;
+            left: 1rem;
+            border-top-width: 2px;
+            border-left-width: 2px;
+            border-top-left-radius: 0.5rem;
+        }
+
+        .corner-tr {
+            top: 1rem;
+            right: 1rem;
+            border-top-width: 2px;
+            border-right-width: 2px;
+            border-top-right-radius: 0.5rem;
+        }
+
+        .corner-bl {
+            bottom: 1rem;
+            left: 1rem;
+            border-bottom-width: 2px;
+            border-left-width: 2px;
+            border-bottom-left-radius: 0.5rem;
+        }
+
+        .corner-br {
+            bottom: 1rem;
+            right: 1rem;
+            border-bottom-width: 2px;
+            border-right-width: 2px;
+            border-bottom-right-radius: 0.5rem;
+        }
+
+        .gradient-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 0%, var(--background) 70%);
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .runner-icon {
+            width: 8rem;
+            height: 8rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            animation: breathe 2s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.04);
+            }
+        }
+
+        .runner-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .error-code-wrapper {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .error-code {
+            font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+            font-size: clamp(4rem, 15vw, 8rem);
+            font-weight: 700;
+            letter-spacing: -0.05em;
+            color: var(--foreground);
+        }
+
+        .error-code .accent {
+            color: var(--primary);
+        }
+
+        .error-code-underline {
+            position: absolute;
+            bottom: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 4px;
+            width: 6rem;
+            border-radius: 9999px;
+            background-color: var(--primary);
+        }
+
+        .error-title {
+            font-size: clamp(1.5rem, 4vw, 1.875rem);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .error-message {
+            max-width: 28rem;
+            color: var(--muted-foreground);
+            margin-bottom: 2rem;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 640px) {
+            .buttons {
+                flex-direction: row;
+            }
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--foreground);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--secondary);
+        }
+
+        .footer {
+            margin-top: 4rem;
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <div class="track-lines">
+            <div class="track-line" style="top: 15%; opacity: 0.3;"></div>
+            <div class="track-line" style="top: 29%; opacity: 0.26;"></div>
+            <div class="track-line" style="top: 43%; opacity: 0.22;"></div>
+            <div class="track-line" style="top: 57%; opacity: 0.18;"></div>
+            <div class="track-line" style="top: 71%; opacity: 0.14;"></div>
+            <div class="track-line" style="top: 85%; opacity: 0.1;"></div>
+
+            <div class="particles">
+                <div class="particle" style="width: 8px; height: 8px; left: 10%; bottom: 20%; animation-delay: 0s;">
+                </div>
+                <div class="particle" style="width: 6px; height: 6px; left: 25%; bottom: 40%; animation-delay: 0.5s;">
+                </div>
+                <div class="particle" style="width: 10px; height: 10px; left: 40%; bottom: 15%; animation-delay: 1s;">
+                </div>
+                <div class="particle" style="width: 5px; height: 5px; left: 55%; bottom: 60%; animation-delay: 1.5s;">
+                </div>
+                <div class="particle" style="width: 7px; height: 7px; left: 70%; bottom: 30%; animation-delay: 0.3s;">
+                </div>
+                <div class="particle" style="width: 9px; height: 9px; left: 85%; bottom: 50%; animation-delay: 0.8s;">
+                </div>
+                <div class="particle" style="width: 6px; height: 6px; left: 15%; bottom: 70%; animation-delay: 1.2s;">
+                </div>
+                <div class="particle" style="width: 8px; height: 8px; left: 60%; bottom: 80%; animation-delay: 0.2s;">
+                </div>
+            </div>
+
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+
+            <div class="gradient-overlay"></div>
+        </div>
+
+        <div class="content">
+            <div class="runner-icon">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"
+                        style="opacity: 0.3;" />
+
+                    <g class="pulse">
+                        <circle cx="50" cy="28" r="8" fill="currentColor" />
+
+                        <path d="M50 36 L48 52 L52 52 Z" fill="currentColor" />
+
+                        <path d="M48 40 L38 55 L36 60" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+
+                        <path d="M52 40 L60 50 L58 58" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+
+                        <path d="M48 52 L42 68 L40 80" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+
+                        <path d="M52 52 L58 65 L62 78" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+
+                        <circle cx="62" cy="30" r="2" fill="currentColor" style="opacity: 0.6;" />
+                        <circle cx="66" cy="36" r="1.5" fill="currentColor" style="opacity: 0.4;" />
+                    </g>
+
+                    <line x1="20" y1="85" x2="80" y2="85" stroke="currentColor" stroke-width="2" stroke-dasharray="8 4"
+                        style="opacity: 0.4;" />
+                </svg>
+            </div>
+
+            <div class="error-code-wrapper">
+                <h1 class="error-code">4<span class="accent">0</span>4</h1>
+                <div class="error-code-underline"></div>
+            </div>
+
+            <h2 class="error-title">Chyba serveru</h2>
+            <p class="error-message">
+                Náš server potřebuje pauzu na regeneraci. I ti nejlepší vytrvalci musí občas odpočívat. Zkuste prosím
+                akci opakovat později.
+            </p>
+
+            <div class="buttons">
+                <button class="btn btn-primary" onclick="window.location.reload()">Zkusit znovu</button>
+                <a href="https://vytrvalec.uts.zcu.cz" class="btn btn-outline">Zpět na hlavní stránku</a>
+            </div>
+
+            <div class="footer">
+                <p>Měsíční Vytrvalec - Ústav tělesné výchovy a sportu ZČU</p>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
