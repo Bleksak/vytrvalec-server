@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Action;
 
+use App\Algorithm\Graph;
 use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
 use App\Entity\Faculty;
 use App\Entity\FacultyMapping;
 use App\Entity\Season;
+use App\Exceptions\SeasonConfiguration\FacultyMappingCycleException;
 use App\Repository\FacultyMappingRepository;
 use App\Repository\SeasonRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -49,7 +51,17 @@ final readonly class SeasonActions
         $season = new Season($dto->season->start, $dto->season->end, $charity);
         $this->seasonRepository->save($season, true);
 
+        $graph = [];
+        $nodes = [];
+
         foreach ($dto->facultyMapping as $mapping) {
+            if ($mapping->parent !== null) {
+                $graph[$mapping->faculty][] = $mapping->parent;
+                $nodes[$mapping->parent] = true;
+            }
+
+            $nodes[$mapping->faculty] = true;
+
             $faculty = $this->entityManager->getReference(
                 Faculty::class,
                 $mapping->faculty,
@@ -68,6 +80,12 @@ final readonly class SeasonActions
 
             $mapping = new FacultyMapping($season, $faculty, $parent);
             $this->facultyMappingRepository->save($mapping, false);
+        }
+
+        if (Graph::hasCycle(\array_keys($nodes), $graph)) {
+            $this->entityManager->rollback();
+
+            throw new FacultyMappingCycleException();
         }
 
         $this->entityManager->flush();
