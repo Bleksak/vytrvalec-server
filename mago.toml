@@ -47,6 +47,7 @@ assert-description = { enabled = false }
 trait-name = { psr = true }
 interface-name = { psr = true }
 class-name = { psr = true }
+prefer-early-continue = { enabled = true, max_allowed_statements = 1 }
 
 ambiguous-function-call = { enabled = true }
 require-namespace = { enabled = true }
