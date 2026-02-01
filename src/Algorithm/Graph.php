@@ -48,7 +48,6 @@ final class Graph
 
         while ($stack !== []) {
             $node = \end($stack);
-            \assert(\is_array($stack));
 
             if ($labels[$node] === self::LABEL_WHITE) {
                 $labels[$node] = self::LABEL_GRAY;
