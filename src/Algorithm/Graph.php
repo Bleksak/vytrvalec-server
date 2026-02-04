@@ -37,7 +37,7 @@ final class Graph
 
     /**
      * @param array<int, list<int>> $graph
-     * @param array<int, self::LABEL_*> &$labels
+     * @param array<int, self::LABEL_*> $labels
      */
     private static function dfsCheckCycles(
         array $graph,
