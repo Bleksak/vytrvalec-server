@@ -58,12 +58,19 @@ final readonly class WebsocketSubmissionProducerCommand
         $server->expose(new InternetAddress('0.0.0.0', $this->port));
         $server->expose(new InternetAddress('::', $this->port));
 
+        echo \sprintf("Listening on port: %d\n", $this->port);
+
         $errorHandler = new DefaultErrorHandler();
 
         $acceptor = new AllowOriginAcceptor([
             'http://localhost:3000',
             'http://127.0.0.1:3000',
             'http://[::1]:3000',
+            'https://localhost:3000',
+            'https://127.0.0.1:3000',
+            'https://[::1]:3000',
+            'http://vytrvalec.local',
+            'https://vytrvalec.local',
             'https://vytrvalec.uts.zcu.cz',
         ]);
 
