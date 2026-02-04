@@ -74,4 +74,4 @@ check-property-initialization = false # NOTE: We cannot use this until the issue
 check-use-statements = true
 
 class-initializers = ["__construct", "setContainer"]
-plugins = ["standard", "std", "php-stdlib"]
+plugins = ["standard", "std", "php-stdlib", "psr-container"]
