@@ -48,6 +48,7 @@ trait-name = { psr = true }
 interface-name = { psr = true }
 class-name = { psr = true }
 prefer-early-continue = { enabled = true, max_allowed_statements = 1 }
+no-isset = { enabled = false }
 
 ambiguous-function-call = { enabled = true }
 require-namespace = { enabled = true }

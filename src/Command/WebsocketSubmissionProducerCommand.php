@@ -47,7 +47,7 @@ final readonly class WebsocketSubmissionProducerCommand
         $port = (int) $port;
 
         \assert($port >= 0, 'Port must be >= 0');
-        \assert($port <= 65535, 'Port must be <= 65535');
+        \assert($port <= 65_535, 'Port must be <= 65535');
 
         $this->port = $port;
     }
