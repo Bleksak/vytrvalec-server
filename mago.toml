@@ -72,6 +72,8 @@ register-super-globals = true
 trust-existence-checks = true
 check-property-initialization = false # NOTE: We cannot use this until the issues with it are fixed or more configuration is added
 check-use-statements = true
+enforce-class-finality = true
+require-api-or-internal = true
 
 class-initializers = ["__construct", "setContainer"]
 plugins = ["standard", "std", "php-stdlib", "psr-container"]

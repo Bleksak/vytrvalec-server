@@ -7,6 +7,9 @@ namespace App\CustomLogic;
 use App\Dto\ExtraPointsResultDto;
 use App\Entity\Season;
 
+/**
+ * @api
+ */
 interface ExtraPointsInterface
 {
     public static function getUniqueName(): string;

@@ -12,7 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<FacultyMapping>
  */
-class FacultyMappingRepository extends ServiceEntityRepository
+final class FacultyMappingRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

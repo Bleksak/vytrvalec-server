@@ -9,7 +9,7 @@ use App\Repository\FacultyMappingRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FacultyMappingRepository::class)]
-class FacultyMapping
+final class FacultyMapping
 {
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'facultyMappings')]
