@@ -25,7 +25,5 @@ final class AccountDeleteFormType extends AbstractType
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-    }
+    public function configureOptions(OptionsResolver $resolver): void {}
 }
