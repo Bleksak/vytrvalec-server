@@ -51,7 +51,9 @@ final class SubmissionCreateFormType extends AbstractType
             'choices' => $activities,
             'label' => 'submission.edit.activity',
             'choice_label' =>
-                fn(Activity $faculty): ?string => $faculty->translations->get($this->localeSwitcher->getLocale())?->name,
+                fn(Activity $faculty): ?string => $faculty->translations->get(
+                    $this->localeSwitcher->getLocale(),
+                )?->name,
         ]);
 
         $builder->add('submit', SubmitType::class, [

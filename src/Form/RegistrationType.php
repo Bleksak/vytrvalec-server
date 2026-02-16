@@ -40,7 +40,9 @@ final class RegistrationType extends AbstractType
             'choices' => $faculties,
             'label' => 'registration.faculty',
             'choice_label' =>
-                fn(Faculty $faculty): ?string => $faculty->translations->get($this->localeSwitcher->getLocale())?->name,
+                fn(Faculty $faculty): ?string => $faculty->translations->get(
+                    $this->localeSwitcher->getLocale(),
+                )?->name,
         ]);
 
         $builder->add('email', EmailType::class, [
