@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Action;
 
-use App\Controller\ForgottenPasswordController;
 use App\Dto\EmailingChangeDto;
 use App\Dto\PasswordChangeDto;
 use App\Dto\User\ForgottenPasswordResetDto;
@@ -21,10 +20,10 @@ use App\Notifications\EmailTemplate\ForgottenPasswordEmailTemplate;
 use App\Notifications\EmailTemplate\RegisterEmailTemplate;
 use App\Repository\FacultyRepository;
 use App\Repository\UserRepository;
+use App\Services\ClientUrlBuilderFactory;
 use App\Services\VytrvalecMailer;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final readonly class UserActions
 {
@@ -33,7 +32,7 @@ final readonly class UserActions
         private FacultyRepository $facultyRepository,
         private UserPasswordHasherInterface $hasher,
         private VytrvalecMailer $mailer,
-        private UrlGeneratorInterface $urlGenerator,
+        private ClientUrlBuilderFactory $clientUrlBuilderFactory,
     ) {}
 
     /**
@@ -42,16 +41,6 @@ final readonly class UserActions
      */
     public function create(UserRegistrationDto $dto): void
     {
-        \assert(
-            $dto->email !== null
-            && $dto->password !== null
-            && $dto->firstName !== null
-            && $dto->lastName !== null
-            && $dto->faculty !== null
-            && $dto->anonymize !== null
-            && $dto->gdpr !== null,
-        );
-
         $faculty = $this->facultyRepository->find($dto->faculty);
 
         if ($faculty === null) {
@@ -159,10 +148,14 @@ final readonly class UserActions
 
         $this->userRepository->save($user, true);
 
+        $forgottenPasswordLink = $this->clientUrlBuilderFactory
+            ->builder()
+            ->path('/reset-password')
+            ->argument($userPasswordResetToken)
+            ->build();
+
         $mail = new ForgottenPasswordEmailTemplate();
-        $mail->setContext('password_reset_link', $this->urlGenerator->generate(ForgottenPasswordController::ROUTE, [
-            'passwordResetToken' => $userPasswordResetToken,
-        ]));
+        $mail->setContext('password_reset_link', $forgottenPasswordLink);
 
         $this->mailer->send($user, $mail, forceSend: true);
     }

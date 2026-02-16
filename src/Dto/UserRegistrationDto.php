@@ -12,7 +12,7 @@ final class UserRegistrationDto
     #[OA\Property]
     #[Assert\NotBlank(message: 'blank', allowNull: false)]
     #[Assert\Email(message: 'invalid')]
-    public ?string $email = '';
+    public string $email = '';
 
     #[OA\Property]
     #[Assert\NotBlank(message: 'blank', allowNull: false)]
@@ -20,15 +20,15 @@ final class UserRegistrationDto
         message: 'weak',
         minScore: Assert\PasswordStrength::STRENGTH_WEAK,
     )]
-    public ?string $password = '';
+    public string $password = '';
 
     #[OA\Property]
     #[Assert\NotBlank(message: 'blank', allowNull: false)]
-    public ?string $firstName = '';
+    public string $firstName = '';
 
     #[OA\Property]
     #[Assert\NotBlank(message: 'blank', allowNull: false)]
-    public ?string $lastName = '';
+    public string $lastName = '';
 
     #[OA\Property]
     #[Assert\NotBlank(message: 'invalid', allowNull: false)]
@@ -39,7 +39,7 @@ final class UserRegistrationDto
     #[OA\Property]
     #[Assert\NotNull(message: 'blank')]
     #[Assert\Type(type: 'bool', message: 'invalid')]
-    public ?bool $anonymize = false;
+    public bool $anonymize = false;
 
     #[OA\Property]
     #[Assert\NotNull(message: 'blank')]

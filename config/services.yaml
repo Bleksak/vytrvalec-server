@@ -32,6 +32,10 @@ services:
         arguments:
             $appBase: '%app_base%'
 
+    App\Services\ClientUrlBuilderFactory:
+        arguments:
+            $clientUrl: '%client_url%'
+
     App\Security\AccessTokenHandler:
         arguments:
             $secret: '%jwt_secret%'
