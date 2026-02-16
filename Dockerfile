@@ -7,5 +7,6 @@ COPY . .
 
 RUN npm install
 RUN composer install --no-interaction && composer dump -o
+RUN php bin/console asset-map:compile
 
 EXPOSE 1337
