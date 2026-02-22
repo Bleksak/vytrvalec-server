@@ -51,6 +51,7 @@ prefer-early-continue = { enabled = true, max_allowed_statements = 1 }
 no-isset = { enabled = false }
 file-name = { enabled = true }
 single-class-per-file = { enabled = true }
+prefer-first-class-callable = { check-functions = true, enabled = true }
 
 ambiguous-function-call = { enabled = true }
 require-namespace = { enabled = true }
