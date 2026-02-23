@@ -6,7 +6,7 @@ namespace App\Dto;
 
 /**
  * @import-type OutlierResultDtoType from OutlierResult
- * @type OutlierActivityDtoType = array{activityId: int, results: list<OutlierResultDtoType>}
+ * @type OutlierActivityDtoType = array{activityId: int, results: array<int, OutlierResultDtoType>}
  */
 final class OutlierActivity
 {
@@ -43,11 +43,15 @@ final class OutlierActivity
         ));
     }
 
+    /**
+     * @return OutlierActivityDtoType
+     */
     public function toArray(): array
     {
         return [
             'activityId' => $this->activityId,
             'results' => \array_map(
+                /** @return OutlierResultDtoType */
                 static fn(OutlierResult $result): array => $result->toArray(),
                 $this->results,
             ),

@@ -223,6 +223,7 @@ final class SubmissionRepository extends ServiceEntityRepository
             ->getResult();
 
         return \array_map(
+            /** @param array{distance: int, faculty: int, activity: int} $row */
             static fn(array $row): WeeklySubmissionSum => new WeeklySubmissionSum(
                 (int) $row['distance'],
                 $row['faculty'],

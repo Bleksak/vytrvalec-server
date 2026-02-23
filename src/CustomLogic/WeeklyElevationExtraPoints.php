@@ -66,6 +66,7 @@ final readonly class WeeklyElevationExtraPoints implements ExtraPointsInterface
         $result = $query->executeQuery()->fetchAllAssociative();
 
         return \array_map(
+            /** @param array{user_id: int, activity_id: int, faculty_id: int, value: string} $row */
             static fn(array $row): ExtraPointsResultDto => new ExtraPointsResultDto(
                 $row['user_id'],
                 $row['activity_id'],

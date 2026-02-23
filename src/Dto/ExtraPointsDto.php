@@ -41,6 +41,9 @@ final class ExtraPointsDto
         );
     }
 
+    /**
+     * @return ExtraPointsDtoType
+     */
     public function toArray(): array
     {
         return [

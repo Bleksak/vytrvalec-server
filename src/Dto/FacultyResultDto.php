@@ -36,6 +36,9 @@ final class FacultyResultDto
         return new self($data['faculty'], $data['distance']);
     }
 
+    /**
+     * @return FacultyResultDtoType
+     */
     public function toArray(): array
     {
         return [

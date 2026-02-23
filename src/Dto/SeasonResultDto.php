@@ -10,8 +10,7 @@ namespace App\Dto;
  * @import-type WeeklyResultDtoType from WeeklyResultDto
  * @import-type OutlierActivityDtoType from OutlierActivity
  *
- * TODO(@bleksak): tady odstranit null na users
- * @type SeasonResultDtoType = array{results: array<int, WeeklyResultDtoType>, outliers: list<OutlierActivityDtoType>, users: null|list<int>}
+ * @type SeasonResultDtoType = array{results: array<int, WeeklyResultDtoType>, outliers: array<int, OutlierActivityDtoType>, users: list<int>}
  */
 final class SeasonResultDto
 {
@@ -42,24 +41,27 @@ final class SeasonResultDto
             }, $data['results']),
 
             \array_map(OutlierActivity::fromCache(...), $data['outliers']),
-            $data['users'] ?? [],
+            $data['users'],
         );
     }
 
+    /**
+     * @return SeasonResultDtoType
+     */
     public function toArray(): array
     {
-        $results = [];
-
-        foreach ($this->results as $idx => $result) {
-            $results[$idx] = $result->toArray();
-        }
-
         return [
-            'results' => $results,
+            'results' => \array_map(
+                /** @return WeeklyResultDtoType */
+                static fn(WeeklyResultDto $weeklyResult): array => $weeklyResult->toArray(),
+                $this->results,
+            ),
             'outliers' => \array_map(
+                /** @return OutlierActivityDtoType */
                 static fn(OutlierActivity $outlier): array => $outlier->toArray(),
                 $this->outliers,
             ),
+            'users' => $this->users,
         ];
     }
 }

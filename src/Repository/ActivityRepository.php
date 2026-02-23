@@ -82,6 +82,7 @@ final class ActivityRepository extends ServiceEntityRepository
         }
 
         $activities = \array_map(
+            /** @param array{activity: int, distance: int} $row */
             static fn(array $row): int => $row['activity'],
             $activityListWithDistances,
         );

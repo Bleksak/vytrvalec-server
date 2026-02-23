@@ -61,6 +61,9 @@ final class ActivityResultDto
         return $result;
     }
 
+    /**
+     * @return ActivityResultDtoType
+     */
     public function toArray(): array
     {
         $results = [];
@@ -72,6 +75,7 @@ final class ActivityResultDto
             'results' => $results,
             'activity' => $this->activity,
             'extras' => \array_map(
+                /** @return ExtraPointsDtoType */
                 static fn(ExtraPointsDto $extraPoints): array => $extraPoints->toArray(),
                 $this->extras,
             ),

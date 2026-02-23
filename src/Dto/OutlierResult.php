@@ -23,6 +23,9 @@ final class OutlierResult
         return new self($data['user'], $data['facultyId'], $data['value']);
     }
 
+    /**
+     * @return OutlierResultDtoType
+     */
     public function toArray(): array
     {
         return [

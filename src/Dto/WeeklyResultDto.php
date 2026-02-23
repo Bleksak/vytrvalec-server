@@ -51,16 +51,17 @@ final class WeeklyResultDto
         return new self($data['week'], $activities);
     }
 
+    /**
+     * @return WeeklyResultDtoType
+     */
     public function toArray(): array
     {
-        $activities = [];
-
-        foreach ($this->activities as $idx => $activity) {
-            $activities[$idx] = $activity->toArray();
-        }
-
         return [
-            'activities' => $activities,
+            'activities' => \array_map(
+                /** @return ActivityResultDtoType */
+                static fn(ActivityResultDto $activityResultDto): array => $activityResultDto->toArray(),
+                $this->activities,
+            ),
             'week' => $this->week,
         ];
     }

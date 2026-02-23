@@ -51,6 +51,9 @@ final readonly class AnonymizedUser
         );
     }
 
+    /**
+     * @return AnonymizedUserDtoType
+     */
     public function toArray(): array
     {
         return [
