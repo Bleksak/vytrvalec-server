@@ -29,7 +29,7 @@ framework:
         email_validation_mode: strict
 
     assets:
-        base_url: '%env(APP_URL)%'
+        base_url: '%env(APP_BASE_URL)%'
 
 when@test:
     framework:
