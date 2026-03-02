@@ -75,6 +75,10 @@ data:
             proxy_set_header Host $host;
         }
 
+        location /assets/ {
+            try_files $uri =404;
+        }
+
         location ~ ^/api/ {
             try_files $uri /index.php$is_args$args;
         }
