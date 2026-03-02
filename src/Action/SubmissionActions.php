@@ -117,11 +117,6 @@ final readonly class SubmissionActions
 
         $this->handleCacheUpdate($submission, $dto);
 
-        if ($dto->state && (!$submission->reviewed || !$submission->accepted)) {
-            // noop when already accepted, otherwise profile cache would stack
-            $this->profileCacheRepository->addCache($submission);
-        }
-
         // TODO(@bleksak): Ted mi doslo, ze tady se da frajerovi zaspamovat email kdyby kutak furt schvaloval a zamital aktivitu :D
         if (!$dto->state) {
             // if ($submission->getUser()->getToken() !== null) {
