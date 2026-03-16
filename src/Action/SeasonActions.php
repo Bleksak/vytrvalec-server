@@ -53,7 +53,7 @@ final readonly class SeasonActions
             ];
         }
 
-        $season = new Season($dto->season->start, $dto->season->end, $charity);
+        $season = new Season($dto->season->start, $dto->season->end, $charity, $dto->season->isTest);
         $this->seasonRepository->save($season, true);
 
         $graph = [];

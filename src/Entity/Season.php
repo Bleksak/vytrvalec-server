@@ -65,11 +65,13 @@ final class Season
         \DateTime $start,
         \DateTime $end,
         Charity $charity,
+        bool $isTest,
     ) {
         $this->submissions = new ArrayCollection();
         $this->start = $start;
         $this->end = $end;
         $this->charity = $charity;
+        $this->isTest = $isTest;
         $this->facultyMappings = new ArrayCollection();
     }
 
