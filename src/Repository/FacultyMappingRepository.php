@@ -97,7 +97,7 @@ final class FacultyMappingRepository extends ServiceEntityRepository
     {
         $this
             ->createQueryBuilder('fm')
-            ->delete('fm')
+            ->delete()
             ->where('fm.season = :season')
             ->setParameter('season', $season)
             ->getQuery()
