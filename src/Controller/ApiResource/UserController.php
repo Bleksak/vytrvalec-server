@@ -56,7 +56,7 @@ final class UserController extends AbstractController
             return new Response(status: 404);
         }
 
-        $expirationTime = \time() + 30 * 24 * 60 * 60; // 30 days expiration
+        $expirationTime = \time() + (30 * 24 * 60 * 60); // 30 days expiration
 
         $payload = new JWTPayload(
             $user->id,
