@@ -53,7 +53,8 @@ final class SeasonController extends AbstractController
     #[Route('/api/season', name: 'api_season_create', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
     public function create(
-        #[MapRequestPayload] SeasonConfigurationCreateDto $dto,
+        #[MapRequestPayload]
+        SeasonConfigurationCreateDto $dto,
         ImagePath $imagePath,
     ): Response {
         $result = $this->action->create($dto);
@@ -205,7 +206,8 @@ final class SeasonController extends AbstractController
         ImagePath $imagePath,
         SubmissionRepository $submissionRepository,
         Season $season,
-        #[MapQueryString] SeasonQueryFilterRequestDto $queryFilter,
+        #[MapQueryString]
+        SeasonQueryFilterRequestDto $queryFilter,
     ): Response {
         $results = $submissionRepository->findBySeasonAndFilter(
             $season,

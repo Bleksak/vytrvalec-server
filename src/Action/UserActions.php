@@ -162,7 +162,8 @@ final readonly class UserActions
 
     public function forgottenPasswordReset(
         User $user,
-        #[\SensitiveParameter] ForgottenPasswordResetDto|PasswordResetDto $dto,
+        #[\SensitiveParameter]
+        ForgottenPasswordResetDto|PasswordResetDto $dto,
     ): void {
         $user->setPassword($this->hasher->hashPassword($user, $dto->password));
         $user->setPasswordResetToken(null);
