@@ -177,7 +177,7 @@ final class UserController extends AbstractController
     ): Response {
         try {
             $this->action->forgottenPasswordRequest($dto->email);
-        } finally {
+        } catch (UserNotFoundException) {
         }
 
         return new Response(status: Response::HTTP_OK);
