@@ -3,7 +3,7 @@
 php-version = "8.5.0"
 
 [source]
-paths = ["src"]
+paths = ["src", "bin", "tests"]
 includes = ["vendor", "var"]
 excludes = [
   "vendor/nikic/fast-route/test",
