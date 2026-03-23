@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Local;
 
 use App\Repository\SeasonRepository;
@@ -7,7 +9,10 @@ use App\Repository\SubmissionRepository;
 use App\Services\SubmissionImageValidityCheckerService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class LocalOCRTest extends KernelTestCase
+use function assert;
+use function printf;
+
+final class LocalOCRTest extends KernelTestCase
 {
     public function testImageValidityChecker(): void
     {
@@ -29,10 +34,8 @@ class LocalOCRTest extends KernelTestCase
                 continue;
             }
 
-            if (
-                $submission->image->getPath()
-                !== '/uploads/660afe10ac0a99.65032747.jpg'
-            ) {
+            $path = $submission->image?->getPath();
+            if ($path !== '/uploads/660afe10ac0a99.65032747.jpg') {
                 continue;
             }
 
@@ -42,7 +45,7 @@ class LocalOCRTest extends KernelTestCase
                 continue;
             }
 
-            printf('image: %s%s', $submission->image->getPath(), \PHP_EOL);
+            printf('image: %s%s', $path, \PHP_EOL);
 
             printf(
                 'Features->date: %s vs real: %s%s',
@@ -50,9 +53,11 @@ class LocalOCRTest extends KernelTestCase
                 $submission->date->format('d-m-Y'),
                 \PHP_EOL,
             );
+            $distance = $features->distance;
+            assert($distance !== null, 'Distance should not be null');
             printf(
                 'Features->distance: %d m vs real: %d m%s',
-                ($features->distance * 1000) ?? 'null',
+                $distance * 1000,
                 $submission->distance,
                 \PHP_EOL,
             );
