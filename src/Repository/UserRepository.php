@@ -198,7 +198,7 @@ final class UserRepository extends ServiceEntityRepository implements
             $qb->expr()->like('LOWER(u.lastName)', ':search'),
             $qb->expr()->like('LOWER(u.email)', ':search'),
             $qb->expr()->like('LOWER(f.shortcut)', ':search'),
-        ))->setParameter('search', '%' . mb_strtolower($search) . '%');
+        ))->setParameter('search', '%' . \mb_strtolower($search) . '%');
     }
 
     public function findOneByEmail(string $email): ?User

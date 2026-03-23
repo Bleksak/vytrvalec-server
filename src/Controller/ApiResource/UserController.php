@@ -252,7 +252,7 @@ final class UserController extends AbstractController
     {
         $page = \max(1, (int) $request->query->get('page', 1));
         $limit = \min(100, \max(1, (int) $request->query->get('limit', 25)));
-        $search = (string) $request->query->get('search', '');
+        $search = $request->query->getString('search');
 
         $users = $this->userRepository->findAllNotDeletedPaginated(
             $page,
