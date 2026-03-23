@@ -250,33 +250,26 @@ final class UserController extends AbstractController
         path: '/api/user',
         name: 'api_user_list',
         methods: ['GET'],
-        // documentation: 'Retrieve all <code>User</code> entities',
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Successfully retrieved all User entities',
-        //         'response' => [
-        //             [
-        //                 'id' => 'integer',
-        //                 'email' => 'string',
-        //                 'roles' => ['ROLE_USER', 'ROLE_STAFF'],
-        //                 'faculty' => [
-        //                     'id' => 'integer',
-        //                     'name' => 'string',
-        //                     'shortcut' => 'string',
-        //                 ]
-        //             ]
-        //         ]
-        //     ],
-        //     Response::HTTP_UNAUTHORIZED => ['message' => 'Unauthorized access'],
-        // ],
     )]
     #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
-    public function userList(): Response
+    public function userList(Request $request): Response
     {
-        return $this->json(\array_map(
-            static fn(User $user): UserResponseDto => $user->toResponseObject(),
-            $this->userRepository->findAllNotDeleted(),
-        ));
+        $page = \max(1, (int) $request->query->get('page', 1));
+        $limit = \min(100, \max(1, (int) $request->query->get('limit', 25)));
+        $search = (string) $request->query->get('search', '');
+
+        $users = $this->userRepository->findAllNotDeletedPaginated($page, $limit, $search);
+        $total = $this->userRepository->countAllNotDeleted($search);
+
+        return $this->json([
+            'data' => \array_map(
+                static fn(User $user): UserResponseDto => $user->toResponseObject(),
+                $users,
+            ),
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit,
+        ]);
     }
 
     #[Route(
