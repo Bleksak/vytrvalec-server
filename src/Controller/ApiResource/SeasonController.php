@@ -9,6 +9,7 @@ use App\Dto\Season\Request\SeasonQueryFilterRequestDto;
 use App\Dto\Season\Response\SeasonIndexResponseDto;
 use App\Dto\Season\SeasonIndexDto;
 use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
+use App\Dto\SeasonConfiguration\SeasonConfigurationUpdateDto;
 use App\Dto\Submission\Response\AdministrationSubmissionListResponseDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
@@ -95,6 +96,50 @@ final class SeasonController extends AbstractController
         }
 
         return $this->json($season->toResponseObject());
+    }
+
+    #[OA\Patch(
+        description: 'Update a Season',
+        parameters: [
+            new OA\Parameter(
+                name: 'season',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer', example: 1),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Season successfully updated',
+            ),
+            new OA\Response(
+                response: Response::HTTP_BAD_REQUEST,
+                description: 'Invalid input.',
+            ),
+            new OA\Response(
+                response: Response::HTTP_FORBIDDEN,
+                description: 'Unauthorized access.',
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Provided Season does not exist.',
+            ),
+        ],
+    )]
+    #[Route(
+        '/api/season/{season}',
+        name: 'api_season_update',
+        methods: ['PATCH'],
+    )]
+    #[IsGranted('ROLE_STAFF')]
+    public function updatePatch(
+        Season $season,
+        #[MapRequestPayload]
+        SeasonConfigurationUpdateDto $dto,
+    ): Response {
+        $this->action->update($season, $dto);
+
+        return new Response(status: Response::HTTP_OK);
     }
 
     #[OA\Delete(

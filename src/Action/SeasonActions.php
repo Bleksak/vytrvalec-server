@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Action;
 
 use App\Algorithm\Graph;
+use App\Dto\Faculty\FacultyMappingDto;
 use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
+use App\Dto\SeasonConfiguration\SeasonConfigurationUpdateDto;
 use App\Entity\Faculty;
 use App\Entity\FacultyMapping;
 use App\Entity\Season;
@@ -61,41 +63,12 @@ final readonly class SeasonActions
         );
         $this->seasonRepository->save($season, true);
 
-        $graph = [];
-        $nodes = [];
-
-        foreach ($dto->facultyMapping as $mapping) {
-            if ($mapping->parent !== null) {
-                $graph[$mapping->faculty][] = $mapping->parent;
-                $nodes[$mapping->parent] = true;
-            }
-
-            $nodes[$mapping->faculty] = true;
-
-            $faculty = $this->entityManager->getReference(
-                Faculty::class,
-                $mapping->faculty,
-            );
-
-            if ($faculty === null) {
-                continue;
-            }
-
-            $parent = $mapping->parent === null
-                ? null
-                : $this->entityManager->getReference(
-                    Faculty::class,
-                    $mapping->parent,
-                );
-
-            $mapping = new FacultyMapping($season, $faculty, $parent);
-            $this->facultyMappingRepository->save($mapping, false);
-        }
-
-        if (Graph::hasCycle(\array_keys($nodes), $graph)) {
+        try {
+            $this->applyFacultyMappings($season, $dto->facultyMapping);
+        } catch (FacultyMappingCycleException $e) {
             $this->entityManager->rollback();
 
-            throw new FacultyMappingCycleException();
+            throw $e;
         }
 
         $this->entityManager->flush();
@@ -120,6 +93,57 @@ final readonly class SeasonActions
         // $this->messageBus->dispatch(new Envelope(new SeasonEndMessage($season->getId()), $stamps));
 
         return $season;
+    }
+
+    public function update(Season $season, SeasonConfigurationUpdateDto $dto): void
+    {
+        $season->start = $dto->season->start;
+        $season->end = $dto->season->end;
+        $season->isTest = $dto->season->isTest;
+
+        $this->facultyMappingRepository->removeBySeason($season);
+        $this->applyFacultyMappings($season, $dto->facultyMapping);
+
+        $this->entityManager->flush();
+    }
+
+    /** @param list<FacultyMappingDto> $mappings */
+    private function applyFacultyMappings(Season $season, array $mappings): void
+    {
+        $graph = [];
+        $nodes = [];
+
+        foreach ($mappings as $mapping) {
+            if ($mapping->parent !== null) {
+                $graph[$mapping->faculty][] = $mapping->parent;
+                $nodes[$mapping->parent] = true;
+            }
+
+            $nodes[$mapping->faculty] = true;
+
+            $faculty = $this->entityManager->getReference(
+                Faculty::class,
+                $mapping->faculty,
+            );
+
+            if ($faculty === null) {
+                continue;
+            }
+
+            $parent = $mapping->parent === null
+                ? null
+                : $this->entityManager->getReference(
+                    Faculty::class,
+                    $mapping->parent,
+                );
+
+            $newMapping = new FacultyMapping($season, $faculty, $parent);
+            $this->facultyMappingRepository->save($newMapping, false);
+        }
+
+        if (Graph::hasCycle(\array_keys($nodes), $graph)) {
+            throw new FacultyMappingCycleException();
+        }
     }
 
     public function delete(Season $season): void
