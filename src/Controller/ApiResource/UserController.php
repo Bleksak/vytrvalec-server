@@ -246,11 +246,7 @@ final class UserController extends AbstractController
         return $this->json($user->toResponseObject());
     }
 
-    #[Route(
-        path: '/api/user',
-        name: 'api_user_list',
-        methods: ['GET'],
-    )]
+    #[Route(path: '/api/user', name: 'api_user_list', methods: ['GET'])]
     #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
     public function userList(Request $request): Response
     {
@@ -258,7 +254,11 @@ final class UserController extends AbstractController
         $limit = \min(100, \max(1, (int) $request->query->get('limit', 25)));
         $search = (string) $request->query->get('search', '');
 
-        $users = $this->userRepository->findAllNotDeletedPaginated($page, $limit, $search);
+        $users = $this->userRepository->findAllNotDeletedPaginated(
+            $page,
+            $limit,
+            $search,
+        );
         $total = $this->userRepository->countAllNotDeleted($search);
 
         return $this->json([

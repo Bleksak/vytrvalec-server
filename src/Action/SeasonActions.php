@@ -95,8 +95,10 @@ final readonly class SeasonActions
         return $season;
     }
 
-    public function update(Season $season, SeasonConfigurationUpdateDto $dto): void
-    {
+    public function update(
+        Season $season,
+        SeasonConfigurationUpdateDto $dto,
+    ): void {
         $season->start = $dto->season->start;
         $season->end = $dto->season->end;
         $season->isTest = $dto->season->isTest;

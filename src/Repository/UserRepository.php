@@ -153,9 +153,14 @@ final class UserRepository extends ServiceEntityRepository implements
     /**
      * @return list<User>
      */
-    public function findAllNotDeletedPaginated(int $page, int $limit, string $search = ''): array
-    {
-        $qb = $this->notDeletedQuery()->orderBy('u.id', 'ASC')
+    public function findAllNotDeletedPaginated(
+        int $page,
+        int $limit,
+        string $search = '',
+    ): array {
+        $qb = $this
+            ->notDeletedQuery()
+            ->orderBy('u.id', 'ASC')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
 
@@ -176,7 +181,8 @@ final class UserRepository extends ServiceEntityRepository implements
 
     private function notDeletedQuery(): QueryBuilder
     {
-        return $this->createQueryBuilder('u')
+        return $this
+            ->createQueryBuilder('u')
             ->leftJoin('u.faculty', 'f')
             ->where('u.email IS NOT NULL');
     }
@@ -187,14 +193,12 @@ final class UserRepository extends ServiceEntityRepository implements
             return;
         }
 
-        $qb->andWhere(
-            $qb->expr()->orX(
-                $qb->expr()->like('LOWER(u.firstName)', ':search'),
-                $qb->expr()->like('LOWER(u.lastName)', ':search'),
-                $qb->expr()->like('LOWER(u.email)', ':search'),
-                $qb->expr()->like('LOWER(f.shortcut)', ':search'),
-            ),
-        )->setParameter('search', '%' . mb_strtolower($search) . '%');
+        $qb->andWhere($qb->expr()->orX(
+            $qb->expr()->like('LOWER(u.firstName)', ':search'),
+            $qb->expr()->like('LOWER(u.lastName)', ':search'),
+            $qb->expr()->like('LOWER(u.email)', ':search'),
+            $qb->expr()->like('LOWER(f.shortcut)', ':search'),
+        ))->setParameter('search', '%' . mb_strtolower($search) . '%');
     }
 
     public function findOneByEmail(string $email): ?User
