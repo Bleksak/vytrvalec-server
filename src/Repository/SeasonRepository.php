@@ -11,6 +11,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * @extends ServiceEntityRepository<Season>
@@ -22,7 +23,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class SeasonRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private Security $security)
     {
         parent::__construct($registry, Season::class);
     }
@@ -88,6 +89,10 @@ final class SeasonRepository extends ServiceEntityRepository
             ->leftJoin('c.image', 'i')
             ->leftJoin('c.translations', 'ct')
             ->orderBy('s.start', 'DESC');
+
+        if (!$this->security->isGranted('ROLE_STAFF')) {
+            $qb->andWhere('s.isTest = false');
+        }
 
         /** @var list<array{0: Season, submissionCount: int}> */
         $results = $qb->getQuery()->getResult();
