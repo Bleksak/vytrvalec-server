@@ -9,6 +9,8 @@ use App\Dto\EmailingChangeDto;
 use App\Dto\PasswordChangeDto;
 use App\Dto\User\PasswordResetDto;
 use App\Dto\User\PasswordResetRequestDto;
+use App\Dto\User\Request\UserSearchDto;
+use App\Dto\User\Response\UserListResponseDto;
 use App\Dto\User\Response\UserLoginResponseDto;
 use App\Dto\User\Response\UserResponseDto;
 use App\Dto\User\UserEditDto;
@@ -30,6 +32,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -247,36 +250,28 @@ final class UserController extends AbstractController
         return $this->json($user->toResponseObject());
     }
 
-    #[Route(
-        path: '/api/user',
-        name: 'api_user_list',
-        methods: ['GET'],
-        // documentation: 'Retrieve all <code>User</code> entities',
-        // responses: [
-        //     Response::HTTP_OK => [
-        //         'message' => 'Successfully retrieved all User entities',
-        //         'response' => [
-        //             [
-        //                 'id' => 'integer',
-        //                 'email' => 'string',
-        //                 'roles' => ['ROLE_USER', 'ROLE_STAFF'],
-        //                 'faculty' => [
-        //                     'id' => 'integer',
-        //                     'name' => 'string',
-        //                     'shortcut' => 'string',
-        //                 ]
-        //             ]
-        //         ]
-        //     ],
-        //     Response::HTTP_UNAUTHORIZED => ['message' => 'Unauthorized access'],
-        // ],
-    )]
+    #[Route(path: '/api/user', name: 'api_user_list', methods: ['GET'])]
     #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
-    public function userList(): Response
-    {
-        return $this->json(\array_map(
+    public function userList(
+        #[MapQueryString]
+        UserSearchDto $dto = new UserSearchDto(),
+    ): Response {
+        $users = $this->userRepository->findAllNotDeletedPaginated(
+            $dto->page,
+            $dto->limit,
+            $dto->search,
+        );
+
+        $data = \array_values(\array_map(
             static fn(User $user): UserResponseDto => $user->toResponseObject(),
-            $this->userRepository->findAllNotDeleted(),
+            \iterator_to_array($users),
+        ));
+
+        return $this->json(new UserListResponseDto(
+            data: $data,
+            total: \count($users),
+            page: $dto->page,
+            limit: $dto->limit,
         ));
     }
 

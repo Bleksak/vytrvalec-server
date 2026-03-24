@@ -9,6 +9,7 @@ use App\Dto\Season\Request\SeasonQueryFilterRequestDto;
 use App\Dto\Season\Response\SeasonIndexResponseDto;
 use App\Dto\Season\SeasonIndexDto;
 use App\Dto\SeasonConfiguration\SeasonConfigurationCreateDto;
+use App\Dto\SeasonConfiguration\SeasonConfigurationUpdateDto;
 use App\Dto\Submission\Response\AdministrationSubmissionListResponseDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
@@ -18,6 +19,7 @@ use App\Repository\SubmissionRepository;
 use App\Schema\SeasonWithoutSubmissionsSchema;
 use App\Services\ImagePath;
 use App\Services\SeasonResultRankingService;
+use App\Utils\FeatureFlag;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -51,7 +53,7 @@ final class SeasonController extends AbstractController
         ),
     ])]
     #[Route('/api/season', name: 'api_season_create', methods: ['POST'])]
-    #[IsGranted('ROLE_STAFF')]
+    #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
     public function create(
         #[MapRequestPayload]
         SeasonConfigurationCreateDto $dto,
@@ -97,6 +99,50 @@ final class SeasonController extends AbstractController
         return $this->json($season->toResponseObject());
     }
 
+    #[OA\Patch(
+        description: 'Update a Season',
+        parameters: [
+            new OA\Parameter(
+                name: 'season',
+                in: 'path',
+                schema: new OA\Schema(type: 'integer', example: 1),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Season successfully updated',
+            ),
+            new OA\Response(
+                response: Response::HTTP_BAD_REQUEST,
+                description: 'Invalid input.',
+            ),
+            new OA\Response(
+                response: Response::HTTP_FORBIDDEN,
+                description: 'Unauthorized access.',
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Provided Season does not exist.',
+            ),
+        ],
+    )]
+    #[Route(
+        '/api/season/{season}',
+        name: 'api_season_update',
+        methods: ['PATCH'],
+    )]
+    #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
+    public function updatePatch(
+        Season $season,
+        #[MapRequestPayload]
+        SeasonConfigurationUpdateDto $dto,
+    ): Response {
+        $this->action->update($season, $dto);
+
+        return new Response(status: Response::HTTP_OK);
+    }
+
     #[OA\Delete(
         description: 'Delete a non running Season. This request will fail if the Season is running or contains any submissions.',
         parameters: [
@@ -130,7 +176,7 @@ final class SeasonController extends AbstractController
         name: 'api_season_delete',
         methods: ['DELETE'],
     )]
-    #[IsGranted('ROLE_STAFF')]
+    #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
     public function delete(Season $season): Response
     {
         $this->action->delete($season);
@@ -201,7 +247,7 @@ final class SeasonController extends AbstractController
         name: 'api_season_submissions',
         methods: ['GET'],
     )]
-    #[IsGranted('ROLE_STAFF')]
+    #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
     public function submissions(
         ImagePath $imagePath,
         SubmissionRepository $submissionRepository,

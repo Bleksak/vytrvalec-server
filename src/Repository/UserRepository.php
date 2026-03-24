@@ -10,6 +10,7 @@ use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use SensitiveParameter;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -147,6 +148,35 @@ final class UserRepository extends ServiceEntityRepository implements
             ->where('u.email IS NOT NULL')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return Paginator<User>
+     */
+    public function findAllNotDeletedPaginated(
+        int $page,
+        int $limit,
+        string $search = '',
+    ): Paginator {
+        $qb = $this
+            ->createQueryBuilder('u')
+            ->leftJoin('u.faculty', 'f')
+            ->where('u.email IS NOT NULL')
+            ->orderBy('u.id', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+
+        if ($search !== '') {
+            $qb->andWhere($qb->expr()->orX(
+                $qb->expr()->like('LOWER(u.firstName)', ':search'),
+                $qb->expr()->like('LOWER(u.lastName)', ':search'),
+                $qb->expr()->like('LOWER(u.email)', ':search'),
+                $qb->expr()->like('LOWER(f.shortcut)', ':search'),
+            ))->setParameter('search', '%' . \mb_strtolower($search) . '%');
+        }
+
+        /** @var Paginator<User> */
+        return new Paginator($qb->getQuery());
     }
 
     public function findOneByEmail(string $email): ?User
