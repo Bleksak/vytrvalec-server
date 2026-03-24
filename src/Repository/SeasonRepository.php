@@ -7,11 +7,12 @@ namespace App\Repository;
 use App\Dto\Season\SeasonIndexDto;
 use App\Entity\Charity;
 use App\Entity\Season;
+use App\Entity\User;
+use App\Utils\FeatureFlag;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * @extends ServiceEntityRepository<Season>
@@ -23,10 +24,8 @@ use Symfony\Bundle\SecurityBundle\Security;
  */
 final class SeasonRepository extends ServiceEntityRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        private Security $security,
-    ) {
+    public function __construct(ManagerRegistry $registry)
+    {
         parent::__construct($registry, Season::class);
     }
 
@@ -76,7 +75,7 @@ final class SeasonRepository extends ServiceEntityRepository
     /**
      * @return list<SeasonIndexDto>
      */
-    public function findOrdered(): array
+    public function findOrdered(?User $user): array
     {
         $qb = $this
             ->createQueryBuilder('s')
@@ -92,7 +91,7 @@ final class SeasonRepository extends ServiceEntityRepository
             ->leftJoin('c.translations', 'ct')
             ->orderBy('s.start', 'DESC');
 
-        if (!$this->security->isGranted('ROLE_STAFF')) {
+        if ($user === null || !$user->canAccess(FeatureFlag::ROLE_STAFF)) {
             $qb->andWhere('s.isTest = false');
         }
 

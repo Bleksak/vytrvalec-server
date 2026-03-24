@@ -13,6 +13,7 @@ use App\Dto\Submission\Response\AdministrationSubmissionListResponseDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use App\Entity\Submission;
+use App\Entity\User;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Schema\SeasonWithoutSubmissionsSchema;
@@ -25,6 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[OA\Tag(name: 'Season')]
@@ -293,11 +295,11 @@ final class SeasonController extends AbstractController
         ),
     ])]
     #[Route('/api/season', name: 'api_season_index', methods: ['GET'])]
-    public function index(): Response
+    public function index(#[CurrentUser] ?User $user): Response
     {
         return $this->json(\array_map(
             fn(SeasonIndexDto $season): SeasonIndexResponseDto => $season->toResponseObject($this->imagePath),
-            $this->seasonRepository->findOrdered(),
+            $this->seasonRepository->findOrdered($user),
         ));
     }
 }
