@@ -243,8 +243,11 @@ final class SeasonController extends AbstractController
         name: 'api_season_index_past',
         methods: ['GET'],
     )]
-    public function indexPast(ImagePath $imagePath, #[CurrentUser] ?User $user): Response
-    {
+    public function indexPast(
+        ImagePath $imagePath,
+        #[CurrentUser]
+        ?User $user,
+    ): Response {
         return $this->json(\array_map(
             static fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject(
                 $imagePath,
