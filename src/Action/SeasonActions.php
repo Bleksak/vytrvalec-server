@@ -18,6 +18,7 @@ use App\Repository\FacultyMappingRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 
 final readonly class SeasonActions
 {
@@ -32,6 +33,7 @@ final readonly class SeasonActions
 
     /**
      * @return Season|array<string, array<string, string>|list<string>>
+     * @throws FacultyMappingCycleException
      */
     public function create(SeasonConfigurationCreateDto $dto): Season|array
     {
@@ -109,7 +111,10 @@ final readonly class SeasonActions
         $this->entityManager->flush();
     }
 
-    /** @param list<FacultyMappingDto> $mappings */
+    /**
+     * @param list<FacultyMappingDto> $mappings
+     * @throws FacultyMappingCycleException|ORMException
+     */
     private function applyFacultyMappings(Season $season, array $mappings): void
     {
         $graph = [];

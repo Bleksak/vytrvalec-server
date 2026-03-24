@@ -10,7 +10,7 @@ use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use SensitiveParameter;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -151,54 +151,32 @@ final class UserRepository extends ServiceEntityRepository implements
     }
 
     /**
-     * @return list<User>
+     * @return Paginator<User>
      */
     public function findAllNotDeletedPaginated(
         int $page,
         int $limit,
         string $search = '',
-    ): array {
+    ): Paginator {
         $qb = $this
-            ->notDeletedQuery()
+            ->createQueryBuilder('u')
+            ->leftJoin('u.faculty', 'f')
+            ->where('u.email IS NOT NULL')
             ->orderBy('u.id', 'ASC')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
 
-        $this->applySearchFilter($qb, $search);
-
-        /** @var list<User> */
-        return $qb->getQuery()->getResult();
-    }
-
-    public function countAllNotDeleted(string $search = ''): int
-    {
-        $qb = $this->notDeletedQuery()->select('COUNT(u.id)');
-
-        $this->applySearchFilter($qb, $search);
-
-        return (int) $qb->getQuery()->getSingleScalarResult();
-    }
-
-    private function notDeletedQuery(): QueryBuilder
-    {
-        return $this
-            ->createQueryBuilder('u')
-            ->leftJoin('u.faculty', 'f')
-            ->where('u.email IS NOT NULL');
-    }
-
-    private function applySearchFilter(QueryBuilder $qb, string $search): void
-    {
-        if ($search === '') {
-            return;
+        if ($search !== '') {
+            $qb->andWhere($qb->expr()->orX(
+                $qb->expr()->like('LOWER(u.firstName)', ':search'),
+                $qb->expr()->like('LOWER(u.lastName)', ':search'),
+                $qb->expr()->like('LOWER(u.email)', ':search'),
+                $qb->expr()->like('LOWER(f.shortcut)', ':search'),
+            ))->setParameter('search', '%' . \mb_strtolower($search) . '%');
         }
 
-        $qb->andWhere($qb->expr()->orX(
-            $qb->expr()->like('LOWER(u.firstName)', ':search'),
-            $qb->expr()->like('LOWER(u.lastName)', ':search'),
-            $qb->expr()->like('LOWER(u.email)', ':search'),
-            $qb->expr()->like('LOWER(f.shortcut)', ':search'),
-        ))->setParameter('search', '%' . \mb_strtolower($search) . '%');
+        /** @var Paginator<User> */
+        return new Paginator($qb->getQuery());
     }
 
     public function findOneByEmail(string $email): ?User

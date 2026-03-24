@@ -19,6 +19,7 @@ use App\Repository\SubmissionRepository;
 use App\Schema\SeasonWithoutSubmissionsSchema;
 use App\Services\ImagePath;
 use App\Services\SeasonResultRankingService;
+use App\Utils\FeatureFlag;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -52,7 +53,7 @@ final class SeasonController extends AbstractController
         ),
     ])]
     #[Route('/api/season', name: 'api_season_create', methods: ['POST'])]
-    #[IsGranted('ROLE_STAFF')]
+    #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
     public function create(
         #[MapRequestPayload]
         SeasonConfigurationCreateDto $dto,
@@ -131,7 +132,7 @@ final class SeasonController extends AbstractController
         name: 'api_season_update',
         methods: ['PATCH'],
     )]
-    #[IsGranted('ROLE_STAFF')]
+    #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
     public function updatePatch(
         Season $season,
         #[MapRequestPayload]
@@ -175,7 +176,7 @@ final class SeasonController extends AbstractController
         name: 'api_season_delete',
         methods: ['DELETE'],
     )]
-    #[IsGranted('ROLE_STAFF')]
+    #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
     public function delete(Season $season): Response
     {
         $this->action->delete($season);
@@ -246,7 +247,7 @@ final class SeasonController extends AbstractController
         name: 'api_season_submissions',
         methods: ['GET'],
     )]
-    #[IsGranted('ROLE_STAFF')]
+    #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
     public function submissions(
         ImagePath $imagePath,
         SubmissionRepository $submissionRepository,

@@ -9,6 +9,8 @@ use App\Dto\EmailingChangeDto;
 use App\Dto\PasswordChangeDto;
 use App\Dto\User\PasswordResetDto;
 use App\Dto\User\PasswordResetRequestDto;
+use App\Dto\User\Request\UserSearchDto;
+use App\Dto\User\Response\UserListResponseDto;
 use App\Dto\User\Response\UserLoginResponseDto;
 use App\Dto\User\Response\UserResponseDto;
 use App\Dto\User\UserEditDto;
@@ -30,6 +32,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -248,28 +251,27 @@ final class UserController extends AbstractController
 
     #[Route(path: '/api/user', name: 'api_user_list', methods: ['GET'])]
     #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
-    public function userList(Request $request): Response
-    {
-        $page = \max(1, (int) $request->query->get('page', 1));
-        $limit = \min(100, \max(1, (int) $request->query->get('limit', 25)));
-        $search = $request->query->getString('search');
-
+    public function userList(
+        #[MapQueryString]
+        UserSearchDto $dto = new UserSearchDto(),
+    ): Response {
         $users = $this->userRepository->findAllNotDeletedPaginated(
-            $page,
-            $limit,
-            $search,
+            $dto->page,
+            $dto->limit,
+            $dto->search,
         );
-        $total = $this->userRepository->countAllNotDeleted($search);
 
-        return $this->json([
-            'data' => \array_map(
-                static fn(User $user): UserResponseDto => $user->toResponseObject(),
-                $users,
-            ),
-            'total' => $total,
-            'page' => $page,
-            'limit' => $limit,
-        ]);
+        $data = \array_map(
+            static fn(User $user): UserResponseDto => $user->toResponseObject(),
+            \iterator_to_array($users, false),
+        );
+
+        return $this->json(new UserListResponseDto(
+            data: $data,
+            total: \count($users),
+            page: $dto->page,
+            limit: $dto->limit,
+        ));
     }
 
     #[Route(
