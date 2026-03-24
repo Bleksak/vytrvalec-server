@@ -58,8 +58,7 @@ final class SubmissionController extends AbstractController
     )]
     #[IsGranted('ROLE_USER')]
     public function delete(
-        #[CurrentUser]
-        User $user,
+        #[CurrentUser] User $user,
         Submission $submission,
     ): Response {
         if (!$user->hasRole('ROLE_STAFF') && $user !== $submission->user) {
@@ -82,11 +81,9 @@ final class SubmissionController extends AbstractController
     )]
     #[IsGranted('ROLE_USER')]
     public function create(
-        #[CurrentUser]
-        User $user,
+        #[CurrentUser] User $user,
         SeasonRepository $seasonRepository,
-        #[MapRequestPayload]
-        SubmissionCreateDto $submissionCreateDto,
+        #[MapRequestPayload] SubmissionCreateDto $submissionCreateDto,
     ): Response {
         if ($user->banned) {
             throw new UserBannedException();
@@ -234,11 +231,9 @@ final class SubmissionController extends AbstractController
     )]
     #[IsGranted('ROLE_USER')]
     public function edit(
-        #[CurrentUser]
-        User $user,
+        #[CurrentUser] User $user,
         Submission $submission,
-        #[MapRequestPayload]
-        SubmissionEditDto $submissionEditDto,
+        #[MapRequestPayload] SubmissionEditDto $submissionEditDto,
     ): Response {
         if ($submission->accepted) {
             return $this->json(['submission' => [
@@ -296,10 +291,8 @@ final class SubmissionController extends AbstractController
     )]
     #[IsGranted('ROLE_STAFF')]
     public function setState(
-        #[CurrentUser]
-        User $user,
-        #[MapRequestPayload]
-        SubmissionStateDto $dto,
+        #[CurrentUser] User $user,
+        #[MapRequestPayload] SubmissionStateDto $dto,
         Submission $submission,
     ): Response {
         $errors = $this->action->setState($user, $submission, $dto);
@@ -326,10 +319,8 @@ final class SubmissionController extends AbstractController
         methods: ['GET'],
     )]
     public function extractReviewedSubmissionForSeasons(
-        #[CurrentUser]
-        User $user,
-        #[MapQueryParameter]
-        ?int $season = null,
+        #[CurrentUser] User $user,
+        #[MapQueryParameter] ?int $season = null,
     ): Response {
         if (
             !$user->canAccess(FeatureFlag::ROLE_STAFF)

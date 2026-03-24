@@ -99,8 +99,7 @@ final class User implements UserInterface, PasswordAuthenticatedUserInterface
         Faculty $faculty,
         bool $anonymize,
         array $roles = [],
-        #[SensitiveParameter]
-        ?string $token = null,
+        #[SensitiveParameter] ?string $token = null,
         string $locale = 'cs_CZ',
     ) {
         $this->submissions = new ArrayCollection();
@@ -253,8 +252,7 @@ final class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function setPasswordResetToken(
-        #[SensitiveParameter]
-        ?string $passwordResetToken,
+        #[SensitiveParameter] ?string $passwordResetToken,
     ): static {
         $this->passwordResetToken = $passwordResetToken;
 

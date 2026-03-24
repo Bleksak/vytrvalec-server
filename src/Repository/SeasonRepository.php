@@ -23,8 +23,10 @@ use Symfony\Bundle\SecurityBundle\Security;
  */
 final class SeasonRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry, private Security $security)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private Security $security,
+    ) {
         parent::__construct($registry, Season::class);
     }
 

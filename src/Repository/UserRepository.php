@@ -52,8 +52,7 @@ final class UserRepository extends ServiceEntityRepository implements
     #[\Override]
     public function upgradePassword(
         PasswordAuthenticatedUserInterface $user,
-        #[SensitiveParameter]
-        string $newHashedPassword,
+        #[SensitiveParameter] string $newHashedPassword,
     ): void {
         \assert(
             $user instanceof User,
@@ -130,8 +129,7 @@ final class UserRepository extends ServiceEntityRepository implements
     }
 
     public function findByPasswordResetToken(
-        #[SensitiveParameter]
-        string $passwordResetToken,
+        #[SensitiveParameter] string $passwordResetToken,
     ): ?User {
         return $this->findOneBy(['passwordResetToken' => $passwordResetToken]);
     }

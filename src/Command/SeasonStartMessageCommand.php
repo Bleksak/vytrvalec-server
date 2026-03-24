@@ -24,10 +24,8 @@ final readonly class SeasonStartMessageCommand
 
     public function __invoke(
         SymfonyStyle $io,
-        #[Argument]
-        int $seasonId,
-        #[Option]
-        bool $send,
+        #[Argument] int $seasonId,
+        #[Option] bool $send,
     ): int {
         if (!$send) {
             $io->writeln('Send option is required for emails to be sent!');

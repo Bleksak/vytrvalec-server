@@ -108,8 +108,7 @@ final class FacultyController extends AbstractController
     )]
     #[IsGranted('ROLE_STAFF')]
     public function updatePatch(
-        #[MapRequestPayload]
-        FacultyUpdateDto $facultyDto,
+        #[MapRequestPayload] FacultyUpdateDto $facultyDto,
         Faculty $faculty,
     ): Response {
         $errors = $this->action->update($faculty, $facultyDto);

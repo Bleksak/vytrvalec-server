@@ -46,8 +46,7 @@ final class UserController extends AbstractController
     #[OA\Post(description: 'Log the user in and generate a JWT token')]
     #[Route(path: '/api/user/login', name: 'api_user_login', methods: ['POST'])]
     public function login(
-        #[MapRequestPayload]
-        UserLoginDto $dto,
+        #[MapRequestPayload] UserLoginDto $dto,
         ParameterBagInterface $bag,
     ): Response {
         try {
@@ -172,8 +171,7 @@ final class UserController extends AbstractController
         methods: ['POST'],
     )]
     public function forgottenPasswordRequest(
-        #[MapRequestPayload]
-        PasswordResetRequestDto $dto,
+        #[MapRequestPayload] PasswordResetRequestDto $dto,
     ): Response {
         try {
             $this->action->forgottenPasswordRequest($dto->email);
@@ -199,8 +197,7 @@ final class UserController extends AbstractController
         // ]
     )]
     public function forgottenPasswordReset(
-        #[MapRequestPayload]
-        PasswordResetDto $dto,
+        #[MapRequestPayload] PasswordResetDto $dto,
     ): Response {
         $user = $this->userRepository->findByPasswordResetToken($dto->passwordResetToken);
 
@@ -236,8 +233,7 @@ final class UserController extends AbstractController
         // ],
     )]
     public function userData(
-        #[CurrentUser]
-        User $currentUser,
+        #[CurrentUser] User $currentUser,
         User $user,
     ): Response {
         if (!$this->isGranted(FeatureFlag::ROLE_STAFF->value)) {
@@ -302,8 +298,7 @@ final class UserController extends AbstractController
         // ],
     )]
     public function register(
-        #[MapRequestPayload]
-        UserRegistrationDto $dto,
+        #[MapRequestPayload] UserRegistrationDto $dto,
     ): Response {
         if ($this->isGranted(FeatureFlag::ROLE_USER->value)) {
             return $this->json(['auth' => [
@@ -340,10 +335,8 @@ final class UserController extends AbstractController
     )]
     #[IsGranted(FeatureFlag::ROLE_USER->value)]
     public function updatePassword(
-        #[MapRequestPayload]
-        PasswordChangeDto $dto,
-        #[CurrentUser]
-        User $currentUser,
+        #[MapRequestPayload] PasswordChangeDto $dto,
+        #[CurrentUser] User $currentUser,
     ): Response {
         $errors = $this->action->updatePassword($currentUser, $dto);
 
@@ -356,8 +349,7 @@ final class UserController extends AbstractController
 
     #[Route(path: '/api/user/anonymize', methods: ['POST'])]
     public function setAccountAnonymization(
-        #[CurrentUser]
-        User $user,
+        #[CurrentUser] User $user,
         Request $request,
     ): Response {
         $anonymizeValue = \boolval($request->getPayload()->get(
@@ -419,10 +411,8 @@ final class UserController extends AbstractController
         methods: ['PATCH'],
     )]
     public function setMailing(
-        #[CurrentUser]
-        User $user,
-        #[MapRequestPayload]
-        EmailingChangeDto $emailingChangeDto,
+        #[CurrentUser] User $user,
+        #[MapRequestPayload] EmailingChangeDto $emailingChangeDto,
     ): Response {
         $this->action->toggleMailing($user, $emailingChangeDto);
 
@@ -455,8 +445,7 @@ final class UserController extends AbstractController
     )]
     #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
     public function update(
-        #[MapRequestPayload]
-        UserEditDto $dto,
+        #[MapRequestPayload] UserEditDto $dto,
         User $user,
     ): Response {
         $this->action->update($user, $dto);
