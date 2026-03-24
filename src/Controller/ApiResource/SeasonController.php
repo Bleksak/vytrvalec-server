@@ -14,6 +14,7 @@ use App\Dto\Submission\Response\AdministrationSubmissionListResponseDto;
 use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use App\Entity\Submission;
+use App\Entity\User;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Schema\SeasonWithoutSubmissionsSchema;
@@ -27,6 +28,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[OA\Tag(name: 'Season')]
@@ -89,9 +91,9 @@ final class SeasonController extends AbstractController
         name: 'api_season_current',
         methods: ['GET'],
     )]
-    public function current(): Response
+    public function current(#[CurrentUser] ?User $user): Response
     {
-        $season = $this->seasonRepository->findCurrentSeason();
+        $season = $this->seasonRepository->findCurrentSeason($user);
         if ($season === null) {
             return $this->json([], Response::HTTP_NOT_FOUND);
         }
@@ -287,13 +289,16 @@ final class SeasonController extends AbstractController
         name: 'api_season_index_past',
         methods: ['GET'],
     )]
-    public function indexPast(ImagePath $imagePath): Response
-    {
+    public function indexPast(
+        ImagePath $imagePath,
+        #[CurrentUser]
+        ?User $user,
+    ): Response {
         return $this->json(\array_map(
             static fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject(
                 $imagePath,
             ),
-            $this->seasonRepository->findPast(),
+            $this->seasonRepository->findPast($user),
         ));
     }
 
@@ -339,11 +344,11 @@ final class SeasonController extends AbstractController
         ),
     ])]
     #[Route('/api/season', name: 'api_season_index', methods: ['GET'])]
-    public function index(): Response
+    public function index(#[CurrentUser] ?User $user): Response
     {
         return $this->json(\array_map(
             fn(SeasonIndexDto $season): SeasonIndexResponseDto => $season->toResponseObject($this->imagePath),
-            $this->seasonRepository->findOrdered(),
+            $this->seasonRepository->findOrdered($user),
         ));
     }
 }

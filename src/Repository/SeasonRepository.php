@@ -7,6 +7,8 @@ namespace App\Repository;
 use App\Dto\Season\SeasonIndexDto;
 use App\Entity\Charity;
 use App\Entity\Season;
+use App\Entity\User;
+use App\Utils\FeatureFlag;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
@@ -45,17 +47,21 @@ final class SeasonRepository extends ServiceEntityRepository
         }
     }
 
-    public function findCurrentSeason(): ?Season
+    public function findCurrentSeason(?User $user): ?Season
     {
-        /** @var Season|null */
-        return $this
+        $qb = $this
             ->createQueryBuilder('s')
             ->where('s.start <= :now')
             ->andWhere('s.end >= :now')
             ->setParameter('now', new \DateTimeImmutable())
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult(Query::HYDRATE_OBJECT);
+            ->setMaxResults(1);
+
+        if ($user === null || !$user->canAccess(FeatureFlag::ROLE_STAFF)) {
+            $qb->andWhere('s.isTest = false');
+        }
+
+        /** @var Season|null */
+        return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_OBJECT);
     }
 
     public function getLast(): ?Season
@@ -73,7 +79,7 @@ final class SeasonRepository extends ServiceEntityRepository
     /**
      * @return list<SeasonIndexDto>
      */
-    public function findOrdered(): array
+    public function findOrdered(?User $user): array
     {
         $qb = $this
             ->createQueryBuilder('s')
@@ -88,6 +94,10 @@ final class SeasonRepository extends ServiceEntityRepository
             ->leftJoin('c.image', 'i')
             ->leftJoin('c.translations', 'ct')
             ->orderBy('s.start', 'DESC');
+
+        if ($user === null || !$user->canAccess(FeatureFlag::ROLE_STAFF)) {
+            $qb->andWhere('s.isTest = false');
+        }
 
         /** @var list<array{0: Season, submissionCount: int}> */
         $results = $qb->getQuery()->getResult();
@@ -107,10 +117,9 @@ final class SeasonRepository extends ServiceEntityRepository
     /**
      * @return list<Season>
      */
-    public function findPast(): array
+    public function findPast(?User $user): array
     {
-        /** @var list<Season> */
-        return $this
+        $qb = $this
             ->createQueryBuilder('s')
             ->addSelect('s')
             ->addSelect('sc')
@@ -121,9 +130,14 @@ final class SeasonRepository extends ServiceEntityRepository
             ->innerJoin('sc.translations', 'sct')
             ->where('s.end < :now')
             ->orderBy('s.start', 'DESC')
-            ->setParameter('now', new \DateTimeImmutable())
-            ->getQuery()
-            ->getResult();
+            ->setParameter('now', new \DateTimeImmutable());
+
+        if ($user === null || !$user->canAccess(FeatureFlag::ROLE_STAFF)) {
+            $qb->andWhere('s.isTest = false');
+        }
+
+        /** @var list<Season> */
+        return $qb->getQuery()->getResult();
     }
 
     public function findByStartMonth(\DateTime $dateTime): ?Season
