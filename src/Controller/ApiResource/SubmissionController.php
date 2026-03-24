@@ -92,7 +92,7 @@ final class SubmissionController extends AbstractController
             throw new UserBannedException();
         }
 
-        $season = $seasonRepository->findCurrentSeason();
+        $season = $seasonRepository->findCurrentSeason($user);
 
         if ($season === null) {
             return $this->json(['season' => [

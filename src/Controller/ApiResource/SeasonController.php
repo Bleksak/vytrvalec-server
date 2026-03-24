@@ -89,9 +89,9 @@ final class SeasonController extends AbstractController
         name: 'api_season_current',
         methods: ['GET'],
     )]
-    public function current(): Response
+    public function current(#[CurrentUser] ?User $user): Response
     {
-        $season = $this->seasonRepository->findCurrentSeason();
+        $season = $this->seasonRepository->findCurrentSeason($user);
         if ($season === null) {
             return $this->json([], Response::HTTP_NOT_FOUND);
         }
@@ -243,13 +243,13 @@ final class SeasonController extends AbstractController
         name: 'api_season_index_past',
         methods: ['GET'],
     )]
-    public function indexPast(ImagePath $imagePath): Response
+    public function indexPast(ImagePath $imagePath, #[CurrentUser] ?User $user): Response
     {
         return $this->json(\array_map(
             static fn(Season $season): SeasonIndexResponseDto => $season->toResponseObject(
                 $imagePath,
             ),
-            $this->seasonRepository->findPast(),
+            $this->seasonRepository->findPast($user),
         ));
     }
 
