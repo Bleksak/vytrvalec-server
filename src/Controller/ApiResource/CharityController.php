@@ -62,7 +62,8 @@ final class CharityController extends AbstractController
     #[Route('/api/charity', 'api_charity_create', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
     public function create(
-        #[MapRequestPayload] CharityCreateDto $charityCreateDto,
+        #[MapRequestPayload]
+        CharityCreateDto $charityCreateDto,
     ): Response {
         $charity = $this->action->create($charityCreateDto);
 
@@ -135,7 +136,8 @@ final class CharityController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function updatePatch(
         Charity $charity,
-        #[MapRequestPayload] CharityUpdateDto $charityEditDto,
+        #[MapRequestPayload]
+        CharityUpdateDto $charityEditDto,
     ): Response {
         $this->action->update($charity, $charityEditDto);
 

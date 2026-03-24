@@ -54,7 +54,8 @@ final class ActivityController extends AbstractController
     #[Route('/api/activity', name: 'activity_create', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
     public function create(
-        #[MapRequestPayload] ActivityCreateDto $activityCreateDto,
+        #[MapRequestPayload]
+        ActivityCreateDto $activityCreateDto,
         ImagePath $imagePath,
     ): Response {
         $activity = $this->action->create($activityCreateDto);
@@ -150,7 +151,8 @@ final class ActivityController extends AbstractController
     )]
     #[IsGranted('ROLE_STAFF')]
     public function updatePatch(
-        #[MapRequestPayload] ActivityUpdateDto $dto,
+        #[MapRequestPayload]
+        ActivityUpdateDto $dto,
         Activity $activity,
     ): Response {
         $this->action->update($activity, $dto);
