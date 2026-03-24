@@ -261,10 +261,10 @@ final class UserController extends AbstractController
             $dto->search,
         );
 
-        $data = \array_map(
+        $data = \array_values(\array_map(
             static fn(User $user): UserResponseDto => $user->toResponseObject(),
-            \iterator_to_array($users, false),
-        );
+            \iterator_to_array($users),
+        ));
 
         return $this->json(new UserListResponseDto(
             data: $data,
