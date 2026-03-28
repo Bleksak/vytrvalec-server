@@ -27,13 +27,6 @@ final class GenerateSquashMigrationCommand
         private DependencyFactory $dependencyFactory,
     ) {}
 
-    private function generateAddSqlCommand(string $query): string
-    {
-        return <<<SQL
-            \$this->addSql('{$query}');
-            SQL;
-    }
-
     public function __invoke(SymfonyStyle $io): int
     {
         $mysql = new MySQLPlatform();

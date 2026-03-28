@@ -9,8 +9,10 @@ trait DoctrineNamespaceTrait
 {
     protected static function generateAddSqlCommand(string $query): string
     {
+        $query = \var_export($query, true);
+
         return <<<SQL
-            \$this->addSql('{$query}');
+            \$this->addSql({$query});
             SQL;
     }
 
