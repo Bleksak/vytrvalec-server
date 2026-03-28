@@ -10,10 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 final class FacultyTranslation
 {
     #[ORM\Id]
-    #[ORM\Column]
-    public private(set) string $locale;
-
-    #[ORM\Id]
     #[ORM\ManyToOne(
         targetEntity: Faculty::class,
         inversedBy: 'translations',
@@ -21,6 +17,10 @@ final class FacultyTranslation
     )]
     #[ORM\JoinColumn]
     public Faculty $faculty;
+
+    #[ORM\Id]
+    #[ORM\Column(length: 6)]
+    public private(set) string $locale;
 
     #[ORM\Column]
     public string $name;

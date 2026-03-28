@@ -10,46 +10,60 @@ use App\Services\ImagePath;
 use App\Utils\SubmissionState;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Index(columns: ['week'], name: 'week_index')]
+#[ORM\Index(columns: [
+    'accepted',
+    'season_id',
+    'activity_id',
+    'user_id',
+    'distance',
+], name: 'idx_submission_accepted_season_activity_user_distance')]
+#[ORM\Index(
+    columns: ['accepted', 'activity_id'],
+    name: 'idx_submission_accepted_activity',
+)]
+#[ORM\Index(
+    columns: ['accepted', 'season_id', 'user_id'],
+    name: 'idx_submission_accepted_season_user',
+)]
+#[ORM\Index(
+    columns: ['season_id', 'week', 'accepted'],
+    name: 'idx_submission_season_week_accepted',
+)]
+#[ORM\Index(
+    columns: ['accepted', 'activity_id', 'distance'],
+    name: 'idx_submission_accepted_activity_distance',
+)]
 #[ORM\HasLifecycleCallbacks]
 final class Submission
 {
-    #[OA\Property(example: 1)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     public private(set) int $id;
 
-    #[OA\Property(example: true)]
     #[ORM\Column]
     public bool $accepted = false;
 
-    #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
     public Season $season;
 
-    #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
     public private(set) User $user;
 
-    #[OA\Property(type: 'integer', example: 1500)]
     #[ORM\Column(type: Types::BIGINT)]
     public int $elevation;
 
-    #[OA\Property(type: 'integer', example: 1500)]
     #[ORM\Column(type: Types::BIGINT)]
     public int $distance;
 
-    #[OA\Property(example: true)]
     #[ORM\Column]
     public bool $reviewed = false;
 
-    #[OA\Property]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(
         nullable: true,
@@ -58,24 +72,19 @@ final class Submission
     )]
     public ?Image $image;
 
-    #[OA\Property(example: 2)]
     #[ORM\Column]
     public int $week;
 
-    #[OA\Property(type: 'integer', example: 1)]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     public Activity $activity;
 
-    #[OA\Property(type: 'string', format: 'date', example: '2025-04-11')]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     public \DateTime $date;
 
-    #[OA\Property(type: 'string', format: 'date-time', example: 1)]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     public \DateTime $updatedAt;
 
-    #[OA\Property(example: 'Dobrej vykon lil bro')]
     #[ORM\Column(length: 512)]
     public string $message = '';
 

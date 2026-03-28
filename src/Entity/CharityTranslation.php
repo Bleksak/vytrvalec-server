@@ -10,10 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 final class CharityTranslation
 {
     #[ORM\Id]
-    #[ORM\Column]
-    public private(set) string $locale;
-
-    #[ORM\Id]
     #[ORM\ManyToOne(
         targetEntity: Charity::class,
         inversedBy: 'translations',
@@ -22,10 +18,14 @@ final class CharityTranslation
     #[ORM\JoinColumn]
     public Charity $charity;
 
+    #[ORM\Id]
+    #[ORM\Column(length: 6)]
+    public private(set) string $locale;
+
     #[ORM\Column]
     public string $name;
 
-    #[ORM\Column]
+    #[ORM\Column(length: 10_000)]
     public string $description;
 
     public function __construct(

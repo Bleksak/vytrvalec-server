@@ -28,8 +28,8 @@ final class Image
     #[ORM\Column(nullable: true)]
     public ?\DateTime $usedAt = null;
 
-    #[ORM\Column(enumType: MimeType::class)]
-    public ?MimeType $originalMimeType;
+    #[ORM\Column(enumType: MimeType::class, length: 32)]
+    public MimeType $originalMimeType;
 
     public function __construct(string $path, MimeType $originalMimeType)
     {

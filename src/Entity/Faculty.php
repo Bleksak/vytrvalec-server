@@ -11,29 +11,25 @@ use App\Repository\FacultyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: FacultyRepository::class)]
 final class Faculty
 {
-    #[OA\Property(example: 1)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     public private(set) int $id;
 
-    #[OA\Property(example: 'FAV')]
     #[ORM\Column(length: 10)]
     public string $shortcut;
 
-    #[OA\Parameter(example: true)]
     #[ORM\Column]
     public bool $visible;
 
     #[ORM\ManyToOne(targetEntity: self::class)]
     public ?Faculty $parent = null;
 
-    #[ORM\Column(length: 8)]
+    #[ORM\Column(length: 9)]
     public string $color;
 
     /** @var Collection<string, FacultyTranslation> */
