@@ -177,7 +177,7 @@ final class ActivityController extends AbstractController
             static fn(Activity $activity): ActivityResponseDto => $activity->toResponseObject(
                 $imagePath,
             ),
-            $this->activityRepository->findAllWithTranslations(),
+            $this->activityRepository->findAll(),
         ));
     }
 }
