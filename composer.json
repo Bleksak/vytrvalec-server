@@ -13,7 +13,7 @@
     "amphp/log": "^2.0",
     "amphp/websocket-server": "^4.0",
     "doctrine/doctrine-bundle": "^3.0",
-    "doctrine/doctrine-migrations-bundle": "^3.0",
+    "doctrine/doctrine-migrations-bundle": "^4.0",
     "doctrine/orm": "^3.5",
     "easycorp/easyadmin-bundle": "^4.27",
     "firebase/php-jwt": "^6.11",
