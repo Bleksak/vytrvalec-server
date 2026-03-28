@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\Charity;
 use App\Entity\CharityTranslation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -49,5 +50,30 @@ final class CharityRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * @return array<int, Charity>
+     */
+    public function findAllWithTranslations(?string $locale = null): array
+    {
+        $query = $this
+            ->createQueryBuilder('c')
+            ->addSelect('ct')
+            ->indexBy('c', 'c.id');
+
+        if ($locale !== null) {
+            $query->innerJoin(
+                'c.translations',
+                'ct',
+                Join::WITH,
+                'ct.locale = :locale',
+            )->setParameter('locale', $locale);
+        } else {
+            $query->innerJoin('c.translations', 'ct');
+        }
+
+        /** @var array<int, Charity> */
+        return $query->getQuery()->getResult();
     }
 }
