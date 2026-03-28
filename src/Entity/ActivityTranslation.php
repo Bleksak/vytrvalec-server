@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 final class ActivityTranslation
 {
     #[ORM\Id]
-    #[ORM\Column]
+    #[ORM\Column(length: 6)]
     public private(set) string $locale;
 
     #[ORM\Id]

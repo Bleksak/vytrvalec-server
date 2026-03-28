@@ -11,7 +11,6 @@ use App\Utils\FeatureFlag;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use OpenApi\Attributes as OA;
 use SensitiveParameter;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -35,7 +34,6 @@ final class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var array<string>
      */
-    #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
     #[ORM\Column(type: 'json')]
     public array $roles = [];
 
