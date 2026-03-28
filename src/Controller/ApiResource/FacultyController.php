@@ -165,7 +165,7 @@ final class FacultyController extends AbstractController
     {
         return $this->json(\array_map(
             static fn(Faculty $faculty): FacultyResponseDto => $faculty->toResponseObject(),
-            $this->facultyRepository->findAll(),
+            $this->facultyRepository->findAllWithTranslations(),
         ));
     }
 

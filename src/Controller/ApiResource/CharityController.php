@@ -159,7 +159,7 @@ final class CharityController extends AbstractController
     {
         return $this->json(\array_map(
             fn(Charity $charity): CharityGetResponseDto => $charity->toResponseObject($this->imagePath),
-            $this->charityRepository->findAll(),
+            $this->charityRepository->findAllWithTranslations(),
         ));
     }
 
