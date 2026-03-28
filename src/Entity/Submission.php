@@ -13,11 +13,29 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Index(columns: ['week'], name: 'week_index')]
-#[ORM\Index(columns: ['accepted', 'season_id', 'activity_id', 'user_id', 'distance'], name: 'idx_submission_accepted_season_activity_user_distance')]
-#[ORM\Index(columns: ['accepted', 'activity_id'], name: 'idx_submission_accepted_activity')]
-#[ORM\Index(columns: ['accepted', 'season_id', 'user_id'], name: 'idx_submission_accepted_season_user')]
-#[ORM\Index(columns: ['season_id', 'week', 'accepted'], name: 'idx_submission_season_week_accepted')]
-#[ORM\Index(columns: ['accepted', 'activity_id', 'distance'], name: 'idx_submission_accepted_activity_distance')]
+#[ORM\Index(columns: [
+    'accepted',
+    'season_id',
+    'activity_id',
+    'user_id',
+    'distance',
+], name: 'idx_submission_accepted_season_activity_user_distance')]
+#[ORM\Index(
+    columns: ['accepted', 'activity_id'],
+    name: 'idx_submission_accepted_activity',
+)]
+#[ORM\Index(
+    columns: ['accepted', 'season_id', 'user_id'],
+    name: 'idx_submission_accepted_season_user',
+)]
+#[ORM\Index(
+    columns: ['season_id', 'week', 'accepted'],
+    name: 'idx_submission_season_week_accepted',
+)]
+#[ORM\Index(
+    columns: ['accepted', 'activity_id', 'distance'],
+    name: 'idx_submission_accepted_activity_distance',
+)]
 #[ORM\HasLifecycleCallbacks]
 final class Submission
 {
