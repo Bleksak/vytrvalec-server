@@ -50,8 +50,7 @@ final class SeasonRepository extends ServiceEntityRepository
     public function findCurrentSeason(?User $user): ?Season
     {
         $qb = $this
-            ->createQueryBuilder('s, sfm')
-            ->join('s.facultyMappings', 'sfm')
+            ->createQueryBuilder('s')
             ->where('s.start <= :now')
             ->andWhere('s.end >= :now')
             ->setParameter('now', new \DateTimeImmutable())
