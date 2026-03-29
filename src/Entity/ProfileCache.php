@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: ProfileCacheRepository::class)]
-final class ProfileCache
+final class ProfileCache extends AbstractEntity
 {
     #[OA\Property]
     #[ORM\Id]

@@ -8,43 +8,19 @@ use App\Dto\ActivityStatisticsDto;
 use App\Entity\Activity;
 use App\Entity\Submission;
 use App\Services\ImagePath;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Activity>
- *
- * @method Activity|null find($id, $lockMode = null, $lockVersion = null)
- * @method Activity|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
- * @method Activity[]    findAll()
- * @method Activity[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
+ * @extends AbstractRepository<Activity>
  */
-final class ActivityRepository extends ServiceEntityRepository
+final class ActivityRepository extends AbstractRepository
 {
     public function __construct(
         private readonly SubmissionRepository $submissionRepository,
         ManagerRegistry $registry,
     ) {
         parent::__construct($registry, Activity::class);
-    }
-
-    public function save(Activity $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(Activity $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
     }
 
     public function submissionsCount(Activity $activity): int

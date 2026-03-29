@@ -21,7 +21,9 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     columns: ['email_unsubscribe_hash'],
     name: 'email_unsubscribe_hash',
 )]
-final class User implements UserInterface, PasswordAuthenticatedUserInterface
+final class User extends AbstractEntity implements
+    UserInterface,
+    PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

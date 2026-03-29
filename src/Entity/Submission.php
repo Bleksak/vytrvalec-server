@@ -37,7 +37,7 @@ use Doctrine\ORM\Mapping as ORM;
     name: 'idx_submission_accepted_activity_distance',
 )]
 #[ORM\HasLifecycleCallbacks]
-final class Submission
+final class Submission extends AbstractEntity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

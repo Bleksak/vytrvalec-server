@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
 
 #[ORM\Entity(repositoryClass: CharityRepository::class)]
-final class Charity
+final class Charity extends AbstractEntity
 {
     #[OA\Property]
     #[ORM\Id]

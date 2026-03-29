@@ -8,7 +8,7 @@ use App\Repository\ExtraPointsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ExtraPointsRepository::class)]
-final class ExtraPoints
+final class ExtraPoints extends AbstractEntity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

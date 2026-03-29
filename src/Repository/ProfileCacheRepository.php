@@ -7,32 +7,17 @@ namespace App\Repository;
 use App\Entity\ProfileCache;
 use App\Entity\Submission;
 use App\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ProfileCache>
- *
- * @method ProfileCache|null find($id, $lockMode = null, $lockVersion = null)
- * @method ProfileCache|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
- * @method ProfileCache[]    findAll()
- * @method ProfileCache[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
+ * @extends AbstractRepository<ProfileCache>
  */
-final class ProfileCacheRepository extends ServiceEntityRepository
+final class ProfileCacheRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, ProfileCache::class);
-    }
-
-    public function save(ProfileCache $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
     }
 
     public function addCache(Submission $submission, bool $flush = false): void

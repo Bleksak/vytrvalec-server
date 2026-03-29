@@ -5,41 +5,17 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Faculty;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Faculty>
- *
- * @method Faculty|null find($id, $lockMode = null, $lockVersion = null)
- * @method Faculty|null findOneBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null)
- * @method Faculty[]    findAll()
- * @method Faculty[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
+ * @extends AbstractRepository<Faculty>
  */
-final class FacultyRepository extends ServiceEntityRepository
+final class FacultyRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Faculty::class);
-    }
-
-    public function save(Faculty $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(Faculty $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
     }
 
     /**

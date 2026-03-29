@@ -7,7 +7,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-final class FacultyTranslation
+final class FacultyTranslation extends AbstractEntity
 {
     #[ORM\Id]
     #[ORM\ManyToOne(

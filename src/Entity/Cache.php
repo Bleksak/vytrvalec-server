@@ -11,7 +11,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SeasonCacheRepository::class)]
-final class Cache
+final class Cache extends AbstractEntity
 {
     #[ORM\Id]
     #[ORM\OneToOne]

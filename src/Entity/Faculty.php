@@ -13,7 +13,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FacultyRepository::class)]
-final class Faculty
+final class Faculty extends AbstractEntity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

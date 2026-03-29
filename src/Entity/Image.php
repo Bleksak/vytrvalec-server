@@ -13,7 +13,7 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Index(columns: ['used_at'], name: 'idx_used_at')]
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
-final class Image
+final class Image extends AbstractEntity
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME)]
