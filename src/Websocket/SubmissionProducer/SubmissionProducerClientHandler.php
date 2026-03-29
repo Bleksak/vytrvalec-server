@@ -286,6 +286,8 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
 
                         $this->submissionRepository->save($submission, true);
 
+                        unset($this->submissions[$customClient->submissionId]);
+
                         $customClient->submissionId = null;
 
                         $client->sendText($this->serializer->serialize(
