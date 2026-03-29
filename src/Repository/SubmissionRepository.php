@@ -342,6 +342,18 @@ final class SubmissionRepository extends AbstractRepository
             ->getResult();
     }
 
+    public function hasSubmissions(Season $season): bool
+    {
+        return $this
+            ->createQueryBuilder('s')
+            ->select('s.id')
+            ->where('s.season = :season')
+            ->setParameter('season', $season)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult() !== null;
+    }
+
     public function removeBySeason(Season $season, bool $flush = false): void
     {
         $this
