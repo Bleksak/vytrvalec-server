@@ -109,7 +109,9 @@ final readonly class SubmissionActions
         Submission $submission,
         SubmissionStateDto $dto,
     ): array {
-        if ($dto->updatedAt !== $submission->updatedAt) {
+        if (
+            $dto->updatedAt?->getTimestamp() !== $submission->updatedAt->getTimestamp()
+        ) {
             return ['mismatch_updated_at'];
         }
 
