@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]
 #[ORM\Index(columns: ['start'], name: 'date_index')]
-final class Season
+final class Season extends AbstractEntity
 {
     #[OA\Property(example: 1)]
     #[ORM\Id]

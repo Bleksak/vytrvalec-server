@@ -14,41 +14,22 @@ use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use App\Services\ImagePath;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Submission>
+ * @extends AbstractRepository<Submission>
  *
  * @method Submission|null find($id, $lockMode = null, $lockVersion = null)
  * @method Submission|null findOneBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null)
  * @method Submission[]    findAll()
  * @method Submission[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
-final class SubmissionRepository extends ServiceEntityRepository
+final class SubmissionRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Submission::class);
-    }
-
-    public function save(Submission $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(Submission $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
     }
 
     /**

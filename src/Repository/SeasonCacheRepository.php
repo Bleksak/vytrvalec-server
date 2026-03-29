@@ -6,32 +6,22 @@ namespace App\Repository;
 
 use App\Entity\Cache;
 use App\Entity\Season;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Cache>
+ * @extends AbstractRepository<Cache>
  *
  * @method Cache|null find($id, $lockMode = null, $lockVersion = null)
  * @method Cache|null findOneBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null)
  * @method Cache[]    findAll()
  * @method Cache[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
-final class SeasonCacheRepository extends ServiceEntityRepository
+final class SeasonCacheRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Cache::class);
-    }
-
-    public function save(Cache $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
     }
 
     /**

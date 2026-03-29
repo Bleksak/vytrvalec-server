@@ -6,35 +6,21 @@ namespace App\Repository;
 
 use App\Entity\FacultyMapping;
 use App\Entity\Season;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<FacultyMapping>
+ * @extends AbstractRepository<FacultyMapping>
+ *
+ * @method FacultyMapping|null find($id, $lockMode = null, $lockVersion = null)
+ * @method FacultyMapping|null findOneBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null)
+ * @method FacultyMapping[]    findAll()
+ * @method FacultyMapping[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
-final class FacultyMappingRepository extends ServiceEntityRepository
+final class FacultyMappingRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, FacultyMapping::class);
-    }
-
-    public function save(FacultyMapping $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(FacultyMapping $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
     }
 
     /**

@@ -9,42 +9,23 @@ use App\Entity\Charity;
 use App\Entity\Season;
 use App\Entity\User;
 use App\Utils\FeatureFlag;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Season>
+ * @extends AbstractRepository<Season>
  *
  * @method Season|null find($id, $lockMode = null, $lockVersion = null)
  * @method Season|null findOneBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null)
  * @method Season[]    findAll()
  * @method Season[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
-final class SeasonRepository extends ServiceEntityRepository
+final class SeasonRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Season::class);
-    }
-
-    public function save(Season $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(Season $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
     }
 
     public function findCurrentSeason(?User $user): ?Season
