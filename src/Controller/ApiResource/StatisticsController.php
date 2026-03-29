@@ -84,17 +84,20 @@ final class StatisticsController extends AbstractController
             ),
         ),
     ])]
+    #[IsGranted('ROLE_USER')]
     #[Route('/api/stats/{user}', name: 'stats_user_index', methods: ['GET'])]
-    public function indexUserStatistics(?User $user = null): Response
-    {
-        if ($user === null) {
-            /**
-             * @var ?User $user
-             */
-            $user = $this->getUser();
+    public function indexUserStatistics(
+        #[CurrentUser]
+        User $currentUser,
+        ?User $user = null,
+    ): Response {
+        $target = $user ?? $currentUser;
+
+        if ($target !== $currentUser) {
+            return new Response(status: Response::HTTP_FORBIDDEN);
         }
 
-        $cache = $user?->getProfileCaches();
+        $cache = $target->getProfileCaches();
 
         return $this->json(\array_map(
             static fn(ProfileCache $profileCache): ProfileCacheResponseDto => $profileCache->toResponseObject(),
