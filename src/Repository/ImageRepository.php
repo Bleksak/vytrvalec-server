@@ -9,11 +9,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends AbstractRepository<Image>
- *
- * @method Image|null find($id, $lockMode = null, $lockVersion = null)
- * @method Image|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
- * @method Image[]    findAll()
- * @method Image[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class ImageRepository extends AbstractRepository
 {

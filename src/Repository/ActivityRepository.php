@@ -13,11 +13,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends AbstractRepository<Activity>
- *
- * @method Activity|null find($id, $lockMode = null, $lockVersion = null)
- * @method Activity|null findOneBy(mixed[] $criteria, mixed[] $orderBy = null)
- * @method Activity[]    findAll()
- * @method Activity[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class ActivityRepository extends AbstractRepository
 {

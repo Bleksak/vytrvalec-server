@@ -10,11 +10,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends AbstractRepository<Faculty>
- *
- * @method Faculty|null find($id, $lockMode = null, $lockVersion = null)
- * @method Faculty|null findOneBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null)
- * @method Faculty[]    findAll()
- * @method Faculty[]    findBy(mixed[] $criteria, array<string, string('ASC')|string('DESC')|string('asc')|string('desc')>|null $orderBy = null, $limit = null, $offset = null)
  */
 final class FacultyRepository extends AbstractRepository
 {
