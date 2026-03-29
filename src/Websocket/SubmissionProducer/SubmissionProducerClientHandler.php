@@ -79,14 +79,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
             $ignoredIds,
         );
 
-        $toMerge = \array_filter(
-            \array_diff_key($newSubmissions, $this->submissions),
-            static fn(Submission $submission): bool => (
-                $submission->reviewed === false
-            ),
-        );
-
-        foreach ($toMerge as $key => $submission) {
+        foreach ($newSubmissions as $key => $submission) {
             $this->submissions[$key] = $submission;
         }
 
@@ -222,8 +215,9 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
 
                             echo
                                 \sprintf(
-                                    'Allocated submission with id: %d',
-                                    $customClient->clientId,
+                                    'Allocated submission with id: %d%s',
+                                    $customClient->submissionId,
+                                    PHP_EOL,
                                 )
                             ;
                         }
