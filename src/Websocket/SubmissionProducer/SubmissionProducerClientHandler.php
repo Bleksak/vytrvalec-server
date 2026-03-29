@@ -219,6 +219,13 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
                         if ($customClient->submissionId === null) {
                             $customClient->submissionId =
                                 $this->allocateSubmission();
+
+                            echo
+                                \sprintf(
+                                    'Allocated submission with id: %d',
+                                    $customClient->clientId,
+                                )
+                            ;
                         }
 
                         if ($customClient->submissionId === null) {
@@ -278,15 +285,15 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
                             SubmissionProducerReviewPayload::class,
                         );
 
-                        $submission =
-                            $this->submissions[$customClient->submissionId];
+                        $submissionId = $customClient->submissionId;
+                        $submission = $this->submissions[$submissionId];
 
                         $submission->reviewed = true;
                         $submission->accepted = $payload->accepted;
 
                         $this->submissionRepository->save($submission, true);
 
-                        unset($this->submissions[$customClient->submissionId]);
+                        unset($this->submissions[$submissionId]);
 
                         $customClient->submissionId = null;
 
@@ -321,6 +328,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
         }
 
         if ($this->freeList === []) {
+            $lock->release();
             return null;
         }
 
