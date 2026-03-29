@@ -179,8 +179,16 @@ final class SeasonController extends AbstractController
         methods: ['DELETE'],
     )]
     #[IsGranted(FeatureFlag::ROLE_STAFF->value)]
-    public function delete(Season $season): Response
-    {
+    public function delete(
+        Season $season,
+        SubmissionRepository $submissionRepository,
+    ): Response {
+        if ($submissionRepository->hasSubmissions($season)) {
+            return $this->json([
+                'error' => 'Season cannot be deleted because it contains submissions.',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $this->action->delete($season);
 
         return new Response(status: Response::HTTP_OK);
