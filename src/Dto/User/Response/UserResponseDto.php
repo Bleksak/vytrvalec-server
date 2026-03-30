@@ -30,6 +30,8 @@ final readonly class UserResponseDto
         #[OA\Property]
         public FacultyResponseDto $faculty,
         #[OA\Property]
+        public string $locale,
+        #[OA\Property]
         public ?bool $anonymize,
     ) {}
 }

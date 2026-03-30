@@ -87,7 +87,7 @@ final class User extends AbstractEntity implements
     public ?string $emailUnsubscribeHash = null;
 
     #[ORM\Column(length: 8)]
-    public string $locale = 'cs_CZ';
+    public string $locale = 'cs';
 
     /**
      * @param array<string> $roles
@@ -101,7 +101,7 @@ final class User extends AbstractEntity implements
         array $roles = [],
         #[SensitiveParameter]
         ?string $token = null,
-        string $locale = 'cs_CZ',
+        string $locale = 'cs',
     ) {
         $this->submissions = new ArrayCollection();
         $this->profileCaches = new ArrayCollection();
@@ -319,6 +319,7 @@ final class User extends AbstractEntity implements
             $this->firstName,
             $this->lastName,
             $this->faculty->toResponseObject(),
+            $this->locale,
             $this->anonymize,
         );
     }

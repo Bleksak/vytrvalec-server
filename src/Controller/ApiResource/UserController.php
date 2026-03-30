@@ -55,7 +55,7 @@ final class UserController extends AbstractController
     ): Response {
         try {
             $user = $this->action->login($dto);
-        } catch (PasswordInvalidException|UserNotFoundException) {
+        } catch (PasswordInvalidException | UserNotFoundException) {
             return new Response(status: 404);
         }
 
@@ -308,7 +308,7 @@ final class UserController extends AbstractController
 
         try {
             $this->action->create($dto);
-        } catch (NonUniqueEmailException|InvalidFacultySelectedException $e) {
+        } catch (NonUniqueEmailException | InvalidFacultySelectedException $e) {
             return $this->json(
                 $e->clientSideError(),
                 Response::HTTP_BAD_REQUEST,
@@ -362,6 +362,16 @@ final class UserController extends AbstractController
         $this->action->updateAnonymization($user, $anonymizeValue);
 
         return new Response();
+    }
+
+    #[Route(path: '/api/user/locale/{locale}', methods: ['PATCH'])]
+    public function updateLocale(
+        #[CurrentUser]
+        User $user,
+        string $locale,
+    ): Response {
+        $this->action->updateLocale($user, $locale);
+        return new Response(status: Response::HTTP_OK);
     }
 
     #[OA\Get(

@@ -177,6 +177,12 @@ final readonly class UserActions
         $this->userRepository->save($user, true);
     }
 
+    public function updateLocale(User $user, string $locale): void
+    {
+        $user->locale = $locale;
+        $this->userRepository->save($user, true);
+    }
+
     public function disableMailing(string $unsubscribeHash): bool
     {
         $user = $this->userRepository->findByUnsubscribeHash($unsubscribeHash);
