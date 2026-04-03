@@ -88,7 +88,7 @@
     "twig/twig": "^3.21"
   },
   "require-dev": {
-    "carthage-software/mago": "^1.15.2",
+    "carthage-software/mago": "^1.18.1",
     "phpunit/phpunit": "^12.3",
     "symfony/browser-kit": "8.0.*",
     "symfony/css-selector": "8.0.*",
