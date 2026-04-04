@@ -48,3 +48,7 @@ devenv.local.yaml
 
 # pre-commit
 .pre-commit-config.yaml
+
+###> friends-of-behat/symfony-extension ###
+/behat.php
+###< friends-of-behat/symfony-extension ###
