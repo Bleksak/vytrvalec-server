@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Dto\Season\Request;
 
-use App\Dto\Season\Request\SeasonQueryFilterType;
-
 final readonly class SeasonQueryFilterRequestDto
 {
     public function __construct(

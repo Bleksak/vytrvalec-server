@@ -123,8 +123,7 @@ final readonly class SeasonResultRankingService
                 SeasonResultRankRowDto $a,
                 SeasonResultRankRowDto $b,
             ): int => (
-                $b->points <=> $a->points
-                ?: $b->distance <=> $a->distance
+                $b->points <=> $a->points ?: $b->distance <=> $a->distance
             ),
         );
 
