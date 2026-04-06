@@ -46,14 +46,14 @@ final readonly class SeasonResultRankingService
     }
 
     /**
-     * @param int|null $week null => cela sezona
+     * @param int|null $currentWeek null => cela sezona
      * @param int|null $activity null => vsechny aktivity dohromady
      */
     public function calculateSeasonResultRanking(
         Season $season,
         SeasonResultWithUsersDto $seasonResult,
         ?int $activity = null,
-        ?int $week = null,
+        ?int $currentWeek = null,
     ): SeasonResultRankDto {
         // za kazdy tyden se udeluje stejny pocet bodu(N)
         // tzn pokud se v prvnim tydnu zucastni 7 fakult a ve druhem tydnu 12 fakult, rozdeluje se i za prvni tyden 12 bodu
@@ -76,7 +76,7 @@ final readonly class SeasonResultRankingService
         $ranking = [];
         $extras = [];
 
-        if ($week === null) {
+        if ($currentWeek === null) {
             foreach ($seasonResult->results as $week => $weeklyResult) {
                 $this->populateRankingArray(
                     $facultySet,
@@ -87,11 +87,11 @@ final readonly class SeasonResultRankingService
                 );
             }
         } else {
-            if ($week < 0 || $week >= $season->getWeekCount()) {
+            if ($currentWeek < 0 || $currentWeek >= $season->getWeekCount()) {
                 return new SeasonResultRankDto(0, 0, [], []);
             }
 
-            $weeklyResult = $seasonResult->results[$week];
+            $weeklyResult = $seasonResult->results[$currentWeek];
             $this->populateRankingArray(
                 $facultySet,
                 $weeklyResult,
@@ -171,7 +171,8 @@ final readonly class SeasonResultRankingService
                 continue;
             }
 
-            $facultyResults = [...$activityResult->results];
+            // NOTE: uses copy on write
+            $facultyResults = $activityResult->results;
 
             // TODO(@bleksak): tenhle sort mozna movnout do SeasonResultCalculatoru
             \usort(
