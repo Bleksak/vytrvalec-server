@@ -48,7 +48,7 @@ final readonly class CharityActions
     {
         $nameTranslations = $dto->translations?->name?->toArray() ?? [];
         $descriptionTranslations = $dto->translations?->description?->toArray()
-        ?? [];
+            ?? [];
 
         foreach ($nameTranslations as $locale => $translation) {
             \assert($translation !== null, 'Translation cannot be null!');

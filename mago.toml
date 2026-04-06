@@ -24,6 +24,8 @@ null-type-hint = "question"
 always-break-attribute-named-argument-lists = true
 method-brace-style = "next_line"
 empty-line-between-same-symbols = true
+line-before-binary-operator = true
+indent-binary-expression-continuation = true
 
 [linter]
 integrations = ["symfony", "amphp", "phpunit", "doctrine"]
