@@ -7,7 +7,7 @@ namespace App\Dto;
 use OpenApi\Attributes as OA;
 
 /**
- * @type ExtraPointsDtoType = array{user: int, name: string, faculty: int, value: int, points: int, activity: null|int}
+ * @type ExtraPointsDtoType = array{user: int, name: string, faculty: int, value: int, points: int, activity: int}
  */
 final class ExtraPointsDto
 {
@@ -37,7 +37,7 @@ final class ExtraPointsDto
             $data['name'],
             $data['value'],
             $data['points'],
-            $data['activity'] ?? 0,
+            $data['activity'],
         );
     }
 
