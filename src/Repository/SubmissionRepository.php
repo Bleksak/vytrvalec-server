@@ -163,7 +163,6 @@ final class SubmissionRepository extends AbstractRepository
                 SeasonQueryFilterType::Page->value => \is_int($value)
                     ? $queryBuilder->setFirstResult(($value - 1) * $limit)
                     : $queryBuilder,
-                default => $queryBuilder,
             };
         }
 

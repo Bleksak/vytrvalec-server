@@ -58,6 +58,11 @@ require-namespace = { enabled = true }
 
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000, enabled = false }
+no-is-null = { enabled = true }
+no-array-accumulation-in-loop = { enabled = true }
+no-iterator-to-array-in-foreach = { enabled = true }
+no-parameter-shadowing = { enabled = true }
+sorted-integer-keys = { enabled = true }
 
 [analyzer]
 find-unused-expressions = true
