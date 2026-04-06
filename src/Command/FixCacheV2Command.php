@@ -10,6 +10,7 @@ use App\Entity\Faculty;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
+use App\Repository\FacultyMappingRepository;
 use App\Repository\SeasonCacheRepository;
 use App\Repository\SubmissionRepository;
 use App\Repository\UserRepository;
@@ -28,6 +29,7 @@ final readonly class FixCacheV2Command
         private EntityManagerInterface $em,
         private UserRepository $userRepository,
         private SubmissionRepository $submissionRepository,
+        private FacultyMappingRepository $facultyMappingRepository,
     ) {}
 
     public function __invoke(): int
@@ -38,6 +40,7 @@ final readonly class FixCacheV2Command
             $newWeeklyResults = [];
             $data = $cache->data;
             $users = [];
+            $facultyParentRoots = $this->facultyMappingRepository->findRootsBySeason($cache->season);
 
             foreach ($data->results as $week) {
                 $newActivityResults = [];
@@ -73,6 +76,8 @@ final readonly class FixCacheV2Command
 
             foreach ($data->outliers as $outlier) {
                 foreach ($outlier->results as $outlierResult) {
+                    $outlierResult->facultyId =
+                        $facultyParentRoots[$outlierResult->facultyId];
                     $users[$outlierResult->user] = $outlierResult->user;
                 }
             }

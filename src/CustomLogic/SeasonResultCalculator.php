@@ -103,6 +103,9 @@ final readonly class SeasonResultCalculator
 
         foreach ($topThree as $outlier) {
             foreach ($outlier->results as $outlierResult) {
+                $outlierResult->facultyId =
+                    $facultyParentRoots[$outlierResult->facultyId];
+
                 $users[$outlierResult->user] = $outlierResult->user;
             }
         }
