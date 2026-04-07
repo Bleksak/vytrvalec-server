@@ -19,8 +19,6 @@ trait DoctrineNamespaceTrait
     /** @param array<string, string> $dirs */
     protected function getDoctrineNamespace(array $dirs): string
     {
-        $namespace = null;
-
         \assert(\count($dirs) === 1);
         $namespace = \key($dirs);
 
