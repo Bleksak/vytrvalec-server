@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Behat;
 
 use App\DataFixtures\FacultyFixtures;
+use App\DataFixtures\UserFixtures;
+use Behat\Hook\AfterScenario;
 use Behat\Hook\BeforeScenario;
+use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Psr\Container\ContainerInterface;
 
 /**
  * @internal
@@ -15,20 +19,60 @@ use Doctrine\ORM\Tools\SchemaTool;
 trait DatabaseContextTrait
 {
     protected EntityManagerInterface $entityManager;
+    protected ContainerInterface $container;
 
-    #[BeforeScenario]
-    public function prepareDatabase(): void
+    private static function isInitialized(EntityManagerInterface $em): bool
     {
-        $schemaTool = new SchemaTool($this->entityManager);
+        $connection = $em->getConnection();
 
-        $metadata = $this->entityManager
-            ->getMetadataFactory()
-            ->getAllMetadata();
+        $schemaManager = $connection->createSchemaManager();
+        return count($schemaManager->introspectTables()) > 0;
+    }
 
-        $schemaTool->dropSchema($metadata);
+    /** @param list<FixtureInterface> $fixtures */
+    private static function prepareDatabase(
+        EntityManagerInterface $entityManager,
+        array $fixtures,
+    ): void {
+        if (self::isInitialized($entityManager)) {
+            return;
+        }
+
+        $schemaTool = new SchemaTool($entityManager);
+        $metadata = $entityManager->getMetadataFactory()->getAllMetadata();
+
+        $url = $entityManager->getConnection()->getParams()['url'] ?? null;
+        $isInMemory = $url && str_contains($url, ':memory:');
+
+        if (!$isInMemory) {
+            $schemaTool->dropSchema($metadata);
+        }
+
         $schemaTool->createSchema($metadata);
 
-        $fixture = new FacultyFixtures();
-        $fixture->load($this->entityManager);
+        foreach ($fixtures as $fixture) {
+            $fixture->load($entityManager);
+        }
+
+        $entityManager
+            ->getConnection()
+            ->executeStatement('PRAGMA foreign_keys = ON');
+    }
+
+    #[BeforeScenario]
+    public function startTransaction(): void
+    {
+        self::prepareDatabase($this->entityManager, [
+            $this->container->get(FacultyFixtures::class),
+            $this->container->get(UserFixtures::class),
+        ]);
+
+        $this->entityManager->beginTransaction();
+    }
+
+    #[AfterScenario]
+    public function rollbackTransaction(): void
+    {
+        $this->entityManager->rollback();
     }
 }
