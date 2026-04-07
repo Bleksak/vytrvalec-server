@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Behat;
 
 use App\Action\UserActions;
-
-
 use App\Dto\UserRegistrationDto;
 use App\Exceptions\User\InvalidFacultySelectedException;
 use App\Exceptions\User\NonUniqueEmailException;
@@ -19,6 +17,7 @@ use Behat\Step\When;
 use Doctrine\ORM\EntityManagerInterface;
 use SensitiveParameter;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use function PHPUnit\Framework\assertEquals;
@@ -30,7 +29,7 @@ final class AuthContext implements Context
 {
     use DatabaseContextTrait;
 
-    private $validationErrors = null;
+    private ?ConstraintViolationListInterface $validationErrors = null;
     private ?\Exception $exception = null;
 
     public function __construct(
@@ -113,7 +112,7 @@ final class AuthContext implements Context
     }
 
     #[Then('I should receive a validation error for the :field field')]
-    public function iShouldReceiveAValidationErrorForTheField(string $field): void
+    public function iShouldReceiveAValidationErrorForTheField(string $_field): void
     {
         assertNotNull($this->validationErrors);
         assertEquals(true, \count($this->validationErrors) > 0);

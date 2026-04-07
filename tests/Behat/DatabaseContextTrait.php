@@ -20,13 +20,14 @@ trait DatabaseContextTrait
 {
     protected EntityManagerInterface $entityManager;
     protected ContainerInterface $container;
+    private static ?bool $inMemoryDb = null;
 
     private static function isInitialized(EntityManagerInterface $em): bool
     {
         $connection = $em->getConnection();
 
         $schemaManager = $connection->createSchemaManager();
-        return count($schemaManager->introspectTables()) > 0;
+        return \count($schemaManager->introspectTables()) > 0;
     }
 
     /** @param list<FixtureInterface> $fixtures */
@@ -40,13 +41,6 @@ trait DatabaseContextTrait
 
         $schemaTool = new SchemaTool($entityManager);
         $metadata = $entityManager->getMetadataFactory()->getAllMetadata();
-
-        $url = $entityManager->getConnection()->getParams()['url'] ?? null;
-        $isInMemory = $url && str_contains($url, ':memory:');
-
-        if (!$isInMemory) {
-            $schemaTool->dropSchema($metadata);
-        }
 
         $schemaTool->createSchema($metadata);
 
