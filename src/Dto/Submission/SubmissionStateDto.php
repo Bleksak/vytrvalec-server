@@ -14,8 +14,9 @@ final class SubmissionStateDto
     public ?\DateTime $updatedAt = null;
 
     #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
-    public bool $state;
+    #[Assert\NotNull(message: 'blank')]
+    #[Assert\Type(type: 'bool', message: 'invalid')]
+    public bool $state = false;
 
     #[OA\Property]
     public string $message = '';
