@@ -24,11 +24,11 @@ fmt:
     vendor/bin/mago fmt
     vendor/bin/twig-cs-fixer fix src/ templates/
 
-db:migrate:diff:
+db-migrate-diff:
     bin/console migrations:diff
 
-db:migrate:squash:
+db-migrate-squash:
     bin/console migrations:squash
 
-db:seed:
+db-seed:
     bin/console doctrine:fixtures:load
