@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Behat;
 
 use App\Action\UserActions;
+use App\Dto\User\UserLoginDto;
 use App\Dto\UserRegistrationDto;
+use App\Entity\User;
 use App\Exceptions\User\InvalidFacultySelectedException;
 use App\Exceptions\User\NonUniqueEmailException;
+use App\Exceptions\User\PasswordInvalidException;
+use App\Exceptions\User\UserNotFoundException;
 use App\Repository\FacultyRepository;
 use App\Repository\UserRepository;
 use Behat\Behat\Context\Context;
@@ -31,6 +35,7 @@ final class AuthContext implements Context
 
     private ?ConstraintViolationListInterface $validationErrors = null;
     private ?\Exception $exception = null;
+    private ?User $loggedUser = null;
 
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -84,13 +89,15 @@ final class AuthContext implements Context
 
         $this->validationErrors = $this->validator->validate($registrationDto);
 
-        if (\count($this->validationErrors) === 0) {
-            try {
-                $this->userActions->create($registrationDto);
-                $this->exception = null;
-            } catch (\Exception $e) {
-                $this->exception = $e;
-            }
+        if (\count($this->validationErrors) !== 0) {
+            return;
+        }
+
+        try {
+            $this->userActions->create($registrationDto);
+            $this->exception = null;
+        } catch (\Exception $e) {
+            $this->exception = $e;
         }
     }
 
@@ -145,5 +152,67 @@ final class AuthContext implements Context
             InvalidFacultySelectedException::class,
             $this->exception,
         );
+    }
+
+    #[When('I log in with email :email and password :password')]
+    #[When(
+        'I log in with email :email, password :password and Firebase token :firebaseToken',
+    )]
+    public function iLogInWithEmailAndPassword(
+        string $email,
+        #[SensitiveParameter]
+        string $password,
+        #[\SensitiveParameter]
+        ?string $firebaseToken = null,
+    ): void {
+        $loginDto = new UserLoginDto($email, $password, $firebaseToken);
+        $this->loggedUser = null;
+        $this->exception = null;
+
+        $this->validationErrors = $this->validator->validate($loginDto);
+
+        if (\count($this->validationErrors) !== 0) {
+            return;
+        }
+
+        try {
+            $this->loggedUser = $this->userActions->login($loginDto);
+        } catch (\Exception $e) {
+            $this->exception = $e;
+        }
+    }
+
+    #[Then('I should receive a successful login response')]
+    public function iShouldReceiveASuccessfulLoginResponse(): void
+    {
+        assertNull($this->exception);
+    }
+
+    #[Then(
+        'the logged in user should have email :email, first name :firstName, last name :lastName',
+    )]
+    public function theLoggedInUserShouldHaveEmailFirstNameLastName(
+        string $email,
+        string $firstName,
+        string $lastName,
+    ): void {
+        assertNotNull($this->loggedUser);
+        assertEquals($email, $this->loggedUser->email);
+        assertEquals($firstName, $this->loggedUser->firstName);
+        assertEquals($lastName, $this->loggedUser->lastName);
+    }
+
+    #[Then('I should receive an error that the user was not found')]
+    public function iShouldReceiveAnErrorThatTheUserWasNotFound(): void
+    {
+        assertNotNull($this->exception);
+        assertInstanceOf(UserNotFoundException::class, $this->exception);
+    }
+
+    #[Then('I should receive an error that the password is invalid')]
+    public function iShouldReceiveAnErrorThatThePasswordIsInvalid(): void
+    {
+        assertNotNull($this->exception);
+        assertInstanceOf(PasswordInvalidException::class, $this->exception);
     }
 }

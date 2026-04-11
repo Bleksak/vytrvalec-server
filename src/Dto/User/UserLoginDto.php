@@ -9,19 +9,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class UserLoginDto
 {
-    #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
-    #[Assert\Email(message: 'invalid')]
-    public ?string $email = null;
+    public function __construct(
+        #[OA\Property]
+        #[Assert\NotBlank(message: 'blank', allowNull: false)]
+        #[Assert\Email(message: 'invalid')]
+        public ?string $email = null,
 
-    #[OA\Property]
-    #[Assert\NotBlank(message: 'blank', allowNull: false)]
-    #[Assert\PasswordStrength(
-        message: 'invalid',
-        minScore: Assert\PasswordStrength::STRENGTH_WEAK,
-    )]
-    public ?string $password = null;
+        #[\SensitiveParameter]
+        #[OA\Property]
+        #[Assert\NotBlank(message: 'blank', allowNull: false)]
+        #[Assert\PasswordStrength(
+            message: 'invalid',
+            minScore: Assert\PasswordStrength::STRENGTH_WEAK,
+        )]
+        public ?string $password = null,
 
-    #[OA\Property]
-    public ?string $firebaseToken = null;
+        #[\SensitiveParameter]
+        #[OA\Property]
+        public ?string $firebaseToken = null,
+    ) {}
 }
