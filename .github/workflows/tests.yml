@@ -23,6 +23,9 @@ jobs:
         env:
           COMPOSER_ALLOW_SUPERUSER: 1
 
+      - name: Setup just
+        uses: extractions/setup-just@v3
+
       - name: Setup project
         run: just setup
 
