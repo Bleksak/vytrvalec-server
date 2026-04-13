@@ -163,7 +163,6 @@ final class SubmissionRepository extends AbstractRepository
                 SeasonQueryFilterType::Page->value => \is_int($value)
                     ? $queryBuilder->setFirstResult(($value - 1) * $limit)
                     : $queryBuilder,
-                default => $queryBuilder,
             };
         }
 
@@ -233,10 +232,9 @@ final class SubmissionRepository extends AbstractRepository
                         AS row_num
                         FROM sub
                     )
-                SELECT value, activity_id, user_id, COALESCE(f.parent_id, u.faculty_id) AS faculty_id
+                SELECT value, activity_id, user_id, u.faculty_id AS faculty_id
                 FROM sorted s
                 INNER JOIN user u ON u.id = s.user_id
-                INNER JOIN faculty f ON u.faculty_id = f.id
                 WHERE s.row_num <= ?
                 ORDER BY value DESC
             ');

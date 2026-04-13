@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\DataFixtures\:
+        resource: '../src/DataFixtures/*'
+        public: true
+
+    Doctrine\ORM\EntityManagerInterface:
+        alias: doctrine.orm.entity_manager
+        public: true
+
+    App\Tests\Behat\:
+        resource: '../tests/Behat/*'

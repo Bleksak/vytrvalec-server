@@ -24,6 +24,8 @@ null-type-hint = "question"
 always-break-attribute-named-argument-lists = true
 method-brace-style = "next_line"
 empty-line-between-same-symbols = true
+line-before-binary-operator = true
+indent-binary-expression-continuation = true
 
 [linter]
 integrations = ["symfony", "amphp", "phpunit", "doctrine"]
@@ -58,6 +60,13 @@ require-namespace = { enabled = true }
 
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000, enabled = false }
+no-is-null = { enabled = true }
+no-array-accumulation-in-loop = { enabled = true }
+no-iterator-to-array-in-foreach = { enabled = true }
+no-parameter-shadowing = { enabled = true }
+sorted-integer-keys = { enabled = true }
+no-redundant-readonly = { enabled = true  }
+method-name = { enabled = true, use-snake-case-for-tests = false, camel = true }
 
 [analyzer]
 find-unused-expressions = true
@@ -78,6 +87,12 @@ check-property-initialization = false # NOTE: We cannot use this until the issue
 check-use-statements = true
 enforce-class-finality = true
 require-api-or-internal = true
+check-experimental = true
+check-name-casing = true
+
+# TODO: enable this one later probably
+# allow-side-effects-in-conditions = false
+
 
 class-initializers = ["__construct", "setContainer"]
 plugins = ["standard", "std", "php-stdlib", "psr-container"]

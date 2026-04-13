@@ -18,11 +18,10 @@ final readonly class SeasonQueryFilterRequestDto
     ) {}
 
     /**
-     * @return array<string, int|string|\DateTime>
+     * @return array<value-of<SeasonQueryFilterType>, bool|int|string|\DateTime>
      */
     public function toArray(): array
     {
-        /** @var array<string, int|string|\DateTime> */
         return \array_filter([
             SeasonQueryFilterType::Date->value => $this->date,
             SeasonQueryFilterType::Week->value => $this->week,

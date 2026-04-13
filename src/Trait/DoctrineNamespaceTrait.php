@@ -19,10 +19,8 @@ trait DoctrineNamespaceTrait
     /** @param array<string, string> $dirs */
     protected function getDoctrineNamespace(array $dirs): string
     {
-        $namespace = null;
-
         \assert(\count($dirs) === 1);
-        $namespace = \key($dirs);
+        $namespace = \array_key_first($dirs);
 
         if (!isset($dirs[$namespace])) {
             throw new \Exception(\sprintf(
@@ -30,8 +28,6 @@ trait DoctrineNamespaceTrait
                 $namespace,
             ));
         }
-
-        \assert($namespace !== null);
 
         return $namespace;
     }

@@ -1,0 +1,35 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: none
+          tools: composer
+        env:
+          COMPOSER_ALLOW_SUPERUSER: 1
+
+      - name: Setup just
+        uses: extractions/setup-just@v3
+
+      - name: Setup project
+        run: just setup
+
+      - name: Run Behat tests
+        run: just test

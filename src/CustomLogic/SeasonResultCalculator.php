@@ -82,7 +82,7 @@ final readonly class SeasonResultCalculator
                 foreach ($extras as $extra) {
                     $facultyId =
                         $facultyParentRoots[$extra->facultyId]
-                        ?? $extra->facultyId;
+                            ?? $extra->facultyId;
 
                     $results[$cls->getWeek()]->activities[$extra->activityId]->extras[] =
                         new ExtraPointsDto(
@@ -103,6 +103,9 @@ final readonly class SeasonResultCalculator
 
         foreach ($topThree as $outlier) {
             foreach ($outlier->results as $outlierResult) {
+                $outlierResult->facultyId =
+                    $facultyParentRoots[$outlierResult->facultyId];
+
                 $users[$outlierResult->user] = $outlierResult->user;
             }
         }

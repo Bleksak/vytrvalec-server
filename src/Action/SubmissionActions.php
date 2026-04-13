@@ -115,11 +115,20 @@ final readonly class SubmissionActions
             return ['mismatch_updated_at'];
         }
 
+        // Submission is reviewed and DTO has the same state as the submission => noop
+        // TODO(@bleksak): The message might have changed, but we will handle that another day
+        if (
+            $submission->reviewed === true
+            && $submission->accepted === $dto->state
+        ) {
+            return [];
+        }
+
         $submission->message = $dto->message;
 
         $this->handleCacheUpdate($submission, $dto);
 
-        // TODO(@bleksak): Ted mi doslo, ze tady se da frajerovi zaspamovat email kdyby kutak furt schvaloval a zamital aktivitu :D
+        // TODO(@bleksak): tady se da frajerovi zaspamovat email kdyby admin furt schvaloval a zamital aktivitu :D
         if (!$dto->state) {
             // if ($submission->getUser()->getToken() !== null) {
             //     $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));
@@ -226,12 +235,12 @@ final readonly class SubmissionActions
         Submission $submission,
         SubmissionStateDto $dto,
     ): void {
-        if ($dto->state && (!$submission->reviewed || !$submission->accepted)) {
+        if ($dto->state && !$submission->reviewed && !$submission->accepted) {
             // noop when already accepted, otherwise profile cache would stack
             $this->profileCacheRepository->addCache($submission);
         }
 
-        if (!$dto->state) {
+        if (!$dto->state && $submission->accepted) {
             $this->profileCacheRepository->removeCache($submission);
         }
     }

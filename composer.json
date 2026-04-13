@@ -88,7 +88,10 @@
     "twig/twig": "^3.21"
   },
   "require-dev": {
+    "friends-of-behat/symfony-extension": "dev-symfony-8-behat-4-support",
+    "behat/behat": "4.x-dev",
     "carthage-software/mago": "^1.18.1",
+    "doctrine/doctrine-fixtures-bundle": "^4.3",
     "phpunit/phpunit": "^12.3",
     "symfony/browser-kit": "8.0.*",
     "symfony/css-selector": "8.0.*",
@@ -148,6 +151,10 @@
     {
       "type": "vcs",
       "url": "https://github.com/Bleksak/pico"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/shahinataei-ts/SymfonyExtension"
     }
   ]
 }

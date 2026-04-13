@@ -6,7 +6,6 @@ namespace App\Command;
 
 use App\Repository\ProfileCacheRepository;
 use App\Repository\UserRepository;
-use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -22,16 +21,15 @@ final readonly class FixProfileCacheCommand
         private ProfileCacheRepository $profileCacheRepository,
     ) {}
 
-    public function __invoke(SymfonyStyle $io, #[Argument] int $userId): int
+    public function __invoke(SymfonyStyle $io): int
     {
-        $user = $this->userRepository->find($userId);
-        if (!$user) {
-            $io->error('User not found');
+        $users = $this->userRepository->findAll();
 
-            return Command::FAILURE;
+        foreach ($users as $user) {
+            $this->profileCacheRepository->fixCacheValues($user);
         }
 
-        $this->profileCacheRepository->fixCacheValues($user);
+        $io->success('Done');
 
         return Command::SUCCESS;
     }
