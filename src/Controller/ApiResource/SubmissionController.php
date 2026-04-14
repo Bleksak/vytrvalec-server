@@ -19,6 +19,7 @@ use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use App\Services\ImagePath;
 use App\Utils\FeatureFlag;
+use App\Utils\SubmissionState;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use OpenApi\Attributes\JsonContent;
@@ -66,7 +67,7 @@ final class SubmissionController extends AbstractController
             return new Response(status: Response::HTTP_FORBIDDEN);
         }
 
-        if ($submission->reviewed && $submission->accepted) {
+        if ($submission->state === SubmissionState::Accepted) {
             return new Response(status: Response::HTTP_BAD_REQUEST);
         }
 
@@ -240,7 +241,7 @@ final class SubmissionController extends AbstractController
         #[MapRequestPayload]
         SubmissionEditDto $submissionEditDto,
     ): Response {
-        if ($submission->accepted) {
+        if ($submission->state === SubmissionState::Accepted) {
             return $this->json(['submission' => [
                 'accepted',
             ]], Response::HTTP_BAD_REQUEST);

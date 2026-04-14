@@ -6,6 +6,7 @@ namespace App\CustomLogic;
 
 use App\Dto\ExtraPointsResultDto;
 use App\Entity\Season;
+use App\Utils\SubmissionState;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class WeeklyElevationExtraPoints implements ExtraPointsInterface
@@ -37,7 +38,7 @@ final readonly class WeeklyElevationExtraPoints implements ExtraPointsInterface
                     SELECT MAX(s.elevation) as value, a.min_elevation, s.activity_id as activity_id, s.user_id as user_id
                     FROM submission s
                     INNER JOIN activity a ON s.activity_id = a.id
-                    WHERE s.week = ? AND s.accepted = ? AND s.season_id = ?
+                    WHERE s.week = ? AND s.state = ? AND s.season_id = ?
                     GROUP BY s.user_id, s.activity_id, a.min_elevation
                     HAVING(value) >= min_elevation
                 ),
@@ -57,7 +58,7 @@ final readonly class WeeklyElevationExtraPoints implements ExtraPointsInterface
         ');
 
         $query->bindValue(1, self::getWeek());
-        $query->bindValue(2, true);
+        $query->bindValue(2, SubmissionState::Accepted->value);
         $query->bindValue(3, $season->id);
 
         /**

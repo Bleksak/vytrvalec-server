@@ -6,6 +6,7 @@ namespace App\CustomLogic;
 
 use App\Dto\ExtraPointsResultDto;
 use App\Entity\Season;
+use App\Utils\SubmissionState;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class DailyDistanceExtraPoints implements ExtraPointsInterface
@@ -36,7 +37,7 @@ final readonly class DailyDistanceExtraPoints implements ExtraPointsInterface
                 sub AS (
                     SELECT SUM(s.distance) as value, s.activity_id as activity_id, s.user_id as user_id, s.date
                     FROM submission s
-                    WHERE s.week = ? AND s.accepted = ? AND s.season_id = ?
+                    WHERE s.week = ? AND s.state = ? AND s.season_id = ?
                     GROUP BY s.date, s.user_id, s.activity_id
                 ),
                 sorted AS (
@@ -55,7 +56,7 @@ final readonly class DailyDistanceExtraPoints implements ExtraPointsInterface
         ');
 
         $query->bindValue(1, self::getWeek());
-        $query->bindValue(2, true);
+        $query->bindValue(2, SubmissionState::Accepted->value);
         $query->bindValue(3, $season->id);
 
         /**
