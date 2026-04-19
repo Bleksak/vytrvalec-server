@@ -128,8 +128,8 @@ final class SubmissionRepository extends AbstractRepository
             ->setParameter('seasonId', $season->id)
             ->setFirstResult(0)
             ->setMaxResults($limit)
-            ->addOrderBy('s.date', 'ASC')
-            ->addOrderBy('s.id', 'ASC');
+            ->addOrderBy('s.date', 'DESC')
+            ->addOrderBy('s.id', 'DESC');
 
         foreach ($queryFilter->toArray() as $key => $value) {
             $queryBuilder = match ($key) {
