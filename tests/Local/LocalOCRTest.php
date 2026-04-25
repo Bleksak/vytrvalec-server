@@ -16,7 +16,7 @@ final class LocalOCRTest extends KernelTestCase
 {
     public function testImageValidityChecker(): void
     {
-        $kernel = self::bootKernel();
+        self::bootKernel();
 
         $checker = static::getContainer()->get(SubmissionImageValidityCheckerService::class);
         $submissionRepository = static::getContainer()->get(SubmissionRepository::class);
