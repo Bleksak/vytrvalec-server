@@ -40,7 +40,7 @@ final readonly class SponsorDtoMapper
             $sponsor->image->getPath($this->imagePath),
             $sponsor
                 ->seasons
-                ->map(fn(Season $season): int => $season->id)
+                ->map(static fn(Season $season): int => $season->id)
                 ->toArray(),
         );
     }
