@@ -14,4 +14,17 @@ final class SponsorRepository extends AbstractRepository
     {
         parent::__construct($registry, Sponsor::class);
     }
+
+    public function findOneWithSeasons(int $id): ?Sponsor
+    {
+        return $this
+            ->createQueryBuilder('s')
+            ->addSelect('s')
+            ->addSelect('seasons')
+            ->leftJoin('s.seasons', 'seasons')
+            ->where('s.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
