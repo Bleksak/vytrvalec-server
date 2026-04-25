@@ -67,6 +67,9 @@ no-parameter-shadowing = { enabled = true }
 sorted-integer-keys = { enabled = true }
 no-redundant-readonly = { enabled = true  }
 method-name = { enabled = true, use-snake-case-for-tests = false, camel = true }
+no-dead-store = { enabled = true }
+no-redundant-variable = { enabled = true }
+no-redundant-else = { enabled = true }
 
 [analyzer]
 find-unused-expressions = true
