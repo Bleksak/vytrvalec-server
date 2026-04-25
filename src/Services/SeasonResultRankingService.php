@@ -77,7 +77,7 @@ final readonly class SeasonResultRankingService
         $extras = [];
 
         if ($currentWeek === null) {
-            foreach ($seasonResult->results as $week => $weeklyResult) {
+            foreach ($seasonResult->results as $weeklyResult) {
                 $this->populateRankingArray(
                     $facultySet,
                     $weeklyResult,

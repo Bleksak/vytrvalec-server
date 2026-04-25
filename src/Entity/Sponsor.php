@@ -27,6 +27,7 @@ final class Sponsor extends AbstractEntity
     #[ORM\ManyToOne]
     public Image $image;
 
+    /** @var Collection<int, Season> */
     #[ORM\ManyToMany(targetEntity: Season::class, mappedBy: 'sponsors')]
     public Collection $seasons;
 

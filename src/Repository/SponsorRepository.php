@@ -17,6 +17,7 @@ final class SponsorRepository extends AbstractRepository
 
     public function findOneWithSeasons(int $id): ?Sponsor
     {
+        /** @var null|Sponsor */
         return $this
             ->createQueryBuilder('s')
             ->addSelect('s')

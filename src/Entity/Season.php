@@ -61,6 +61,7 @@ final class Season extends AbstractEntity
     )]
     public Collection $facultyMappings;
 
+    /** @var Collection<int, Sponsor> */
     #[ORM\ManyToMany(targetEntity: Sponsor::class, inversedBy: 'seasons')]
     #[ORM\JoinTable('season_sponsor')]
     public Collection $sponsors;
