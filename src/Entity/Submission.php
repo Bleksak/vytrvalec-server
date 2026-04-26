@@ -121,7 +121,7 @@ final class Submission extends AbstractEntity
             $days = 0;
         }
 
-        $this->week = \intdiv($days, num2: 7);
+        $this->week = $days > 0 ? \intdiv($days - 1, 7) : 0;
         $this->updatedAt = new \DateTime();
     }
 
