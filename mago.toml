@@ -8,9 +8,9 @@ includes = ["vendor", "var"]
 excludes = [
   "vendor/nikic/fast-route/test",
   "vendor/composer/autoload_classmap.php",
-  "vendor/google/common-protos/metadata",
+  # "vendor/google/common-protos/metadata",
   "vendor/google/gax/metadata",
-  "vendor/google/longrunning/metadata",
+  # "vendor/google/longrunning/metadata",
   "vendor/symfony/cache/Traits/ValueWrapper.php",
   "vendor/composer/autoload_static.php",
 ]
@@ -70,6 +70,7 @@ method-name = { enabled = true, use-snake-case-for-tests = false, camel = true }
 no-dead-store = { enabled = true }
 no-redundant-variable = { enabled = true }
 no-redundant-else = { enabled = true }
+no-negated-ternary = { enabled = true }
 
 [analyzer]
 find-unused-expressions = true
@@ -99,3 +100,4 @@ check-name-casing = true
 
 class-initializers = ["__construct", "setContainer"]
 plugins = ["standard", "std", "php-stdlib", "psr-container"]
+
