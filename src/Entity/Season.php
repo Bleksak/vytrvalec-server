@@ -106,7 +106,9 @@ final class Season extends AbstractEntity
 
     public function isRunning(): bool
     {
-        $today = new \DateTimeImmutable();
+        $today = new \DateTime();
+        $today->setTime(0, 0);
+
         $start = \DateTimeImmutable::createFromInterface($this->start);
         $end = \DateTimeImmutable::createFromInterface($this->end);
 
