@@ -25,15 +25,14 @@ final class SeasonRepository extends AbstractRepository
 
     public function findCurrentSeason(?User $user): ?Season
     {
-        $currentDate = new \DateTimeImmutable();
-        $currentEndDate = $currentDate->modify('+1 day');
+        $currentDate = new \DateTime();
+        $currentDate->setTime(0, 0);
 
         $qb = $this
             ->createQueryBuilder('s')
             ->where('s.start <= :now')
-            ->andWhere('s.end >= :end')
+            ->andWhere('s.end >= :now')
             ->setParameter('now', $currentDate)
-            ->setParameter('end', $currentEndDate)
             ->setMaxResults(1);
 
         if ($user === null || !$user->canAccess(FeatureFlag::ROLE_STAFF)) {
