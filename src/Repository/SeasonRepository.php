@@ -33,7 +33,7 @@ final class SeasonRepository extends AbstractRepository
             ->where('s.start <= :now')
             ->andWhere('s.end >= :end')
             ->setParameter('now', $currentDate)
-            ->setParameter('now', $currentEndDate)
+            ->setParameter('end', $currentEndDate)
             ->setMaxResults(1);
 
         if ($user === null || !$user->canAccess(FeatureFlag::ROLE_STAFF)) {
