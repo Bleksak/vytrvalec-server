@@ -102,7 +102,6 @@ final readonly class SeasonActions
     ): void {
         $season->start = $dto->season->start;
         $season->end = $dto->season->end;
-        $season->isTest = $dto->season->isTest;
 
         $this->facultyMappingRepository->removeBySeason($season);
         $this->applyFacultyMappings($season, $dto->facultyMapping);
