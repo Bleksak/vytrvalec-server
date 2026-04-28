@@ -71,6 +71,9 @@ no-dead-store = { enabled = true }
 no-redundant-variable = { enabled = true }
 no-redundant-else = { enabled = true }
 no-negated-ternary = { enabled = true }
+no-unused-closure-capture = { enabled = true }
+no-unused-global = { enabled = true }
+no-unused-static = { enabled = true }
 
 [analyzer]
 find-unused-expressions = true
