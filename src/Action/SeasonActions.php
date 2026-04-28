@@ -15,6 +15,7 @@ use App\Exceptions\Season\SeasonCannotBeDeletedException;
 use App\Exceptions\SeasonConfiguration\FacultyMappingCycleException;
 use App\Repository\CharityRepository;
 use App\Repository\FacultyMappingRepository;
+use App\Repository\SeasonCacheRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,6 +29,7 @@ final readonly class SeasonActions
         private EntityManagerInterface $entityManager,
         private SubmissionRepository $submissionRepository,
         private CharityRepository $charityRepository,
+        private SeasonCacheRepository $seasonCacheRepository,
     ) {}
 
     /**
@@ -165,6 +167,7 @@ final readonly class SeasonActions
             $this->charityRepository->remove($season->charity);
         }
 
+        $this->seasonCacheRepository->removeBySeason($season);
         $this->seasonRepository->remove($season, true);
 
         $this->entityManager->commit();

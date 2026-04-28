@@ -56,4 +56,19 @@ final class SeasonCacheRepository extends AbstractRepository
             ->getQuery()
             ->getOneOrNullResult(Query::HYDRATE_OBJECT);
     }
+
+    public function removeBySeason(Season $season, bool $flush = false): void
+    {
+        $this
+            ->createQueryBuilder('c')
+            ->delete()
+            ->where('c.season = :season')
+            ->setParameter('season', $season)
+            ->getQuery()
+            ->execute();
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }
