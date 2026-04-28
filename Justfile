@@ -32,3 +32,11 @@ db-migrate-squash:
 
 db-seed:
     bin/console doctrine:fixtures:load
+
+run:
+    trap 'kill 0' EXIT INT TERM; \
+    echo "Starting FrankenPHP + WebSocket server... + Queue"; \
+    frankenphp run --config Caddyfile & \
+    php bin/console mv:ws-submission-producer & \
+    php bin/console messenger:consume --all -vvv & \
+    wait
