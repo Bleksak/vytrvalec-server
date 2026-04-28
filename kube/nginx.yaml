@@ -21,18 +21,12 @@ spec:
         - name: shared-files
           emptyDir: {}
 
-        - name: rmq-config
-          emptyDir: {}
-
         - name: nginx-config-volume
           configMap:
             name: nginx-config
         - name: upload-pv
           persistentVolumeClaim:
             claimName: upload-pv
-        - name: rabbitmq-pv
-          persistentVolumeClaim:
-            claimName: rabbitmq-pv
 
       imagePullSecrets:
         - name: server-deploy-token
@@ -54,21 +48,6 @@ spec:
 
           - name: upload-pv
             mountPath: /var/www/vytrvalec/public/uploads
-
-      - name: vytrvalec-rmq
-        imagePullPolicy: IfNotPresent
-        image: heidiks/rabbitmq-delayed-message-exchange:4.0.2-management
-        env:
-          - name: RABBITMQ_DEFAULT_USER
-            value: guest
-          - name: RABBITMQ_DEFAULT_PASS
-            value: guest
-        ports:
-          - containerPort: 5672
-          - containerPort: 15672
-        volumeMounts:
-          - name: rabbitmq-pv
-            mountPath: /var/lib/rabbitmq/
 
       - name: vytrvalec-web
         imagePullPolicy: Always
@@ -115,15 +94,4 @@ spec:
   resources:
     requests:
       storage: 40Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: rabbitmq-pv
-spec:
-  storageClassName: csi-rbd-synergia
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
+
