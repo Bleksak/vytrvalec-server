@@ -46,11 +46,6 @@ db-migrate-squash:
 db-seed:
 	{{php}} bin/console doctrine:fixtures:load
 
-db-reset:
-	{{php}} bin/console doctrine:database:drop --force --if-exists -q
-	{{php}} bin/console doctrine:database:create --if-not-exists -q
-	{{php}} bin/console doctrine:migrations:migrate --no-interaction -q
-
 run:
 	@trap 'kill 0' EXIT INT TERM; \
 	echo "Starting FrankenPHP + WebSocket server + Queue..."; \
