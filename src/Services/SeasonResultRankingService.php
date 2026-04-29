@@ -16,6 +16,7 @@ use App\Entity\Season;
 use App\Entity\User;
 use App\Repository\SeasonCacheRepository;
 use App\Repository\UserRepository;
+use App\Utils\WeekCalculator;
 
 final readonly class SeasonResultRankingService
 {
@@ -87,7 +88,13 @@ final readonly class SeasonResultRankingService
                 );
             }
         } else {
-            if ($currentWeek < 0 || $currentWeek >= $season->getWeekCount()) {
+            if (
+                $currentWeek < 0
+                || $currentWeek >= WeekCalculator::calculateWeekCount(
+                    \DateTimeImmutable::createFromInterface($season->start),
+                    \DateTimeImmutable::createFromInterface($season->end),
+                )
+            ) {
                 return new SeasonResultRankDto(0, 0, [], []);
             }
 

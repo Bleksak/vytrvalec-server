@@ -8,6 +8,7 @@ use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Repository\SubmissionRepository;
 use App\Services\ImagePath;
 use App\Utils\SubmissionState;
+use App\Utils\WeekCalculator;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -114,14 +115,10 @@ final class Submission extends AbstractEntity
         $this->elevation = $elevation;
         $this->message = '';
 
-        $sub = $this->date->diff($this->season->start);
-        $days = $sub->days;
-
-        if ($days === false) {
-            $days = 0;
-        }
-
-        $this->week = $days > 0 ? \intdiv($days - 1, 7) : 0;
+        $this->week = WeekCalculator::calculateWeekNumber(
+            $this->season->start,
+            $this->date,
+        );
         $this->updatedAt = new \DateTime();
     }
 

@@ -115,22 +115,6 @@ final class Season extends AbstractEntity
         return $today >= $start && $today <= $end;
     }
 
-    public function getWeekCount(): int
-    {
-        $start = \DateTimeImmutable::createFromInterface($this->start);
-        $end = \DateTimeImmutable::createFromInterface($this->end);
-
-        $diff = $end->diff($start);
-        \assert(
-            $diff->days !== false,
-            'DateInterval vytvoreny pres diff nemuze mit days = false',
-        );
-
-        $weeks = \intdiv($diff->days + 1, 7);
-
-        return $weeks === 0 ? 1 : $weeks;
-    }
-
     public function addFacultyMapping(FacultyMapping $facultyMapping): static
     {
         if (!$this->facultyMappings->contains($facultyMapping)) {

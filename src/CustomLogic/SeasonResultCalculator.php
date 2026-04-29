@@ -12,6 +12,7 @@ use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use App\Repository\FacultyMappingRepository;
 use App\Repository\SubmissionRepository;
+use App\Utils\WeekCalculator;
 use DateTime;
 
 final readonly class SeasonResultCalculator
@@ -29,7 +30,10 @@ final readonly class SeasonResultCalculator
         $facultyParentRoots =
             $this->facultyMappingRepository->findRootsBySeason($season);
 
-        $weeks = $season->getWeekCount();
+        $weeks = WeekCalculator::calculateWeekCount(
+            \DateTimeImmutable::createFromInterface($season->start),
+            \DateTimeImmutable::createFromInterface($season->end),
+        );
         $results = [];
         $users = [];
 
