@@ -12,6 +12,7 @@ use App\Entity\Faculty;
 use App\Entity\FacultyMapping;
 use App\Entity\Season;
 use App\Exceptions\Season\SeasonCannotBeDeletedException;
+use App\Exceptions\Season\SeasonCannotBeUpdatedException;
 use App\Exceptions\SeasonConfiguration\FacultyMappingCycleException;
 use App\Repository\CharityRepository;
 use App\Repository\FacultyMappingRepository;
@@ -98,10 +99,21 @@ final readonly class SeasonActions
         return $season;
     }
 
+    /**
+     * @throws SeasonCannotBeUpdatedException
+     */
     public function update(
         Season $season,
         SeasonConfigurationUpdateDto $dto,
     ): void {
+        $dateHasChanged =
+            $season->start->getTimestamp() !== $dto->season->start->getTimestamp()
+            || $season->end->getTimestamp() !== $dto->season->end->getTimestamp();
+
+        if ($dateHasChanged && $season->isRunning()) {
+            throw new SeasonCannotBeUpdatedException();
+        }
+
         $season->start = $dto->season->start;
         $season->end = $dto->season->end;
 
