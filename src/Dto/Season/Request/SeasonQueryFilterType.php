@@ -8,10 +8,8 @@ enum SeasonQueryFilterType: string
 {
     case Date = 'date';
     case Week = 'week';
-    case Accepted = 'accepted';
-    case Reviewed = 'reviewed';
+    case State = 'state';
     case User = 'user';
     case Faculty = 'faculty';
     case Activity = 'activity';
-    case Page = 'page';
 }

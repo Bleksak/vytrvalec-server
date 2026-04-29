@@ -8,12 +8,12 @@ use App\Dto\Extract\ExtractSubmissionDto;
 use App\Dto\OutlierActivity;
 use App\Dto\OutlierResult;
 use App\Dto\Season\Request\SeasonQueryFilterRequestDto;
-use App\Dto\Season\Request\SeasonQueryFilterType;
 use App\Dto\WeeklySubmissionSum;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
 use App\Services\ImagePath;
+use App\Utils\SubmissionState;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -87,7 +87,8 @@ final class SubmissionRepository extends AbstractRepository
             ->select('s, i, u')
             ->join('s.image', 'i')
             ->join('s.user', 'u')
-            ->andWhere('s.reviewed = 0')
+            ->andWhere('s.state = :state')
+            ->setParameter('state', SubmissionState::Pending)
             ->orderBy('s.date', 'ASC')
             ->setMaxResults($limit);
 
@@ -131,40 +132,11 @@ final class SubmissionRepository extends AbstractRepository
             ->addOrderBy('s.date', 'DESC')
             ->addOrderBy('s.id', 'DESC');
 
-        foreach ($queryFilter->toArray() as $key => $value) {
-            $queryBuilder = match ($key) {
-                SeasonQueryFilterType::Date->value => $queryBuilder->andWhere(
-                    's.date = :date',
-                )->setParameter('date', $value),
-                SeasonQueryFilterType::Week->value => $queryBuilder->andWhere(
-                    's.week = :weekId',
-                )->setParameter('weekId', $value),
-                SeasonQueryFilterType::Accepted->value
-                    => $queryBuilder->andWhere(
-                    's.accepted = :accepted',
-                )->setParameter('accepted', $value),
-                SeasonQueryFilterType::Reviewed->value
-                    => $queryBuilder->andWhere(
-                    's.reviewed = :reviewed',
-                )->setParameter('reviewed', $value),
-                SeasonQueryFilterType::User->value => \is_string($value)
-                    ? $queryBuilder->andWhere(
-                        'u.email LIKE :userId',
-                    )->setParameter('userId', $value . '%')
-                    : $queryBuilder,
-                SeasonQueryFilterType::Faculty->value
-                    => $queryBuilder->andWhere(
-                    'u.faculty = :facultyId',
-                )->setParameter('facultyId', $value),
-                SeasonQueryFilterType::Activity->value
-                    => $queryBuilder->andWhere(
-                    's.activity = :activityId',
-                )->setParameter('activityId', $value),
-                SeasonQueryFilterType::Page->value => \is_int($value)
-                    ? $queryBuilder->setFirstResult(($value - 1) * $limit)
-                    : $queryBuilder,
-            };
+        if ($queryFilter->page !== null) {
+            $queryBuilder->setFirstResult(($queryFilter->page - 1) * $limit);
         }
+
+        $queryBuilder->addCriteria($queryFilter->toCriteria());
 
         /**
          * @var Paginator<Submission>
@@ -187,13 +159,14 @@ final class SubmissionRepository extends AbstractRepository
             ->innerJoin('u.faculty', 'f')
             ->andWhere('s.season = :season')
             ->andWhere('s.week = :week')
-            ->andWhere('s.accepted = 1')
+            ->andWhere('s.state = :state')
             ->groupBy('activity')
             ->addGroupBy('faculty')
             ->orderBy('activity', 'asc')
             ->addOrderBy('distance', 'desc')
             ->setParameter('week', $week)
             ->setParameter('season', $season)
+            ->setParameter('state', SubmissionState::Accepted)
             ->getQuery()
             ->getResult();
 
@@ -221,7 +194,7 @@ final class SubmissionRepository extends AbstractRepository
                     sub AS (
                         SELECT SUM(s.distance) as value, s.activity_id as activity_id, s.user_id as user_id
                         FROM submission s
-                        WHERE s.accepted = ? AND s.season_id = ?
+                        WHERE s.state = ? AND s.season_id = ?
                         GROUP BY s.user_id, s.activity_id
                     ),
                     sorted AS (
@@ -239,7 +212,7 @@ final class SubmissionRepository extends AbstractRepository
                 ORDER BY value DESC
             ');
 
-        $query->bindValue(1, true);
+        $query->bindValue(1, SubmissionState::Accepted->value);
         $query->bindValue(2, $season->id);
         $query->bindValue(3, $n);
 
@@ -277,8 +250,9 @@ final class SubmissionRepository extends AbstractRepository
         $result = $this
             ->createQueryBuilder('s')
             ->select('count(distinct s.user) as count')
-            ->where('s.accepted = 1')
+            ->where('s.state = :state')
             ->groupBy('s.season')
+            ->setParameter('state', SubmissionState::Accepted)
             ->getQuery()
             ->getSingleColumnResult();
 
@@ -293,18 +267,16 @@ final class SubmissionRepository extends AbstractRepository
         ?int $season = null,
     ): array {
         $qb = $this
-            ->createQueryBuilder('ss')
-            ->select('ss, i')
-            ->join('ss.image', 'i')
-            ->where('ss.reviewed = 1')
-            ->andWhere('ss.image IS NOT NULL')
-            ->orderBy('ss.season');
+            ->createQueryBuilder('s')
+            ->select('s, i')
+            ->join('s.image', 'i')
+            ->where('s.state IN(:state)')
+            ->setParameter('state', SubmissionState::reviewedStates())
+            ->andWhere('s.image IS NOT NULL')
+            ->orderBy('s.season');
 
         if ($season !== null) {
-            $qb->where('ss.season = (:season)')->setParameter(
-                'season',
-                $season,
-            );
+            $qb->where('s.season = (:season)')->setParameter('season', $season);
         }
 
         /** @var list<Submission> */
@@ -314,7 +286,7 @@ final class SubmissionRepository extends AbstractRepository
             static fn(Submission $submission): ExtractSubmissionDto => new ExtractSubmissionDto(
                 $submission->activity->id,
                 $submission->season->id,
-                $submission->accepted,
+                $submission->state,
                 $submission->distance,
                 $submission->elevation,
                 $submission->image?->getPath($imagePath) ?? '',
@@ -334,8 +306,9 @@ final class SubmissionRepository extends AbstractRepository
             ->select(
                 'IDENTITY(s.activity) as activity, SUM(s.distance) AS distance',
             )
-            ->where('s.accepted = 1')
+            ->where('s.state = :state')
             ->groupBy('s.activity')
+            ->setParameter('state', SubmissionState::Accepted)
             ->getQuery()
             ->getResult();
     }

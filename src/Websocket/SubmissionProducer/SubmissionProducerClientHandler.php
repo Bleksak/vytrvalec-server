@@ -282,8 +282,7 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
                         $submissionId = $customClient->submissionId;
                         $submission = $this->submissions[$submissionId];
 
-                        $submission->reviewed = true;
-                        $submission->accepted = $payload->accepted;
+                        $submission->state = $payload->state;
 
                         $this->submissionRepository->save($submission, true);
 

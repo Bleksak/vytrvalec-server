@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Dto\Submission;
 
+use App\Utils\SubmissionState;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -15,8 +16,7 @@ final class SubmissionStateDto
 
     #[OA\Property]
     #[Assert\NotNull(message: 'blank')]
-    #[Assert\Type(type: 'bool', message: 'invalid')]
-    public bool $state = false;
+    public SubmissionState $state;
 
     #[OA\Property]
     public string $message = '';
