@@ -67,6 +67,7 @@ no-parameter-shadowing = { enabled = true }
 sorted-integer-keys = { enabled = true }
 no-redundant-readonly = { enabled = true  }
 method-name = { enabled = true, use-snake-case-for-tests = false, camel = true }
+prefer-array-spread = { enabled = true }
 
 [analyzer]
 find-unused-expressions = true
@@ -90,7 +91,6 @@ check-experimental = true
 check-name-casing = true
 strict-array-index-existence = true
 allow-array-truthy-operand = false
-# prefer-array-spread = true
 
 # TODO: enable this one later probably
 # allow-side-effects-in-conditions = false
