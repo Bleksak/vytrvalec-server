@@ -98,7 +98,9 @@ final readonly class SeasonResultRankingService
                 return new SeasonResultRankDto(0, 0, [], []);
             }
 
-            $weeklyResult = $seasonResult->results[$currentWeek];
+            $weeklyResult = $seasonResult->results[$currentWeek] ?? null;
+            \assert($weeklyResult !== null);
+
             $this->populateRankingArray(
                 $facultySet,
                 $weeklyResult,
@@ -190,23 +192,31 @@ final readonly class SeasonResultRankingService
             );
 
             for ($i = 0; $i < \count($facultyResults); ++$i) {
+                \assert(isset($facultyResults[$i]));
                 $facultyResult = $facultyResults[$i];
                 $facultyId = $facultyResult->faculty;
 
                 $points = \count($facultySet) - $i;
 
-                $ranking[$facultyId] ??= [
-                    'distance' => 0,
-                    'points' => 0,
-                    'faculty' => $facultyId,
-                ];
+                $facultyRanking = $ranking[$facultyId] ?? [
+                        'distance' => 0,
+                        'points' => 0,
+                        'faculty' => $facultyId,
+                    ];
 
-                $ranking[$facultyId]['distance'] += $facultyResult->distance;
-                $ranking[$facultyId]['points'] += $points;
+                $facultyRanking['distance'] += $facultyResult->distance;
+                $facultyRanking['points'] += $points;
+
+                $ranking[$facultyId] = $facultyRanking;
             }
 
             foreach ($activityResult->extras as $extra) {
-                $ranking[$extra->faculty]['points'] += $extra->points;
+                $facultyRanking = $ranking[$extra->faculty] ?? null;
+                \assert($facultyRanking !== null);
+
+                $facultyRanking['points'] += $extra->points;
+                $ranking[$extra->faculty] = $facultyRanking;
+
                 $extras[] = $extra;
             }
         }

@@ -76,8 +76,13 @@ final readonly class FixCacheV2Command
 
             foreach ($data->outliers as $outlier) {
                 foreach ($outlier->results as $outlierResult) {
+                    \assert(
+                        isset($facultyParentRoots[$outlierResult->facultyId]),
+                    );
+
                     $outlierResult->facultyId =
                         $facultyParentRoots[$outlierResult->facultyId];
+
                     $users[$outlierResult->user] = $outlierResult->user;
                 }
             }

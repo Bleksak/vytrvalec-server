@@ -23,6 +23,8 @@ final class Graph
         }
 
         foreach ($nodes as $node) {
+            \assert(isset($labels[$node]));
+
             if (
                 $labels[$node] === self::LABEL_WHITE
                 && isset($graph[$node])
@@ -49,10 +51,15 @@ final class Graph
         while ($stack !== []) {
             $node = \end($stack);
 
+            \assert(isset($labels[$node]));
+
             if ($labels[$node] === self::LABEL_WHITE) {
                 $labels[$node] = self::LABEL_GRAY;
 
+                \assert(isset($graph[$node]));
                 foreach ($graph[$node] as $edge) {
+                    \assert(isset($labels[$edge]));
+
                     if (
                         $labels[$edge] === self::LABEL_WHITE
                         && isset($graph[$edge])

@@ -36,6 +36,7 @@ final class UrlBuilder
     {
         if (\is_array($value)) {
             foreach ($value as $v) {
+                \assert(isset($this->queryParams[$key]));
                 \assert(\is_array($this->queryParams[$key]));
 
                 $this->queryParams[$key][] = $v;
