@@ -2,7 +2,7 @@ set shell := ["bash", "-c"]
 
 # Use FrankenPHP's bundled PHP for everything
 php := "frankenphp php-cli"
-composer := "./bin/composer"
+composer := "composer"
 
 pre-init:
 	./setup.sh
