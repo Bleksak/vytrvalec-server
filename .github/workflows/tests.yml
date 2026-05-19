@@ -16,6 +16,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Install ImageMagick
+        run: sudo apt-get update && sudo apt-get install -y libmagickwand-dev imagemagick
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
