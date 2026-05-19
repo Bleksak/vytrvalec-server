@@ -31,8 +31,8 @@ jobs:
 
       - name: Setup project
         run: |
-          just init php=php
+          just php="php" init
 
       - name: Run Behat tests
         run: |
-          just test php=php
+          just php="php" test
