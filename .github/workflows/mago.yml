@@ -29,6 +29,8 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://carthage.software/mago.sh | bash
           export PATH="$HOME/.mago/bin:$PATH"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Run Mago Lint
         run: mago lint --reporting-format=github
