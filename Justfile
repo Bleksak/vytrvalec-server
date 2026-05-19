@@ -16,7 +16,7 @@ init:
 	touch var/data.db;
 	{{php}} bin/console doctrine:schema:create
 	{{php}} bin/console asset-map:compile -q
-	just db-seed
+	just db-seed php={{php}}
 
 update:
 	{{composer}} update --no-interaction
