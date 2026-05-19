@@ -28,9 +28,6 @@ jobs:
       - name: Setup just
         uses: extractions/setup-just@v3
 
-      - name: Install FrankenPHP
-        run: curl -fsSL https://frankenphp.dev/install.sh | sh && sudo mv ./frankenphp /usr/local/bin/
-
       - name: Setup project
         run: |
           just pre-init
