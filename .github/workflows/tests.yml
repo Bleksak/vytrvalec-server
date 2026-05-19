@@ -29,7 +29,9 @@ jobs:
         uses: extractions/setup-just@v3
 
       - name: Setup project
-        run: just setup
+        run: |
+          just pre-init
+          just init
 
       - name: Run Behat tests
         run: just test
