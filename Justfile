@@ -1,8 +1,8 @@
 set shell := ["bash", "-c"]
 
 # Use FrankenPHP's bundled PHP for everything
-php := "frankenphp php-cli"
-composer := "./bin/composer"
+export php := "frankenphp php-cli"
+composer := "composer"
 
 pre-init:
 	./setup.sh
@@ -16,7 +16,7 @@ init:
 	touch var/data.db;
 	{{php}} bin/console doctrine:schema:create
 	{{php}} bin/console asset-map:compile -q
-	just db-seed
+	just php="{{php}}" db-seed
 
 update:
 	{{composer}} update --no-interaction

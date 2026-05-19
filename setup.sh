@@ -134,7 +134,7 @@ install_frankenphp() {
 
     info "Installing FrankenPHP..."
     curl -fsSL https://frankenphp.dev/install.sh | sh
-    sudo mv ./frankenphp /usr/local/bin/frankenphp
+    [[ -f ./frankenphp ]] && sudo mv ./frankenphp /usr/local/bin/frankenphp
     ok "FrankenPHP installed"
 }
 

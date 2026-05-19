@@ -8,9 +8,9 @@ includes = ["vendor", "var"]
 excludes = [
   "vendor/nikic/fast-route/test",
   "vendor/composer/autoload_classmap.php",
-  "vendor/google/common-protos/metadata",
+  # "vendor/google/common-protos/metadata",
   "vendor/google/gax/metadata",
-  "vendor/google/longrunning/metadata",
+  # "vendor/google/longrunning/metadata",
   "vendor/symfony/cache/Traits/ValueWrapper.php",
   "vendor/composer/autoload_static.php",
 ]
@@ -67,6 +67,13 @@ no-parameter-shadowing = { enabled = true }
 sorted-integer-keys = { enabled = true }
 no-redundant-readonly = { enabled = true  }
 method-name = { enabled = true, use-snake-case-for-tests = false, camel = true }
+no-dead-store = { enabled = true }
+no-redundant-variable = { enabled = true }
+no-redundant-else = { enabled = true }
+no-negated-ternary = { enabled = true }
+no-unused-closure-capture = { enabled = true }
+no-unused-global = { enabled = true }
+no-unused-static = { enabled = true }
 prefer-array-spread = { enabled = true }
 
 [analyzer]
@@ -98,3 +105,4 @@ allow-array-truthy-operand = false
 
 class-initializers = ["__construct", "setContainer"]
 plugins = ["standard", "std", "php-stdlib", "psr-container"]
+

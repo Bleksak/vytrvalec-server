@@ -61,6 +61,11 @@ final class Season extends AbstractEntity
     )]
     public Collection $facultyMappings;
 
+    /** @var Collection<int, Sponsor> */
+    #[ORM\ManyToMany(targetEntity: Sponsor::class, inversedBy: 'seasons')]
+    #[ORM\JoinTable('season_sponsor')]
+    public Collection $sponsors;
+
     public function __construct(
         \DateTime $start,
         \DateTime $end,
@@ -73,6 +78,7 @@ final class Season extends AbstractEntity
         $this->charity = $charity;
         $this->isTest = $isTest;
         $this->facultyMappings = new ArrayCollection();
+        $this->sponsors = new ArrayCollection();
     }
 
     public function addSubmission(Submission $submission): self
