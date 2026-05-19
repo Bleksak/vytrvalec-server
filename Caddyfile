@@ -1,23 +1,23 @@
 vytrvalec.local {
 	root * public/
 
+	@ws path /ws /ws/*
+
+	handle @ws {
+		reverse_proxy 127.0.0.1:1337 {
+			# header_up Host {http.reverse_proxy.upstream.hostport}
+			# Optional: pass the original X-Forwarded headers
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
 	@symfony {
 		path /api/* /_wdt/* /_profiler/*
 	}
 
 	handle @symfony {
 		php_server
-	}
-
-	@ws path /ws /ws/*
-
-	handle @ws {
-		reverse_proxy 127.0.0.1:1337 {
-			header_up Host {http.reverse_proxy.upstream.hostport}
-			# Optional: pass the original X-Forwarded headers
-			header_up X-Forwarded-For {remote_host}
-			header_up X-Forwarded-Proto {scheme}
-		}
 	}
 
 	@static {

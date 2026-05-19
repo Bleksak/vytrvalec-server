@@ -3,9 +3,6 @@ framework:
         failure_transport: failed
 
         transports:
-            delayed_rabbitmq:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
-                options:
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:

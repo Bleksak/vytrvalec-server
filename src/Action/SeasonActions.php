@@ -12,9 +12,11 @@ use App\Entity\Faculty;
 use App\Entity\FacultyMapping;
 use App\Entity\Season;
 use App\Exceptions\Season\SeasonCannotBeDeletedException;
+use App\Exceptions\Season\SeasonCannotBeUpdatedException;
 use App\Exceptions\SeasonConfiguration\FacultyMappingCycleException;
 use App\Repository\CharityRepository;
 use App\Repository\FacultyMappingRepository;
+use App\Repository\SeasonCacheRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SubmissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,6 +30,7 @@ final readonly class SeasonActions
         private EntityManagerInterface $entityManager,
         private SubmissionRepository $submissionRepository,
         private CharityRepository $charityRepository,
+        private SeasonCacheRepository $seasonCacheRepository,
     ) {}
 
     /**
@@ -96,13 +99,23 @@ final readonly class SeasonActions
         return $season;
     }
 
+    /**
+     * @throws SeasonCannotBeUpdatedException
+     */
     public function update(
         Season $season,
         SeasonConfigurationUpdateDto $dto,
     ): void {
+        $dateHasChanged =
+            $season->start->getTimestamp() !== $dto->season->start->getTimestamp()
+            || $season->end->getTimestamp() !== $dto->season->end->getTimestamp();
+
+        if ($dateHasChanged && $season->isRunning()) {
+            throw new SeasonCannotBeUpdatedException();
+        }
+
         $season->start = $dto->season->start;
         $season->end = $dto->season->end;
-        $season->isTest = $dto->season->isTest;
 
         $this->facultyMappingRepository->removeBySeason($season);
         $this->applyFacultyMappings($season, $dto->facultyMapping);
@@ -166,6 +179,7 @@ final readonly class SeasonActions
             $this->charityRepository->remove($season->charity);
         }
 
+        $this->seasonCacheRepository->removeBySeason($season);
         $this->seasonRepository->remove($season, true);
 
         $this->entityManager->commit();

@@ -7,6 +7,7 @@ namespace App\Dto\Submission\Response;
 use App\Dto\User\Response\UserResponseDto;
 use App\Entity\Submission;
 use App\Services\ImagePath;
+use App\Utils\SubmissionState;
 use OpenApi\Attributes as OA;
 
 final class AdministrationSubmissionListResponseDto
@@ -14,8 +15,6 @@ final class AdministrationSubmissionListResponseDto
     public function __construct(
         #[OA\Property(example: 1)]
         public int $id,
-        #[OA\Property(example: true)]
-        public bool $accepted,
         #[OA\Property(type: 'integer', example: 1)]
         public int $seasonId,
         #[OA\Property(type: 'integer', example: 1)]
@@ -24,8 +23,8 @@ final class AdministrationSubmissionListResponseDto
         public int $elevation,
         #[OA\Property(type: 'integer', example: 1500)]
         public int $distance,
-        #[OA\Property(example: true)]
-        public bool $reviewed,
+        #[OA\Property]
+        public SubmissionState $state,
         #[OA\Property]
         public ?string $image,
         #[OA\Property(example: 2)]
@@ -48,12 +47,11 @@ final class AdministrationSubmissionListResponseDto
     ): self {
         return new self(
             $submission->id,
-            $submission->accepted,
             $submission->season->id,
             $submission->user->toResponseObject(),
             $submission->elevation,
             $submission->distance,
-            $submission->reviewed,
+            $submission->state,
             $submission->image?->getPath($imagePath) ?? '',
             $submission->week,
             $submission->activity->id,

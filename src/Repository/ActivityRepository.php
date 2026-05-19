@@ -90,13 +90,18 @@ final class ActivityRepository extends AbstractRepository
          */
         $activities = $query->getQuery()->getResult();
 
-        return \array_map(
-            static fn(Activity $row): ActivityStatisticsDto => new ActivityStatisticsDto(
+        return \array_map(static function (Activity $row) use (
+            $imagePath,
+            $indexMap,
+        ): ActivityStatisticsDto {
+            $distance = $indexMap[$row->id] ?? null;
+            \assert($distance !== null);
+
+            return new ActivityStatisticsDto(
                 $row->toResponseObject($imagePath),
-                $indexMap[$row->id],
-            ),
-            $activities,
-        );
+                $distance,
+            );
+        }, $activities);
     }
 
     /**

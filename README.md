@@ -1,41 +1,53 @@
 # Měsíční Vytrvalec server
 
-## Requirements:
-- PHP 8.2+
-- NodeJS 21.2.0+
+## Quick Start
 
-## Prerequisties
-- Install composer (ex. `paru -S composer`)
-- Install PHP required extensions - php-imagick, php-xsl, php-ffi, php-iconv, php-sodium, php-amqp
-- Inside php.ini enable extensions:
+```bash
+git clone <repo> && cd vytrvalec-server
+just setup
+just run
+```
 
-       extension=amqp
-       extension=ffi
-       extension=gd
-       extension=gettext
-       extension=iconv
-       extension=imagick
-       extension=xsl
-       extension=pdo_mysql (For MySQL database)
-       extension=sodium
+That's it. `just pre-init` or `./setup.sh` installs all dependencies automatically:
+- **just** - task runner
+- **FrankenPHP** - PHP app server (includes PHP 8.4 + all extensions)
+- **fnm + Node.js** - for frontend asset builds
+- **Composer** - PHP package manager
+- **sqlite3** - default database
 
-## Setup
-- Create submission images upload folder `mkdir public/uploads` - Otherwise you will not be able to upload images
-- `cp .env .env.local`
-- Fill .env.local with your local environment variables (database, jwt token, smtp, firebase token)
-- `composer install`
-- `npm ci`
-- `php bin/console doctrine:migrations:migrate`
-- `php bin/console doctrine:database:create`
-- `php bin/console doctrine:fixtures:load`
-- Place `google-service-account.json` into the root of the project. Obtain this file from firebase console. It is json of your service account.
+Then `just init` sets up the project for running.
 
-## How to start the server
-- Install  symfony-cli - `paru -S xdebug symfony-cli`
-- Run with `symfony server:start {..args}`
+Then `just run` starts FrankenPHP, the WebSocket server, and the messenger queue.
 
-## Starting the Websocket server
-- php bin/console mv:ws-submission-producer
+## Prerequisites
+
+- Linux (Ubuntu/Debian, Fedora, openSUSE, Arch supported)
+- `sudo` access (for system packages)
+- `curl` and `wget`
+
+## Configuration
+
+The default setup uses **SQLite**. For MySQL, edit `.env.local`:
+
+```
+DATABASE_URL="mysql://user:pass@localhost/db?serverVersion=8.0&charset=utf8"
+```
+
+Place `google-service-account.json` in the project root for Firebase integration.
+
+## Available Commands
+
+```
+just               # List all commands
+just pre-init      # Full dependency + project setup
+just project-setup # Project-only (composer, npm, DB, assets)
+just run           # Start server + WebSocket + queue
+just test          # Run tests
+just lint          # Run Mago linter
+just analyze       # Run Mago static analysis
+just fmt           # Format code
+just db-seed       # Load fixtures
+```
 
 ### ZČU VPN connection
 - On Linux, install NetworkManager - `paru -S networkmanager-openconnect`
@@ -79,9 +91,6 @@
 - If you are using JetBrains IDE install this [plugin](https://plugins.jetbrains.com/plugin/28437-mago) from xepozz.
 
 ### Run before push
-- `vendor/bin/mago analyze` - Static analysis
-- `vendor/bin/mago lint` - Linter
-- `vendor/bin/mago format` - Formatting
-- `vendor/bin/twig-cs-fixer` - Twig linter
-- `npx prettier "templates/**/*.html.twig" -w` - Twig formatter
-
+- `just analyze` - Static analysis
+- `just lint` - Linter
+- `just fmt` - Formatting (Mago + Twig CS Fixer)

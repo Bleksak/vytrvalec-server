@@ -238,7 +238,10 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
                         }
 
                         $submission =
-                            $this->submissions[$customClient->submissionId];
+                            $this->submissions[$customClient->submissionId]
+                                ?? null;
+                        \assert($submission !== null);
+
                         $user = $submission->user;
 
                         $response = new SubmissionProducerMessage(
@@ -280,10 +283,10 @@ final class SubmissionProducerClientHandler implements WebsocketClientHandler
                         );
 
                         $submissionId = $customClient->submissionId;
-                        $submission = $this->submissions[$submissionId];
+                        $submission = $this->submissions[$submissionId] ?? null;
+                        \assert($submission !== null);
 
-                        $submission->reviewed = true;
-                        $submission->accepted = $payload->accepted;
+                        $submission->state = $payload->state;
 
                         $this->submissionRepository->save($submission, true);
 

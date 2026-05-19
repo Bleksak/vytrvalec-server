@@ -18,9 +18,4 @@ final class SeasonUpdateDto
     #[Assert\Type('datetime')]
     #[Assert\NotBlank(allowNull: false)]
     public \DateTime $end;
-
-    #[OA\Property]
-    #[Assert\NotNull(message: 'blank')]
-    #[Assert\Type(type: 'bool', message: 'invalid')]
-    public bool $isTest = false;
 }

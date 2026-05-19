@@ -12,6 +12,7 @@ use App\Dto\WeeklyResultDto;
 use App\Entity\Season;
 use App\Repository\FacultyMappingRepository;
 use App\Repository\SubmissionRepository;
+use App\Utils\WeekCalculator;
 use DateTime;
 
 final readonly class SeasonResultCalculator
@@ -29,7 +30,11 @@ final readonly class SeasonResultCalculator
         $facultyParentRoots =
             $this->facultyMappingRepository->findRootsBySeason($season);
 
-        $weeks = $season->getWeekCount();
+        $weeks = WeekCalculator::calculateWeekCount(
+            \DateTimeImmutable::createFromInterface($season->start),
+            \DateTimeImmutable::createFromInterface($season->end),
+        );
+
         $results = [];
         $users = [];
 
@@ -53,13 +58,15 @@ final readonly class SeasonResultCalculator
                 $actualFaculty =
                     $facultyParentRoots[$result->faculty] ?? $result->faculty;
 
-                if (!isset($activities[$result->activity][$actualFaculty])) {
-                    $activities[$result->activity][$actualFaculty] =
-                        new FacultyResultDto($actualFaculty, 0);
-                }
+                $facultyResult =
+                    $activities[$result->activity][$actualFaculty] ?? new FacultyResultDto(
+                            $actualFaculty,
+                            0,
+                        );
 
-                $activities[$result->activity][$actualFaculty]->distance +=
-                    $result->distance;
+                $facultyResult->distance += $result->distance;
+
+                $activities[$result->activity][$actualFaculty] = $facultyResult;
             }
 
             $activityResult = [];
@@ -84,15 +91,21 @@ final readonly class SeasonResultCalculator
                         $facultyParentRoots[$extra->facultyId]
                             ?? $extra->facultyId;
 
-                    $results[$cls->getWeek()]->activities[$extra->activityId]->extras[] =
-                        new ExtraPointsDto(
-                            $extra->user,
-                            $facultyId,
-                            $cls->getUniqueName(),
-                            $extra->value,
-                            $cls->reward(),
-                            $extra->activityId,
-                        );
+                    $weeklyResult = $results[$cls->getWeek()] ?? null;
+                    \assert($weeklyResult !== null);
+
+                    $activityResult =
+                        $weeklyResult->activities[$extra->activityId] ?? null;
+                    \assert($activityResult !== null);
+
+                    $activityResult->extras[] = new ExtraPointsDto(
+                        $extra->user,
+                        $facultyId,
+                        $cls->getUniqueName(),
+                        $extra->value,
+                        $cls->reward(),
+                        $extra->activityId,
+                    );
 
                     $users[$extra->user] = $extra->user;
                 }
@@ -103,6 +116,8 @@ final readonly class SeasonResultCalculator
 
         foreach ($topThree as $outlier) {
             foreach ($outlier->results as $outlierResult) {
+                \assert(isset($facultyParentRoots[$outlierResult->facultyId]));
+
                 $outlierResult->facultyId =
                     $facultyParentRoots[$outlierResult->facultyId];
 

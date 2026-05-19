@@ -34,7 +34,7 @@ abstract class AbstractEmailTemplate
      */
     public function mergeContext(array $context): void
     {
-        $this->context = \array_merge($this->context, $context);
+        $this->context = [...$this->context, ...$context];
     }
 
     abstract public function getSubject(): string;

@@ -16,6 +16,7 @@ use App\Repository\ImageRepository;
 use App\Repository\ProfileCacheRepository;
 use App\Repository\SubmissionRepository;
 use App\Services\VytrvalecMailer;
+use App\Utils\SubmissionState;
 use DateTime;
 
 final readonly class SubmissionActions
@@ -82,10 +83,7 @@ final readonly class SubmissionActions
 
         // Submission is reviewed and DTO has the same state as the submission => noop
         // TODO(@bleksak): The message might have changed, but we will handle that another day
-        if (
-            $submission->reviewed === true
-            && $submission->accepted === $dto->state
-        ) {
+        if ($submission->state === $dto->state) {
             return [];
         }
 
@@ -94,7 +92,7 @@ final readonly class SubmissionActions
         $this->handleCacheUpdate($submission, $dto);
 
         // TODO(@bleksak): tady se da frajerovi zaspamovat email kdyby admin furt schvaloval a zamital aktivitu :D
-        if (!$dto->state) {
+        if ($dto->state === SubmissionState::Rejected) {
             // if ($submission->getUser()->getToken() !== null) {
             //     $this->firebase->send(new VytrvalecNotification($submission->getUser(), $dto->message));
             // }
@@ -112,8 +110,7 @@ final readonly class SubmissionActions
             }
         }
 
-        $submission->reviewed = true;
-        $submission->accepted = $dto->state;
+        $submission->state = $dto->state;
 
         $this->submissionRepository->save($submission, true);
 
@@ -181,7 +178,7 @@ final readonly class SubmissionActions
         }
 
         $submission->message = '';
-        $submission->reviewed = false;
+        $submission->state = SubmissionState::Pending;
 
         $this->submissionRepository->save($submission, true);
 
@@ -192,12 +189,17 @@ final readonly class SubmissionActions
         Submission $submission,
         SubmissionStateDto $dto,
     ): void {
-        if ($dto->state && !$submission->reviewed && !$submission->accepted) {
-            // noop when already accepted, otherwise profile cache would stack
+        if (
+            $dto->state === SubmissionState::Accepted
+            && $submission->state !== SubmissionState::Accepted
+        ) {
             $this->profileCacheRepository->addCache($submission);
         }
 
-        if (!$dto->state && $submission->accepted) {
+        if (
+            $dto->state !== SubmissionState::Accepted
+            && $submission->state === SubmissionState::Accepted
+        ) {
             $this->profileCacheRepository->removeCache($submission);
         }
     }

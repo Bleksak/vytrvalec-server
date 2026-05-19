@@ -8,33 +8,34 @@ use App\Dto\Submission\Response\SubmissionResponseDto;
 use App\Repository\SubmissionRepository;
 use App\Services\ImagePath;
 use App\Utils\SubmissionState;
+use App\Utils\WeekCalculator;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Index(columns: ['week'], name: 'week_index')]
 #[ORM\Index(columns: [
-    'accepted',
+    'state',
     'season_id',
     'activity_id',
     'user_id',
     'distance',
-], name: 'idx_submission_accepted_season_activity_user_distance')]
+], name: 'idx_submission_state_season_activity_user_distance')]
 #[ORM\Index(
-    columns: ['accepted', 'activity_id'],
-    name: 'idx_submission_accepted_activity',
+    columns: ['state', 'activity_id'],
+    name: 'idx_submission_state_activity',
 )]
 #[ORM\Index(
-    columns: ['accepted', 'season_id', 'user_id'],
-    name: 'idx_submission_accepted_season_user',
+    columns: ['state', 'season_id', 'user_id'],
+    name: 'idx_submission_state_season_user',
 )]
 #[ORM\Index(
-    columns: ['season_id', 'week', 'accepted'],
-    name: 'idx_submission_season_week_accepted',
+    columns: ['season_id', 'week', 'state'],
+    name: 'idx_submission_season_week_state',
 )]
 #[ORM\Index(
-    columns: ['accepted', 'activity_id', 'distance'],
-    name: 'idx_submission_accepted_activity_distance',
+    columns: ['state', 'activity_id', 'distance'],
+    name: 'idx_submission_state_activity_distance',
 )]
 #[ORM\HasLifecycleCallbacks]
 final class Submission extends AbstractEntity
@@ -43,9 +44,6 @@ final class Submission extends AbstractEntity
     #[ORM\GeneratedValue]
     #[ORM\Column]
     public private(set) int $id;
-
-    #[ORM\Column]
-    public bool $accepted = false;
 
     #[ORM\ManyToOne(inversedBy: 'submissions')]
     #[ORM\JoinColumn(nullable: false)]
@@ -62,7 +60,7 @@ final class Submission extends AbstractEntity
     public int $distance;
 
     #[ORM\Column]
-    public bool $reviewed = false;
+    public SubmissionState $state = SubmissionState::Pending;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(
@@ -114,43 +112,27 @@ final class Submission extends AbstractEntity
         $this->elevation = $elevation;
         $this->message = '';
 
-        $sub = $this->date->diff($this->season->start);
-        $days = $sub->days;
-
-        if ($days === false) {
-            $days = 0;
-        }
-
-        $this->week = $days > 0 ? \intdiv($days - 1, 7) : 0;
+        $this->week = WeekCalculator::calculateWeekNumber(
+            $this->season->start,
+            $this->date,
+        );
         $this->updatedAt = new \DateTime();
-    }
-
-    public function getState(): SubmissionState
-    {
-        if ($this->reviewed === false) {
-            return SubmissionState::Pending;
-        }
-
-        return $this->accepted
-            ? SubmissionState::Accepted
-            : SubmissionState::Rejected;
     }
 
     public function isEditable(): bool
     {
-        return $this->reviewed === false || $this->accepted === false;
+        return $this->state === SubmissionState::Pending;
     }
 
     public function toResponseObject(?ImagePath $imagePath): SubmissionResponseDto
     {
         return new SubmissionResponseDto(
             $this->id,
-            $this->accepted,
             $this->season->id,
             $this->user->id,
             $this->elevation,
             $this->distance,
-            $this->reviewed,
+            $this->state,
             $this->image?->getPath($imagePath),
             $this->week,
             $this->activity->id,

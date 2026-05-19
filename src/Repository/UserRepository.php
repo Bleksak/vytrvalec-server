@@ -9,6 +9,7 @@ use App\Dto\UserCountByFacultyStatistics;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
+use App\Utils\SubmissionState;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use SensitiveParameter;
@@ -59,7 +60,7 @@ final class UserRepository extends AbstractRepository implements
                             ->select('1')
                             ->from(Submission::class, 's')
                             ->where('s.user = u')
-                            ->andWhere('s.accepted = :accepted')
+                            ->andWhere('s.state = :state')
                             ->andWhere('s.season = :season')
                             ->getDQL(),
                     ),
@@ -67,7 +68,7 @@ final class UserRepository extends AbstractRepository implements
             ->innerJoin('u.faculty', 'f')
             ->groupBy('f.id')
             ->orderBy('count', 'desc')
-            ->setParameter('accepted', true)
+            ->setParameter('state', SubmissionState::Accepted)
             ->setParameter('season', $season)
             ->getQuery()
             ->getResult();
