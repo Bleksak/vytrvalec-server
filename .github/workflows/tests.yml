@@ -21,6 +21,7 @@ jobs:
         with:
           php-version: "8.4"
           coverage: none
+          extensions: imagick
           tools: composer
         env:
           COMPOSER_ALLOW_SUPERUSER: 1
