@@ -67,7 +67,6 @@ no-parameter-shadowing = { enabled = true }
 sorted-integer-keys = { enabled = true }
 no-redundant-readonly = { enabled = true  }
 method-name = { enabled = true, use-snake-case-for-tests = false, camel = true }
-<<<<<<< sponsors-in-db
 no-dead-store = { enabled = true }
 no-redundant-variable = { enabled = true }
 no-redundant-else = { enabled = true }
@@ -75,9 +74,7 @@ no-negated-ternary = { enabled = true }
 no-unused-closure-capture = { enabled = true }
 no-unused-global = { enabled = true }
 no-unused-static = { enabled = true }
-=======
 prefer-array-spread = { enabled = true }
->>>>>>> master
 
 [analyzer]
 find-unused-expressions = true
