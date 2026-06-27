@@ -75,6 +75,9 @@ no-unused-closure-capture = { enabled = true }
 no-unused-global = { enabled = true }
 no-unused-static = { enabled = true }
 prefer-array-spread = { enabled = true }
+prefer-early-return = { enabled = true }
+suspicious-explode-arguments = { enabled = true }
+no-duplicate-match-arm = { enabled = true }
 
 [analyzer]
 find-unused-expressions = true

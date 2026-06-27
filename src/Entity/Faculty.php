@@ -66,9 +66,11 @@ final class Faculty extends AbstractEntity
 
     public function addTranslation(FacultyTranslation $translation): void
     {
-        if (!$this->translations->containsKey($translation->locale)) {
-            $this->translations->set($translation->locale, $translation);
+        if ($this->translations->containsKey($translation->locale)) {
+            return;
         }
+
+        $this->translations->set($translation->locale, $translation);
     }
 
     public function toResponseObject(): FacultyResponseDto

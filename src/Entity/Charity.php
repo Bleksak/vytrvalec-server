@@ -72,9 +72,11 @@ final class Charity extends AbstractEntity
 
     public function addTranslation(CharityTranslation $translation): void
     {
-        if (!$this->translations->containsKey($translation->locale)) {
-            $this->translations->set($translation->locale, $translation);
+        if ($this->translations->containsKey($translation->locale)) {
+            return;
         }
+
+        $this->translations->set($translation->locale, $translation);
     }
 
     public function toResponseObject(?ImagePath $imagePath = null): CharityGetResponseDto
