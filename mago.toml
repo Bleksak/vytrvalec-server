@@ -80,6 +80,7 @@ suspicious-explode-arguments = { enabled = true }
 no-duplicate-match-arm = { enabled = true }
 prefer-datetimeimmutable-create-from-timestamp = { enabled = true }
 redundant-static = { enabled = true }
+too-many-enum-cases = { enabled = false }
 
 [analyzer]
 find-unused-expressions = true
