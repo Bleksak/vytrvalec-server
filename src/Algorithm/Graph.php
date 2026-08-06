@@ -28,7 +28,7 @@ final class Graph
             if (
                 $labels[$node] === self::LABEL_WHITE
                 && isset($graph[$node])
-                && static::dfsCheckCycles($graph, $node, $labels)
+                && self::dfsCheckCycles($graph, $node, $labels)
             ) {
                 return true;
             }

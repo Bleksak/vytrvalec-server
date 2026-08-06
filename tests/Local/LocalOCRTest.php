@@ -18,9 +18,9 @@ final class LocalOCRTest extends KernelTestCase
     {
         self::bootKernel();
 
-        $checker = static::getContainer()->get(SubmissionImageValidityCheckerService::class);
-        $submissionRepository = static::getContainer()->get(SubmissionRepository::class);
-        $seasonRepository = static::getContainer()->get(SeasonRepository::class);
+        $checker = self::getContainer()->get(SubmissionImageValidityCheckerService::class);
+        $submissionRepository = self::getContainer()->get(SubmissionRepository::class);
+        $seasonRepository = self::getContainer()->get(SeasonRepository::class);
 
         $season = $seasonRepository->find(8);
 

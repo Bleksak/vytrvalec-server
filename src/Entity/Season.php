@@ -121,7 +121,7 @@ final class Season extends AbstractEntity
         return $today >= $start && $today <= $end;
     }
 
-    public function addFacultyMapping(FacultyMapping $facultyMapping): static
+    public function addFacultyMapping(FacultyMapping $facultyMapping): self
     {
         if (!$this->facultyMappings->contains($facultyMapping)) {
             $this->facultyMappings->add($facultyMapping);
@@ -131,7 +131,7 @@ final class Season extends AbstractEntity
         return $this;
     }
 
-    public function removeFacultyMapping(FacultyMapping $facultyMapping): static
+    public function removeFacultyMapping(FacultyMapping $facultyMapping): self
     {
         $this->facultyMappings->removeElement($facultyMapping);
 

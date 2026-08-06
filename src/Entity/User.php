@@ -232,7 +232,7 @@ final class User extends AbstractEntity implements
         return $this->token;
     }
 
-    public function setToken(#[SensitiveParameter] ?string $token): static
+    public function setToken(#[SensitiveParameter] ?string $token): self
     {
         $this->token = $token;
 
@@ -255,7 +255,7 @@ final class User extends AbstractEntity implements
     public function setPasswordResetToken(
         #[SensitiveParameter]
         ?string $passwordResetToken,
-    ): static {
+    ): self {
         $this->passwordResetToken = $passwordResetToken;
 
         return $this;
@@ -280,14 +280,14 @@ final class User extends AbstractEntity implements
         return $this->locale;
     }
 
-    public function setLocale(string $locale): static
+    public function setLocale(string $locale): self
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    public function anonymize(): static
+    public function anonymize(): self
     {
         $this->resetEmailUnsubscribeHash();
         $this->anonymize = true;
