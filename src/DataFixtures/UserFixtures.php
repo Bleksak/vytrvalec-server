@@ -6,6 +6,7 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use App\Repository\FacultyRepository;
+use App\Utils\FeatureFlag;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -39,7 +40,22 @@ final class UserFixtures extends Fixture implements DependentFixtureInterface
             'VeryStrongPassword123@!',
         ));
 
+        $user2 = new User(
+            email: 'admin@test.com',
+            firstName: 'Vytrvalec',
+            lastName: 'Administrator',
+            faculty: $faculty,
+            anonymize: false,
+            roles: [FeatureFlag::ROLE_STAFF->value],
+        );
+
+        $user2->setPassword($this->passwordHasher->hashPassword(
+            $user2,
+            'VeryStrongPassword123@!',
+        ));
+
         $manager->persist($user);
+        $manager->persist($user2);
         $manager->flush();
     }
 
