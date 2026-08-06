@@ -7,6 +7,7 @@ namespace App\Controller\ApiResource;
 use App\Action\FacultyActions;
 use App\Dto\Faculty\FacultyCreateDto;
 use App\Dto\Faculty\FacultyUpdateDto;
+use App\Dto\Faculty\Response\FacultyDeleteResponseDto;
 use App\Dto\Faculty\Response\FacultyResponseDto;
 use App\Entity\Faculty;
 use App\Repository\FacultyRepository;
@@ -183,6 +184,13 @@ final class FacultyController extends AbstractController
                 response: Response::HTTP_OK,
                 description: 'Succesfully deleted the given Faculty',
             ),
+            new OA\Response(
+                response: Response::HTTP_BAD_REQUEST,
+                description: 'Faculty cannot be deleted, it has users',
+                content: new OA\JsonContent(
+                    ref: new Model(type: FacultyDeleteResponseDto::class),
+                ),
+            ),
         ],
     )]
     #[Route(
@@ -193,7 +201,12 @@ final class FacultyController extends AbstractController
     #[IsGranted('ROLE_STAFF')]
     public function delete(Faculty $faculty): Response
     {
-        $this->facultyRepository->remove($faculty, true);
+        if (!$this->action->delete($faculty)) {
+            return $this->json(
+                new FacultyDeleteResponseDto(['has_users']),
+                Response::HTTP_BAD_REQUEST,
+            );
+        }
 
         return new Response(status: Response::HTTP_OK);
     }

@@ -54,7 +54,7 @@ final class User extends AbstractEntity implements
     #[ORM\Column(type: 'string', length: 255)]
     public string $lastName;
 
-    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     public Faculty $faculty;
 

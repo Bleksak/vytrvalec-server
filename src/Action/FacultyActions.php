@@ -8,13 +8,17 @@ use App\Dto\Faculty\FacultyCreateDto;
 use App\Dto\Faculty\FacultyUpdateDto;
 use App\Entity\Faculty;
 use App\Entity\FacultyTranslation;
+use App\Repository\FacultyMappingRepository;
 use App\Repository\FacultyRepository;
+use App\Repository\UserRepository;
 use App\Utils\AbstractProperty;
 
 final readonly class FacultyActions
 {
     public function __construct(
         private FacultyRepository $facultyRepository,
+        private UserRepository $userRepository,
+        private FacultyMappingRepository $facultyMappingRepository,
     ) {}
 
     public function create(FacultyCreateDto $dto): int
@@ -79,5 +83,17 @@ final readonly class FacultyActions
         $this->facultyRepository->save($faculty, true);
 
         return [];
+    }
+
+    public function delete(Faculty $faculty): bool
+    {
+        if ($this->userRepository->countByFaculty($faculty) !== 0) {
+            return false;
+        }
+
+        $this->facultyMappingRepository->removeByFaculty($faculty);
+        $this->facultyRepository->remove($faculty, true);
+
+        return true;
     }
 }

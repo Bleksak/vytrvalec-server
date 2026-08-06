@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Dto\Statistics\UserCountGroupedByFacultyTotal;
 use App\Dto\UserCountByFacultyStatistics;
+use App\Entity\Faculty;
 use App\Entity\Season;
 use App\Entity\Submission;
 use App\Entity\User;
@@ -41,6 +42,20 @@ final class UserRepository extends AbstractRepository implements
         $user->setPassword($newHashedPassword);
 
         $this->save($user, true);
+    }
+
+    public function countByFaculty(Faculty $faculty): int
+    {
+        $qb = $this->createQueryBuilder('u');
+
+        return \intval(
+            $qb
+                ->select($qb->expr()->count('u.id'))
+                ->where('u.faculty = :faculty')
+                ->setParameter('faculty', $faculty->id)
+                ->getQuery()
+                ->getSingleScalarResult(),
+        );
     }
 
     public function countUserGroupedByFaculties(Season $season): UserCountGroupedByFacultyTotal

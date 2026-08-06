@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Faculty;
 use App\Entity\FacultyMapping;
 use App\Entity\Season;
 use Doctrine\Persistence\ManagerRegistry;
@@ -72,6 +73,25 @@ final class FacultyMappingRepository extends AbstractRepository
         }
 
         return $result;
+    }
+
+    public function removeByFaculty(Faculty $faculty, bool $flush = false): void
+    {
+        $qb = $this->createQueryBuilder('fm');
+
+        $qb
+            ->delete()
+            ->where($qb->expr()->orX(
+                'fm.faculty = :faculty',
+                'fm.parent = :faculty',
+            ))
+            ->setParameter('faculty', $faculty->id)
+            ->getQuery()
+            ->execute();
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 
     public function removeBySeason(Season $season, bool $flush = false): void
