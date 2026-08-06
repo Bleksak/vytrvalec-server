@@ -26,7 +26,7 @@ final class UserEditDto
     public ?int $facultyId = null;
 
     #[OA\Property]
-    #[Assert\NotBlank]
+    #[Assert\NotNull]
     public ?bool $banned = null;
 
     /**
