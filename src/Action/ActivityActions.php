@@ -71,7 +71,7 @@ final readonly class ActivityActions
 
     public function delete(Activity $activity): bool
     {
-        if ($this->activityRepository->submissionsCount($activity) === 0) {
+        if ($this->activityRepository->submissionsCount($activity) !== 0) {
             return false;
         }
 
