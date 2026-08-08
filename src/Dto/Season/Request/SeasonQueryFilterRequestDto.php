@@ -61,21 +61,21 @@ final readonly class SeasonQueryFilterRequestDto
 
         if ($this->user !== null) {
             $criteria->andWhere(Criteria::expr()->contains(
-                SeasonQueryFilterType::User->value,
+                'u.email',
                 $this->user,
             ));
         }
 
         if ($this->faculty !== null) {
-            $criteria->andWhere(Criteria::expr()->contains(
-                SeasonQueryFilterType::Faculty->value,
+            $criteria->andWhere(Criteria::expr()->eq(
+                'u.faculty',
                 $this->faculty,
             ));
         }
 
         if ($this->activity !== null) {
-            $criteria->andWhere(Criteria::expr()->contains(
-                SeasonQueryFilterType::Activity->value,
+            $criteria->andWhere(Criteria::expr()->eq(
+                's.activity',
                 $this->activity,
             ));
         }
